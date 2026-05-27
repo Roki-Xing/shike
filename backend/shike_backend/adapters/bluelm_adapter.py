@@ -87,6 +87,8 @@ class BlueLMModelAdapter:
 
         request_id = str(uuid.uuid4())
         session_id = str(uuid.uuid4())
+        # Doc center requires requestId as a query param. Empirically both `requestId` and
+        # `request_id` are accepted, but we follow the doc spelling.
         params = {"requestId": request_id}
 
         user_prompt = self._user_template.format(
@@ -100,15 +102,31 @@ class BlueLMModelAdapter:
             schema_json=json.dumps(self._schema, ensure_ascii=False),
         )
 
-        payload = {
+        payload: dict[str, Any] = {
             "messages": [
                 {"role": "system", "content": self._system_prompt},
                 {"role": "user", "content": user_prompt},
             ],
             "model": self._model,
+            # These fields are tolerated by the OpenAI-compatible endpoint, and may be required
+            # by legacy endpoints. Keep them to reduce friction when switching URIs.
             "sessionId": session_id,
             "extra": {"temperature": self._temperature},
+            # Reduce “helpful formatting”: when supported, this makes the model emit raw JSON
+            # without ``` fences. Unknown fields are typically ignored, but if a given model
+            # rejects it we'll fall back to parsing anyway.
+            "response_format": {"type": "json_object"},
+            "stream": False,
+            "temperature": self._temperature,
         }
+
+        # "Deep thinking" flags differ by model (per doc center).
+        # Keep defaults conservative: we don't need deep reasoning for schema filling.
+        model_name = (self._model or "").lower()
+        if "qwen" in model_name:
+            payload["enable_thinking"] = False
+        else:
+            payload["thinking"] = {"type": "disabled"}
 
         # AIGC doc "鉴权方式" uses Bearer AppKey (not gateway signature headers).
         # Keep headers minimal and never log/return secrets.
@@ -144,12 +162,29 @@ class BlueLMModelAdapter:
                 last_error = "invalid_json_response"
                 continue
 
-            # Provider returns {code,msg,data}. code==0 indicates success.
+            content: str | None = None
+
+            # Endpoint A (legacy): {code,msg,data:{content:"..."}} with code==0 on success.
             if isinstance(obj, dict) and obj.get("code") == 0 and isinstance(obj.get("data"), dict):
-                content = obj["data"].get("content", "")
-            else:
+                content = str(obj["data"].get("content", "") or "")
+
+            # Endpoint B (OpenAI-compatible): {choices:[{message:{content:"..."}}]} on success,
+            # or {error:{code,message}} on failure.
+            if content is None and isinstance(obj, dict) and isinstance(obj.get("choices"), list):
+                try:
+                    content = str(obj["choices"][0]["message"]["content"])
+                except Exception:
+                    content = None
+
+            if content is None:
                 # Provider-specific error; keep it generic to avoid leaking sensitive details.
-                msg = obj.get("msg") if isinstance(obj, dict) else None
+                msg: str | None = None
+                if isinstance(obj, dict):
+                    if isinstance(obj.get("msg"), str):
+                        msg = obj["msg"]
+                    elif isinstance(obj.get("error"), dict) and isinstance(obj["error"].get("message"), str):
+                        msg = obj["error"]["message"]
+
                 if isinstance(msg, str) and "permission" in msg.lower():
                     last_error = "provider_permission_denied"
                 else:

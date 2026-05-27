@@ -64,8 +64,11 @@ class Settings:
         # Defaults follow common community examples; they can be overridden at runtime.
         # NOTE: The exact API surface is subject to official vivo documentation and may change.
         bluelm_base_url = _env("BLUELM_BASE_URL", "https://api-ai.vivo.com.cn") or "https://api-ai.vivo.com.cn"
-        bluelm_uri = _env("BLUELM_URI", "/vivogpt/completions") or "/vivogpt/completions"
-        bluelm_model = _env("BLUELM_MODEL", "vivo-BlueLM-TB-Pro") or "vivo-BlueLM-TB-Pro"
+        # The contest doc center currently recommends OpenAI-compatible `/v1/chat/completions`.
+        # Keep env override to allow older `/vivogpt/completions` if the key has that permission.
+        bluelm_uri = _env("BLUELM_URI", "/v1/chat/completions") or "/v1/chat/completions"
+        # Default to a model name shown in doc center and observed to be accessible for contest keys.
+        bluelm_model = _env("BLUELM_MODEL", "Volc-DeepSeek-V3.2") or "Volc-DeepSeek-V3.2"
 
         bluelm_timeout_seconds = _env_int("BLUELM_TIMEOUT_SECONDS", 12)
         bluelm_max_retries = _env_int("BLUELM_MAX_RETRIES", 1)

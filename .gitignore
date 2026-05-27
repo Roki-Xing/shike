@@ -28,3 +28,5 @@ android-mvp/**/build/
 *.sqlite3
 *.log
 
+# Spike outputs are local evidence; don't commit them.
+spike/logs/
