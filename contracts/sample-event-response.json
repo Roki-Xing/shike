@@ -1,0 +1,29 @@
+{
+  "scene_type": "event_poster",
+  "confidence": 0.91,
+  "title": "AI应用分享会",
+  "time": {
+    "start_text": "4月24日19:30",
+    "deadline_text": "今晚22:00",
+    "normalized_start": "2026-04-24T19:30:00+08:00",
+    "normalized_deadline": "2026-04-24T22:00:00+08:00"
+  },
+  "location": {
+    "raw": "图书馆报告厅",
+    "map_query": "图书馆报告厅",
+    "confidence": 0.88
+  },
+  "task": {
+    "summary": "报名并前往AI应用分享会",
+    "priority": "high",
+    "topic": "event"
+  },
+  "suggested_actions": [
+    {"type": "calendar", "label": "加入活动日历", "requires_permission": true},
+    {"type": "reminder", "label": "报名截止前提醒", "requires_permission": true},
+    {"type": "map", "label": "打开活动地点", "requires_permission": false}
+  ],
+  "missing_fields": ["registration_url"],
+  "explanation": "海报包含活动主题、时间、地点和报名截止，适合生成活动行动卡。"
+}
+

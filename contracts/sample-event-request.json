@@ -1,0 +1,9 @@
+{
+  "input_id": "sample-event-001",
+  "source_type": "camera",
+  "ocr_text": "AI应用分享会 4月24日19:30 图书馆报告厅 报名截止今晚22:00 主办：校科协",
+  "locale": "zh-CN",
+  "scene_hint": "event_poster",
+  "user_timezone": "Asia/Shanghai"
+}
+

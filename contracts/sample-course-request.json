@@ -1,0 +1,9 @@
+{
+  "input_id": "sample-course-001",
+  "source_type": "screenshot",
+  "ocr_text": "高数A班今晚18:30改到B203，上课前请提前到新教室。作业第5章今晚22:00前提交。",
+  "locale": "zh-CN",
+  "scene_hint": "course_notice",
+  "user_timezone": "Asia/Shanghai"
+}
+

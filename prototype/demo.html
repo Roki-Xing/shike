@@ -1,0 +1,421 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>拾刻 Demo 控制台</title>
+  <link rel="icon" href="data:," />
+  <style>
+    :root {
+      --ink: #101828;
+      --muted: #667085;
+      --line: #e3ebe9;
+      --bg: #eef6f4;
+      --brand: #0f766e;
+      --brand-strong: #0b635d;
+      --brand-soft: #ddf4ee;
+      --orange: #f97316;
+      --orange-soft: #fff0e5;
+      --blue: #2563eb;
+      --blue-soft: #eaf1ff;
+      --panel: #fff;
+      --screen: #f7fbfa;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background:
+        linear-gradient(180deg, #f8fcfb 0%, var(--bg) 58%, #dfeeed 100%);
+      color: var(--ink);
+      font-family: Inter, "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+    }
+
+    main {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 28px 20px 36px;
+      display: grid;
+      grid-template-columns: minmax(320px, 390px) 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+    main > * { min-width: 0; }
+
+    .phone {
+      width: 372px;
+      min-height: 764px;
+      border: 10px solid #0d1117;
+      border-radius: 46px;
+      background: var(--screen);
+      overflow: hidden;
+      position: relative;
+      box-shadow:
+        0 26px 54px rgba(15, 23, 42, .22),
+        inset 0 0 0 1px rgba(255, 255, 255, .32);
+    }
+
+    .phone:before {
+      content: "";
+      position: absolute;
+      z-index: 3;
+      top: 12px;
+      left: 50%;
+      width: 13px;
+      height: 13px;
+      border-radius: 999px;
+      background: #070b10;
+      transform: translateX(-50%);
+      box-shadow: inset 0 0 0 2px #17202a;
+    }
+
+    .phone:after {
+      content: "";
+      position: absolute;
+      inset: 4px;
+      pointer-events: none;
+      border-radius: 36px;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .42);
+    }
+
+    .status, .top, .date, .nav, .card-head, .card-actions, .summary-head, .inbox-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .status {
+      height: 35px;
+      padding: 0 20px;
+      font-size: 12px;
+      font-weight: 800;
+      background: rgba(255, 255, 255, .9);
+    }
+    .status span:nth-child(2) { color: transparent; }
+    .screen { padding: 12px 14px 13px; }
+    .top {
+      display: grid;
+      grid-template-columns: 1fr 1.15fr 1fr;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .brand { color: var(--brand); font-size: 23px; font-weight: 900; letter-spacing: 0; }
+    .title { text-align: center; font-size: 17px; font-weight: 900; }
+    .bell {
+      justify-self: end;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: #fff;
+      border: 1px solid var(--line);
+      color: #344054;
+      position: relative;
+      font-size: 13px;
+      font-weight: 900;
+    }
+    .bell:after {
+      content: "";
+      position: absolute;
+      right: 7px;
+      top: 7px;
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #ef4444;
+    }
+    .date {
+      gap: 10px;
+      margin-bottom: 11px;
+      color: #344054;
+    }
+    .date-left { display: flex; align-items: center; gap: 8px; min-width: 0; }
+    .date-icon {
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      border-radius: 999px;
+      background: var(--brand-soft);
+      color: var(--brand);
+      font-size: 13px;
+      font-weight: 900;
+    }
+    .date-copy { flex: 1; min-width: 0; }
+    .date-main { font-size: 12px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .date-sub { margin-top: 2px; font-size: 11px; color: #98a2b3; }
+    .chip {
+      border-radius: 999px;
+      padding: 7px 10px;
+      font-size: 11px;
+      font-weight: 800;
+      background: #fff;
+      border: 1px solid var(--line);
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      padding: 12px;
+      margin-bottom: 9px;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, .055);
+    }
+
+    .action-card { padding-bottom: 10px; }
+    .card-head { gap: 10px; align-items: flex-start; }
+    .card-body { flex: 1; min-width: 0; }
+    .icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+      flex: 0 0 auto;
+      font-size: 16px;
+    }
+    .green { background: var(--brand-soft); color: var(--brand); }
+    .orange { background: var(--orange-soft); color: var(--orange); }
+    .blue { background: var(--blue-soft); color: var(--blue); }
+    .card h2 { margin: 0; font-size: 15px; line-height: 1.3; letter-spacing: 0; }
+    .meta-line {
+      margin-top: 6px;
+      color: #667085;
+      display: grid;
+      gap: 3px;
+      font-size: 11px;
+      line-height: 1.4;
+    }
+    .meta-line span { display: flex; align-items: center; gap: 6px; min-width: 0; }
+    .pill {
+      border-radius: 999px;
+      padding: 6px 9px;
+      font-size: 11px;
+      font-weight: 850;
+      white-space: nowrap;
+      flex: 0 0 auto;
+    }
+    .card-actions {
+      margin-top: 10px;
+      padding-top: 9px;
+      border-top: 1px solid #edf2f1;
+      gap: 8px;
+      font-size: 12px;
+    }
+    .action-note {
+      min-width: 0;
+      color: var(--muted);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .action-link { color: var(--brand); font-weight: 850; white-space: nowrap; }
+    .action-link.orange { color: var(--orange); }
+    .action-link.blue { color: var(--blue); }
+    .cta {
+      margin: 10px 0 9px;
+      padding: 15px;
+      border-radius: 11px;
+      background: linear-gradient(180deg, #149384, var(--brand-strong));
+      color: #fff;
+      text-align: center;
+      box-shadow: 0 14px 24px rgba(15, 118, 110, .22);
+    }
+    .cta strong { display: block; font-size: 16px; margin-bottom: 5px; letter-spacing: 0; }
+    .cta span { font-size: 12px; opacity: .9; }
+    .summary-card { padding: 12px 13px; }
+    .summary-head { margin-bottom: 9px; font-size: 13px; font-weight: 900; }
+    .summary-more { color: var(--muted); font-size: 11px; font-weight: 800; }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      text-align: center;
+      gap: 0;
+    }
+    .summary-grid > div + div { border-left: 1px solid #edf2f1; }
+    .summary-num { font-size: 19px; font-weight: 900; line-height: 1; }
+    .summary-label { margin-top: 5px; color: var(--muted); font-size: 11px; }
+    .inbox-card { padding: 12px 13px; }
+    .inbox-list { display: grid; gap: 8px; }
+    .inbox-row { gap: 8px; font-size: 12px; }
+    .inbox-main { min-width: 0; color: #344054; font-weight: 750; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .inbox-meta { color: var(--muted); font-size: 11px; white-space: nowrap; }
+    .inbox-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--brand);
+      flex: 0 0 auto;
+    }
+    .inbox-dot.orange { background: var(--orange); }
+    .inbox-dot.blue { background: var(--blue); }
+    .nav {
+      margin-top: 1px;
+      padding: 8px 6px 9px;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 3px;
+    }
+    .nav-cell { text-align: center; color: var(--muted); font-size: 10px; font-weight: 800; }
+    .nav-icon {
+      width: 27px;
+      height: 27px;
+      margin: 0 auto 4px;
+      display: grid;
+      place-items: center;
+      border-radius: 999px;
+      background: #f2f4f7;
+      color: #667085;
+      font-size: 12px;
+    }
+    .nav-cell.active { color: var(--brand); }
+    .nav-cell.active .nav-icon { background: var(--brand-soft); color: var(--brand); }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 18px;
+      margin-bottom: 14px;
+    }
+
+    h1 { margin: 0 0 8px; font-size: 30px; }
+    h3 { margin: 0 0 12px; font-size: 17px; }
+    .lead { margin: 0 0 18px; color: var(--muted); line-height: 1.65; }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .metric { padding: 12px; border: 1px solid var(--line); border-radius: 12px; background: #fbfdfc; }
+    .metric strong { display: block; font-size: 20px; color: var(--brand); }
+    .metric span { color: var(--muted); font-size: 12px; }
+    .note { margin: 10px 0 0; color: var(--muted); font-size: 12px; line-height: 1.6; }
+    ol { margin: 0; padding-left: 20px; color: #344054; line-height: 1.75; }
+    code { background: #f2f4f7; border-radius: 6px; padding: 2px 5px; }
+    .cmd { display: block; padding: 10px; border-radius: 10px; background: #101828; color: #fff; overflow-x: auto; }
+    @media (max-width: 860px) {
+      main { display: block; padding-inline: 16px; }
+      .phone { margin: 0 auto; width: min(372px, calc(100vw - 32px)); border-width: 8px; }
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="phone" aria-label="拾刻手机演示">
+      <div class="status"><span>10:28</span><span>拾刻</span><span>100%</span></div>
+      <div class="screen">
+        <div class="top"><span class="brand">拾刻</span><span class="title">今日行动台</span><span class="bell">铃</span></div>
+        <div class="date">
+          <div class="date-left">
+            <span class="date-icon">日</span>
+            <div class="date-copy"><div class="date-main">5月24日 星期五 农历四月十七</div><div class="date-sub">按截止时间和地点自动排序</div></div>
+          </div>
+          <span class="chip">全部日程</span>
+        </div>
+
+        <article class="card action-card">
+          <div class="card-head">
+            <span class="icon green">书</span>
+            <div class="card-body">
+              <h2>高数A班教室变更</h2>
+              <div class="meta-line"><span>◎ 今天 18:30</span><span>⌖ B203 · 第二教学楼</span></div>
+            </div>
+            <span class="pill green">已安排</span>
+          </div>
+          <div class="card-actions"><span class="action-note">由教务处通知 · 确认后可写入日历</span><span class="action-link">查看路线</span></div>
+        </article>
+
+        <article class="card action-card">
+          <div class="card-head">
+            <span class="icon orange">喇</span>
+            <div class="card-body">
+              <h2>AI应用分享会报名截止</h2>
+              <div class="meta-line"><span>◎ 今晚 22:00</span><span>⌖ 图书馆报告厅</span></div>
+            </div>
+            <span class="pill orange">即将截止</span>
+          </div>
+          <div class="card-actions"><span class="action-note">距截止 11小时32分钟</span><span class="action-link orange">去报名</span></div>
+        </article>
+
+        <article class="card action-card">
+          <div class="card-head">
+            <span class="icon blue">卡</span>
+            <div class="card-body">
+              <h2>行动卡：查看路线并提交作业</h2>
+              <div class="meta-line"><span>☑ 查看图书馆到 B203 的路线</span><span>☑ 提交《高数作业 3》至学习通</span></div>
+            </div>
+            <span class="pill blue">待确认</span>
+          </div>
+          <div class="card-actions"><span class="action-note">来源：学习通任务</span><span class="action-link blue">查看详情</span></div>
+        </article>
+
+        <div class="cta"><strong>确认后安排</strong><span>确认后写入日历，并在适当时间提醒你</span></div>
+
+        <section class="card summary-card" aria-label="今日概要">
+          <div class="summary-head"><span>今日概要</span><span class="summary-more">更多</span></div>
+          <div class="summary-grid">
+            <div><div class="summary-num" style="color: var(--brand);">3</div><div class="summary-label">待办事项</div></div>
+            <div><div class="summary-num" style="color: var(--orange);">1</div><div class="summary-label">即将截止</div></div>
+            <div><div class="summary-num" style="color: var(--blue);">2</div><div class="summary-label">地点需前往</div></div>
+          </div>
+        </section>
+
+        <section class="card inbox-card" aria-label="近期提醒与收件箱">
+          <div class="summary-head"><span>近期提醒 · 收件箱</span><span class="summary-more">全部</span></div>
+          <div class="inbox-list">
+            <div class="inbox-row"><span class="inbox-dot blue"></span><span class="inbox-main">明天 09:00 产品设计课小组讨论</span><span class="inbox-meta">企业微信</span></div>
+            <div class="inbox-row"><span class="inbox-dot orange"></span><span class="inbox-main">5月25日 14:00 图书馆座位预约开始</span><span class="inbox-meta">图书馆系统</span></div>
+          </div>
+        </section>
+
+        <nav class="nav card" aria-label="原型底部导航">
+          <div class="nav-cell"><div class="nav-icon">⌂</div>首页</div>
+          <div class="nav-cell active"><div class="nav-icon">日</div>今日</div>
+          <div class="nav-cell"><div class="nav-icon">计</div>计划</div>
+          <div class="nav-cell"><div class="nav-icon">讯</div>消息</div>
+          <div class="nav-cell"><div class="nav-icon">我</div>我的</div>
+        </nav>
+      </div>
+    </section>
+
+    <section>
+      <div class="panel">
+        <h1>拾刻 Demo 控制台</h1>
+	        <p class="lead">一个可直接打开的演示入口：左侧展示核心首页，右侧给出 3 分钟讲解路径、验收指标和交付包核对命令；完整七页原型入口为 <code>prototype/index.html</code>。</p>
+	        <div class="grid">
+	          <div class="metric"><strong>22/22</strong><span>REAL_WORLD_READY_METRIC</span></div>
+	          <div class="metric"><strong>16/16</strong><span>DEMO_ACCEPTANCE_METRIC</span></div>
+		          <div class="metric"><strong>31/31</strong><span>ANDROID_STRUCTURE_METRIC</span></div>
+	          <div class="metric"><strong>61/61</strong><span>ANDROID_UNIT_TEST_METRIC</span></div>
+	          <div class="metric"><strong>APK</strong><span>可安装 Debug 包</span></div>
+	        </div>
+	        <p class="note">指标来自下方命令输出；录屏前请重新运行验收，避免静态展示替代真实日志。</p>
+      </div>
+
+      <div class="panel">
+        <h3>3 分钟演示路线</h3>
+        <ol>
+          <li>打开今日行动台，说明拾刻不是聊天首页，而是行动首页。</li>
+	          <li>走课程截图链路：选择截图、编辑 OCR 文本草稿、后端解析课程、确认修正、加日历。</li>
+	          <li>走活动拍照链路：拍照导入、后端解析活动、确认修正、提醒和地图。</li>
+	          <li>展示后端失败回退到 <code>MockModelAdapter</code>，再展示重启恢复。</li>
+	          <li>扫过交付物自检中心、风险与缺失字段和 <code>06-delivery-readiness.mp4</code>，说明可交付状态。</li>
+        </ol>
+      </div>
+
+      <div class="panel">
+	        <h3>验收命令</h3>
+		        <code class="cmd">python3 shike/validation/validate_android_structure.py</code><br />
+		        <code class="cmd">python3 shike/validation/validate_android_unit_tests.py</code><br />
+		        <code class="cmd">python3 shike/validation/validate_action_execution.py</code><br />
+		        <code class="cmd">python3 shike/validation/validate_demo_acceptance.py</code><br />
+		        <code class="cmd">python3 shike/validation/validate_real_world_ready.py</code><br />
+	        <code class="cmd">python3 shike/scripts/verify_core20_package.py "/path/to/拾刻_核心20文件交付包_20260505"</code>
+	      </div>
+    </section>
+  </main>
+</body>
+</html>

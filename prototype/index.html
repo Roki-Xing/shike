@@ -1,0 +1,1212 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>拾刻原型</title>
+  <link rel="icon" href="data:," />
+  <style>
+    :root {
+      --ink: #17202a;
+      --muted: #667085;
+      --line: #e3eaf0;
+      --panel: #ffffff;
+      --bg: #eef6f4;
+      --brand: #0f766e;
+      --brand-strong: #0b635d;
+      --brand-soft: #ddf4ee;
+      --surface: #f6f8fa;
+      --surface-2: #f2f4f7;
+      --warn: #f97316;
+      --warn-soft: #fff0e5;
+      --danger: #b42318;
+      --blue: #2563eb;
+      --blue-soft: #eaf1ff;
+      --screen: #f7fbfa;
+      --shadow: 0 16px 36px rgba(15, 23, 42, 0.16);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: linear-gradient(180deg, #f8fcfb 0%, var(--bg) 56%, #dfeeed 100%);
+      font-family: Inter, "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+      gap: 22px;
+      padding: 28px 24px 36px;
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    .phone {
+      width: 352px;
+      min-height: 720px;
+      margin: 0 auto;
+      background: #f8fafc;
+      border: 12px solid #111827;
+      border-radius: 42px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .status {
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+      font-size: 12px;
+      color: #111827;
+      background: rgba(255, 255, 255, 0.88);
+    }
+
+    .screen {
+      padding: 16px;
+    }
+
+    .titlebar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .titlebar h2 {
+      font-size: 22px;
+      margin: 0;
+      letter-spacing: 0;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 28px;
+      padding: 0 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      background: var(--brand-soft);
+      color: var(--brand);
+      border: 1px solid #a7e8dc;
+      white-space: nowrap;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 12px;
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05);
+    }
+
+    .card h3 {
+      margin: 0 0 8px;
+      font-size: 16px;
+      letter-spacing: 0;
+    }
+
+    .muted {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .btns {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    button, .btn {
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      border-radius: 8px;
+      min-height: 38px;
+      padding: 8px 10px;
+      font-weight: 650;
+      font-size: 13px;
+      cursor: default;
+    }
+
+    .primary {
+      background: var(--brand);
+      color: white;
+      border-color: var(--brand);
+    }
+
+    .field {
+      display: grid;
+      grid-template-columns: 74px 1fr;
+      gap: 10px;
+      padding: 9px 0;
+      border-bottom: 1px solid #edf1f6;
+      font-size: 13px;
+    }
+
+    .field:last-child { border-bottom: 0; }
+    .label { color: var(--muted); }
+    .value { font-weight: 650; }
+
+    .confidence {
+      height: 8px;
+      background: #e5e7eb;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .confidence span {
+      display: block;
+      height: 100%;
+      width: 91%;
+      background: var(--brand);
+    }
+
+    .camera {
+      height: 300px;
+      border-radius: 14px;
+      background:
+        linear-gradient(135deg, rgba(15, 118, 110, 0.22), rgba(37, 99, 235, 0.18)),
+        repeating-linear-gradient(0deg, #26313d 0 34px, #2c3846 34px 68px);
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+
+    .scanbox {
+      position: absolute;
+      left: 38px;
+      right: 38px;
+      top: 58px;
+      height: 174px;
+      border: 2px solid #d9f4ee;
+      border-radius: 14px;
+      box-shadow: 0 0 0 999px rgba(0, 0, 0, 0.22);
+    }
+
+    .bottom-sheet {
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      bottom: 16px;
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      border-radius: 14px;
+      padding: 12px;
+    }
+
+    .screenshot-preview {
+      height: 150px;
+      border-radius: 10px;
+      background:
+        linear-gradient(180deg, #f8fafc, #e2e8f0);
+      border: 1px solid var(--line);
+      padding: 12px;
+      font-size: 13px;
+      line-height: 1.55;
+      color: #334155;
+      margin-bottom: 12px;
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 12px;
+      background: #fff;
+    }
+
+    .tabs div {
+      text-align: center;
+      padding: 9px 2px;
+      font-size: 12px;
+      color: var(--muted);
+      border-right: 1px solid var(--line);
+    }
+
+    .tabs div:last-child { border-right: 0; }
+    .tabs .active { background: var(--brand-soft); color: var(--brand); font-weight: 700; }
+
+    .danger { color: var(--danger); }
+    .warn { color: var(--warn); }
+    .blue { color: var(--blue); }
+
+    .toggle {
+      width: 46px;
+      height: 26px;
+      border-radius: 999px;
+      background: var(--brand);
+      position: relative;
+      flex: 0 0 auto;
+    }
+
+    .toggle:after {
+      content: "";
+      position: absolute;
+      right: 3px;
+      top: 3px;
+      width: 20px;
+      height: 20px;
+      background: white;
+      border-radius: 50%;
+    }
+
+    .caption {
+      text-align: center;
+      font-size: 14px;
+      font-weight: 750;
+      margin-top: 10px;
+      color: #243447;
+    }
+
+    .phone-home {
+      min-height: 764px;
+      background: var(--screen);
+      border-color: #0d1117;
+      border-width: 10px;
+      border-radius: 46px;
+      box-shadow:
+        0 26px 54px rgba(15, 23, 42, 0.22),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.32);
+    }
+
+    .phone-home:before {
+      content: "";
+      position: absolute;
+      z-index: 3;
+      top: 12px;
+      left: 50%;
+      width: 13px;
+      height: 13px;
+      border-radius: 999px;
+      background: #070b10;
+      transform: translateX(-50%);
+      box-shadow: inset 0 0 0 2px #17202a;
+    }
+
+    .phone-home:after {
+      content: "";
+      position: absolute;
+      inset: 4px;
+      pointer-events: none;
+      border-radius: 36px;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.42);
+    }
+
+    .home-status {
+      height: 35px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      font-size: 12px;
+      font-weight: 800;
+      color: #101828;
+      background: rgba(255, 255, 255, 0.9);
+    }
+
+    .home-status span:nth-child(2) { color: transparent; }
+
+    .home-screen {
+      padding: 12px 14px 13px;
+    }
+
+    .home-topbar {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .home-brand {
+      color: var(--brand);
+      font-size: 23px;
+      font-weight: 900;
+      letter-spacing: 0;
+    }
+
+    .home-title {
+      text-align: center;
+      font-size: 17px;
+      font-weight: 900;
+      color: #101828;
+      letter-spacing: 0;
+    }
+
+    .home-bell {
+      justify-self: end;
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      color: #344054;
+      font-size: 13px;
+      font-weight: 900;
+      position: relative;
+    }
+
+    .home-bell:after {
+      content: "";
+      position: absolute;
+      right: 7px;
+      top: 7px;
+      width: 7px;
+      height: 7px;
+      background: #ef4444;
+      border-radius: 999px;
+    }
+
+    .icon {
+      width: 16px;
+      height: 16px;
+      display: inline-block;
+      flex: 0 0 auto;
+      color: currentColor;
+    }
+
+    .icon.sm {
+      width: 14px;
+      height: 14px;
+    }
+
+    .icon.lg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .icon.stroke {
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .home-date {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 11px;
+    }
+
+    .date-left {
+      display: flex;
+      gap: 9px;
+      align-items: center;
+      min-width: 0;
+    }
+
+    .date-icon {
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      border-radius: 999px;
+      background: var(--brand-soft);
+      color: var(--brand);
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .date-icon svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .date-copy {
+      min-width: 0;
+    }
+
+    .date-main {
+      font-size: 12px;
+      font-weight: 800;
+      color: #344054;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .ghost-pill {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      padding: 6px 10px;
+      color: #667085;
+      font-size: 11px;
+      font-weight: 800;
+      white-space: nowrap;
+      display: inline-flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .agenda-card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      padding: 12px;
+      margin-bottom: 9px;
+      box-shadow:
+        0 10px 22px rgba(15, 23, 42, 0.06),
+        inset 0 1px 0 rgba(255, 255, 255, 0.65);
+    }
+
+    .agenda-head {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .agenda-icon {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      border-radius: 999px;
+      color: inherit;
+    }
+
+    .agenda-icon svg {
+      width: 20px;
+      height: 20px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .agenda-icon.green { background: var(--brand-soft); color: var(--brand); }
+    .agenda-icon.orange { background: var(--warn-soft); color: var(--warn); }
+    .agenda-icon.blue { background: var(--blue-soft); color: var(--blue); }
+
+    .agenda-body {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .agenda-title {
+      margin: 0;
+      color: #101828;
+      font-size: 16px;
+      line-height: 1.28;
+      font-weight: 900;
+      letter-spacing: 0;
+    }
+
+    .agenda-lines {
+      display: grid;
+      gap: 3px;
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.4;
+    }
+
+    .agenda-lines span {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .agenda-lines .meta-icon {
+      width: 14px;
+      height: 14px;
+      display: inline-grid;
+      place-items: center;
+      flex: 0 0 auto;
+      color: #475467;
+    }
+
+    .agenda-lines .meta-icon svg {
+      width: 14px;
+      height: 14px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .status-pill {
+      border-radius: 999px;
+      padding: 6px 9px;
+      font-size: 11px;
+      font-weight: 850;
+      white-space: nowrap;
+    }
+
+    .status-pill.green { background: var(--brand-soft); color: var(--brand); }
+    .status-pill.orange { background: var(--warn-soft); color: var(--warn); }
+    .status-pill.blue { background: var(--blue-soft); color: var(--blue); }
+
+    .agenda-foot {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+      border-top: 1px solid #eaf0f4;
+      padding-top: 9px;
+      margin-top: 10px;
+    }
+
+    .foot-chip {
+      min-width: 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: #475467;
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: var(--surface-2);
+      border: 1px solid #eaecf0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .foot-link {
+      color: var(--brand);
+      font-size: 12px;
+      font-weight: 850;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .foot-link.orange { color: var(--warn); }
+    .foot-link.blue { color: var(--blue); }
+
+    .progress {
+      height: 8px;
+      border-radius: 999px;
+      background: #eaecf0;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .progress > span {
+      display: block;
+      height: 100%;
+      width: 78%;
+      background: #f97316;
+      border-radius: 999px;
+    }
+
+    .home-cta {
+      padding: 15px;
+      margin: 10px 0 9px;
+      border-radius: 11px;
+      color: #fff;
+      text-align: center;
+      background: linear-gradient(180deg, #2c8f8a, #1d7475);
+      box-shadow: 0 18px 26px rgba(15, 118, 110, 0.20);
+    }
+
+    .home-cta strong {
+      display: block;
+      font-size: 16px;
+      margin-bottom: 5px;
+      letter-spacing: 0;
+    }
+
+    .home-cta span {
+      display: block;
+      color: rgba(255, 255, 255, 0.86);
+      font-size: 12px;
+    }
+
+    .summary-panel {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      padding: 12px 13px;
+      margin-bottom: 9px;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.04);
+    }
+
+    .summary-head {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 9px;
+      color: #101828;
+      font-weight: 900;
+      font-size: 13px;
+    }
+
+    .summary-more {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+      text-align: center;
+    }
+
+    .summary-grid > div + div {
+      border-left: 1px solid #edf2f1;
+    }
+
+    .summary-num {
+      font-size: 19px;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .summary-label {
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .inbox-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .inbox-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 12px;
+    }
+
+    .inbox-main {
+      min-width: 0;
+      color: #344054;
+      font-weight: 750;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .inbox-meta {
+      color: var(--muted);
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    .inbox-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--brand);
+      flex: 0 0 auto;
+    }
+
+    .inbox-dot.orange { background: var(--warn); }
+    .inbox-dot.blue { background: var(--blue); }
+
+    .home-nav {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 4px;
+      align-items: center;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 8px 6px 9px;
+    }
+
+    .nav-cell {
+      text-align: center;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    .nav-icon {
+      width: 27px;
+      height: 27px;
+      margin: 0 auto 4px;
+      display: grid;
+      place-items: center;
+      border-radius: 999px;
+      background: #f2f4f7;
+      font-size: 12px;
+      font-weight: 900;
+      color: #667085;
+    }
+
+    .nav-cell.active {
+      color: var(--brand);
+    }
+
+    .nav-cell.active .nav-icon {
+      background: var(--brand-soft);
+      color: var(--brand);
+    }
+
+    .readiness-list {
+      display: grid;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .readiness-row {
+      display: grid;
+      grid-template-columns: 10px 62px 1fr;
+      gap: 8px;
+      align-items: center;
+      font-size: 12px;
+      color: #101828;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--brand);
+    }
+
+    .dot.orange { background: var(--warn); }
+    .dot.blue { background: var(--blue); }
+
+    .readiness-label {
+      color: #344054;
+      font-weight: 800;
+    }
+
+    .demo-route {
+      display: grid;
+      gap: 9px;
+      margin-top: 10px;
+    }
+
+    .demo-step {
+      display: grid;
+      grid-template-columns: 24px 1fr;
+      gap: 9px;
+      align-items: start;
+      font-size: 12px;
+    }
+
+    .step-index {
+      width: 24px;
+      height: 24px;
+      display: grid;
+      place-items: center;
+      border-radius: 999px;
+      background: var(--brand-soft);
+      color: var(--brand);
+      font-weight: 850;
+    }
+
+    .step-title {
+      color: #101828;
+      font-weight: 850;
+      margin-bottom: 2px;
+    }
+
+    .step-body {
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .risk-panel {
+      margin-top: 10px;
+      padding: 12px;
+      border-radius: 12px;
+      background: #fff7ed;
+      color: #7c2d12;
+    }
+
+    .risk-title {
+      color: #9a3412;
+      font-weight: 850;
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+
+    .risk-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 12px;
+      padding: 3px 0;
+    }
+
+    .risk-line strong {
+      color: #9a3412;
+    }
+  </style>
+</head>
+<body>
+  <main class="board">
+    <section>
+      <div class="phone phone-home">
+        <div class="home-status"><span>10:28</span><span>拾刻</span><span>100%</span></div>
+        <div class="home-screen">
+          <div class="home-topbar">
+            <div class="home-brand">拾刻</div>
+            <div class="home-title">今日行动台</div>
+            <div class="home-bell" aria-label="通知">
+              <svg class="icon stroke" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+              </svg>
+            </div>
+          </div>
+
+          <div class="home-date">
+            <div class="date-left">
+              <div class="date-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M8 2v4"></path>
+                  <path d="M16 2v4"></path>
+                  <path d="M3 10h18"></path>
+                  <path d="M21 6H3v16h18V6z"></path>
+                </svg>
+              </div>
+              <div class="date-copy">
+                <div class="date-main">5月24日  星期五  农历四月十七</div>
+                <div class="date-sub">按截止时间和地点自动排序</div>
+              </div>
+            </div>
+            <div class="ghost-pill">
+              全部日程
+              <svg class="icon stroke sm" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m9 18 6-6-6-6"></path>
+              </svg>
+            </div>
+          </div>
+
+          <article class="agenda-card">
+            <div class="agenda-head">
+              <div class="agenda-icon green" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M4 19.5V5a2 2 0 0 1 2-2h14v16H6a2 2 0 0 0-2 2.5z"></path>
+                  <path d="M8 3v16"></path>
+                </svg>
+              </div>
+              <div class="agenda-body">
+                <h3 class="agenda-title">高数A班教室变更</h3>
+                <div class="agenda-lines">
+                  <span>
+                    <span class="meta-icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24"><path d="M12 8v4l3 3"></path><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"></path></svg>
+                    </span>
+                    今天 18:30
+                  </span>
+                  <span>
+                    <span class="meta-icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24"><path d="M12 22s7-4 7-10a7 7 0 1 0-14 0c0 6 7 10 7 10z"></path><path d="M12 12a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"></path></svg>
+                    </span>
+                    B203 · 第二教学楼
+                  </span>
+                </div>
+              </div>
+              <span class="status-pill green">已安排</span>
+            </div>
+            <div class="agenda-foot">
+              <div class="foot-chip">
+                <svg class="icon stroke sm" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="m3 11 9-9 9 9"></path>
+                  <path d="M9 22V12h6v10"></path>
+                </svg>
+                由教务处通知 · 已同步到日历
+              </div>
+              <div class="foot-link">
+                查看路线
+                <svg class="icon stroke sm" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+              </div>
+            </div>
+          </article>
+
+          <article class="agenda-card">
+            <div class="agenda-head">
+              <div class="agenda-icon orange" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="m3 11 18-5v12L3 13v-2z"></path>
+                  <path d="M11 19a3 3 0 0 1-6 0"></path>
+                </svg>
+              </div>
+              <div class="agenda-body">
+                <h3 class="agenda-title">AI应用分享会报名截止</h3>
+                <div class="agenda-lines">
+                  <span>
+                    <span class="meta-icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24"><path d="M12 8v4l3 3"></path><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"></path></svg>
+                    </span>
+                    今晚 22:00
+                  </span>
+                  <span>
+                    <span class="meta-icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24"><path d="M12 22s7-4 7-10a7 7 0 1 0-14 0c0 6 7 10 7 10z"></path><path d="M12 12a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"></path></svg>
+                    </span>
+                    图书馆报告厅
+                  </span>
+                </div>
+              </div>
+              <span class="status-pill orange">即将截止</span>
+            </div>
+            <div class="agenda-foot">
+              <div style="flex: 1; min-width: 0;">
+                <div class="foot-chip" style="max-width: 100%;">
+                  <svg class="icon stroke sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8v4l3 3"></path><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"></path></svg>
+                  距离截止 11小时32分钟
+                </div>
+                <div class="progress" aria-label="截止进度"><span></span></div>
+              </div>
+              <div class="foot-link orange">
+                去报名
+                <svg class="icon stroke sm" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+              </div>
+            </div>
+          </article>
+
+          <article class="agenda-card">
+            <div class="agenda-head">
+              <div class="agenda-icon blue" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M9 2h6"></path>
+                  <path d="M9 4h6"></path>
+                  <path d="M7 4h10v18H7z"></path>
+                  <path d="m9 12 2 2 4-4"></path>
+                </svg>
+              </div>
+              <div class="agenda-body">
+                <h3 class="agenda-title">行动卡：查看路线并提交作业</h3>
+                <div class="agenda-lines">
+                  <span>
+                    <span class="meta-icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+                    </span>
+                    查看图书馆到 B203 的路线
+                  </span>
+                  <span>
+                    <span class="meta-icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+                    </span>
+                    提交《高数作业 3》至学习通
+                  </span>
+                </div>
+              </div>
+              <span class="status-pill blue">待确认</span>
+            </div>
+            <div class="agenda-foot">
+              <div class="foot-chip">
+                <svg class="icon stroke sm" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M4 19.5V5a2 2 0 0 1 2-2h14v16H6a2 2 0 0 0-2 2.5z"></path>
+                  <path d="M8 3v16"></path>
+                </svg>
+                来自：学习通任务
+              </div>
+              <div class="foot-link blue">
+                查看详情
+                <svg class="icon stroke sm" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+              </div>
+            </div>
+          </article>
+
+          <div class="home-cta">
+            <strong>确认后安排</strong>
+            <span>确认后写入日历，并在适当时间提醒你</span>
+          </div>
+
+          <section class="summary-panel">
+            <div class="summary-head"><span>今日概要</span><span class="summary-more">更多</span></div>
+            <div class="summary-grid">
+              <div><div class="summary-num" style="color: var(--brand);">3</div><div class="summary-label">待办事项</div></div>
+              <div><div class="summary-num" style="color: var(--warn);">1</div><div class="summary-label">即将截止</div></div>
+              <div><div class="summary-num" style="color: var(--blue);">2</div><div class="summary-label">地点需前往</div></div>
+            </div>
+          </section>
+
+          <section class="summary-panel">
+            <div class="summary-head"><span>近期提醒 · 收件箱</span><span class="summary-more">全部</span></div>
+            <div class="inbox-list">
+              <div class="inbox-row"><span class="inbox-dot blue"></span><span class="inbox-main">明天 09:00 产品设计课小组讨论</span><span class="inbox-meta">企业微信</span></div>
+              <div class="inbox-row"><span class="inbox-dot orange"></span><span class="inbox-main">5月25日 14:00 图书馆座位预约开始</span><span class="inbox-meta">图书馆系统</span></div>
+            </div>
+          </section>
+
+          <nav class="home-nav" aria-label="原型底部导航">
+            <div class="nav-cell"><div class="nav-icon">⌂</div>首页</div>
+            <div class="nav-cell active"><div class="nav-icon">日</div>今日</div>
+            <div class="nav-cell"><div class="nav-icon">计</div>计划</div>
+            <div class="nav-cell"><div class="nav-icon">讯</div>消息</div>
+            <div class="nav-cell"><div class="nav-icon">我</div>我的</div>
+          </nav>
+        </div>
+      </div>
+      <div class="caption">页面 1：今日行动台</div>
+    </section>
+
+    <section>
+      <div class="phone">
+        <div class="status"><span>9:42</span><span>截图</span><span>5G</span></div>
+        <div class="screen">
+          <div class="titlebar"><h2>截图动作卡</h2><span class="pill">系统入口</span></div>
+          <div class="screenshot-preview">
+            【群通知】高数 A 班今晚 18:30 改到 B203，上课前请提前到新教室。作业第 5 章今晚 22:00 前提交。
+          </div>
+          <div class="card">
+            <div class="row"><h3>识别到课程变更</h3><span class="pill">0.94</span></div>
+            <div class="muted">建议：加入日历、提前 30 分钟提醒、打开教室路线。</div>
+            <div class="btns"><button class="primary">交给拾刻</button><button>稍后</button><button>忽略</button></div>
+          </div>
+          <div class="card">
+            <h3>为什么处理</h3>
+            <div class="muted">包含时间、地点和截止事项，属于高优先级课程行动。</div>
+          </div>
+        </div>
+      </div>
+      <div class="caption">页面 2：截图悬浮动作卡</div>
+    </section>
+
+    <section>
+      <div class="phone">
+        <div class="status"><span>9:43</span><span>相机</span><span>5G</span></div>
+        <div class="screen">
+          <div class="titlebar"><h2>相机导办</h2><span class="pill">海报识别</span></div>
+          <div class="camera">
+            <div class="scanbox"></div>
+            <div class="bottom-sheet">
+              <div class="row"><strong>识别到活动海报</strong><span class="pill">0.91</span></div>
+              <div class="muted">可提取活动时间、地点和报名截止。</div>
+            </div>
+          </div>
+          <button class="primary" style="width: 100%;">拍照并解析</button>
+        </div>
+      </div>
+      <div class="caption">页面 3：相机导办页</div>
+    </section>
+
+    <section>
+      <div class="phone">
+        <div class="status"><span>9:44</span><span>解析</span><span>5G</span></div>
+        <div class="screen">
+          <div class="titlebar"><h2>AI 解析确认</h2><span class="pill">可编辑</span></div>
+          <div class="card">
+            <h3>高数课教室变更</h3>
+            <div class="confidence"><span></span></div>
+            <div class="field"><div class="label">场景</div><div class="value">课程通知</div></div>
+            <div class="field"><div class="label">时间</div><div class="value">今天 18:30</div></div>
+            <div class="field"><div class="label">地点</div><div class="value">B203</div></div>
+            <div class="field"><div class="label">任务</div><div class="value">查看新教室路线，22:00 前交作业</div></div>
+            <div class="risk-panel">
+              <div class="risk-title">风险与缺失字段</div>
+              <div class="risk-line"><strong>相对时间</strong><span>需按当前日期确认</span></div>
+              <div class="risk-line"><strong>报名链接</strong><span>不需要</span></div>
+              <div class="risk-line"><strong>系统写入</strong><span>用户确认后执行</span></div>
+            </div>
+          </div>
+          <div class="card">
+            <h3 class="warn">需要确认</h3>
+            <div class="muted">“今天”将按当前日期解析。确认后才会写入日历和提醒。</div>
+          </div>
+          <button class="primary" style="width: 100%;">确认处理</button>
+        </div>
+      </div>
+      <div class="caption">页面 4：AI 解析确认页</div>
+    </section>
+
+    <section>
+      <div class="phone">
+        <div class="status"><span>9:45</span><span>编排</span><span>5G</span></div>
+        <div class="screen">
+          <div class="titlebar"><h2>行动编排</h2><span class="pill">用户确认</span></div>
+          <div class="card">
+            <div class="row"><h3>加入日历</h3><span class="pill">已选</span></div>
+            <div class="muted">高数课 · 今天 18:30 · B203</div>
+          </div>
+          <div class="card">
+            <div class="row"><h3>本地提醒</h3><span class="pill">已选</span></div>
+            <div class="muted">课前 30 分钟提醒；作业截止前 2 小时提醒。</div>
+          </div>
+          <div class="card">
+            <div class="row"><h3>地图导航</h3><span class="pill">可选</span></div>
+            <div class="muted">打开地图 deeplink，用户自行确认路线。</div>
+          </div>
+          <button class="primary" style="width: 100%;">一键安排</button>
+        </div>
+      </div>
+      <div class="caption">页面 5：行动编排页</div>
+    </section>
+
+    <section>
+      <div class="phone">
+        <div class="status"><span>9:46</span><span>收件箱</span><span>5G</span></div>
+        <div class="screen">
+          <div class="titlebar"><h2>收件箱</h2><span class="pill">持续追踪</span></div>
+          <div class="tabs"><div class="active">待确认</div><div>已安排</div><div>即将截止</div><div>已完成</div></div>
+          <div class="card">
+            <div class="row"><h3>AI 分享会</h3><span class="pill">即将截止</span></div>
+            <div class="muted">报名截止 22:00 · 地点：图书馆报告厅</div>
+            <div class="btns"><button class="primary">执行</button><button>归档</button><button>忽略</button></div>
+          </div>
+          <div class="card">
+            <div class="row"><h3>高数课教室变更</h3><span class="pill">已安排</span></div>
+            <div class="muted">日历和提醒已创建，地图待用户打开。</div>
+          </div>
+        </div>
+      </div>
+      <div class="caption">页面 6：收件箱页</div>
+    </section>
+
+    <section>
+      <div class="phone">
+        <div class="status"><span>9:47</span><span>隐私</span><span>5G</span></div>
+        <div class="screen">
+          <div class="titlebar"><h2>隐私与端云</h2><span class="pill">可控</span></div>
+          <div class="card">
+            <div class="row"><h3>端侧优先</h3><span class="toggle"></span></div>
+            <div class="muted">OCR、本地缓存、基础分类和敏感字段脱敏优先在端侧完成。</div>
+          </div>
+          <div class="card">
+            <div class="row"><h3>云侧增强</h3><span class="toggle"></span></div>
+            <div class="muted">复杂海报理解和模糊字段补全可在确认后使用云侧模型。</div>
+          </div>
+          <div class="card">
+            <h3>权限管理</h3>
+            <div class="field"><div class="label">日历</div><div class="value blue">确认时申请</div></div>
+            <div class="field"><div class="label">提醒</div><div class="value blue">本地通知</div></div>
+            <div class="field"><div class="label">地图</div><div class="value blue">deeplink</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="caption">页面 7：隐私与端云设置页</div>
+    </section>
+  </main>
+</body>
+</html>

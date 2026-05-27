@@ -1,0 +1,14 @@
+下面是来自 Android 的解析请求，请根据 OCR 文本输出一个 JSON 对象（只输出 JSON，不要输出其他文字）。
+
+input_id: {input_id}
+source_type: {source_type}
+locale: {locale}
+scene_hint: {scene_hint}
+user_timezone: {user_timezone}
+
+OCR_TEXT:
+{ocr_text}
+
+你必须严格遵守以下 JSON Schema（additionalProperties=false 等约束也必须遵守）：
+{schema_json}
+

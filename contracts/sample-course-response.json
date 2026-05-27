@@ -1,0 +1,29 @@
+{
+  "scene_type": "course_notice",
+  "confidence": 0.94,
+  "title": "高数A班教室变更",
+  "time": {
+    "start_text": "今晚18:30",
+    "deadline_text": "今晚22:00",
+    "normalized_start": "2026-04-24T18:30:00+08:00",
+    "normalized_deadline": "2026-04-24T22:00:00+08:00"
+  },
+  "location": {
+    "raw": "B203",
+    "map_query": "B203",
+    "confidence": 0.82
+  },
+  "task": {
+    "summary": "查看新教室路线并提交第5章作业",
+    "priority": "high",
+    "topic": "course"
+  },
+  "suggested_actions": [
+    {"type": "calendar", "label": "加入日历", "requires_permission": true},
+    {"type": "reminder", "label": "课前30分钟提醒", "requires_permission": true},
+    {"type": "map", "label": "打开教室路线", "requires_permission": false}
+  ],
+  "missing_fields": [],
+  "explanation": "文本包含课程、时间、地点和截止事项，适合转成行动卡。"
+}
+

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="cn.shike.app.data.CaptureImportMapperTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-05-26T09:01:51" hostname="LAPTOP-B84BKQGP" time="0.0">
+  <properties/>
+  <testcase name="gallerySelectionFromImage_mapsImageLabelToCourseDraft" classname="cn.shike.app.data.CaptureImportMapperTest" time="0.0"/>
+  <testcase name="selectionFromCaptureDraft_routesOnlyCameraDraftToEventSample" classname="cn.shike.app.data.CaptureImportMapperTest" time="0.0"/>
+  <testcase name="cameraSelectionFromPreview_mapsPreviewToEventDraft" classname="cn.shike.app.data.CaptureImportMapperTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

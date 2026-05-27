@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="cn.shike.app.data.ShareImportMapperTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-05-26T09:01:51" hostname="LAPTOP-B84BKQGP" time="0.0">
+  <properties/>
+  <testcase name="itemFromSharedText_activityTextMapsToEventReviewCard" classname="cn.shike.app.data.ShareImportMapperTest" time="0.0"/>
+  <testcase name="sharedTextCaptureDraft_keepsShareChannelAndRawText" classname="cn.shike.app.data.ShareImportMapperTest" time="0.0"/>
+  <testcase name="itemFromSharedText_courseTextMapsToCourseReviewCard" classname="cn.shike.app.data.ShareImportMapperTest" time="0.0"/>
+  <testcase name="itemFromSharedText_blankTextFallsBackToCourseSample" classname="cn.shike.app.data.ShareImportMapperTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

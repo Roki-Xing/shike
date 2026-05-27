@@ -1,0 +1,79 @@
+{
+  "config": {
+    "direction": "higher",
+    "goal": "\u7ee7\u7eed\u4f18\u5316\u62fe\u523b\u9879\u76ee\u529f\u80fd\u4e0e\u53ef\u4ea4\u4ed8\u6027\uff0c\u6267\u884c5\u8f6e\uff0c\u6bcf\u8f6e\u4fdd\u7559\u4e00\u4e2a\u53ef\u9a8c\u8bc1\u7684\u65b0\u529f\u80fd\u6216\u4ea4\u4ed8\u589e\u5f3a",
+    "guard": "python3 validation/validate_real_world_ready.py",
+    "iterations": 5,
+    "metric": "kept_feature_enhancements",
+    "parallel_mode": "serial",
+    "repos": [
+      {
+        "path": "/home/xing-12_26/projects/codex-workspace/shike",
+        "role": "primary",
+        "scope": "android-mvp/app/src/main/java/cn/shike/app/MainActivity.kt,prototype/index.html,README.md,docs/device-runbook.md,materials/demo-script.md,materials/submission-checklist.md,validation/validate_real_world_ready.py"
+      }
+    ],
+    "rollback_policy": "non_destructive_patch_revert",
+    "scope": "android-mvp/app/src/main/java/cn/shike/app/MainActivity.kt,prototype/index.html,README.md,docs/device-runbook.md,materials/demo-script.md,materials/submission-checklist.md,validation/validate_real_world_ready.py",
+    "session_mode": "foreground",
+    "stop_condition": "iteration_cap_5",
+    "verify": "python3 validation/validate_real_world_ready.py",
+    "web_search": "disabled"
+  },
+  "mode": "loop",
+  "run_tag": "shike-5-feature-optimizations",
+  "state": {
+    "baseline_metric": 0,
+    "best_iteration": 140,
+    "best_metric": 140,
+    "blocked": 0,
+    "consecutive_discards": 0,
+    "crashes": 0,
+    "current_labels": [
+      "feature/prototype-home-polish",
+      "guard/deliverables",
+      "guard/persistence",
+      "guard/android-structure",
+      "guard/android-unit-tests",
+      "guard/action-execution",
+      "guard/model-bridge",
+      "guard/demo-acceptance",
+      "guard/real-world-ready",
+      "guard/landable",
+      "guard/backend",
+      "guard/spike"
+    ],
+    "current_metric": 140,
+    "discards": 0,
+    "iteration": 140,
+    "keeps": 140,
+    "last_commit": "no-git",
+    "last_repo_commits": {
+      "/home/xing-12_26/projects/codex-workspace/shike": "no-git"
+    },
+    "last_status": "keep",
+    "last_trial_commit": "no-git",
+    "last_trial_labels": [
+      "feature/prototype-home-polish",
+      "guard/deliverables",
+      "guard/persistence",
+      "guard/android-structure",
+      "guard/android-unit-tests",
+      "guard/action-execution",
+      "guard/model-bridge",
+      "guard/demo-acceptance",
+      "guard/real-world-ready",
+      "guard/landable",
+      "guard/backend",
+      "guard/spike"
+    ],
+    "last_trial_metric": 140,
+    "last_trial_repo_commits": {
+      "/home/xing-12_26/projects/codex-workspace/shike": "no-git"
+    },
+    "no_ops": 0,
+    "pivot_count": 0
+  },
+  "updated_at": "2026-05-26T10:21:03Z",
+  "version": 1
+}

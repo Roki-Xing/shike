@@ -1,0 +1,9 @@
+{
+  "input_id": "sample-unknown-001",
+  "source_type": "screenshot",
+  "ocr_text": "今天很忙，记得看看这个。",
+  "locale": "zh-CN",
+  "scene_hint": null,
+  "user_timezone": "Asia/Shanghai"
+}
+

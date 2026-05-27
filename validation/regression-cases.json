@@ -1,0 +1,1591 @@
+[
+  {
+    "id": "course-notice-001",
+    "scene": "course_notice",
+    "input": "高数A今晚10:00调整到教学楼B203，课前完成预习并确认签到。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "清晰文本"
+  },
+  {
+    "id": "course-notice-002",
+    "scene": "course_notice",
+    "input": "线性代数明早12:30调整到综合楼C301，课前完成预习并确认签到。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "相对时间"
+  },
+  {
+    "id": "course-notice-003",
+    "scene": "course_notice",
+    "input": "大学英语周三14:00调整到待确认，课前完成预习并确认签到。",
+    "expected_fields": [
+      "time",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder"
+    ],
+    "edge": "地点缺失",
+    "expected_missing_fields": [
+      "location"
+    ]
+  },
+  {
+    "id": "course-notice-004",
+    "scene": "course_notice",
+    "input": "概率论周五16:30调整到图书馆研讨室2，课前完成预习并确认签到。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "多个截止时间"
+  },
+  {
+    "id": "course-notice-005",
+    "scene": "course_notice",
+    "input": "物理实验本周六18:00调整到信远楼一区105，课前完成预习并确认签到。",
+    "expected_fields": [
+      "task"
+    ],
+    "expected_actions": [
+      "reminder"
+    ],
+    "edge": "低质量图片",
+    "expected_missing_fields": [
+      "time",
+      "location"
+    ]
+  },
+  {
+    "id": "course-notice-006",
+    "scene": "course_notice",
+    "input": "数据结构今晚8:30调整到教学楼B203，课前完成预习并确认签到。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "清晰文本"
+  },
+  {
+    "id": "course-notice-007",
+    "scene": "course_notice",
+    "input": "离散数学明早10:00调整到综合楼C301，课前完成预习并确认签到。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "相对时间"
+  },
+  {
+    "id": "course-notice-008",
+    "scene": "course_notice",
+    "input": "思政讨论周三12:30调整到待确认，课前完成预习并确认签到。",
+    "expected_fields": [
+      "time",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder"
+    ],
+    "edge": "地点缺失",
+    "expected_missing_fields": [
+      "location"
+    ]
+  },
+  {
+    "id": "course-notice-009",
+    "scene": "course_notice",
+    "input": "电路分析周五14:00调整到图书馆研讨室2，课前完成预习并确认签到。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "多个截止时间"
+  },
+  {
+    "id": "course-notice-010",
+    "scene": "course_notice",
+    "input": "机器学习本周六16:30调整到信远楼一区105，课前完成预习并确认签到。",
+    "expected_fields": [
+      "task"
+    ],
+    "expected_actions": [
+      "reminder"
+    ],
+    "edge": "低质量图片",
+    "expected_missing_fields": [
+      "time",
+      "location"
+    ]
+  },
+  {
+    "id": "course-notice-011",
+    "scene": "course_notice",
+    "input": "高数A今晚18:00调整到教学楼B203，课前完成预习并确认签到。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "清晰文本"
+  },
+  {
+    "id": "course-notice-012",
+    "scene": "course_notice",
+    "input": "线性代数明早8:30调整到综合楼C301，课前完成预习并确认签到。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "相对时间"
+  },
+  {
+    "id": "course-notice-013",
+    "scene": "course_notice",
+    "input": "大学英语周三10:00调整到待确认，课前完成预习并确认签到。",
+    "expected_fields": [
+      "time",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder"
+    ],
+    "edge": "地点缺失",
+    "expected_missing_fields": [
+      "location"
+    ]
+  },
+  {
+    "id": "course-notice-014",
+    "scene": "course_notice",
+    "input": "概率论周五12:30调整到图书馆研讨室2，课前完成预习并确认签到。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "多个截止时间"
+  },
+  {
+    "id": "course-notice-015",
+    "scene": "course_notice",
+    "input": "物理实验本周六14:00调整到信远楼一区105，课前完成预习并确认签到。",
+    "expected_fields": [
+      "task"
+    ],
+    "expected_actions": [
+      "reminder"
+    ],
+    "edge": "低质量图片",
+    "expected_missing_fields": [
+      "time",
+      "location"
+    ]
+  },
+  {
+    "id": "course-notice-016",
+    "scene": "course_notice",
+    "input": "数据结构今晚16:30调整到教学楼B203，课前完成预习并确认签到。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "清晰文本"
+  },
+  {
+    "id": "course-notice-017",
+    "scene": "course_notice",
+    "input": "离散数学明早18:00调整到综合楼C301，课前完成预习并确认签到。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "相对时间"
+  },
+  {
+    "id": "course-notice-018",
+    "scene": "course_notice",
+    "input": "思政讨论周三8:30调整到待确认，课前完成预习并确认签到。",
+    "expected_fields": [
+      "time",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder"
+    ],
+    "edge": "地点缺失",
+    "expected_missing_fields": [
+      "location"
+    ]
+  },
+  {
+    "id": "course-notice-019",
+    "scene": "course_notice",
+    "input": "电路分析周五10:00调整到图书馆研讨室2，课前完成预习并确认签到。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "多个截止时间"
+  },
+  {
+    "id": "course-notice-020",
+    "scene": "course_notice",
+    "input": "机器学习本周六12:30调整到信远楼一区105，课前完成预习并确认签到。",
+    "expected_fields": [
+      "task"
+    ],
+    "expected_actions": [
+      "reminder"
+    ],
+    "edge": "低质量图片",
+    "expected_missing_fields": [
+      "time",
+      "location"
+    ]
+  },
+  {
+    "id": "event-poster-001",
+    "scene": "event_poster",
+    "input": "AI应用分享会 今晚10:00 图书馆报告厅 报名截止今晚22:00，名额有限。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "清晰海报"
+  },
+  {
+    "id": "event-poster-002",
+    "scene": "event_poster",
+    "input": "校园音乐夜 明早12:30 操场舞台 报名截止明早22:00，名额有限。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "报名方式缺失",
+    "expected_missing_fields": [
+      "registration_url"
+    ]
+  },
+  {
+    "id": "event-poster-003",
+    "scene": "event_poster",
+    "input": "创业讲座 周三14:00 艺术楼大厅 报名截止周三22:00，名额有限。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "地址简称"
+  },
+  {
+    "id": "event-poster-004",
+    "scene": "event_poster",
+    "input": "摄影展 周五16:30 学生活动中心二层 报名截止周五22:00，名额有限。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "截止时间在前"
+  },
+  {
+    "id": "event-poster-005",
+    "scene": "event_poster",
+    "input": "志愿服务宣讲 本周六18:00 报告厅A 报名截止本周六22:00，名额有限。",
+    "expected_fields": [
+      "task"
+    ],
+    "expected_actions": [
+      "reminder"
+    ],
+    "edge": "低质量图片",
+    "expected_missing_fields": [
+      "time",
+      "location"
+    ]
+  },
+  {
+    "id": "event-poster-006",
+    "scene": "event_poster",
+    "input": "职业规划沙龙 今晚8:30 图书馆报告厅 报名截止今晚22:00，名额有限。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "清晰海报"
+  },
+  {
+    "id": "event-poster-007",
+    "scene": "event_poster",
+    "input": "社团招新 明早10:00 操场舞台 报名截止明早22:00，名额有限。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "报名方式缺失",
+    "expected_missing_fields": [
+      "registration_url"
+    ]
+  },
+  {
+    "id": "event-poster-008",
+    "scene": "event_poster",
+    "input": "科技节路演 周三12:30 艺术楼大厅 报名截止周三22:00，名额有限。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "地址简称"
+  },
+  {
+    "id": "event-poster-009",
+    "scene": "event_poster",
+    "input": "读书会 周五14:00 学生活动中心二层 报名截止周五22:00，名额有限。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "截止时间在前"
+  },
+  {
+    "id": "event-poster-010",
+    "scene": "event_poster",
+    "input": "心理健康讲座 本周六16:30 报告厅A 报名截止本周六22:00，名额有限。",
+    "expected_fields": [
+      "task"
+    ],
+    "expected_actions": [
+      "reminder"
+    ],
+    "edge": "低质量图片",
+    "expected_missing_fields": [
+      "time",
+      "location"
+    ]
+  },
+  {
+    "id": "event-poster-011",
+    "scene": "event_poster",
+    "input": "AI应用分享会 今晚18:00 图书馆报告厅 报名截止今晚22:00，名额有限。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "清晰海报"
+  },
+  {
+    "id": "event-poster-012",
+    "scene": "event_poster",
+    "input": "校园音乐夜 明早8:30 操场舞台 报名截止明早22:00，名额有限。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "报名方式缺失",
+    "expected_missing_fields": [
+      "registration_url"
+    ]
+  },
+  {
+    "id": "event-poster-013",
+    "scene": "event_poster",
+    "input": "创业讲座 周三10:00 艺术楼大厅 报名截止周三22:00，名额有限。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "地址简称"
+  },
+  {
+    "id": "event-poster-014",
+    "scene": "event_poster",
+    "input": "摄影展 周五12:30 学生活动中心二层 报名截止周五22:00，名额有限。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "截止时间在前"
+  },
+  {
+    "id": "event-poster-015",
+    "scene": "event_poster",
+    "input": "志愿服务宣讲 本周六14:00 报告厅A 报名截止本周六22:00，名额有限。",
+    "expected_fields": [
+      "task"
+    ],
+    "expected_actions": [
+      "reminder"
+    ],
+    "edge": "低质量图片",
+    "expected_missing_fields": [
+      "time",
+      "location"
+    ]
+  },
+  {
+    "id": "event-poster-016",
+    "scene": "event_poster",
+    "input": "职业规划沙龙 今晚16:30 图书馆报告厅 报名截止今晚22:00，名额有限。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "清晰海报"
+  },
+  {
+    "id": "event-poster-017",
+    "scene": "event_poster",
+    "input": "社团招新 明早18:00 操场舞台 报名截止明早22:00，名额有限。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "报名方式缺失",
+    "expected_missing_fields": [
+      "registration_url"
+    ]
+  },
+  {
+    "id": "event-poster-018",
+    "scene": "event_poster",
+    "input": "科技节路演 周三8:30 艺术楼大厅 报名截止周三22:00，名额有限。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "地址简称"
+  },
+  {
+    "id": "event-poster-019",
+    "scene": "event_poster",
+    "input": "读书会 周五10:00 学生活动中心二层 报名截止周五22:00，名额有限。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "截止时间在前"
+  },
+  {
+    "id": "event-poster-020",
+    "scene": "event_poster",
+    "input": "心理健康讲座 本周六12:30 报告厅A 报名截止本周六22:00，名额有限。",
+    "expected_fields": [
+      "task"
+    ],
+    "expected_actions": [
+      "reminder"
+    ],
+    "edge": "低质量图片",
+    "expected_missing_fields": [
+      "time",
+      "location"
+    ]
+  },
+  {
+    "id": "meeting-notice-001",
+    "scene": "meeting_notice",
+    "input": "项目周会定于今晚10:00在腾讯会议进行，请准备进展和待协调事项。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "会议通知"
+  },
+  {
+    "id": "meeting-notice-002",
+    "scene": "meeting_notice",
+    "input": "班委例会定于明早12:30在会议室301进行，请准备进展和待协调事项。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "线上地点"
+  },
+  {
+    "id": "meeting-notice-003",
+    "scene": "meeting_notice",
+    "input": "实验室组会定于周三14:00在学院楼B402进行，请准备进展和待协调事项。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "相对时间"
+  },
+  {
+    "id": "meeting-notice-004",
+    "scene": "meeting_notice",
+    "input": "答辩预演定于周五16:30在线上会议室进行，请准备进展和待协调事项。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "议程较长"
+  },
+  {
+    "id": "meeting-notice-005",
+    "scene": "meeting_notice",
+    "input": "导师沟通会定于本周六18:00在创新中心204进行，请准备进展和待协调事项。",
+    "expected_fields": [
+      "task"
+    ],
+    "expected_actions": [
+      "reminder"
+    ],
+    "edge": "低置信度",
+    "expected_missing_fields": [
+      "time",
+      "location"
+    ]
+  },
+  {
+    "id": "meeting-notice-006",
+    "scene": "meeting_notice",
+    "input": "项目周会定于今晚8:30在腾讯会议进行，请准备进展和待协调事项。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "会议通知"
+  },
+  {
+    "id": "meeting-notice-007",
+    "scene": "meeting_notice",
+    "input": "班委例会定于明早10:00在会议室301进行，请准备进展和待协调事项。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "线上地点"
+  },
+  {
+    "id": "meeting-notice-008",
+    "scene": "meeting_notice",
+    "input": "实验室组会定于周三12:30在学院楼B402进行，请准备进展和待协调事项。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "相对时间"
+  },
+  {
+    "id": "meeting-notice-009",
+    "scene": "meeting_notice",
+    "input": "答辩预演定于周五14:00在线上会议室进行，请准备进展和待协调事项。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "议程较长"
+  },
+  {
+    "id": "meeting-notice-010",
+    "scene": "meeting_notice",
+    "input": "导师沟通会定于本周六16:30在创新中心204进行，请准备进展和待协调事项。",
+    "expected_fields": [
+      "task"
+    ],
+    "expected_actions": [
+      "reminder"
+    ],
+    "edge": "低置信度",
+    "expected_missing_fields": [
+      "time",
+      "location"
+    ]
+  },
+  {
+    "id": "meeting-notice-011",
+    "scene": "meeting_notice",
+    "input": "项目周会定于今晚18:00在腾讯会议进行，请准备进展和待协调事项。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "会议通知"
+  },
+  {
+    "id": "meeting-notice-012",
+    "scene": "meeting_notice",
+    "input": "班委例会定于明早8:30在会议室301进行，请准备进展和待协调事项。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "线上地点"
+  },
+  {
+    "id": "meeting-notice-013",
+    "scene": "meeting_notice",
+    "input": "实验室组会定于周三10:00在学院楼B402进行，请准备进展和待协调事项。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "相对时间"
+  },
+  {
+    "id": "meeting-notice-014",
+    "scene": "meeting_notice",
+    "input": "答辩预演定于周五12:30在线上会议室进行，请准备进展和待协调事项。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "议程较长"
+  },
+  {
+    "id": "meeting-notice-015",
+    "scene": "meeting_notice",
+    "input": "导师沟通会定于本周六14:00在创新中心204进行，请准备进展和待协调事项。",
+    "expected_fields": [
+      "task"
+    ],
+    "expected_actions": [
+      "reminder"
+    ],
+    "edge": "低置信度",
+    "expected_missing_fields": [
+      "time",
+      "location"
+    ]
+  },
+  {
+    "id": "assignment-deadline-001",
+    "scene": "assignment_deadline",
+    "input": "数据库实验报告今晚22:00前通过教学平台提交，逾期将标记为迟交。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "作业截止"
+  },
+  {
+    "id": "assignment-deadline-002",
+    "scene": "assignment_deadline",
+    "input": "英语展示PPT明早22:00前通过课程群提交，逾期将标记为迟交。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "多个提交物"
+  },
+  {
+    "id": "assignment-deadline-003",
+    "scene": "assignment_deadline",
+    "input": "算法作业周三22:00前通过待确认提交，逾期将标记为迟交。",
+    "expected_fields": [
+      "time",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder"
+    ],
+    "edge": "缺少地点",
+    "expected_missing_fields": [
+      "location"
+    ]
+  },
+  {
+    "id": "assignment-deadline-004",
+    "scene": "assignment_deadline",
+    "input": "课程论文周五22:00前通过邮箱提交提交，逾期将标记为迟交。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "相对截止"
+  },
+  {
+    "id": "assignment-deadline-005",
+    "scene": "assignment_deadline",
+    "input": "物理预习报告本周六22:00前通过实验系统提交，逾期将标记为迟交。",
+    "expected_fields": [
+      "task"
+    ],
+    "expected_actions": [
+      "reminder"
+    ],
+    "edge": "低质量图片",
+    "expected_missing_fields": [
+      "time",
+      "location"
+    ]
+  },
+  {
+    "id": "assignment-deadline-006",
+    "scene": "assignment_deadline",
+    "input": "数据库实验报告今晚22:00前通过教学平台提交，逾期将标记为迟交。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "作业截止"
+  },
+  {
+    "id": "assignment-deadline-007",
+    "scene": "assignment_deadline",
+    "input": "英语展示PPT明早22:00前通过课程群提交，逾期将标记为迟交。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "多个提交物"
+  },
+  {
+    "id": "assignment-deadline-008",
+    "scene": "assignment_deadline",
+    "input": "算法作业周三22:00前通过待确认提交，逾期将标记为迟交。",
+    "expected_fields": [
+      "time",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder"
+    ],
+    "edge": "缺少地点",
+    "expected_missing_fields": [
+      "location"
+    ]
+  },
+  {
+    "id": "assignment-deadline-009",
+    "scene": "assignment_deadline",
+    "input": "课程论文周五22:00前通过邮箱提交提交，逾期将标记为迟交。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "相对截止"
+  },
+  {
+    "id": "assignment-deadline-010",
+    "scene": "assignment_deadline",
+    "input": "物理预习报告本周六22:00前通过实验系统提交，逾期将标记为迟交。",
+    "expected_fields": [
+      "task"
+    ],
+    "expected_actions": [
+      "reminder"
+    ],
+    "edge": "低质量图片",
+    "expected_missing_fields": [
+      "time",
+      "location"
+    ]
+  },
+  {
+    "id": "assignment-deadline-011",
+    "scene": "assignment_deadline",
+    "input": "数据库实验报告今晚22:00前通过教学平台提交，逾期将标记为迟交。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "作业截止"
+  },
+  {
+    "id": "assignment-deadline-012",
+    "scene": "assignment_deadline",
+    "input": "英语展示PPT明早22:00前通过课程群提交，逾期将标记为迟交。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "多个提交物"
+  },
+  {
+    "id": "assignment-deadline-013",
+    "scene": "assignment_deadline",
+    "input": "算法作业周三22:00前通过待确认提交，逾期将标记为迟交。",
+    "expected_fields": [
+      "time",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder"
+    ],
+    "edge": "缺少地点",
+    "expected_missing_fields": [
+      "location"
+    ]
+  },
+  {
+    "id": "assignment-deadline-014",
+    "scene": "assignment_deadline",
+    "input": "课程论文周五22:00前通过邮箱提交提交，逾期将标记为迟交。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "相对截止"
+  },
+  {
+    "id": "assignment-deadline-015",
+    "scene": "assignment_deadline",
+    "input": "物理预习报告本周六22:00前通过实验系统提交，逾期将标记为迟交。",
+    "expected_fields": [
+      "task"
+    ],
+    "expected_actions": [
+      "reminder"
+    ],
+    "edge": "低质量图片",
+    "expected_missing_fields": [
+      "time",
+      "location"
+    ]
+  },
+  {
+    "id": "travel-plan-001",
+    "scene": "travel_plan",
+    "input": "高铁出行今晚10:00在西安北站集合，提前15分钟到达并检查证件。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "出行行程"
+  },
+  {
+    "id": "travel-plan-002",
+    "scene": "travel_plan",
+    "input": "校车预约明早12:30在南校区东门集合，提前15分钟到达并检查证件。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "地点明确"
+  },
+  {
+    "id": "travel-plan-003",
+    "scene": "travel_plan",
+    "input": "机场集合周三14:00在机场T3集合，提前15分钟到达并检查证件。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "集合时间"
+  },
+  {
+    "id": "travel-plan-004",
+    "scene": "travel_plan",
+    "input": "比赛报到周五16:30在会议中心签到处集合，提前15分钟到达并检查证件。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "票务提醒"
+  },
+  {
+    "id": "travel-plan-005",
+    "scene": "travel_plan",
+    "input": "实习通勤本周六18:00在地铁站A口集合，提前15分钟到达并检查证件。",
+    "expected_fields": [
+      "task"
+    ],
+    "expected_actions": [
+      "reminder"
+    ],
+    "edge": "低置信度",
+    "expected_missing_fields": [
+      "time",
+      "location"
+    ]
+  },
+  {
+    "id": "travel-plan-006",
+    "scene": "travel_plan",
+    "input": "高铁出行今晚8:30在西安北站集合，提前15分钟到达并检查证件。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "出行行程"
+  },
+  {
+    "id": "travel-plan-007",
+    "scene": "travel_plan",
+    "input": "校车预约明早10:00在南校区东门集合，提前15分钟到达并检查证件。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "地点明确"
+  },
+  {
+    "id": "travel-plan-008",
+    "scene": "travel_plan",
+    "input": "机场集合周三12:30在机场T3集合，提前15分钟到达并检查证件。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "集合时间"
+  },
+  {
+    "id": "travel-plan-009",
+    "scene": "travel_plan",
+    "input": "比赛报到周五14:00在会议中心签到处集合，提前15分钟到达并检查证件。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "票务提醒"
+  },
+  {
+    "id": "travel-plan-010",
+    "scene": "travel_plan",
+    "input": "实习通勤本周六16:30在地铁站A口集合，提前15分钟到达并检查证件。",
+    "expected_fields": [
+      "task"
+    ],
+    "expected_actions": [
+      "reminder"
+    ],
+    "edge": "低置信度",
+    "expected_missing_fields": [
+      "time",
+      "location"
+    ]
+  },
+  {
+    "id": "low-quality-fragment-001",
+    "scene": "low_quality_fragment",
+    "input": "图像模糊：模糊课程截图 今晚 10:? 待确认 事项?? 请确认",
+    "expected_fields": [
+      "task"
+    ],
+    "expected_missing_fields": [
+      "time",
+      "location"
+    ],
+    "expected_actions": [
+      "reminder"
+    ],
+    "edge": "低质量图片"
+  },
+  {
+    "id": "low-quality-fragment-002",
+    "scene": "low_quality_fragment",
+    "input": "图像模糊：反光活动海报 明早 12:? 图书馆? 事项?? 请确认",
+    "expected_fields": [
+      "task"
+    ],
+    "expected_missing_fields": [
+      "time",
+      "location"
+    ],
+    "expected_actions": [
+      "reminder"
+    ],
+    "edge": "模糊时间"
+  },
+  {
+    "id": "low-quality-fragment-003",
+    "scene": "low_quality_fragment",
+    "input": "图像模糊：截断会议通知 周三 14:? 会议室? 事项?? 请确认",
+    "expected_fields": [
+      "task"
+    ],
+    "expected_missing_fields": [
+      "time",
+      "location"
+    ],
+    "expected_actions": [
+      "reminder"
+    ],
+    "edge": "地点缺失"
+  },
+  {
+    "id": "low-quality-fragment-004",
+    "scene": "low_quality_fragment",
+    "input": "图像模糊：遮挡作业提醒 周五 16:? 平台? 事项?? 请确认",
+    "expected_fields": [
+      "task"
+    ],
+    "expected_missing_fields": [
+      "time",
+      "location"
+    ],
+    "expected_actions": [
+      "reminder"
+    ],
+    "edge": "OCR截断"
+  },
+  {
+    "id": "low-quality-fragment-005",
+    "scene": "low_quality_fragment",
+    "input": "图像模糊：压缩出行图片 本周六 18:? 车站? 事项?? 请确认",
+    "expected_fields": [
+      "task"
+    ],
+    "expected_missing_fields": [
+      "time",
+      "location"
+    ],
+    "expected_actions": [
+      "reminder"
+    ],
+    "edge": "低置信度"
+  },
+  {
+    "id": "low-quality-fragment-006",
+    "scene": "low_quality_fragment",
+    "input": "图像模糊：模糊课程截图 今晚 8:? 待确认 事项?? 请确认",
+    "expected_fields": [
+      "task"
+    ],
+    "expected_missing_fields": [
+      "time",
+      "location"
+    ],
+    "expected_actions": [
+      "reminder"
+    ],
+    "edge": "低质量图片"
+  },
+  {
+    "id": "low-quality-fragment-007",
+    "scene": "low_quality_fragment",
+    "input": "图像模糊：反光活动海报 明早 10:? 图书馆? 事项?? 请确认",
+    "expected_fields": [
+      "task"
+    ],
+    "expected_missing_fields": [
+      "time",
+      "location"
+    ],
+    "expected_actions": [
+      "reminder"
+    ],
+    "edge": "模糊时间"
+  },
+  {
+    "id": "low-quality-fragment-008",
+    "scene": "low_quality_fragment",
+    "input": "图像模糊：截断会议通知 周三 12:? 会议室? 事项?? 请确认",
+    "expected_fields": [
+      "task"
+    ],
+    "expected_missing_fields": [
+      "time",
+      "location"
+    ],
+    "expected_actions": [
+      "reminder"
+    ],
+    "edge": "地点缺失"
+  },
+  {
+    "id": "low-quality-fragment-009",
+    "scene": "low_quality_fragment",
+    "input": "图像模糊：遮挡作业提醒 周五 14:? 平台? 事项?? 请确认",
+    "expected_fields": [
+      "task"
+    ],
+    "expected_missing_fields": [
+      "time",
+      "location"
+    ],
+    "expected_actions": [
+      "reminder"
+    ],
+    "edge": "OCR截断"
+  },
+  {
+    "id": "low-quality-fragment-010",
+    "scene": "low_quality_fragment",
+    "input": "图像模糊：压缩出行图片 本周六 16:? 车站? 事项?? 请确认",
+    "expected_fields": [
+      "task"
+    ],
+    "expected_missing_fields": [
+      "time",
+      "location"
+    ],
+    "expected_actions": [
+      "reminder"
+    ],
+    "edge": "低置信度"
+  },
+  {
+    "id": "negative-fragment-001",
+    "scene": "negative_fragment",
+    "input": "无行动闲聊：这是一段没有明确时间、地点或后续动作的碎片内容，仅用于测试忽略路径。",
+    "expected_fields": [],
+    "expected_missing_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [],
+    "edge": "反例"
+  },
+  {
+    "id": "negative-fragment-002",
+    "scene": "negative_fragment",
+    "input": "广告片段：这是一段没有明确时间、地点或后续动作的碎片内容，仅用于测试忽略路径。",
+    "expected_fields": [],
+    "expected_missing_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [],
+    "edge": "无行动"
+  },
+  {
+    "id": "negative-fragment-003",
+    "scene": "negative_fragment",
+    "input": "表情包文字：这是一段没有明确时间、地点或后续动作的碎片内容，仅用于测试忽略路径。",
+    "expected_fields": [],
+    "expected_missing_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [],
+    "edge": "广告噪声"
+  },
+  {
+    "id": "negative-fragment-004",
+    "scene": "negative_fragment",
+    "input": "无效截图：这是一段没有明确时间、地点或后续动作的碎片内容，仅用于测试忽略路径。",
+    "expected_fields": [],
+    "expected_missing_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [],
+    "edge": "非日程文本"
+  },
+  {
+    "id": "negative-fragment-005",
+    "scene": "negative_fragment",
+    "input": "纯说明文本：这是一段没有明确时间、地点或后续动作的碎片内容，仅用于测试忽略路径。",
+    "expected_fields": [],
+    "expected_missing_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [],
+    "edge": "需要忽略"
+  },
+  {
+    "id": "negative-fragment-006",
+    "scene": "negative_fragment",
+    "input": "营销海报角标：没有明确时间、地点、任务或后续安排，用于验证模型不要生成行动。",
+    "expected_fields": [],
+    "expected_missing_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [],
+    "edge": "反例"
+  },
+  {
+    "id": "negative-fragment-007",
+    "scene": "negative_fragment",
+    "input": "截图水印：没有明确时间、地点、任务或后续安排，用于验证模型不要生成行动。",
+    "expected_fields": [],
+    "expected_missing_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [],
+    "edge": "无行动"
+  },
+  {
+    "id": "negative-fragment-008",
+    "scene": "negative_fragment",
+    "input": "闲聊问候：没有明确时间、地点、任务或后续安排，用于验证模型不要生成行动。",
+    "expected_fields": [],
+    "expected_missing_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [],
+    "edge": "广告噪声"
+  },
+  {
+    "id": "negative-fragment-009",
+    "scene": "negative_fragment",
+    "input": "纯图片标题：没有明确时间、地点、任务或后续安排，用于验证模型不要生成行动。",
+    "expected_fields": [],
+    "expected_missing_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [],
+    "edge": "非日程文本"
+  },
+  {
+    "id": "negative-fragment-010",
+    "scene": "negative_fragment",
+    "input": "过期通知残片：没有明确时间、地点、任务或后续安排，用于验证模型不要生成行动。",
+    "expected_fields": [],
+    "expected_missing_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [],
+    "edge": "需要忽略"
+  }
+]

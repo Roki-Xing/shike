@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="cn.shike.app.ReminderPayloadTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-05-26T09:01:51" hostname="LAPTOP-B84BKQGP" time="0.004">
+  <properties/>
+  <testcase name="scheduledReminderFrom_keepsStablePayloadFields" classname="cn.shike.app.ReminderPayloadTest" time="0.002"/>
+  <testcase name="shouldRestoreScheduledReminder_rejectsExpiredPayload" classname="cn.shike.app.ReminderPayloadTest" time="0.001"/>
+  <testcase name="scheduledReminderFrom_nearStartUsesOneMinuteFallbackAndResultMode" classname="cn.shike.app.ReminderPayloadTest" time="0.0"/>
+  <testcase name="reminderDeliveryPayloadFrom_keepsIntentPayloadFields" classname="cn.shike.app.ReminderPayloadTest" time="0.001"/>
+  <testcase name="reminderDeliveryPayloadFrom_rejectsMissingOrBlankTitle" classname="cn.shike.app.ReminderPayloadTest" time="0.0"/>
+  <testcase name="reminderDeliveryPayloadFrom_defaultsMissingDetailAndId" classname="cn.shike.app.ReminderPayloadTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

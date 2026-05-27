@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/shike/model-output.schema.json",
+  "title": "ShikeModelOutput",
+  "type": "object",
+  "required": [
+    "scene_type",
+    "confidence",
+    "title",
+    "time",
+    "location",
+    "task",
+    "suggested_actions",
+    "missing_fields",
+    "explanation"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "scene_type": {
+      "type": "string",
+      "enum": ["course_notice", "event_poster", "unknown"]
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "time": {
+      "type": ["object", "null"],
+      "required": ["start_text", "deadline_text", "normalized_start", "normalized_deadline"],
+      "additionalProperties": false,
+      "properties": {
+        "start_text": {"type": ["string", "null"]},
+        "deadline_text": {"type": ["string", "null"]},
+        "normalized_start": {"type": ["string", "null"]},
+        "normalized_deadline": {"type": ["string", "null"]}
+      }
+    },
+    "location": {
+      "type": ["object", "null"],
+      "required": ["raw", "map_query", "confidence"],
+      "additionalProperties": false,
+      "properties": {
+        "raw": {"type": ["string", "null"]},
+        "map_query": {"type": ["string", "null"]},
+        "confidence": {"type": "number", "minimum": 0, "maximum": 1}
+      }
+    },
+    "task": {
+      "type": "object",
+      "required": ["summary", "priority", "topic"],
+      "additionalProperties": false,
+      "properties": {
+        "summary": {"type": "string", "minLength": 1},
+        "priority": {"type": "string", "enum": ["low", "medium", "high"]},
+        "topic": {"type": "string", "enum": ["course", "event", "unknown"]}
+      }
+    },
+    "suggested_actions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["type", "label", "requires_permission"],
+        "additionalProperties": false,
+        "properties": {
+          "type": {"type": "string", "enum": ["calendar", "reminder", "map"]},
+          "label": {"type": "string", "minLength": 1},
+          "requires_permission": {"type": "boolean"}
+        }
+      }
+    },
+    "missing_fields": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "explanation": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}
+
