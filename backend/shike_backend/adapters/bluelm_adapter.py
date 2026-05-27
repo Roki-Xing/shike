@@ -1,9 +1,9 @@
-"""BlueLM adapter (server-side) using vivo AI Gateway.
+"""BlueLM adapter (server-side) using vivo AIGC API.
 
 This adapter is designed to be optional:
 - Default backend behavior remains the deterministic Mock adapter.
 - When `SHIKE_MODEL_PROVIDER=bluelm` and credentials are configured, it calls
-  vivo AI Gateway and validates the output against the Shike contract.
+  vivo AIGC API and validates the output against the Shike contract.
 - On failure it raises AdapterError so the route can degrade safely.
 """
 
@@ -17,7 +17,6 @@ from typing import Any
 import requests
 
 from shike_backend.adapters.base import AdapterError
-from shike_backend.adapters.vivo_auth import gen_sign_headers
 from shike_backend.privacy import redact_ocr_text
 from shike_backend.schemas import AnalyzeRequest, AnalyzeResponse, load_model_output_schema
 
@@ -111,14 +110,13 @@ class BlueLMModelAdapter:
             "extra": {"temperature": self._temperature},
         }
 
-        headers = gen_sign_headers(
-            app_id=self._app_id,
-            app_key=self._app_key,
-            method="POST",
-            uri=self._uri,
-            query=params,
-        ).as_http_headers()
-        headers["Content-Type"] = "application/json"
+        # AIGC doc "鉴权方式" uses Bearer AppKey (not gateway signature headers).
+        # Keep headers minimal and never log/return secrets.
+        headers = {
+            "Authorization": f"Bearer {self._app_key}",
+            "X-App-Id": self._app_id,
+            "Content-Type": "application/json",
+        }
 
         url = f"{self._base_url}{self._uri}"
 
@@ -146,11 +144,16 @@ class BlueLMModelAdapter:
                 last_error = "invalid_json_response"
                 continue
 
+            # Provider returns {code,msg,data}. code==0 indicates success.
             if isinstance(obj, dict) and obj.get("code") == 0 and isinstance(obj.get("data"), dict):
                 content = obj["data"].get("content", "")
             else:
                 # Provider-specific error; keep it generic to avoid leaking sensitive details.
-                last_error = "provider_error"
+                msg = obj.get("msg") if isinstance(obj, dict) else None
+                if isinstance(msg, str) and "permission" in msg.lower():
+                    last_error = "provider_permission_denied"
+                else:
+                    last_error = "provider_error"
                 continue
 
             try:
@@ -166,4 +169,3 @@ class BlueLMModelAdapter:
                 continue
 
         raise AdapterError(last_error or "bluelm_failed")
-
