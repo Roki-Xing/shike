@@ -1,0 +1,30 @@
+# Secrets / local env
+.env
+.env.*
+*.env
+*.env.*
+
+# Local configs
+.config/
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build outputs
+build/
+dist/
+
+# Android / Gradle build artifacts
+android-mvp/.gradle/
+android-mvp/**/build/
+
+# Local databases / logs
+*.sqlite3
+*.log
+
