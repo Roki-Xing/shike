@@ -69,6 +69,10 @@ The adapter defaults are conservative for structured extraction:
 - `enable_thinking=false` for qwen models
 - `response_format={"type":"json_object"}` when supported, to reduce ``` fences.
 
+Note (verified against `https://api-ai.vivo.com.cn/v1/chat/completions`):
+- `thinking.type="enabled"` is accepted
+- `thinking.type="enable"` is rejected as an invalid value
+
 ## 5. Environment Variables (Backend Only)
 
 Example (DO NOT COMMIT REAL VALUES):
@@ -136,4 +140,3 @@ Never log:
 - `BLUELM_APP_KEY` value
 - signature strings
 - full OCR text (use length only, or a redacted sample if absolutely needed)
-
