@@ -126,6 +126,8 @@ class BlueLMModelAdapter:
         if "qwen" in model_name:
             payload["enable_thinking"] = False
         else:
+            # Doc center: for DeepSeek/Doubao models `thinking.type` accepts "enabled" / "disabled".
+            # "enable" (without the trailing "d") is rejected by the provider.
             payload["thinking"] = {"type": "disabled"}
 
         # AIGC doc "鉴权方式" uses Bearer AppKey (not gateway signature headers).
