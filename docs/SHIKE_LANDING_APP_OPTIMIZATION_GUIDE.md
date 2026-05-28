@@ -144,7 +144,7 @@ Shike Backend FastAPI
   ├─ PrivacyRedactor
   └─ Request/Response Audit Log（脱敏）
 
-BlueLM / vivo AI Gateway
+BlueLM / vivo AIGC API
   └─ 只由后端调用，不由 Android 直接调用
 ```
 
@@ -212,8 +212,8 @@ class ModelAdapter(Protocol):
 /v1/analyze 收到 Android 请求
   -> 脱敏 OCR 文本用于日志
   -> 构造模型 Prompt
-  -> BlueLMModelAdapter 生成签名 Header
-  -> 请求 vivo AI Gateway
+  -> BlueLMModelAdapter 构造 Bearer 鉴权 Header（后端环境变量读取 AppKEY）
+  -> 请求 vivo AIGC OpenAI-compatible 接口（默认 `/v1/chat/completions`）
   -> 解析模型输出
   -> 如果是 JSON：直接 Pydantic 校验
   -> 如果不是 JSON：有限重试一次“修复为 JSON”
