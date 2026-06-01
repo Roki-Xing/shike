@@ -1,0 +1,8 @@
+{
+  "input_id": "sample-travel-001",
+  "source_type": "camera",
+  "ocr_text": "高铁出行今晚10:00在西安北站集合，提前15分钟到达并检查证件。",
+  "locale": "zh-CN",
+  "scene_hint": "travel_ticket",
+  "user_timezone": "Asia/Shanghai"
+}

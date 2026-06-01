@@ -1,6 +1,7 @@
 package cn.shike.app
 
 import cn.shike.app.data.backendAnalyzeText
+import cn.shike.app.data.backendAnalysisInputForCurrentDraft
 import cn.shike.app.data.backendFailureFallbackCopyFor
 import cn.shike.app.data.backendFailureOutcome
 import cn.shike.app.data.backendSuccessOutcome
@@ -12,6 +13,17 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class BackendAnalysisRunnerTest {
+    @Test
+    fun backendAnalysisInputForCurrentDraft_usesCaptureSourceSpecificBackendType() {
+        val share = backendAnalysisInputForCurrentDraft("文本分享入口（待确认，未落盘）", sampleCourse())
+        val manual = backendAnalysisInputForCurrentDraft("手动输入入口：请编辑 OCR 文本草稿后选择后端解析或离线样例。", sampleCourse())
+
+        assertEquals("share_text", share.sourceType)
+        assertEquals("manual", manual.sourceType)
+        assertEquals("课程通知", share.fallback.scene)
+        assertEquals("课程通知", manual.fallback.scene)
+    }
+
     @Test
     fun backendAnalyzeText_prefersEditedOcrDraftAndFallsBackToSampleRawText() {
         val fallback = sampleCourse()

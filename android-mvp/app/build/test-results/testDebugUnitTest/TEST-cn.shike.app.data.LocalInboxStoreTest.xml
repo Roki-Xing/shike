@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="cn.shike.app.data.LocalInboxStoreTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-05-26T09:01:51" hostname="LAPTOP-B84BKQGP" time="0.004">
+<testsuite name="cn.shike.app.data.LocalInboxStoreTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-05-29T04:53:43" hostname="LAPTOP-B84BKQGP" time="0.001">
   <properties/>
-  <testcase name="encodeInboxActions_filtersBlankLabelsAndEscapesSeparators" classname="cn.shike.app.data.LocalInboxStoreTest" time="0.002"/>
+  <testcase name="encodeInboxActions_filtersBlankLabelsAndEscapesSeparators" classname="cn.shike.app.data.LocalInboxStoreTest" time="0.001"/>
   <testcase name="decodeInboxActions_trimsLabelsAndFallsBackToCourseActions" classname="cn.shike.app.data.LocalInboxStoreTest" time="0.0"/>
   <testcase name="sanitizeInboxCaptureSource_redactsSensitiveSourceAndFallsBackToDefault" classname="cn.shike.app.data.LocalInboxStoreTest" time="0.0"/>
-  <testcase name="sanitizeInboxRawText_redactsSensitiveRawTextAndFallsBackToDefault" classname="cn.shike.app.data.LocalInboxStoreTest" time="0.001"/>
+  <testcase name="sanitizeInboxRawText_redactsSensitiveRawTextAndFallsBackToDefault" classname="cn.shike.app.data.LocalInboxStoreTest" time="0.0"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

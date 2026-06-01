@@ -58,6 +58,8 @@ def main() -> int:
     privacy_test = read("android-mvp/app/src/test/java/cn/shike/app/data/PrivacyRedactionTest.kt")
     capture_test = read("android-mvp/app/src/test/java/cn/shike/app/data/CaptureImportMapperTest.kt")
     share_test = read("android-mvp/app/src/test/java/cn/shike/app/data/ShareImportMapperTest.kt")
+    ocr_engine_source = read("android-mvp/app/src/main/java/cn/shike/app/data/OcrEngine.kt")
+    ocr_engine_test = read("android-mvp/app/src/test/java/cn/shike/app/data/OcrEngineTest.kt")
     initial_selection_source = read("android-mvp/app/src/main/java/cn/shike/app/data/InitialSelectionMapper.kt")
     initial_selection_test = read("android-mvp/app/src/test/java/cn/shike/app/data/InitialSelectionMapperTest.kt")
     review_status_test = read("android-mvp/app/src/test/java/cn/shike/app/data/ReviewStatusMapperTest.kt")
@@ -85,6 +87,7 @@ def main() -> int:
     backend_outcome_test = read("android-mvp/app/src/test/java/cn/shike/app/BackendOutcomeActionsTest.kt")
     sample_actions_test = read("android-mvp/app/src/test/java/cn/shike/app/SampleActionsTest.kt")
     local_inbox_store_source = read("android-mvp/app/src/main/java/cn/shike/app/data/LocalInboxStore.kt")
+    legacy_inbox_snapshot_source = read("android-mvp/app/src/main/java/cn/shike/app/data/LegacyInboxSnapshot.kt")
     local_inbox_store_test = read("android-mvp/app/src/test/java/cn/shike/app/data/LocalInboxStoreTest.kt")
     local_data_clear_test = read("android-mvp/app/src/test/java/cn/shike/app/LocalDataClearActionsTest.kt")
     cloud_enhancement_test = read("android-mvp/app/src/test/java/cn/shike/app/CloudEnhancementActionsTest.kt")
@@ -138,10 +141,11 @@ def main() -> int:
         (
             "capture_import_unit_test_exists",
             "class CaptureImportMapperTest" in capture_test
-            and capture_test.count("@Test") == 3
+            and capture_test.count("@Test") == 4
             and "cameraSelectionFromPreview_mapsPreviewToEventDraft" in capture_test
             and "gallerySelectionFromImage_mapsImageLabelToCourseDraft" in capture_test
-            and "selectionFromCaptureDraft_routesOnlyCameraDraftToEventSample" in capture_test,
+            and "selectionFromCaptureDraft_routesOnlyCameraDraftToEventSample" in capture_test
+            and "backendSourceTypeFromCaptureSource_mapsAllProductEntrypoints" in capture_test,
         ),
         (
             "share_import_unit_test_exists",
@@ -169,12 +173,33 @@ def main() -> int:
             test_result_passed(
                 "android-mvp/app/build/test-results/testDebugUnitTest/TEST-cn.shike.app.data.CaptureImportMapperTest.xml",
                 "cn.shike.app.data.CaptureImportMapperTest",
-                3,
+                4,
             )
             and test_result_passed(
                 "android-mvp/app/build/test-results/testDebugUnitTest/TEST-cn.shike.app.data.ShareImportMapperTest.xml",
                 "cn.shike.app.data.ShareImportMapperTest",
                 4,
+            ),
+        ),
+        (
+            "ocr_engine_unit_test_exists",
+            "interface OcrEngine" in ocr_engine_source
+            and "class ManualOcrEngine" in ocr_engine_source
+            and "class MockOcrEngine" in ocr_engine_source
+            and "data class OcrResult" in ocr_engine_source
+            and "class OcrEngineTest" in ocr_engine_test
+            and ocr_engine_test.count("@Test") == 3
+            and "manualOcrEngine_keepsUserTextAndReportsBlankFailure" in ocr_engine_test
+            and "mockOcrEngine_producesGalleryAndCameraDraftText" in ocr_engine_test
+            and "captureDraftFromInput_recordsOcrMetadataAndPrivacyChoice" in ocr_engine_test
+            and "未识别到稳定文字" in ocr_engine_source,
+        ),
+        (
+            "gradle_ocr_engine_test_passed",
+            test_result_passed(
+                "android-mvp/app/build/test-results/testDebugUnitTest/TEST-cn.shike.app.data.OcrEngineTest.xml",
+                "cn.shike.app.data.OcrEngineTest",
+                3,
             ),
         ),
         (
@@ -327,11 +352,18 @@ def main() -> int:
             and 'put("source_type", sourceType)' in model_api_client_source
             and 'put("ocr_text", ocrText)' in model_api_client_source
             and 'put("scene_hint", sceneHint(scene))' in model_api_client_source
+            and "assignment_deadline" in model_api_client_source
+            and "meeting_notice" in model_api_client_source
+            and "interview_notice" in model_api_client_source
+            and "travel_ticket" in model_api_client_source
             and "class ModelApiClientTest" in model_api_client_test
-            and model_api_client_test.count("@Test") == 5
+            and model_api_client_test.count("@Test") == 8
             and "buildAnalyzeRequestPayload_keepsBackendContractFields" in model_api_client_test
+            and "buildAnalyzeRequestPayload_acceptsShareTextAndManualSourceTypes" in model_api_client_test
+            and "buildAnalyzeRequestPayload_mapsExtendedSceneHints" in model_api_client_test
             and "itemFromAnalyzeJson_courseNoticeCombinesTimeLocationAndActions" in model_api_client_test
             and "itemFromAnalyzeJson_eventPosterUsesFallbacksForBlankFields" in model_api_client_test
+            and "itemFromAnalyzeJson_unknownSceneFallsBackToPendingLabel" in model_api_client_test
             and "actionsFromJson_ignoresBlankAndMalformedActions" in model_api_client_test
             and "normalizeBackendUrl_stripsPathQueryAndFragment" in model_api_client_test
             and "android-demo-test" in model_api_client_test
@@ -362,17 +394,33 @@ def main() -> int:
                     'getString("locale")',
                     'getString("user_timezone")',
                     "course_notice",
+                    "event_poster",
+                    "assignment_deadline",
+                    "meeting_notice",
+                    "interview_notice",
+                    "travel_ticket",
+                    "share_text",
+                    "manual",
                     "zh-CN",
                     "Asia/Shanghai",
                 ]
             ),
         ),
         (
+            "source_type_contract_covers_share_text_and_manual",
+            "fun backendSourceTypeFromCaptureSource" in read("android-mvp/app/src/main/java/cn/shike/app/data/CaptureImportMapper.kt")
+            and "backendSourceTypeFromCaptureSource_mapsAllProductEntrypoints" in capture_test
+            and "backendAnalysisInputForCurrentDraft_usesCaptureSourceSpecificBackendType" in backend_analysis_runner_test
+            and "buildAnalyzeRequestPayload_acceptsShareTextAndManualSourceTypes" in model_api_client_test
+            and "share_text" in model_api_client_test
+            and "manual" in model_api_client_test,
+        ),
+        (
             "gradle_model_api_client_test_passed",
             test_result_passed(
                 "android-mvp/app/build/test-results/testDebugUnitTest/TEST-cn.shike.app.ModelApiClientTest.xml",
                 "cn.shike.app.ModelApiClientTest",
-                5,
+                8,
             ),
         ),
         (
@@ -501,9 +549,11 @@ def main() -> int:
             and "fun backendSuccessOutcome(" in backend_analysis_runner_source
             and "fun backendFailureOutcome(" in backend_analysis_runner_source
             and "fun backendFailureFallbackCopyFor(" in backend_analysis_runner_source
+            and "fun backendAnalysisInputForCurrentDraft(" in backend_analysis_runner_source
             and "data class BackendFailureFallbackCopy" in backend_analysis_runner_source
             and "class BackendAnalysisRunnerTest" in backend_analysis_runner_test
-            and backend_analysis_runner_test.count("@Test") == 4
+            and backend_analysis_runner_test.count("@Test") == 5
+            and "backendAnalysisInputForCurrentDraft_usesCaptureSourceSpecificBackendType" in backend_analysis_runner_test
             and "backendAnalyzeText_prefersEditedOcrDraftAndFallsBackToSampleRawText" in backend_analysis_runner_test
             and "backendFailureOutcome_redactsSensitiveTextAndKeepsFallbackReviewState" in backend_analysis_runner_test
             and "backendFailureFallbackCopyFor_redactsEvidenceBeforeUiPersistence" in backend_analysis_runner_test
@@ -525,7 +575,7 @@ def main() -> int:
             test_result_passed(
                 "android-mvp/app/build/test-results/testDebugUnitTest/TEST-cn.shike.app.BackendAnalysisRunnerTest.xml",
                 "cn.shike.app.BackendAnalysisRunnerTest",
-                4,
+                5,
             ),
         ),
         (
@@ -624,7 +674,7 @@ def main() -> int:
             "fun encodeInboxActions(" in local_inbox_store_source
             and "fun decodeInboxActions(" in local_inbox_store_source
             and ".putString(KEY_ACTIONS, encodeInboxActions(item.actions))" in local_inbox_store_source
-            and "val actions = decodeInboxActions(prefs.getString(KEY_ACTIONS, null))" in local_inbox_store_source
+            and "val actions = decodeInboxActions(preferences.getString(KEY_ACTIONS, null))" in legacy_inbox_snapshot_source
             and "class LocalInboxStoreTest" in local_inbox_store_test
             and local_inbox_store_test.count("@Test") == 4
             and "encodeInboxActions_filtersBlankLabelsAndEscapesSeparators" in local_inbox_store_test
@@ -636,7 +686,7 @@ def main() -> int:
             "local_inbox_capture_source_sanitization_unit_tested",
             "fun sanitizeInboxCaptureSource(" in local_inbox_store_source
             and ".putString(KEY_CAPTURE_SOURCE, sanitizeInboxCaptureSource(captureSource))" in local_inbox_store_source
-            and "sanitizeInboxCaptureSource(preferences(context).getString(KEY_CAPTURE_SOURCE, null))" in local_inbox_store_source
+            and "legacyInboxCaptureSourceFromPreferences(preferences(context))" in local_inbox_store_source
             and "redactSensitiveLogText(captureSource.orEmpty().trim())" in local_inbox_store_source
             and "sanitizeInboxCaptureSource_redactsSensitiveSourceAndFallsBackToDefault" in local_inbox_store_test
             and "13812345678" in local_inbox_store_test
@@ -648,7 +698,7 @@ def main() -> int:
             "local_inbox_raw_text_sanitization_unit_tested",
             "fun sanitizeInboxRawText(" in local_inbox_store_source
             and ".putString(KEY_RAW_TEXT, sanitizeInboxRawText(item.rawText))" in local_inbox_store_source
-            and "rawText = sanitizeInboxRawText(prefs.getString(KEY_RAW_TEXT, null))" in local_inbox_store_source
+            and "rawText = sanitizeInboxRawText(preferences.getString(KEY_RAW_TEXT, null))" in legacy_inbox_snapshot_source
             and "DEFAULT_RAW_TEXT" in local_inbox_store_source
             and "sanitizeInboxRawText_redactsSensitiveRawTextAndFallsBackToDefault" in local_inbox_store_test
             and "学号：2026123456" in local_inbox_store_test
@@ -701,7 +751,7 @@ def main() -> int:
         (
             "android_unit_test_guard_documented",
             "validate_android_unit_tests.py" in docs
-            and "ANDROID_UNIT_TEST_METRIC 61/61" in docs
+            and "ANDROID_UNIT_TEST_METRIC 64/64" in docs
             and "testDebugUnitTest" in docs,
         ),
     ]

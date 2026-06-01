@@ -113,7 +113,21 @@
 | 复赛 | Android APK、FastAPI、Room/SQLite、两类样例闭环 |
 | 决赛 | 端侧轻分类、隐私脱敏、桌面组件、智能体兼容层 |
 
-## 15. 竞争差异
+## 15. 复赛落地证据包
+
+| 证据页 | 展示内容 | 对应门禁 |
+|---|---|---|
+| BlueLM 接入证据 | `ModelAdapter`、结构化输出、脱敏后端日志、Android 不持有 AppKEY | `BLUELM_ADAPTER_METRIC 7/7`、`PASS secret_hygiene` |
+| 云真机测试 | HTTPS 后端、9 段云真机录屏清单、APK hash、测试报告 | `CLOUD_DEVICE_PREP_METRIC 5/5`、`CLOUD_DEVICE_PACKAGE_METRIC 27/27` |
+| 真实 App 前端 | 首页行动台、采集页、解析确认页、行动编排页、收件箱、Debug 页分离 | `FRONTEND_POLISH_METRIC 12/12`、`DEMO_ACCEPTANCE_METRIC 18/18` |
+| 失败降级 | 后端失败、权限拒绝、地图不可用、提醒权限不可用、用户确认门禁 | `REAL_WORLD_READY_METRIC 22/22`、`ACTION_EXECUTION_METRIC 17/17` |
+| 隐私安全 | AppKEY 不进 APK、环境变量、日志脱敏、一键清除本地数据 | `PASS secret_hygiene` |
+| 模型评测 | 110 条样例、低质量输入、unknown 兜底、场景扩展契约 | `MODEL_EVAL_METRIC 110/110`、`MODEL_CONTRACT_STRICT_METRIC 10/10` |
+| 评分证据 | 创新性、应用价值、完成度、大模型应用能力逐项映射到代码/视频/文档 | `REQUIREMENT_MATRIX_METRIC 9/9`、`DELIVERABLES_METRIC 10/10` |
+
+本地发布候选入口是 `materials/evidence/release-evidence-index.md` 和 `python3 shike/validation/validate_landing_release_candidate.py`，当前为 `LANDING_RELEASE_CANDIDATE_METRIC 52/52`。真实 9 段云真机 MP4 和填写后的 `cloud-device-test-report.md` 未收齐前，strict 发布保持 `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE 3/7` 阻断；录制前必须完成 `cloud-device-test-report.md` 的 `Pre-recording Evidence Gate`，确认 `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md` 仍是桌面指导源，`materials/evidence/requirement-matrix.md` 仍通过 `REQUIREMENT_MATRIX_METRIC 9/9`，all 9 real cloud-device MP4 files 已进入证据包，且 no placeholder fields remain after capture。阻断报告为 `materials/evidence/blocking-report.md`。`validation/traceability.md` 的 SHIKE-070 行用于串起 PPT、演示脚本、真机验收清单、发布证据索引和云真机证据包。
+
+## 16. 竞争差异
 
 | 对比对象 | 拾刻差异 |
 |---|---|
@@ -122,7 +136,7 @@
 | AI 聊天助手 | 入口在截图/拍照，不要求用户复制提问 |
 | 系统识屏/记忆 | 面向青年模板和执行追踪 |
 
-## 16. 总结
+## 17. 总结
 
 拾刻抓住手机 AI 最适合解决的问题：把真实高频的碎片信息直接转化成可确认、可执行、可追踪的行动。
 

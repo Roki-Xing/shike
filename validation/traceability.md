@@ -9,7 +9,6 @@
 | SHIKE-040 | 技术可行性 Spike | `spike/run_spike.py`, `spike/logs/spike-results.md` |
 | SHIKE-050 | 模型适配器与结构化输出契约 | `contracts/model-adapter.md`, `contracts/model-output.schema.json` |
 | SHIKE-060 | 复赛 Android MVP 主链路方案 | `docs/android-mvp-implementation.md` |
-| SHIKE-070 | 初赛提交材料包 | `materials/preliminary-deck.md`, `materials/demo-script.md`, `materials/poster-copy.md` |
+| SHIKE-070 | 初赛提交材料包 | `materials/preliminary-deck.md`, `materials/demo-script.md`, `materials/poster-copy.md`, `materials/submission-checklist.md`, `materials/device-demo-checklist.md`, `materials/evidence/release-evidence-index.md` (`RELEASE_EVIDENCE_INDEX_METRIC 10/10`), `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md` desktop guidance source, `materials/evidence/requirement-matrix.md` (`REQUIREMENT_MATRIX_METRIC 9/9`), `materials/evidence/blocking-report.md`, `materials/evidence/cloud-device/` (`CLOUD_DEVICE_PREP_METRIC 5/5`, `CLOUD_DEVICE_PREP_MISSING_VIDEOS 9/9`, `CLOUD_DEVICE_PACKAGE_METRIC 27/27`, expected `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE 3/7`, `Pre-recording Evidence Gate`, all 9 real cloud-device MP4 files, no placeholder fields remain after capture) |
 | SHIKE-080 | 复赛样例回归验证 | `validation/sample-regression.md`, `validation/regression-cases.json` |
 | SHIKE-090 | 降级方案与决赛增强路线 | `docs/fallback-and-finals-roadmap.md` |
-

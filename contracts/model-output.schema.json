@@ -18,7 +18,11 @@
   "properties": {
     "scene_type": {
       "type": "string",
-      "enum": ["course_notice", "event_poster", "unknown"]
+      "enum": [
+        "course_notice",
+        "event_poster",
+        "unknown"
+      ]
     },
     "confidence": {
       "type": "number",
@@ -57,7 +61,10 @@
       "properties": {
         "summary": {"type": "string", "minLength": 1},
         "priority": {"type": "string", "enum": ["low", "medium", "high"]},
-        "topic": {"type": "string", "enum": ["course", "event", "unknown"]}
+        "topic": {
+          "type": "string",
+          "enum": ["course", "event", "unknown"]
+        }
       }
     },
     "suggested_actions": {
@@ -84,4 +91,3 @@
     }
   }
 }
-

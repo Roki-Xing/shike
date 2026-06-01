@@ -1,5 +1,1658 @@
 # Optimization Log
 
+## 2026-05-31 / Round 231
+
+Goal: Make the cloud-device preparation handoff count report-level video evidence placeholders explicitly.
+
+Current handoff summary:
+- This continuation preserves the same release handoff boundary as the previous public-status update: `Goal: Bring the public validation status up to the current materials evidence package.`
+- Evidence package surfaces remain current: scoring evidence map, preliminary deck landing evidence package, `docs/delivery-boundary-and-scoring.md`, and `materials/preliminary-deck.md`.
+- Current release handoff metrics remain:
+  - `CLOUD_DEVICE_PACKAGE_METRIC	27/27`
+  - `RELEASE_EVIDENCE_INDEX_METRIC	10/10`
+  - `REQUIREMENT_MATRIX_METRIC	9/9`
+  - `DEMO_ACCEPTANCE_METRIC	18/18`
+  - `LANDING_RELEASE_CANDIDATE_METRIC	52/52`
+  - `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`
+- Desktop guidance and matrix anchors remain `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md` and `materials/evidence/requirement-matrix.md`.
+- No cloud recordings, report values, credentials, or personal data were fabricated.
+
+Files changed:
+- Updated `scripts/prepare_cloud_device_evidence.py` so the generated capture TODO now detects report video evidence lines that still contain `TBD` and prints `CLOUD_DEVICE_PREP_REPORT_VIDEO_TBD_FIELDS	9/9`.
+- Regenerated `materials/evidence/cloud-device/cloud-device-capture-todo.md` so it includes `Report video evidence still TBD: 9/9` and a `Report Video Evidence Still TBD` section.
+- Updated `validation/validate_cloud_device_package.py` so the non-strict cloud-device package requires the new report-video TBD section and operator instruction.
+- Updated `validation/validate_release_evidence_index.py`, `materials/evidence/release-evidence-index.md`, and `validation/validate_release_blocking_report.py` so release evidence surfaces expect the new prep-helper output and all nine report video placeholder rows.
+- Regenerated `materials/evidence/blocking-report.md` through the strict landing release validator.
+
+Validation:
+- PASS `python3 -m py_compile scripts/prepare_cloud_device_evidence.py validation/validate_cloud_device_package.py validation/validate_release_evidence_index.py validation/validate_release_blocking_report.py validation/validate_landing_release_candidate.py`
+- PASS `python3 scripts/prepare_cloud_device_evidence.py`
+  - Evidence: `CLOUD_DEVICE_PREP_METRIC	5/5`
+  - Evidence: `CLOUD_DEVICE_PREP_MISSING_VIDEOS	9/9`
+  - Evidence: `CLOUD_DEVICE_PREP_REPORT_TBD_FIELDS	14/14`
+  - Evidence: `CLOUD_DEVICE_PREP_REPORT_VIDEO_TBD_FIELDS	9/9`
+- PASS `python3 validation/validate_release_blocking_report.py`
+  - Evidence: `RELEASE_BLOCKING_REPORT_METRIC	8/8`
+- PASS `python3 validation/validate_release_evidence_index.py`
+  - Evidence: `RELEASE_EVIDENCE_INDEX_METRIC	10/10`
+- PASS `python3 validation/validate_cloud_device_package.py`
+  - Evidence: `CLOUD_DEVICE_PACKAGE_METRIC	27/27`
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	52/52`
+- EXPECTED BLOCK `python3 validation/validate_landing_release_candidate.py --strict`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`
+  - Blocking items: missing nine real cloud-device MP4 files, report placeholders, and placeholder cloud-device logcat.
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS	secret_hygiene`
+
+Behavior preserved:
+- Non-strict release readiness remains locally reproducible.
+- Strict release remains blocked until real cloud-device recordings, filled report values, and redacted logcat diagnostics exist.
+- The new metric is an operator handoff guard only; it does not weaken strict gates or manufacture evidence.
+
+Next:
+- Collect the nine real cloud-device MP4 recordings, fill the matching report video evidence rows with real redacted references, replace placeholder logcat, rerun `python3 scripts/prepare_cloud_device_evidence.py`, then rerun strict cloud-device and landing release gates.
+
+## 2026-05-31 / Round 230
+
+Goal: Keep the release evidence index aligned with the current strict-evidence gate after the strict blocker expansion.
+
+Current handoff summary:
+- This continuation preserves the same release handoff boundary as the previous public-status update: `Goal: Bring the public validation status up to the current materials evidence package.`
+- Evidence package surfaces remain current: scoring evidence map, preliminary deck landing evidence package, `docs/delivery-boundary-and-scoring.md`, and `materials/preliminary-deck.md`.
+- Current release handoff metrics remain:
+  - `CLOUD_DEVICE_PACKAGE_METRIC	27/27`
+  - `RELEASE_EVIDENCE_INDEX_METRIC	10/10`
+  - `REQUIREMENT_MATRIX_METRIC	9/9`
+  - `DEMO_ACCEPTANCE_METRIC	18/18`
+  - `LANDING_RELEASE_CANDIDATE_METRIC	52/52`
+  - `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`
+- Desktop guidance and matrix anchors remain `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md` and `materials/evidence/requirement-matrix.md`.
+- No cloud recordings, report values, credentials, or personal data were fabricated.
+
+Files changed:
+- Updated `validation/validate_release_evidence_index.py` so the optimization-log current handoff guard expects the current strict gate token `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7` instead of the stale `2/5` token.
+- Regenerated `materials/evidence/cloud-device/cloud-device-capture-todo.md` and `materials/evidence/cloud-device/apk-sha256.txt` through `scripts/prepare_cloud_device_evidence.py`.
+- Updated this log with the restored release-candidate evidence and the remaining strict external blockers.
+
+Validation:
+- PASS `python3 -m py_compile validation/validate_release_evidence_index.py`
+- PASS `python3 validation/validate_release_evidence_index.py`
+  - Evidence: `RELEASE_EVIDENCE_INDEX_METRIC	10/10`
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	52/52`
+- EXPECTED BLOCK `python3 validation/validate_landing_release_candidate.py --strict`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`
+  - Blocking items: missing nine real cloud-device MP4 files, placeholder report fields, and placeholder cloud-device logcat.
+- PASS `python3 scripts/prepare_cloud_device_evidence.py`
+  - Evidence: `CLOUD_DEVICE_PREP_METRIC	5/5`
+  - Evidence: `CLOUD_DEVICE_PREP_MISSING_VIDEOS	9/9`
+  - Evidence: `CLOUD_DEVICE_PREP_REPORT_TBD_FIELDS	14/14`
+- PASS `python3 validation/validate_cloud_device_package.py`
+  - Evidence: `CLOUD_DEVICE_PACKAGE_METRIC	27/27`
+- EXPECTED BLOCK `python3 validation/validate_cloud_device_package.py --strict`
+  - Evidence: `CLOUD_DEVICE_PACKAGE_METRIC	30/33`
+- PASS `python3 validation/validate_release_blocking_report.py`
+  - Evidence: `RELEASE_BLOCKING_REPORT_METRIC	8/8`
+- PASS `python3 validation/validate_requirement_matrix.py`
+  - Evidence: `REQUIREMENT_MATRIX_METRIC	9/9`
+- PASS `python3 validation/validate_deliverables.py`
+  - Evidence: `METRIC	10/10`
+- PASS `python3 validation/validate_demo_acceptance.py`
+  - Evidence: `DEMO_ACCEPTANCE_METRIC	18/18`
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS	secret_hygiene`
+
+Behavior preserved:
+- Local release-candidate readiness is again reproducible at 52/52.
+- Strict release remains correctly blocked on real external cloud-device evidence.
+- No strict blocker was weakened and no external proof was fabricated.
+
+Next:
+- Collect the nine real cloud-device MP4 recordings, replace the report TBD fields with redacted real values, replace placeholder logcat with redacted diagnostics, rerun the prep helper, then rerun the strict package and strict release gates.
+
+## 2026-05-31 / Round 229
+
+Goal: Make the cloud-device evidence preparation checklist state-aware so the remaining strict blockers are actionable after each recording pass.
+
+Current handoff summary:
+- This continuation preserves the same release handoff boundary as the previous public-status update: `Goal: Bring the public validation status up to the current materials evidence package.`
+- Evidence package surfaces remain current: scoring evidence map, preliminary deck landing evidence package, `docs/delivery-boundary-and-scoring.md`, and `materials/preliminary-deck.md`.
+- Current release handoff metrics remain:
+  - `CLOUD_DEVICE_PACKAGE_METRIC	27/27`
+  - `RELEASE_EVIDENCE_INDEX_METRIC	10/10`
+  - `REQUIREMENT_MATRIX_METRIC	9/9`
+  - `DEMO_ACCEPTANCE_METRIC	18/18`
+  - `LANDING_RELEASE_CANDIDATE_METRIC	52/52`
+  - `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`
+- Desktop guidance and matrix anchors remain `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md` and `materials/evidence/requirement-matrix.md`.
+- No cloud recordings, report values, credentials, or personal data were fabricated.
+
+Files changed:
+- Updated `scripts/prepare_cloud_device_evidence.py` so the generated capture TODO now reads the current evidence folder, counts missing MP4 files, detects report fields that still contain placeholders, and prints `CLOUD_DEVICE_PREP_REPORT_TBD_FIELDS`.
+- Regenerated `materials/evidence/cloud-device/cloud-device-capture-todo.md` so it now starts with `Current Missing Evidence`, `Missing Videos`, and `Report Fields Still TBD`.
+- Updated `validation/validate_cloud_device_package.py` so the non-strict package gate requires that generated missing-evidence summary.
+
+Validation:
+- PASS `python3 -m py_compile scripts/prepare_cloud_device_evidence.py validation/validate_cloud_device_package.py`
+- PASS `python3 scripts/prepare_cloud_device_evidence.py`
+  - Evidence: `CLOUD_DEVICE_PREP_METRIC	5/5`
+  - Evidence: `CLOUD_DEVICE_PREP_MISSING_VIDEOS	9/9`
+  - Evidence: `CLOUD_DEVICE_PREP_REPORT_TBD_FIELDS	14/14`
+- PASS `python3 validation/validate_cloud_device_package.py`
+  - Evidence: `CLOUD_DEVICE_PACKAGE_METRIC	27/27`
+- PASS `python3 validation/validate_release_evidence_index.py`
+  - Evidence: `RELEASE_EVIDENCE_INDEX_METRIC	10/10`
+- PASS `python3 validation/validate_release_blocking_report.py`
+  - Evidence: `RELEASE_BLOCKING_REPORT_METRIC	8/8`
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	52/52`
+
+Behavior preserved:
+- The new summary is generated from existing files; it does not create cloud recordings or replace real report values.
+- Strict release remains blocked until real MP4 files are present and report placeholders are replaced.
+- No credentials or personal data were introduced.
+
+Next:
+- Use `materials/evidence/cloud-device/cloud-device-capture-todo.md` as the operator checklist during cloud-device recording, rerun the prep helper after each batch, and stop only when missing videos and report TBD fields both reach `0`.
+
+## 2026-05-31 / Round 228
+
+Goal: Re-audit the current desktop guidance closeout state and keep the remaining release blocker explicit.
+
+Current handoff summary:
+- This continuation rechecked the same release handoff boundary as the previous public-status update: `Goal: Bring the public validation status up to the current materials evidence package.`
+- Evidence package surfaces remain current: scoring evidence map, preliminary deck landing evidence package, `docs/delivery-boundary-and-scoring.md`, and `materials/preliminary-deck.md`.
+- Current release handoff metrics remain:
+  - `CLOUD_DEVICE_PACKAGE_METRIC	27/27`
+  - `RELEASE_EVIDENCE_INDEX_METRIC	10/10`
+  - `REQUIREMENT_MATRIX_METRIC	9/9`
+  - `DEMO_ACCEPTANCE_METRIC	18/18`
+  - `LANDING_RELEASE_CANDIDATE_METRIC	52/52`
+  - `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`
+- Desktop guidance and matrix anchors remain `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md` and `materials/evidence/requirement-matrix.md`.
+- No cloud recordings, report values, credentials, or personal data were fabricated.
+
+Files changed:
+- Updated `docs/optimization-log.md` with the latest local release-candidate and strict-release evidence from this continuation pass.
+
+Validation:
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	52/52`
+- EXPECTED BLOCK `python3 validation/validate_landing_release_candidate.py --strict`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`
+  - Evidence: `BLOCKING_REPORT	materials/evidence/blocking-report.md`
+  - Reason: strict mode still requires real cloud-device MP4 recordings and a filled cloud-device report; no external evidence was fabricated.
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS	secret_hygiene`
+- PASS `python3 validation/validate_bluelm_adapter.py`
+  - Evidence: `BLUELM_ADAPTER_METRIC	7/7`
+- PASS `python3 backend/verify_backend.py`
+  - Evidence: `backend_passed`
+- PASS `python3 validation/validate_model_contract_strict.py`
+  - Evidence: `MODEL_CONTRACT_STRICT_METRIC	10/10`
+- PASS `python3 validation/validate_cloud_backend_ready.py`
+  - Evidence: `CLOUD_BACKEND_READY_METRIC	5/5`
+
+Behavior preserved:
+- Local release-candidate readiness remains reproducible at 52/52.
+- Strict release remains blocked only on real external cloud-device proof, not on local repository gates.
+- BlueLM credentials remain backend-only; no AppKEY, token, personal OCR text, phone number, email, or student ID was added.
+
+Next:
+- Collect the nine real cloud-device recordings and replace placeholder fields in `materials/evidence/cloud-device/cloud-device-test-report.md`, then rerun the strict gate.
+
+## 2026-05-29 / Round 227
+
+Goal: Bring the public validation status up to the current materials evidence package.
+
+Files changed:
+- Updated `docs/current-validation-status.md` so the repository structure baseline now lists the scoring evidence map and preliminary deck landing evidence package as current handoff artifacts.
+- Updated `validation/validate_release_evidence_index.py` so release evidence validation requires the public status page to mention the scoring evidence map and preliminary deck landing evidence package.
+
+Validation:
+- PASS `python3 -m py_compile validation/validate_release_evidence_index.py`
+- PASS `python3 validation/validate_release_evidence_index.py`
+  - Evidence: `RELEASE_EVIDENCE_INDEX_METRIC	10/10`
+- PASS `python3 validation/validate_deliverables.py`
+  - Evidence: `METRIC	10/10`
+- PASS `python3 validation/validate_requirement_matrix.py`
+  - Evidence: `REQUIREMENT_MATRIX_METRIC	9/9`
+- PASS `python3 validation/validate_demo_acceptance.py`
+  - Evidence: `DEMO_ACCEPTANCE_METRIC	18/18`
+- PASS `python3 validation/validate_cloud_device_package.py`
+  - Evidence: `CLOUD_DEVICE_PACKAGE_METRIC	27/27`
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	52/52`
+- EXPECTED BLOCK `python3 validation/validate_landing_release_candidate.py --strict`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`
+  - Reason: strict mode still correctly blocks on missing real cloud-device MP4/report evidence.
+- PASS `python3 validation/validate_release_blocking_report.py`
+  - Evidence: `RELEASE_BLOCKING_REPORT_METRIC	8/8`
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS	secret_hygiene`
+
+Behavior preserved:
+- The public status page now names `docs/delivery-boundary-and-scoring.md` and `materials/preliminary-deck.md` as evidence-bearing handoff artifacts, but strict release still requires real external cloud-device proof.
+- Before cloud-device recording, operators must confirm `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md` remains the desktop guidance source and `materials/evidence/requirement-matrix.md` still passes `REQUIREMENT_MATRIX_METRIC 9/9`.
+- No cloud recordings, report values, credentials, or personal data were fabricated.
+
+Next:
+- Continue local proof-chain hardening only where it reduces handoff drift; strict completion still depends on real cloud-device MP4 files and a filled report.
+
+## 2026-05-29 / Round 196
+
+Goal: Bring the optimization-log release handoff summary up to the current evidence metrics.
+
+Files changed:
+- Updated `docs/optimization-log.md` with the current release handoff state so the first visible log entry no longer points operators at stale 24/24, 25/25, and 6/6 evidence gates.
+- Updated `validation/validate_release_evidence_index.py` so release evidence validation also requires the optimization log's current handoff summary.
+
+Validation:
+- PASS `python3 scripts/prepare_cloud_device_evidence.py`
+  - Evidence: `CLOUD_DEVICE_PREP_METRIC	5/5`
+  - Evidence: `CLOUD_DEVICE_PREP_MISSING_VIDEOS	9/9`
+- PASS `python3 validation/validate_cloud_device_package.py`
+  - Evidence: `CLOUD_DEVICE_PACKAGE_METRIC	27/27`
+- PASS `python3 validation/validate_release_evidence_index.py`
+  - Evidence: `RELEASE_EVIDENCE_INDEX_METRIC	10/10`
+- PASS `python3 validation/validate_requirement_matrix.py`
+  - Evidence: `REQUIREMENT_MATRIX_METRIC	8/8`
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	52/52`
+- EXPECTED BLOCK `python3 validation/validate_landing_release_candidate.py --strict`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`
+  - Reason: strict mode still correctly blocks on missing real cloud-device MP4/report evidence.
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS	secret_hygiene`
+
+Behavior preserved:
+- Strict release remains blocked on real external cloud-device proof; no cloud recordings, report values, credentials, or personal data were fabricated.
+- Historical optimization-log entries keep their original evidence values because they describe earlier rounds.
+
+Next:
+- Continue only with local, mechanically verifiable release-readiness gaps unless real cloud-device evidence is collected.
+
+## 2026-05-29 / Round 184
+
+Goal: Scan current release handoff surfaces for another local, mechanically verifiable gap.
+
+Files changed:
+- None.
+
+Scan result:
+- Checked README, current validation status, release evidence index, cloud-device README, capture TODO, device demo checklist, and submission checklist for release/strict handoff consistency.
+- No new current-facing stale metric, missing release evidence command, or missing strict boundary was found.
+- Remaining strict release blockers are external: real cloud-device MP4 recordings and filled cloud-device report fields.
+
+Validation:
+- PASS `python3 validation/validate_release_evidence_index.py`
+  - Evidence: `RELEASE_EVIDENCE_INDEX_METRIC	6/6`
+- PASS `python3 validation/validate_cloud_device_package.py`
+  - Evidence: `CLOUD_DEVICE_PACKAGE_METRIC	24/24`
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	52/52`
+- EXPECTED BLOCK `python3 validation/validate_landing_release_candidate.py --strict`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`
+  - Reason: strict mode still correctly blocks on missing real cloud-device MP4/report evidence.
+- PASS `python3 validation/validate_release_blocking_report.py`
+  - Evidence: `RELEASE_BLOCKING_REPORT_METRIC	8/8`
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS	secret_hygiene`
+
+Behavior preserved:
+- No files were changed in this round.
+- No cloud recordings, report values, credentials, or personal data were fabricated.
+
+Next:
+- Further progress toward strict release requires collecting the nine real cloud-device recordings and replacing placeholder report fields with redacted real evidence.
+
+## 2026-05-29 / Round 183
+
+Goal: Make the release evidence index rebuild checklist self-verifying.
+
+Files changed:
+- Updated `materials/evidence/release-evidence-index.md` so the rebuild checklist now reruns `validate_release_evidence_index.py` after refreshing evidence files.
+- Added the expected-blocking `validate_landing_release_candidate.py --strict` command to the release evidence index rebuild checklist so strict evidence status is always rechecked.
+- Updated `validation/validate_release_evidence_index.py` so the evidence index guard requires both commands.
+
+Validation:
+- PASS `python3 -m py_compile validation/validate_release_evidence_index.py`
+- PASS `python3 validation/validate_release_evidence_index.py`
+  - Evidence: `RELEASE_EVIDENCE_INDEX_METRIC	6/6`
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	52/52`
+- PASS `python3 validation/validate_cloud_device_package.py`
+  - Evidence: `CLOUD_DEVICE_PACKAGE_METRIC	24/24`
+- EXPECTED BLOCK `python3 validation/validate_landing_release_candidate.py --strict`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`
+  - Reason: strict mode still correctly blocks on missing real cloud-device MP4/report evidence.
+- PASS `python3 validation/validate_release_blocking_report.py`
+  - Evidence: `RELEASE_BLOCKING_REPORT_METRIC	8/8`
+- PASS `python3 validation/validate_demo_acceptance.py`
+  - Evidence: `DEMO_ACCEPTANCE_METRIC	18/18`
+- PASS `python3 validation/validate_frontend_polish.py`
+  - Evidence: `FRONTEND_POLISH_METRIC	12/12`
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS	secret_hygiene`
+- PASS `python3 validation/validate_real_world_ready.py`
+  - Evidence: `REAL_WORLD_READY_METRIC	22/22`
+
+Behavior preserved:
+- Release evidence index remains a local handoff artifact; strict release still requires real external cloud-device proof.
+- No cloud recordings, report values, credentials, or personal data were fabricated.
+
+Next:
+- Continue scanning for remaining local handoff quality gaps; avoid changing historical log evidence unless it affects current generated artifacts.
+
+## 2026-05-29 / Round 182
+
+Goal: Make strict cloud-device handoff rerun the non-strict package gate before strict validation.
+
+Files changed:
+- Updated `scripts/prepare_cloud_device_evidence.py` so regenerated `cloud-device-capture-todo.md` lists `validate_cloud_device_package.py` before strict cloud-device and strict release validation.
+- Updated `materials/evidence/cloud-device/cloud-device-capture-todo.md` with the same non-strict package precheck.
+- Updated `validation/validate_landing_release_candidate.py` so generated strict blocking reports tell operators to rerun `validate_cloud_device_package.py` and keep `CLOUD_DEVICE_PACKAGE_METRIC 24/24` before strict validation.
+- Updated `materials/evidence/blocking-report.md` with the same required next action.
+- Updated `validation/validate_release_blocking_report.py` and `validation/validate_cloud_device_package.py` so both handoff files require the non-strict package precheck.
+
+Validation:
+- PASS `python3 -m py_compile scripts/prepare_cloud_device_evidence.py validation/validate_landing_release_candidate.py validation/validate_release_blocking_report.py validation/validate_cloud_device_package.py`
+- PASS `python3 scripts/prepare_cloud_device_evidence.py`
+  - Evidence: `CLOUD_DEVICE_PREP_METRIC	5/5`
+  - Evidence: `CLOUD_DEVICE_PREP_MISSING_VIDEOS	9/9`
+- PASS `python3 validation/validate_cloud_device_package.py`
+  - Evidence: `CLOUD_DEVICE_PACKAGE_METRIC	24/24`
+- PASS `python3 validation/validate_release_blocking_report.py`
+  - Evidence: `RELEASE_BLOCKING_REPORT_METRIC	8/8`
+- PASS `python3 validation/validate_release_evidence_index.py`
+  - Evidence: `RELEASE_EVIDENCE_INDEX_METRIC	6/6`
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	52/52`
+- EXPECTED BLOCK `python3 validation/validate_landing_release_candidate.py --strict`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`
+  - Reason: strict mode still correctly blocks on missing real cloud-device MP4/report evidence.
+- PASS `python3 validation/validate_demo_acceptance.py`
+  - Evidence: `DEMO_ACCEPTANCE_METRIC	18/18`
+- PASS `python3 validation/validate_frontend_polish.py`
+  - Evidence: `FRONTEND_POLISH_METRIC	12/12`
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS	secret_hygiene`
+- PASS `python3 validation/validate_real_world_ready.py`
+  - Evidence: `REAL_WORLD_READY_METRIC	22/22`
+
+Behavior preserved:
+- Strict release remains blocked on real external cloud-device proof; this round only improved the operator rerun order.
+- No cloud recordings, report values, credentials, or personal data were fabricated.
+
+Next:
+- Continue scanning evidence handoff artifacts for ordering or traceability gaps that can be verified mechanically.
+
+## 2026-05-29 / Round 181
+
+Goal: Make SHIKE-070 traceability cover the actual release evidence handoff artifacts.
+
+Files changed:
+- Updated `validation/traceability.md` so SHIKE-070 now points to `materials/submission-checklist.md`, `materials/device-demo-checklist.md`, `materials/evidence/release-evidence-index.md`, `materials/evidence/blocking-report.md`, and `materials/evidence/cloud-device/`.
+- Updated `validation/validate_deliverables.py` so SHIKE-070 fails if the traceability matrix omits the release evidence index, blocking report, cloud-device evidence folder, submission checklist, or device demo checklist.
+
+Validation:
+- PASS `python3 -m py_compile validation/validate_deliverables.py`
+- PASS `python3 validation/validate_deliverables.py`
+  - Evidence: `METRIC	10/10`
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	52/52`
+- PASS `python3 validation/validate_cloud_device_package.py`
+  - Evidence: `CLOUD_DEVICE_PACKAGE_METRIC	24/24`
+- PASS `python3 validation/validate_release_evidence_index.py`
+  - Evidence: `RELEASE_EVIDENCE_INDEX_METRIC	6/6`
+- EXPECTED BLOCK `python3 validation/validate_landing_release_candidate.py --strict`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`
+  - Reason: strict mode still correctly blocks on missing real cloud-device MP4/report evidence.
+- PASS `python3 validation/validate_release_blocking_report.py`
+  - Evidence: `RELEASE_BLOCKING_REPORT_METRIC	8/8`
+- PASS `python3 validation/validate_demo_acceptance.py`
+  - Evidence: `DEMO_ACCEPTANCE_METRIC	18/18`
+- PASS `python3 validation/validate_frontend_polish.py`
+  - Evidence: `FRONTEND_POLISH_METRIC	12/12`
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS	secret_hygiene`
+- PASS `python3 validation/validate_real_world_ready.py`
+  - Evidence: `REAL_WORLD_READY_METRIC	22/22`
+
+Behavior preserved:
+- SHIKE-070 still maps to the same submission material bucket; this round only made the release-evidence handoff traceable from the issue matrix.
+- No cloud recordings, report values, credentials, or personal data were fabricated.
+
+Next:
+- Continue with narrow handoff or validator improvements only when they close an actual traceability or release-readiness gap.
+
+## 2026-05-29 / Round 180
+
+Goal: Make the cloud-device evidence package README state the current non-strict package metric.
+
+Files changed:
+- Updated `materials/evidence/cloud-device/README.md` so the package-local handoff says the non-strict gate must pass at `CLOUD_DEVICE_PACKAGE_METRIC 24/24`.
+- Tightened `validation/validate_cloud_device_package.py` so the package README release handoff must include that current package metric.
+
+Validation:
+- PASS Protocol Fingerprint Check
+  - Evidence: re-read `runtime-hard-invariants.md`, `core-principles.md`, and `loop-workflow.md`; resume check returned iteration/current metric 179 before this round.
+- PASS `python3 -m py_compile validation/validate_cloud_device_package.py`
+- PASS `python3 validation/validate_cloud_device_package.py`
+  - Evidence: `CLOUD_DEVICE_PACKAGE_METRIC	24/24`
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	52/52`
+- PASS `python3 validation/validate_release_evidence_index.py`
+  - Evidence: `RELEASE_EVIDENCE_INDEX_METRIC	6/6`
+- EXPECTED BLOCK `python3 validation/validate_landing_release_candidate.py --strict`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`
+  - Reason: strict mode still correctly blocks on missing real cloud-device MP4/report evidence.
+- PASS `python3 validation/validate_release_blocking_report.py`
+  - Evidence: `RELEASE_BLOCKING_REPORT_METRIC	8/8`
+- PASS `python3 validation/validate_demo_acceptance.py`
+  - Evidence: `DEMO_ACCEPTANCE_METRIC	18/18`
+- PASS `python3 validation/validate_frontend_polish.py`
+  - Evidence: `FRONTEND_POLISH_METRIC	12/12`
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS	secret_hygiene`
+- PASS `python3 validation/validate_real_world_ready.py`
+  - Evidence: `REAL_WORLD_READY_METRIC	22/22`
+
+Behavior preserved:
+- The cloud-device evidence folder still distinguishes non-strict handoff readiness from strict real-recording proof.
+- No cloud recordings, report values, credentials, or personal data were fabricated.
+
+Next:
+- Continue scanning remaining handoff materials for stale metric names or missing release evidence boundaries.
+
+## 2026-05-29 / Round 179
+
+Goal: Align the landing optimization guide's cloud-device phase with the current release evidence handoff.
+
+Files changed:
+- Updated `docs/SHIKE_LANDING_APP_OPTIMIZATION_GUIDE.md` so the cloud-device validation section names the current `CLOUD_DEVICE_PACKAGE_METRIC 24/24`, strict `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE 3/7` boundary, release evidence index, and blocking report.
+- Updated the guide's Goal 3 completion condition so it requires the 24/24 package gate, release evidence index, blocking report, and strict external-evidence boundary to stay synchronized.
+- Updated the guide's phase-two acceptance commands to include `validate_release_blocking_report.py`, `validate_release_evidence_index.py`, default `validate_landing_release_candidate.py`, and expected-blocking strict release validation.
+- Tightened `validation/validate_landing_release_candidate.py` so stale cloud-device guide wording cannot pass the public-doc guard.
+
+Validation:
+- PASS `python3 -m py_compile validation/validate_landing_release_candidate.py`
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	52/52`
+- PASS `python3 validation/validate_cloud_device_package.py`
+  - Evidence: `CLOUD_DEVICE_PACKAGE_METRIC	24/24`
+- PASS `python3 validation/validate_release_evidence_index.py`
+  - Evidence: `RELEASE_EVIDENCE_INDEX_METRIC	6/6`
+- EXPECTED BLOCK `python3 validation/validate_landing_release_candidate.py --strict`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`
+  - Reason: strict mode still correctly blocks on missing real cloud-device MP4/report evidence.
+- PASS `python3 validation/validate_release_blocking_report.py`
+  - Evidence: `RELEASE_BLOCKING_REPORT_METRIC	8/8`
+- PASS `python3 validation/validate_demo_acceptance.py`
+  - Evidence: `DEMO_ACCEPTANCE_METRIC	18/18`
+- PASS `python3 validation/validate_frontend_polish.py`
+  - Evidence: `FRONTEND_POLISH_METRIC	12/12`
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS	secret_hygiene`
+- PASS `python3 validation/validate_real_world_ready.py`
+  - Evidence: `REAL_WORLD_READY_METRIC	22/22`
+
+Behavior preserved:
+- The landing guide still keeps cloud-device recording as a real external-evidence task; this round only made its acceptance criteria current and stricter.
+- No cloud recordings, report values, credentials, or personal data were fabricated.
+
+Next:
+- Run the protocol fingerprint check before selecting Round 180, then continue only with a focused, mechanically verifiable handoff improvement.
+
+## 2026-05-29 / Round 178
+
+Goal: Keep the current validation status rerun list aligned with release handoff gates.
+
+Files changed:
+- Updated `docs/current-validation-status.md` so the Next Highest Priority section now separates the S3 quality rerun list from the release handoff rerun list.
+- Added the release handoff rerun commands for `validate_cloud_device_package.py`, `validate_release_blocking_report.py`, `validate_release_evidence_index.py`, `validate_landing_release_candidate.py`, and expected-blocking `validate_landing_release_candidate.py --strict`.
+- Tightened `validation/validate_cloud_device_package.py` so the current status page must keep the release handoff rerun list and strict `2/5` boundary.
+
+Validation:
+- PASS `python3 -m py_compile validation/validate_cloud_device_package.py`
+- PASS `python3 validation/validate_cloud_device_package.py`
+  - Evidence: `CLOUD_DEVICE_PACKAGE_METRIC	24/24`
+- PASS `python3 validation/validate_release_evidence_index.py`
+  - Evidence: `RELEASE_EVIDENCE_INDEX_METRIC	6/6`
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	52/52`
+- EXPECTED BLOCK `python3 validation/validate_landing_release_candidate.py --strict`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`
+  - Reason: strict mode still correctly blocks on missing real cloud-device MP4/report evidence.
+- PASS `python3 validation/validate_release_blocking_report.py`
+  - Evidence: `RELEASE_BLOCKING_REPORT_METRIC	8/8`
+- PASS `python3 validation/validate_demo_acceptance.py`
+  - Evidence: `DEMO_ACCEPTANCE_METRIC	18/18`
+- PASS `python3 validation/validate_frontend_polish.py`
+  - Evidence: `FRONTEND_POLISH_METRIC	12/12`
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS	secret_hygiene`
+- PASS `python3 validation/validate_real_world_ready.py`
+  - Evidence: `REAL_WORLD_READY_METRIC	22/22`
+
+Behavior preserved:
+- The S3 quality hardening list remains intact; release handoff checks are added as a separate final rerun block.
+- Strict release remains blocked on real external cloud-device proof; no evidence was fabricated.
+
+Next:
+- Continue scanning user-facing release materials for missing strict evidence boundaries.
+
+## 2026-05-29 / Round 177
+
+Goal: Make the public cloud-device handoff show the current package gate and release evidence state.
+
+Files changed:
+- Updated `README.md` so the cloud-device evidence package section names the current `CLOUD_DEVICE_PACKAGE_METRIC 24/24`, release evidence index, blocking report, default `LANDING_RELEASE_CANDIDATE_METRIC 52/52`, and expected strict `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE 3/7` state.
+- Updated `docs/current-validation-status.md` with explicit cloud-device package, release blocking report, and release evidence index baseline rows.
+- Updated `validation/validate_cloud_device_package.py` so README and current validation status must keep the release handoff tokens, raising the non-strict package guard to `CLOUD_DEVICE_PACKAGE_METRIC 24/24`.
+- Updated `materials/evidence/release-evidence-index.md` and `validation/validate_release_evidence_index.py` to use the current 24/24 cloud-device package metric.
+
+Validation:
+- PASS `python3 -m py_compile validation/validate_cloud_device_package.py validation/validate_release_evidence_index.py`
+- PASS `python3 validation/validate_cloud_device_package.py`
+  - Evidence: `CLOUD_DEVICE_PACKAGE_METRIC	24/24`
+- PASS `python3 validation/validate_release_evidence_index.py`
+  - Evidence: `RELEASE_EVIDENCE_INDEX_METRIC	6/6`
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	52/52`
+- EXPECTED BLOCK `python3 validation/validate_landing_release_candidate.py --strict`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`
+  - Reason: strict mode still correctly blocks on missing real cloud-device MP4/report evidence.
+- PASS `python3 validation/validate_release_blocking_report.py`
+  - Evidence: `RELEASE_BLOCKING_REPORT_METRIC	8/8`
+- PASS `python3 validation/validate_demo_acceptance.py`
+  - Evidence: `DEMO_ACCEPTANCE_METRIC	18/18`
+- PASS `python3 validation/validate_frontend_polish.py`
+  - Evidence: `FRONTEND_POLISH_METRIC	12/12`
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS	secret_hygiene`
+- PASS `python3 validation/validate_real_world_ready.py`
+  - Evidence: `REAL_WORLD_READY_METRIC	22/22`
+
+Behavior preserved:
+- Strict release remains blocked on real external cloud-device proof; this round only tightened current handoff documentation and guards.
+- No cloud recordings, report values, credentials, or personal data were fabricated.
+
+Next:
+- Continue auditing current validation/public handoff surfaces for stale release evidence metrics or missing strict-mode boundary notes.
+
+## 2026-05-29 / Round 176
+
+Goal: Keep strict blocking reports connected to the release evidence index after cloud-device refreshes.
+
+Files changed:
+- Updated `validation/validate_landing_release_candidate.py` so generated strict blocking reports tell operators to rerun `validate_release_evidence_index.py` after refreshing `apk-sha256.txt` and `cloud-device-capture-todo.md`.
+- Updated `materials/evidence/blocking-report.md` with the same required next action.
+- Updated `validation/validate_release_blocking_report.py` so blocking-report quality now requires the release evidence index rerun instruction.
+
+Validation:
+- PASS `python3 -m py_compile validation/validate_landing_release_candidate.py validation/validate_release_blocking_report.py`
+- EXPECTED BLOCK `python3 validation/validate_landing_release_candidate.py --strict`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`
+  - Reason: strict mode regenerated the blocking report and still correctly blocks on missing real cloud-device MP4/report evidence.
+- PASS `python3 validation/validate_release_blocking_report.py`
+  - Evidence: `RELEASE_BLOCKING_REPORT_METRIC	8/8`
+- PASS `python3 validation/validate_release_evidence_index.py`
+  - Evidence: `RELEASE_EVIDENCE_INDEX_METRIC	6/6`
+- PASS `python3 validation/validate_cloud_device_package.py`
+  - Evidence: `CLOUD_DEVICE_PACKAGE_METRIC	23/23`
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	52/52`
+- PASS `python3 validation/validate_demo_acceptance.py`
+  - Evidence: `DEMO_ACCEPTANCE_METRIC	18/18`
+- PASS `python3 validation/validate_frontend_polish.py`
+  - Evidence: `FRONTEND_POLISH_METRIC	12/12`
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS	secret_hygiene`
+- PASS `python3 validation/validate_real_world_ready.py`
+  - Evidence: `REAL_WORLD_READY_METRIC	22/22`
+
+Behavior preserved:
+- Strict release remains blocked on real external cloud-device proof; this round only made the generated blocker handoff more complete.
+- No cloud recordings, report values, credentials, or personal data were fabricated.
+
+Next:
+- Continue auditing evidence helper outputs and release handoff files for missing rerun or redaction instructions.
+
+## 2026-05-29 / Round 175
+
+Goal: Keep generated cloud-device capture TODO files aligned with release handoff evidence.
+
+Files changed:
+- Updated `scripts/prepare_cloud_device_evidence.py` so regenerated `cloud-device-capture-todo.md` includes a Release Handoff section with the release evidence index, blocking report, default `LANDING_RELEASE_CANDIDATE_METRIC 52/52`, and expected strict `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE 3/7` state.
+- Updated `materials/evidence/cloud-device/cloud-device-capture-todo.md` with the same handoff section and `validate_release_evidence_index.py` command.
+- Updated `validation/validate_cloud_device_package.py` so the package guard requires those generated TODO handoff tokens.
+
+Validation:
+- PASS `python3 -m py_compile scripts/prepare_cloud_device_evidence.py validation/validate_cloud_device_package.py`
+- PASS `python3 scripts/prepare_cloud_device_evidence.py`
+  - Evidence: `CLOUD_DEVICE_PREP_METRIC	5/5`
+  - Evidence: `CLOUD_DEVICE_PREP_MISSING_VIDEOS	9/9`
+- PASS `python3 validation/validate_cloud_device_package.py`
+  - Evidence: `CLOUD_DEVICE_PACKAGE_METRIC	23/23`
+- PASS `python3 validation/validate_release_evidence_index.py`
+  - Evidence: `RELEASE_EVIDENCE_INDEX_METRIC	6/6`
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	52/52`
+- PASS `python3 validation/validate_demo_acceptance.py`
+  - Evidence: `DEMO_ACCEPTANCE_METRIC	18/18`
+- PASS `python3 validation/validate_frontend_polish.py`
+  - Evidence: `FRONTEND_POLISH_METRIC	12/12`
+- EXPECTED BLOCK `python3 validation/validate_landing_release_candidate.py --strict`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`
+  - Reason: real cloud-device MP4 files and filled cloud-device report remain external evidence gaps.
+- PASS `python3 validation/validate_release_blocking_report.py`
+  - Evidence: `RELEASE_BLOCKING_REPORT_METRIC	8/8`
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS	secret_hygiene`
+- PASS `python3 validation/validate_real_world_ready.py`
+  - Evidence: `REAL_WORLD_READY_METRIC	22/22`
+
+Behavior preserved:
+- The preparation helper still does not create fake recordings; it reports all 9 real cloud-device videos as missing until they are collected.
+- Strict release remains blocked on real external cloud-device proof; no cloud recordings, report values, credentials, or personal data were fabricated.
+
+Next:
+- Continue auditing generated evidence helpers and operator checklists for drift against the current release-candidate gate.
+
+## 2026-05-29 / Round 174
+
+Goal: Make the cloud-device manifest a complete release handoff entrypoint.
+
+Files changed:
+- Updated `materials/evidence/cloud-device/cloud-device-manifest.md` with related release handoff files, the default `LANDING_RELEASE_CANDIDATE_METRIC 52/52` gate, and the expected strict `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE 3/7` blocker state.
+- Updated `validation/validate_cloud_device_package.py` with `manifest_links_release_handoff`, raising the package skeleton guard to `CLOUD_DEVICE_PACKAGE_METRIC 23/23`.
+- Updated `materials/evidence/release-evidence-index.md` and `validation/validate_release_evidence_index.py` to reference the current cloud-device package metric.
+
+Validation:
+- PASS `python3 validation/validate_cloud_device_package.py`
+  - Evidence: `CLOUD_DEVICE_PACKAGE_METRIC	23/23`
+- PASS `python3 validation/validate_release_evidence_index.py`
+  - Evidence: `RELEASE_EVIDENCE_INDEX_METRIC	6/6`
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	52/52`
+- PASS `python3 validation/validate_demo_acceptance.py`
+  - Evidence: `DEMO_ACCEPTANCE_METRIC	18/18`
+- PASS `python3 validation/validate_frontend_polish.py`
+  - Evidence: `FRONTEND_POLISH_METRIC	12/12`
+- EXPECTED BLOCK `python3 validation/validate_landing_release_candidate.py --strict`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`
+  - Reason: real cloud-device MP4 files and filled cloud-device report remain external evidence gaps.
+- PASS `python3 validation/validate_release_blocking_report.py`
+  - Evidence: `RELEASE_BLOCKING_REPORT_METRIC	8/8`
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS	secret_hygiene`
+- PASS `python3 validation/validate_real_world_ready.py`
+  - Evidence: `REAL_WORLD_READY_METRIC	22/22`
+
+Behavior preserved:
+- The manifest still describes a staging package; strict mode remains blocked until real recordings and a filled cloud-device report exist.
+- No cloud recordings, report values, credentials, or personal data were fabricated.
+
+Next:
+- Continue improving evidence package completeness and cross-file handoff consistency without converting external blockers into claimed proof.
+
+## 2026-05-29 / Round 172
+
+Goal: Expand the final delivery-package validation list to current core gates.
+
+Files changed:
+- Updated `docs/SHIKE_LANDING_APP_OPTIMIZATION_GUIDE.md` final delivery-package tree so `validation/` includes demo acceptance, real-world readiness, release blocking report, release evidence index, and deliverables validators in addition to the existing security, BlueLM, cloud package, frontend, and release-candidate gates.
+- Updated `validation/validate_landing_release_candidate.py` so `landing_guide_current` requires those core validator names inside the final delivery tree.
+
+Validation:
+- PASS `python3 -m py_compile validation/validate_landing_release_candidate.py`
+- PASS delivery-tree validator list check
+  - Evidence: `DELIVERY_TREE_VALIDATOR_MISSING 0`
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	52/52`
+- PASS `python3 validation/validate_demo_acceptance.py`
+  - Evidence: `DEMO_ACCEPTANCE_METRIC	18/18`
+- PASS `python3 validation/validate_frontend_polish.py`
+  - Evidence: `FRONTEND_POLISH_METRIC	12/12`
+- EXPECTED BLOCK `python3 validation/validate_landing_release_candidate.py --strict`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`
+  - Reason: real cloud-device MP4 files and filled cloud-device report remain external evidence gaps.
+- PASS `python3 validation/validate_release_blocking_report.py`
+  - Evidence: `RELEASE_BLOCKING_REPORT_METRIC	8/8`
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS	secret_hygiene`
+- PASS `python3 validation/validate_real_world_ready.py`
+  - Evidence: `REAL_WORLD_READY_METRIC	22/22`
+
+Behavior preserved:
+- The final package tree remains a handoff suggestion; it now lists the executable gates already used by the release candidate flow.
+- Strict release remains blocked on real external cloud-device proof; no cloud recordings, report values, credentials, or personal data were fabricated.
+
+Next:
+- Continue checking whether final package instructions and current README/status agree on which commands are mandatory versus strict external evidence.
+
+## 2026-05-29 / Round 171
+
+Goal: Make the final delivery-package tree match current backend and evidence paths.
+
+Files changed:
+- Updated `docs/SHIKE_LANDING_APP_OPTIMIZATION_GUIDE.md` final delivery-package tree to replace nonexistent `docs/cloud-device-test-report.md`, `docs/privacy-and-security.md`, `backend/main.py`, and `backend/env.example`.
+- The delivery tree now points to `backend/shike_backend/main.py`, `backend/shike_backend/adapters/`, `backend/shike_backend/prompts/`, and cloud evidence files under `materials/evidence/cloud-device/`.
+- Updated `validation/validate_landing_release_candidate.py` so `landing_guide_current` checks the delivery tree section for the current backend/evidence entries while avoiding false substring matches such as `backend/main.py` inside `shike_backend/main.py`.
+
+Validation:
+- PASS `python3 -m py_compile validation/validate_landing_release_candidate.py`
+- PASS delivery-tree existence check
+  - Evidence: `DELIVERY_TREE_EXISTENCE_MISSING 0`
+- PASS delivery-tree token check
+  - Evidence: tree contains `cloud-device-test-report.md`, `backend-redacted-access-log.txt`, `apk-sha256.txt`, `shike_backend/main.py`, `shike_backend/adapters/`, and `shike_backend/prompts/`; tree omits flat `main.py` and `env.example`.
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	52/52`
+- PASS `python3 validation/validate_demo_acceptance.py`
+  - Evidence: `DEMO_ACCEPTANCE_METRIC	18/18`
+- PASS `python3 validation/validate_frontend_polish.py`
+  - Evidence: `FRONTEND_POLISH_METRIC	12/12`
+- EXPECTED BLOCK `python3 validation/validate_landing_release_candidate.py --strict`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`
+  - Reason: real cloud-device MP4 files and filled cloud-device report remain external evidence gaps.
+- PASS `python3 validation/validate_release_blocking_report.py`
+  - Evidence: `RELEASE_BLOCKING_REPORT_METRIC	8/8`
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS	secret_hygiene`
+- PASS `python3 validation/validate_real_world_ready.py`
+  - Evidence: `REAL_WORLD_READY_METRIC	22/22`
+
+Behavior preserved:
+- The guide now uses existing repository paths and still treats environment variables/runbook setup as operator configuration, not a committed env template.
+- Strict release remains blocked on real external cloud-device proof; no cloud recordings, report values, credentials, or personal data were fabricated.
+
+Next:
+- Continue checking high-visibility delivery instructions for mismatches between tree examples, actual files, and validator expectations.
+
+## 2026-05-29 / Round 170
+
+Goal: Sync the final delivery-package tree with the current material artifact names.
+
+Files changed:
+- Updated `docs/SHIKE_LANDING_APP_OPTIMIZATION_GUIDE.md` final delivery-package tree to replace obsolete `scoring-evidence-map.md`, `final-demo-script.md`, and `landing-deck-outline.md` with current artifacts: `docs/delivery-boundary-and-scoring.md`, `materials/demo-script.md`, `materials/preliminary-deck.md`, `materials/submission-checklist.md`, `materials/evidence/release-evidence-index.md`, and `materials/evidence/blocking-report.md`.
+- Updated `validation/validate_landing_release_candidate.py` so `landing_guide_current` requires the current delivery package file names and rejects the obsolete ones.
+
+Validation:
+- PASS `python3 -m py_compile validation/validate_landing_release_candidate.py`
+- PASS obsolete-name scan with `rg`
+  - Evidence: no `scoring-evidence-map.md`, `final-demo-script.md`, or `landing-deck-outline.md` remains in `docs/SHIKE_LANDING_APP_OPTIMIZATION_GUIDE.md`.
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	52/52`
+- PASS public path existence scan
+  - Evidence: `MISSING_PATH_COUNT 0`
+- PASS `python3 validation/validate_demo_acceptance.py`
+  - Evidence: `DEMO_ACCEPTANCE_METRIC	18/18`
+- PASS `python3 validation/validate_frontend_polish.py`
+  - Evidence: `FRONTEND_POLISH_METRIC	12/12`
+- EXPECTED BLOCK `python3 validation/validate_landing_release_candidate.py --strict`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`
+  - Reason: real cloud-device MP4 files and filled cloud-device report remain external evidence gaps.
+- PASS `python3 validation/validate_release_blocking_report.py`
+  - Evidence: `RELEASE_BLOCKING_REPORT_METRIC	8/8`
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS	secret_hygiene`
+- PASS `python3 validation/validate_real_world_ready.py`
+  - Evidence: `REAL_WORLD_READY_METRIC	22/22`
+
+Behavior preserved:
+- The guide now points reviewers to files that exist in this repository; no new final package artifact is claimed.
+- Strict release remains blocked on real external cloud-device proof; no cloud recordings, report values, credentials, or personal data were fabricated.
+
+Next:
+- Continue scanning remaining high-visibility sections for old package names and outdated submission instructions.
+
+## 2026-05-29 / Round 169
+
+Goal: Make release-candidate public-doc checks easier to maintain safely.
+
+Files changed:
+- Refactored `validation/validate_landing_release_candidate.py` so the growing public-document assertions are grouped into `landing_guide_current` and `goal_mode_guide_current` booleans before constructing the 52-check list.
+
+Validation:
+- PASS `python3 -m py_compile validation/validate_landing_release_candidate.py`
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	52/52`
+- PASS public path existence scan
+  - Evidence: `MISSING_PATH_COUNT 0`
+- PASS `python3 validation/validate_demo_acceptance.py`
+  - Evidence: `DEMO_ACCEPTANCE_METRIC	18/18`
+- PASS `python3 validation/validate_frontend_polish.py`
+  - Evidence: `FRONTEND_POLISH_METRIC	12/12`
+- EXPECTED BLOCK `python3 validation/validate_landing_release_candidate.py --strict`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`
+  - Reason: real cloud-device MP4 files and filled cloud-device report remain external evidence gaps.
+- PASS `python3 validation/validate_release_blocking_report.py`
+  - Evidence: `RELEASE_BLOCKING_REPORT_METRIC	8/8`
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS	secret_hygiene`
+- PASS `python3 validation/validate_real_world_ready.py`
+  - Evidence: `REAL_WORLD_READY_METRIC	22/22`
+
+Behavior preserved:
+- The release-candidate denominator remains 52 checks; this round only changed internal validator structure to reduce future syntax-risk when adding public-doc assertions.
+- Strict release remains blocked on real external cloud-device proof; no cloud recordings, report values, credentials, or personal data were fabricated.
+
+Next:
+- Continue with a protocol fingerprint check before selecting Round 170, then keep the next round focused on high-visibility handoff quality.
+
+## 2026-05-29 / Round 168
+
+Goal: Remove the last missing public-doc path from the goal-mode guide.
+
+Files changed:
+- Updated `docs/CODEX_GOAL_MODE_OPTIMIZATION_GUIDE.md` so the per-round maintained-file list no longer points to nonexistent `android-mvp/app/src/androidTest/**`.
+- Replaced that placeholder with the current real device-maintenance surfaces: `docs/device-runbook.md` and `materials/device-demo-checklist.md`.
+- Updated `validation/validate_landing_release_candidate.py` so the public-docs check rejects the missing `androidTest` path and requires the real runbook/checklist paths in the goal-mode guide.
+
+Validation:
+- PASS `python3 -m py_compile validation/validate_landing_release_candidate.py`
+- PASS old-path scan with `rg`
+  - Evidence: no `android-mvp/app/src/androidTest/` remains in `docs/CODEX_GOAL_MODE_OPTIMIZATION_GUIDE.md`.
+- PASS public path existence scan
+  - Evidence: `MISSING_PATH_COUNT 0`
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	52/52`
+- PASS `python3 validation/validate_demo_acceptance.py`
+  - Evidence: `DEMO_ACCEPTANCE_METRIC	18/18`
+- PASS `python3 validation/validate_frontend_polish.py`
+  - Evidence: `FRONTEND_POLISH_METRIC	12/12`
+- EXPECTED BLOCK `python3 validation/validate_landing_release_candidate.py --strict`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`
+  - Reason: real cloud-device MP4 files and filled cloud-device report remain external evidence gaps.
+- PASS `python3 validation/validate_release_blocking_report.py`
+  - Evidence: `RELEASE_BLOCKING_REPORT_METRIC	8/8`
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS	secret_hygiene`
+- PASS `python3 validation/validate_real_world_ready.py`
+  - Evidence: `REAL_WORLD_READY_METRIC	22/22`
+
+Behavior preserved:
+- No Android instrumentation tests were claimed or fabricated; connected/device verification remains a real-device follow-up documented in current status and runbooks.
+- Strict release remains blocked on real external cloud-device proof; no cloud recordings, report values, credentials, or personal data were fabricated.
+
+Next:
+- Continue auditing high-visibility handoff text for stale assumptions, then consider consolidating the repeated release-candidate public-doc checks into safer local booleans.
+
+## 2026-05-29 / Round 167
+
+Goal: Point the goal-mode guide at the real strict blocking-report artifact.
+
+Files changed:
+- Updated `docs/CODEX_GOAL_MODE_OPTIMIZATION_GUIDE.md` so pause/blocker reporting and per-round maintained-file guidance point to `materials/evidence/blocking-report.md` instead of nonexistent `docs/blocking-report.md`.
+- Updated `validation/validate_landing_release_candidate.py` so the public-docs check requires the real blocking-report path and rejects the old docs path.
+
+Validation:
+- PASS `python3 -m py_compile validation/validate_landing_release_candidate.py`
+- PASS old-path scan with `rg`
+  - Evidence: no `docs/blocking-report.md` remains in `docs/CODEX_GOAL_MODE_OPTIMIZATION_GUIDE.md`.
+- PASS current-path scan with `rg`
+  - Evidence: `materials/evidence/blocking-report.md` appears in the blocker and maintained-file sections.
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	52/52`
+- PASS `python3 validation/validate_demo_acceptance.py`
+  - Evidence: `DEMO_ACCEPTANCE_METRIC	18/18`
+- PASS `python3 validation/validate_frontend_polish.py`
+  - Evidence: `FRONTEND_POLISH_METRIC	12/12`
+- EXPECTED BLOCK `python3 validation/validate_landing_release_candidate.py --strict`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`
+  - Reason: real cloud-device MP4 files and filled cloud-device report remain external evidence gaps.
+- PASS `python3 validation/validate_release_blocking_report.py`
+  - Evidence: `RELEASE_BLOCKING_REPORT_METRIC	8/8`
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS	secret_hygiene`
+- PASS `python3 validation/validate_real_world_ready.py`
+  - Evidence: `REAL_WORLD_READY_METRIC	22/22`
+
+Behavior preserved:
+- Only documentation pointers and the existing public-doc guard changed; strict mode still writes and validates the same `materials/evidence/blocking-report.md` artifact.
+- Strict release remains blocked on real external cloud-device proof; no cloud recordings, report values, credentials, or personal data were fabricated.
+
+Next:
+- Continue scanning public guides for references to missing folders, stale submission-package names, or command paths that do not match current repository layout.
+
+## 2026-05-29 / Round 166
+
+Goal: Replace obsolete landing-guide validator names with current executable gates.
+
+Files changed:
+- Updated `docs/SHIKE_LANDING_APP_OPTIMIZATION_GUIDE.md` so the OCR phase uses `validate_ocr_engine_layer.py` and `validate_ocr_input.py` instead of the nonexistent `validate_capture_ocr_pipeline.py`.
+- Updated the material phase in the same guide so it references current deliverables: `materials/demo-script.md`, `materials/preliminary-deck.md`, `materials/submission-checklist.md`, `materials/evidence/release-evidence-index.md`, and `docs/delivery-boundary-and-scoring.md`, with `validate_deliverables.py` and `validate_release_evidence_index.py` as executable gates.
+- Updated `validation/validate_landing_release_candidate.py` so the public-docs check rejects the obsolete validator names and requires the current OCR/material gates in the landing optimization guide.
+
+Validation:
+- PASS `python3 -m py_compile validation/validate_landing_release_candidate.py`
+- PASS obsolete-name scan with `rg`
+  - Evidence: no `validate_capture_ocr_pipeline.py`, `validate_landing_materials.py`, `materials/final-demo-script.md`, `materials/landing-deck-outline.md`, or `docs/scoring-evidence-map.md` remains in `docs/SHIKE_LANDING_APP_OPTIMIZATION_GUIDE.md`.
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	52/52`
+- PASS `python3 validation/validate_ocr_engine_layer.py`
+  - Evidence: `OCR_ENGINE_LAYER_METRIC	9/9`
+- PASS `python3 validation/validate_ocr_input.py`
+  - Evidence: `OCR_INPUT_METRIC	12/12`
+- PASS `python3 validation/validate_deliverables.py`
+  - Evidence: `METRIC	10/10`
+- PASS `python3 validation/validate_release_evidence_index.py`
+  - Evidence: `RELEASE_EVIDENCE_INDEX_METRIC	6/6`
+- PASS `python3 validation/validate_demo_acceptance.py`
+  - Evidence: `DEMO_ACCEPTANCE_METRIC	18/18`
+- PASS `python3 validation/validate_frontend_polish.py`
+  - Evidence: `FRONTEND_POLISH_METRIC	12/12`
+- EXPECTED BLOCK `python3 validation/validate_landing_release_candidate.py --strict`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`
+  - Reason: real cloud-device MP4 files and filled cloud-device report remain external evidence gaps.
+- PASS `python3 validation/validate_release_blocking_report.py`
+  - Evidence: `RELEASE_BLOCKING_REPORT_METRIC	8/8`
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS	secret_hygiene`
+- PASS `python3 validation/validate_real_world_ready.py`
+  - Evidence: `REAL_WORLD_READY_METRIC	22/22`
+
+Behavior preserved:
+- Release-candidate remains a 52-check local gate; this round only corrected public execution instructions to match existing files.
+- Strict release remains blocked on real external cloud-device proof; no cloud recordings, report values, credentials, or personal data were fabricated.
+
+Next:
+- Continue auditing public handoff docs for references to missing files, obsolete material names, or stale command paths.
+
+## 2026-05-29 / Round 165
+
+Goal: Sync the goal-mode guide inbox target with the landed SQLite inbox workbench.
+
+Files changed:
+- Updated `docs/CODEX_GOAL_MODE_OPTIMIZATION_GUIDE.md` Goal C so the inbox target now requires SQLite persistence, legacy `SharedPreferences` snapshot migration, search, archive/restore, 50 synthetic records, and `INBOX_WORKBENCH_LANDING_METRIC 12/12`.
+- Updated `validation/validate_inbox_workbench_landing.py` so the current inbox guard rejects stale guide wording that still claims only "at least 10 historical action cards".
+
+Validation:
+- PASS stale guide scan with `rg`
+  - Evidence: no `至少 10 条历史行动卡` or old `SharedPreferences 当前卡片快照升级为 Room/SQLite 收件箱` wording remains in `docs/CODEX_GOAL_MODE_OPTIMIZATION_GUIDE.md`.
+- PASS `python3 validation/validate_inbox_workbench_landing.py`
+  - Evidence: `INBOX_WORKBENCH_LANDING_METRIC	12/12`
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	52/52`
+- PASS `python3 validation/validate_demo_acceptance.py`
+  - Evidence: `DEMO_ACCEPTANCE_METRIC	18/18`
+- PASS `python3 validation/validate_frontend_polish.py`
+  - Evidence: `FRONTEND_POLISH_METRIC	12/12`
+- EXPECTED BLOCK `python3 validation/validate_landing_release_candidate.py --strict`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`
+  - Reason: real cloud-device MP4 files and filled cloud-device report remain external evidence gaps.
+- PASS `python3 validation/validate_release_blocking_report.py`
+  - Evidence: `RELEASE_BLOCKING_REPORT_METRIC	8/8`
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS	secret_hygiene`
+- PASS `python3 validation/validate_real_world_ready.py`
+  - Evidence: `REAL_WORLD_READY_METRIC	22/22`
+
+Behavior preserved:
+- The inbox validator still reports the same 12 checks; this round tightened one existing documentation-consistency check rather than inflating the gate.
+- Strict release remains blocked on real external cloud-device proof; no cloud recordings, report values, credentials, or personal data were fabricated.
+
+Next:
+- Continue scanning remaining guides and material surfaces for old denominators, old inbox assumptions, or strict-evidence wording that could mislead a reviewer.
+
+## 2026-05-29 / Round 164
+
+Goal: Sync the landing optimization guide with the current release-candidate gate.
+
+Files changed:
+- Updated `docs/SHIKE_LANDING_APP_OPTIMIZATION_GUIDE.md` so the total local release-candidate gate is `52/52`, including strict blocking-report quality and release evidence index quality.
+- Updated `validation/validate_landing_release_candidate.py` so the existing public-docs check rejects stale guide wording that still claims `LANDING_RELEASE_CANDIDATE_METRIC 50/50`.
+
+Validation:
+- PASS stale guide scan with `rg`
+  - Evidence: no `LANDING_RELEASE_CANDIDATE_METRIC 50/50`, `>= 40/50`, `>= 45/50`, or `整合成 50 项` remains in `docs/SHIKE_LANDING_APP_OPTIMIZATION_GUIDE.md`.
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	52/52`
+- PASS `python3 validation/validate_demo_acceptance.py`
+  - Evidence: `DEMO_ACCEPTANCE_METRIC	18/18`
+- PASS `python3 validation/validate_frontend_polish.py`
+  - Evidence: `FRONTEND_POLISH_METRIC	12/12`
+- EXPECTED BLOCK `python3 validation/validate_landing_release_candidate.py --strict`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`
+  - Reason: real cloud-device MP4 files and filled cloud-device report remain external evidence gaps.
+- PASS `python3 validation/validate_release_blocking_report.py`
+  - Evidence: `RELEASE_BLOCKING_REPORT_METRIC	8/8`
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS	secret_hygiene`
+- PASS `python3 validation/validate_real_world_ready.py`
+  - Evidence: `REAL_WORLD_READY_METRIC	22/22`
+
+Behavior preserved:
+- The release-candidate validator still reports the same 52 local checks; this round tightened an existing public-document guard instead of inflating the denominator.
+- Strict release remains blocked on real external cloud-device proof; no cloud recordings, report values, credentials, or personal data were fabricated.
+
+Next:
+- Continue scanning handoff guides, prototype surfaces, and material checklists for stale gate names or outdated external-evidence boundaries.
+
+## 2026-05-29 / Round 163
+
+Goal: Sync the Demo console with the current demo acceptance metric.
+
+Files changed:
+- Updated `prototype/demo.html` so the Demo console now shows `DEMO_ACCEPTANCE_METRIC 18/18` instead of stale `17/17`.
+- Updated `validation/validate_demo_acceptance.py` so the demo page check requires the current `18/18` demo metric and rejects stale `17/17` wording.
+
+Validation:
+- PASS `python3 validation/validate_demo_acceptance.py`
+  - Evidence: `DEMO_ACCEPTANCE_METRIC	18/18`
+- PASS `python3 validation/validate_frontend_polish.py`
+  - Evidence: `FRONTEND_POLISH_METRIC	12/12`
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	52/52`
+- EXPECTED BLOCK `python3 validation/validate_landing_release_candidate.py --strict`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`
+  - Reason: real cloud-device MP4 files and filled cloud-device report remain external evidence gaps.
+- PASS `python3 validation/validate_release_blocking_report.py`
+  - Evidence: `RELEASE_BLOCKING_REPORT_METRIC	8/8`
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS	secret_hygiene`
+- PASS `python3 validation/validate_real_world_ready.py`
+  - Evidence: `REAL_WORLD_READY_METRIC	22/22`
+
+Behavior preserved:
+- The Demo console remains a static handoff surface, but it now reflects the current mechanical demo acceptance gate.
+- Strict release remains blocked on real external cloud-device proof; no cloud recordings, report values, credentials, or personal data were fabricated.
+
+Next:
+- Continue scanning visible handoff surfaces for stale readiness metrics and keep strict cloud-device blockers separate from local readiness.
+
+## 2026-05-29 / Round 162
+
+Goal: Sync the public README with the current inbox landing guard.
+
+Files changed:
+- Updated `README.md` so the inbox landing guard baseline is now `INBOX_WORKBENCH_LANDING_METRIC 12/12` and explicitly includes status-document synchronization.
+- Updated `validation/validate_inbox_workbench_landing.py` so the inbox landing guard checks the README for the current guard command, metric, and status-document wording.
+
+Validation:
+- PASS `python3 validation/validate_inbox_workbench_landing.py`
+  - Evidence: `INBOX_WORKBENCH_LANDING_METRIC	12/12`
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	52/52`
+- EXPECTED BLOCK `python3 validation/validate_landing_release_candidate.py --strict`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`
+  - Reason: real cloud-device MP4 files and filled cloud-device report remain external evidence gaps.
+- PASS `python3 validation/validate_release_blocking_report.py`
+  - Evidence: `RELEASE_BLOCKING_REPORT_METRIC	8/8`
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS	secret_hygiene`
+- PASS `python3 validation/validate_real_world_ready.py`
+  - Evidence: `REAL_WORLD_READY_METRIC	22/22`
+
+Behavior preserved:
+- The README now matches the stricter inbox landing guard instead of stale `10/10` wording.
+- Strict release remains blocked on real external cloud-device proof; no cloud recordings, report values, credentials, or personal data were fabricated.
+
+Next:
+- Continue scanning public handoff surfaces for stale readiness metrics and tie any remaining drift to mechanical guards.
+
+## 2026-05-29 / Round 161
+
+Goal: Align current validation status with the implemented SQLite inbox layer.
+
+Files changed:
+- Updated `docs/current-validation-status.md` so the persistence risk section now reflects the current `InboxDatabase` SQLite history, `InboxItemEntity` mapping, 50-record synthetic seed coverage, and legacy `SharedPreferences` migration boundary.
+- Updated `validation/validate_inbox_workbench_landing.py` so the inbox landing guard rejects the old “does not yet satisfy Room/SQLite inbox target” wording and requires the current status document to mention the SQLite inbox evidence.
+
+Validation:
+- PASS `python3 validation/validate_inbox_workbench_landing.py`
+  - Evidence: `INBOX_WORKBENCH_LANDING_METRIC	11/11`
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	52/52`
+- EXPECTED BLOCK `python3 validation/validate_landing_release_candidate.py --strict`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`
+  - Reason: real cloud-device MP4 files and filled cloud-device report remain external evidence gaps.
+- PASS `python3 validation/validate_release_blocking_report.py`
+  - Evidence: `RELEASE_BLOCKING_REPORT_METRIC	8/8`
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS	secret_hygiene`
+- PASS `python3 validation/validate_real_world_ready.py`
+  - Evidence: `REAL_WORLD_READY_METRIC	22/22`
+
+Behavior preserved:
+- The inbox landing guard still proves entity types, SQLite storage, legacy snapshot migration, multi-record UI history, 50-record seed coverage, archive/search/status filters, and Android unit guard coverage.
+- Strict release remains blocked on real external cloud-device proof; no cloud recordings, report values, credentials, or personal data were fabricated.
+
+Next:
+- Sync any remaining public metric references to the new `INBOX_WORKBENCH_LANDING_METRIC 11/11` gate.
+
+## 2026-05-29 / Round 160
+
+Goal: Prevent Product Beta status wording from drifting back to the old unfinished-strict posture.
+
+Files changed:
+- Updated `docs/current-validation-status.md` so the next-priority section now keeps `validate_advanced_product_beta.py --strict` inside the release-candidate gate because Product Beta already passes at `PRODUCT_BETA_METRIC 30/30`.
+- Updated `validation/validate_advanced_product_beta.py` so the existing 30-item Product Beta guard also checks the current status document for the completed Product Beta posture and rejects the old “do not treat strict as required until Product Beta exits S2” wording.
+
+Validation:
+- PASS `python3 validation/validate_advanced_product_beta.py`
+  - Evidence: `PRODUCT_BETA_METRIC	30/30`
+- PASS `python3 validation/validate_advanced_product_beta.py --strict`
+  - Evidence: `PRODUCT_BETA_METRIC	30/30`
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	52/52`
+- EXPECTED BLOCK `python3 validation/validate_landing_release_candidate.py --strict`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`
+  - Reason: real cloud-device MP4 files and filled cloud-device report remain external evidence gaps.
+- PASS `python3 validation/validate_release_blocking_report.py`
+  - Evidence: `RELEASE_BLOCKING_REPORT_METRIC	8/8`
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS	secret_hygiene`
+- PASS `python3 validation/validate_real_world_ready.py`
+  - Evidence: `REAL_WORLD_READY_METRIC	22/22`
+
+Behavior preserved:
+- Product Beta remains a completed 30-item gate and `validate_landing_release_candidate.py` still runs `validate_advanced_product_beta.py --strict`.
+- Strict release remains blocked on real external cloud-device proof; no cloud recordings, report values, credentials, or personal data were fabricated.
+
+Next:
+- Continue local consistency hardening around status documents and operator handoff surfaces, while keeping strict external blockers explicit.
+
+## 2026-05-29 / Round 159
+
+Goal: Make the submission checklist explicitly distinguish local readiness from strict cloud-device release evidence.
+
+Files changed:
+- Updated `materials/submission-checklist.md` so SHIKE-070 handoff text directly points to `materials/evidence/cloud-device/`, `materials/evidence/blocking-report.md`, and the expected `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE 3/7` blocker state.
+- Updated `validation/validate_deliverables.py` so SHIKE-070 now requires the submission checklist itself to state that strict cloud-device evidence is still an expected blocker and must not be treated as final release proof before real MP4/report evidence exists.
+
+Validation:
+- PASS `python3 validation/validate_deliverables.py`
+  - Evidence: `METRIC	10/10`
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	52/52`
+- EXPECTED BLOCK `python3 validation/validate_landing_release_candidate.py --strict`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`
+  - Reason: real cloud-device MP4 files and filled cloud-device report remain external evidence gaps.
+- PASS `python3 validation/validate_release_blocking_report.py`
+  - Evidence: `RELEASE_BLOCKING_REPORT_METRIC	8/8`
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS	secret_hygiene`
+- PASS `python3 validation/validate_real_world_ready.py`
+  - Evidence: `REAL_WORLD_READY_METRIC	22/22`
+
+Behavior preserved:
+- SHIKE-070 deliverables still pass at `10/10`, but the checklist now carries the strict external-evidence boundary directly.
+- Strict release remains blocked on real external cloud-device proof; no cloud recordings, report values, credentials, or personal data were fabricated.
+
+Next:
+- Continue proof-chain hardening in release evidence surfaces while keeping strict external blockers explicit.
+
+## 2026-05-29 / Round 158
+
+Goal: Make the device demo checklist distinguish local/USB recordings from cloud-device strict release evidence.
+
+Files changed:
+- Updated `materials/device-demo-checklist.md` with a cloud-device strict evidence section that links `materials/evidence/cloud-device/`, `materials/evidence/release-evidence-index.md`, and `materials/evidence/blocking-report.md`.
+- Updated `validation/validate_demo_acceptance.py` so demo acceptance now requires the cloud strict handoff, `LANDING_RELEASE_CANDIDATE_METRIC 52/52`, expected strict `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE 3/7`, required cloud MP4 names, HTTPS backend wording, and redaction reminders.
+- Updated `README.md` and `docs/current-validation-status.md` so the demo acceptance baseline is `DEMO_ACCEPTANCE_METRIC 18/18`.
+
+Validation:
+- PASS `python3 validation/validate_demo_acceptance.py`
+  - Evidence: `DEMO_ACCEPTANCE_METRIC	18/18`
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	52/52`
+- EXPECTED BLOCK `python3 validation/validate_landing_release_candidate.py --strict`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`
+  - Reason: real cloud-device MP4 files and filled cloud-device report remain external evidence gaps.
+- PASS `python3 validation/validate_release_blocking_report.py`
+  - Evidence: `RELEASE_BLOCKING_REPORT_METRIC	8/8`
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS	secret_hygiene`
+- PASS `python3 validation/validate_real_world_ready.py`
+  - Evidence: `REAL_WORLD_READY_METRIC	22/22`
+
+Behavior preserved:
+- Local/USB demo evidence and cloud-device strict release evidence are now separated in the operator checklist.
+- Strict release remains blocked on real external cloud-device proof; no cloud recordings, report values, credentials, or personal data were fabricated.
+
+Next:
+- Continue hardening handoff documents and validators that prevent local readiness from being confused with final strict cloud-device release evidence.
+
+## 2026-05-29 / Round 157
+
+Goal: Make the cloud-device evidence package README a strict-release handoff entrypoint.
+
+Files changed:
+- Updated `materials/evidence/cloud-device/README.md` to point operators to `materials/evidence/release-evidence-index.md`, `materials/evidence/blocking-report.md`, the default `LANDING_RELEASE_CANDIDATE_METRIC 52/52` gate, and the expected strict `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE 3/7` blocker state.
+- Updated `validation/validate_cloud_device_package.py` so the default package guard requires those release-handoff links and redaction reminders in the package README.
+- Updated `materials/evidence/release-evidence-index.md` and `validation/validate_release_evidence_index.py` so the cloud-device package skeleton evidence is now `CLOUD_DEVICE_PACKAGE_METRIC 22/22`.
+
+Validation:
+- PASS `python3 validation/validate_cloud_device_package.py`
+  - Evidence: `CLOUD_DEVICE_PACKAGE_METRIC	22/22`
+- PASS `python3 validation/validate_release_evidence_index.py`
+  - Evidence: `RELEASE_EVIDENCE_INDEX_METRIC	6/6`
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	52/52`
+- EXPECTED BLOCK `python3 validation/validate_landing_release_candidate.py --strict`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`
+  - Reason: real cloud-device MP4 files and filled cloud-device report remain external evidence gaps.
+- PASS `python3 validation/validate_release_blocking_report.py`
+  - Evidence: `RELEASE_BLOCKING_REPORT_METRIC	8/8`
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS	secret_hygiene`
+- PASS `python3 validation/validate_real_world_ready.py`
+  - Evidence: `REAL_WORLD_READY_METRIC	22/22`
+
+Behavior preserved:
+- The cloud-device package still distinguishes non-strict structure/redaction readiness from strict real-device proof.
+- Strict release remains blocked on real external cloud-device proof; no videos, report values, credentials, or personal data were fabricated.
+
+Next:
+- Continue tightening local handoff checks, especially where operator-facing evidence files can drift from the release-candidate gate.
+
+## 2026-05-29 / Round 156
+
+Goal: Align the release evidence index with the current 52-item local release gate.
+
+Files changed:
+- Updated `materials/evidence/release-evidence-index.md` so the release-candidate evidence row reports the current `LANDING_RELEASE_CANDIDATE_METRIC 52/52`.
+- Updated `validation/validate_release_evidence_index.py` so the release evidence guard now fails on stale `51/51` release-gate wording.
+
+Validation:
+- PASS `python3 validation/validate_release_evidence_index.py`
+  - Evidence: `RELEASE_EVIDENCE_INDEX_METRIC	6/6`
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	52/52`
+- EXPECTED BLOCK `python3 validation/validate_landing_release_candidate.py --strict`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`
+  - Reason: real cloud-device MP4 files and filled cloud-device report remain external evidence gaps.
+- PASS `python3 validation/validate_release_blocking_report.py`
+  - Evidence: `RELEASE_BLOCKING_REPORT_METRIC	8/8`
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS	secret_hygiene`
+- PASS `python3 validation/validate_real_world_ready.py`
+  - Evidence: `REAL_WORLD_READY_METRIC	22/22`
+
+Behavior preserved:
+- The default release-candidate gate remains `52/52`.
+- Strict release remains blocked on real external cloud-device proof; no recordings, report values, BlueLM credentials, or personal data were fabricated.
+
+Next:
+- Continue local proof-chain tightening where it improves handoff reliability, or proceed to real cloud-device recording when external access is available.
+
+## 2026-05-29 / Round 155
+
+Goal: Make the release evidence index part of the submission deliverables.
+
+Files changed:
+- Updated `materials/submission-checklist.md` with `materials/evidence/release-evidence-index.md` as a completed submission artifact and surfaced the key release evidence metrics in the onsite checklist.
+- Updated `validation/traceability.md` so SHIKE-070 points to the release evidence index alongside the deck, demo script, and poster copy.
+- Updated `validation/validate_deliverables.py` so SHIKE-070 requires the release evidence index and checks the 52/52 release gate, 22/22 real-world gate, redacted BlueLM evidence, strict blocker status, and redaction wording.
+
+Validation:
+- PASS `python3 validation/validate_deliverables.py`
+  - Evidence: `METRIC	10/10`
+- PASS `python3 validation/validate_release_evidence_index.py`
+  - Evidence: `RELEASE_EVIDENCE_INDEX_METRIC	6/6`
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	52/52`
+- EXPECTED BLOCK `python3 validation/validate_landing_release_candidate.py --strict`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`
+  - Reason: real cloud-device MP4 files and filled cloud-device report remain external evidence gaps.
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS	secret_hygiene`
+- PASS `python3 validation/validate_real_world_ready.py`
+  - Evidence: `REAL_WORLD_READY_METRIC	22/22`
+
+Behavior preserved:
+- The deliverables validator still covers the same 10 SHIKE issue buckets, but SHIKE-070 now requires the release evidence index.
+- Strict release remains blocked on real external cloud-device proof; this round only improves submission traceability.
+- No credentials or personal data were introduced.
+
+Next:
+- Continue tying remaining proof artifacts into existing gates, or proceed to real cloud-device capture when external access is available.
+
+## 2026-05-29 / Round 154
+
+Goal: Make the release evidence index a mandatory release-candidate handoff artifact.
+
+Files changed:
+- Updated `validation/validate_landing_release_candidate.py` so the default local release-candidate gate runs `validate_release_evidence_index.py` and reports `LANDING_RELEASE_CANDIDATE_METRIC 52/52`.
+- Updated README mechanical acceptance and release-candidate wording to include `validate_release_evidence_index.py` and the 52/52 gate.
+- Updated `docs/current-validation-status.md` to list the 52-item release gate and current `LANDING_RELEASE_CANDIDATE_METRIC 52/52` evidence.
+
+Validation:
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `release_evidence_index_passes	validate_release_evidence_index.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	52/52`
+- PASS `python3 validation/validate_release_evidence_index.py`
+  - Evidence: `RELEASE_EVIDENCE_INDEX_METRIC	6/6`
+- EXPECTED BLOCK `python3 validation/validate_landing_release_candidate.py --strict`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`
+  - Reason: strict mode still correctly requires real cloud-device MP4 files and a completed cloud-device report.
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS	secret_hygiene`
+- PASS `python3 validation/validate_real_world_ready.py`
+  - Evidence: `REAL_WORLD_READY_METRIC	22/22`
+
+Behavior preserved:
+- This round tightened the release-candidate gate by requiring the evidence index; it did not weaken strict external proof.
+- Strict release remains blocked until actual cloud-device recordings and report completion exist.
+- No credentials or personal data were introduced.
+
+Next:
+- Continue local release proof hardening, or proceed to real cloud-device recording using the checklist when external device access is available.
+
+## 2026-05-29 / Round 153
+
+Goal: Create a release evidence index that makes the current local proof package easy to audit.
+
+Files changed:
+- Added `materials/evidence/release-evidence-index.md` with local readiness gates, model evidence, BlueLM redacted smoke evidence, cloud-device strict blockers, APK hash location, redaction rules, and rebuild commands.
+- Added `validation/validate_release_evidence_index.py` to guard that the index covers release metrics, model proof, strict blockers, existing evidence files, rebuild commands, and secret-safe wording.
+
+Validation:
+- PASS `python3 validation/validate_release_evidence_index.py`
+  - Evidence: `RELEASE_EVIDENCE_INDEX_METRIC	6/6`
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	51/51`
+- EXPECTED BLOCK `python3 validation/validate_landing_release_candidate.py --strict`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`
+  - Reason: real cloud-device MP4 files and filled cloud-device report remain external evidence gaps.
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS	secret_hygiene`
+- PASS `python3 validation/validate_real_world_ready.py`
+  - Evidence: `REAL_WORLD_READY_METRIC	22/22`
+
+Behavior preserved:
+- The index references existing evidence files and commands; it does not replace strict external evidence.
+- BlueLM proof remains redacted and backend-side.
+- No secret-like `sk-...` token was embedded in the evidence index.
+
+Next:
+- Consider folding the evidence index validator into the release-candidate gate if it proves useful as a mandatory handoff artifact, or continue with another local proof surface from the desktop judgment doc.
+
+## 2026-05-29 / Round 152
+
+Goal: Fold strict blocking-report quality into the default release-candidate gate.
+
+Files changed:
+- Updated `validation/validate_landing_release_candidate.py` so the default local release-candidate gate now runs `validate_release_blocking_report.py` and reports `LANDING_RELEASE_CANDIDATE_METRIC 51/51`.
+- Updated README mechanical acceptance and release-candidate wording from 50/50 to 51/51, including the strict blocking-report quality guard.
+- Updated `docs/current-validation-status.md` to list the 51-item release gate and current `LANDING_RELEASE_CANDIDATE_METRIC 51/51` evidence.
+
+Validation:
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `release_blocking_report_passes	validate_release_blocking_report.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	51/51`
+- PASS `python3 validation/validate_release_blocking_report.py`
+  - Evidence: `RELEASE_BLOCKING_REPORT_METRIC	8/8`
+- PASS `python3 validation/validate_cloud_device_package.py`
+  - Evidence: `CLOUD_DEVICE_PACKAGE_METRIC	21/21`
+- EXPECTED BLOCK `python3 validation/validate_landing_release_candidate.py --strict`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`
+  - Reason: strict mode still correctly requires real cloud-device MP4 files and a completed cloud-device report.
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS	secret_hygiene`
+- PASS `python3 validation/validate_real_world_ready.py`
+  - Evidence: `REAL_WORLD_READY_METRIC	22/22`
+
+Behavior preserved:
+- This round tightened the default release-candidate gate; it did not relax strict external evidence requirements.
+- Strict release still cannot pass without real cloud-device recordings and report completion.
+- No credentials or personal data were introduced.
+
+Next:
+- Continue improving local proof surfaces around the remaining desktop judgment-doc gaps, while keeping external cloud-device evidence explicitly blocked until collected.
+
+## 2026-05-29 / Round 151
+
+Goal: Strengthen the cloud-device capture preparation checklist before real external recording.
+
+Files changed:
+- Updated `scripts/prepare_cloud_device_evidence.py` so `cloud-device-capture-todo.md` includes required videos, report fields, HTTPS backend reachability, BlueLM redacted log proof, fallback/restart paths, and secret/PII redaction reminders.
+- Updated `validation/validate_cloud_device_package.py` so the default cloud-device package gate now checks those report-field and pre-capture checklist requirements.
+- Regenerated `materials/evidence/cloud-device/cloud-device-capture-todo.md` and refreshed `materials/evidence/cloud-device/apk-sha256.txt` through the preparation script.
+
+Validation:
+- PASS `python3 scripts/prepare_cloud_device_evidence.py`
+  - Evidence: `CLOUD_DEVICE_PREP_METRIC	5/5`
+  - Evidence: `CLOUD_DEVICE_PREP_MISSING_VIDEOS	9/9`
+- PASS `python3 validation/validate_cloud_device_package.py`
+  - Evidence: `CLOUD_DEVICE_PACKAGE_METRIC	21/21`
+- PASS `python3 validation/validate_release_blocking_report.py`
+  - Evidence: `RELEASE_BLOCKING_REPORT_METRIC	8/8`
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	50/50`
+- EXPECTED BLOCK `python3 validation/validate_landing_release_candidate.py --strict`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`
+  - Reason: real cloud-device MP4 files and filled cloud-device report remain external evidence gaps.
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS	secret_hygiene`
+- PASS `python3 validation/validate_real_world_ready.py`
+  - Evidence: `REAL_WORLD_READY_METRIC	22/22`
+
+Behavior preserved:
+- The preparation script still does not fabricate recordings or fill real test results.
+- Strict cloud-device validation still fails until actual recordings and a completed report exist.
+- Default release-candidate readiness remains reproducible locally at 50/50.
+
+Next:
+- Continue local evidence hardening, or use the cloud-device checklist to collect the nine real recordings when the external device platform is available.
+
+## 2026-05-29 / Round 150
+
+Goal: Make the strict release blocking report actionable without fabricating cloud-device evidence.
+
+Files changed:
+- Added `validation/validate_release_blocking_report.py` to guard the generated strict release blocking report.
+- Tightened `validation/validate_landing_release_candidate.py` strict blocker output so `materials/evidence/blocking-report.md` lists each missing cloud-device MP4, each placeholder report field, the HTTPS backend requirement, the preparation command, the strict rerun command, and redaction warnings.
+- Regenerated `materials/evidence/blocking-report.md` through `python3 validation/validate_landing_release_candidate.py --strict`.
+
+Validation:
+- PASS `python3 validation/validate_release_blocking_report.py`
+  - Evidence: `RELEASE_BLOCKING_REPORT_METRIC	8/8`
+- PASS `python3 validation/validate_cloud_device_package.py`
+  - Evidence: `CLOUD_DEVICE_PACKAGE_METRIC	18/18`
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	50/50`
+- EXPECTED BLOCK `python3 validation/validate_landing_release_candidate.py --strict`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`
+  - Evidence: `BLOCKING_REPORT	materials/evidence/blocking-report.md`
+  - Reason: strict mode still correctly requires real cloud-device MP4 files and a completed cloud-device report.
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS	secret_hygiene`
+- PASS `python3 validation/validate_real_world_ready.py`
+  - Evidence: `REAL_WORLD_READY_METRIC	22/22`
+
+Behavior preserved:
+- Default release-candidate readiness remains local and reproducible at 50/50.
+- Strict release mode remains blocked until real external cloud-device evidence is collected.
+- No BlueLM AppKEY, backend token, personal OCR text, phone number, email, or student ID was added.
+
+Next:
+- Continue the desktop judgment-doc audit by improving the remaining evidence workflow that can be advanced locally, or move to actual cloud-device capture when the external platform is available.
+
+## 2026-05-29 / Round 149
+
+Goal: Make the 110-case regression set a hard mechanical gate across model evaluation, Product Beta, and release-candidate readiness.
+
+Files changed:
+- Updated `validation/validate_model_eval_cases.py` so the regression count check is named `case_count_at_least_110` and requires at least 110 cases.
+- Updated `validation/validate_advanced_product_beta.py` so `model_eval_110_cases` requires the actual synthetic case count to be at least 110, with no evaluator-script bypass.
+- Updated `validation/validate_landing_release_candidate.py` so the local release-candidate package checks `regression_cases_at_least_110`.
+
+Validation:
+- PASS `python3 validation/validate_model_eval_cases.py`
+  - Evidence: `case_count_at_least_110	110`
+  - Evidence: `MODEL_EVAL_CASES_METRIC	8/8`
+- PASS `python3 backend/shike_backend/eval/run_model_eval.py --progress-every 25`
+  - Evidence: `MODEL_EVAL_METRIC	110/110	selected=110	total_valid=110`
+- PASS `python3 validation/validate_advanced_product_beta.py --strict`
+  - Evidence: `model_eval_110_cases	synthetic cases=110`
+  - Evidence: `PRODUCT_BETA_METRIC	30/30`
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `regression_cases_at_least_110	110 cases`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	50/50`
+- EXPECTED BLOCK `python3 validation/validate_landing_release_candidate.py --strict`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`
+  - Reason: real cloud-device videos and the completed cloud-device report remain external evidence gaps; no proof was fabricated.
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS	secret_hygiene`
+- PASS `python3 validation/validate_real_world_ready.py`
+  - Evidence: `REAL_WORLD_READY_METRIC	22/22`
+
+Behavior preserved:
+- No schema, Android, backend adapter, or prompt behavior changed in this round.
+- BlueLM credentials remain backend-only and no secret value was written to the repository.
+- Strict release mode still separates local readiness from real external cloud-device proof.
+
+Next:
+- Continue the requirement-by-requirement audit against the desktop repository judgment doc, prioritizing the remaining evidence gaps that can be advanced without fabricating cloud-device results.
+
+## 2026-05-29 / Round 148
+
+Goal: Close stale scene-contract wording after the 110-case multi-scene expansion.
+
+Files changed:
+- Removed the old `travel_plan` mock alias so backend mock routing only emits the current `travel_ticket` contract name for travel-ticket fragments.
+- Updated current-facing model-evaluation wording in README and landing optimization guidance from 100-case coverage to the current 110-case set.
+- Kept historical optimization-log evidence unchanged where it describes earlier rounds, while documenting the current `travel_ticket` contract and 110-case guard chain here.
+
+Validation:
+- PASS `python3 validation/validate_backend_scene_contract.py`
+  - Evidence: `BACKEND_SCENE_CONTRACT_METRIC 11/11`
+- PASS `python3 backend/shike_backend/eval/run_model_eval.py --progress-every 25`
+  - Evidence: `MODEL_EVAL_METRIC 110/110`
+- PASS `python3 validation/validate_advanced_product_beta.py --strict`
+  - Evidence: `PRODUCT_BETA_METRIC 30/30`
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC 50/50`
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS secret_hygiene`
+- PASS `python3 validation/validate_real_world_ready.py`
+  - Evidence: `REAL_WORLD_READY_METRIC 22/22`
+
+Behavior preserved:
+- Android still calls `/v1/analyze` through the backend only; BlueLM secrets remain backend-side.
+- Strict release remains intentionally blocked until real BlueLM online logs and cloud-device recording/report evidence exist.
+- Historical log entries remain as past evidence rather than being rewritten into current status.
+
+Next:
+- Continue the requirement-by-requirement audit against the desktop repository judgment doc, prioritizing real evidence gaps and material polish without fabricating cloud-device proof.
+
+## 2026-05-29 / Round 147
+
+Goal: Make the widened scene contract visible in demo and submission materials instead of leaving it as code-only capability.
+
+Files changed:
+- Updated `materials/demo-script.md` with复赛扩展场景备选：作业截止、会议通知、面试通知、出行票务，并补充评委追问口径。
+- Updated `materials/device-demo-checklist.md` with optional extension recordings and manual checks for `assignment_deadline`, `meeting_notice`, `interview_notice`, and `travel_ticket`.
+- Updated `materials/submission-checklist.md`, `README.md`, `prototype/demo.html`, and `docs/current-validation-status.md` so demo surfaces mention the extended scenes and current `DEMO_ACCEPTANCE_METRIC 17/17`.
+- Tightened `validation/validate_demo_acceptance.py` so the device checklist, demo script, submission checklist, and demo console all carry the extended scene tokens.
+
+Validation:
+- PASS `python3 validation/validate_demo_acceptance.py`
+  - Evidence: `DEMO_ACCEPTANCE_METRIC 17/17`
+- PASS `python3 validation/validate_real_world_ready.py`
+  - Evidence: `REAL_WORLD_READY_METRIC 22/22`
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC 50/50`
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS secret_hygiene`
+
+Behavior preserved:
+- The six required primary demo recordings remain the same; expanded scene videos are optional supplement recordings.
+- User confirmation remains required before calendar, reminder, or map execution in all scenes.
+
+Next:
+- Continue with external cloud-device evidence capture or recorded BlueLM case quality.
+
+## 2026-05-29 / Round 146
+
+Goal: Expand the backend `scene_type` contract beyond the initial course/event baseline without breaking Android confirmation-first execution.
+
+Files changed:
+- Expanded `contracts/model-output.schema.json` and `backend/shike_backend/schemas.py` to include `assignment_deadline`, `meeting_notice`, `interview_notice`, `travel_ticket`, and matching `task.topic` values.
+- Updated `backend/shike_backend/adapters/mock_adapter.py` and `backend/verify_backend.py` so deterministic fallback and smoke tests cover the new scenes.
+- Updated Android scene labels and hints in `ModelApiClient.kt`, with `ModelApiClientTest` now covering eight cases.
+- Added new request/response samples under `contracts/` and `validation/validate_backend_scene_contract.py`.
+- Expanded `validation/regression-cases.json` to 110 cases and renamed the previous travel group to the contract name `travel_ticket`.
+- Updated prompt/docs/status/report surfaces so BlueLM and demo documentation point at the widened contract.
+
+Validation:
+- PASS `python3 backend/shike_backend/eval/run_model_eval.py --progress-every 25`
+  - Evidence: `MODEL_EVAL_METRIC 110/110`
+- PASS `python3 validation/validate_backend_scene_contract.py`
+  - Evidence: `BACKEND_SCENE_CONTRACT_METRIC 11/11`
+- PASS `python3 validation/validate_model_contract_strict.py`
+  - Evidence: `MODEL_CONTRACT_STRICT_METRIC 10/10`
+- PASS `gradle --no-daemon :app:compileDebugKotlin :app:testDebugUnitTest`
+  - Evidence: `BUILD SUCCESSFUL in 26s`
+  - Evidence: `ModelApiClientTest` reports 8 tests, 0 failures, 0 errors
+  - Evidence: local unit suites report 89 tests, 0 failures, 0 errors
+- PASS `python3 validation/validate_android_unit_tests.py`
+  - Evidence: `ANDROID_UNIT_TEST_METRIC 64/64`
+- PASS `python3 validation/validate_model_bridge.py`
+  - Evidence: `MODEL_BRIDGE_METRIC 14/14`
+- PASS `python3 validation/validate_real_world_ready.py`
+  - Evidence: `REAL_WORLD_READY_METRIC 22/22`
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC 50/50`
+- EXPECTED BLOCK `python3 validation/validate_landing_release_candidate.py --strict`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE 3/7`
+  - Reason: real cloud-device videos/report are still missing; no evidence was fabricated.
+
+Behavior preserved:
+- Android still calls only the project FastAPI backend; BlueLM credentials remain backend-only.
+- User confirmation remains required before calendar, reminder, or map execution.
+- Strict release evidence remains blocked on real external cloud-device recordings/report.
+
+Next:
+- Continue with cloud-device evidence capture or improve real BlueLM eval quality using recorded synthetic cases.
+
+## 2026-05-29 / Round 145
+
+Goal: Expand the backend `/v1/analyze` source contract so screenshot, camera, shared text, and manual drafts are represented explicitly end to end.
+
+Files changed:
+- Updated `backend/shike_backend/schemas.py` so `AnalyzeRequest.source_type` accepts `screenshot`, `camera`, `share_text`, and `manual`, while forbidding extra request fields.
+- Expanded `backend/verify_backend.py` and `contracts/` sample requests to cover `share_text` and `manual` inputs.
+- Updated Android request mapping so "解析当前草稿" sends a source type derived from the current capture source instead of forcing every non-event path through `screenshot`.
+- Added source-type coverage to `CaptureImportMapperTest`, `ModelApiClientTest`, and `BackendAnalysisRunnerTest`, with `validate_android_unit_tests.py` now guarding the mapping.
+- Added `validation/validate_backend_source_type_contract.py` and wired it into `validate_model_contract_strict.py`.
+- Updated README, runbooks, Demo console, and device checklist so button labels and request examples match the new contract.
+
+Validation:
+- PASS `gradle --no-daemon :app:compileDebugKotlin :app:testDebugUnitTest`
+  - Evidence: `BUILD SUCCESSFUL in 40s`
+  - Evidence: `CaptureImportMapperTest` reports 4 tests, `ModelApiClientTest` reports 6 tests, `BackendAnalysisRunnerTest` reports 5 tests
+  - Evidence: local unit suites report 87 tests, 0 failures, 0 errors
+- PASS `python3 validation/validate_backend_source_type_contract.py`
+  - Evidence: `BACKEND_SOURCE_TYPE_CONTRACT_METRIC 9/9`
+- PASS `python3 validation/validate_model_contract_strict.py`
+  - Evidence: `MODEL_CONTRACT_STRICT_METRIC 5/5`
+- PASS `python3 validation/validate_android_unit_tests.py`
+  - Evidence: `ANDROID_UNIT_TEST_METRIC 64/64`
+- PASS `python3 validation/validate_model_bridge.py`
+  - Evidence: `MODEL_BRIDGE_METRIC 14/14`
+- PASS `python3 validation/validate_demo_acceptance.py`
+  - Evidence: `DEMO_ACCEPTANCE_METRIC 16/16`
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS secret_hygiene`
+- PASS `python3 validation/validate_real_world_ready.py`
+  - Evidence: `REAL_WORLD_READY_METRIC 22/22`
+- PASS `python3 backend/verify_backend.py`
+  - Evidence: `backend_passed`
+
+Behavior preserved:
+- Android still calls only the project FastAPI backend; it does not hold or call BlueLM credentials directly.
+- User confirmation remains required before calendar, reminder, or map execution.
+- Scene output remained limited to the then-current model-output schema; Round 146 later widened `scene_type`.
+- Strict release evidence is still blocked on real cloud-device recordings/report; no video evidence was fabricated.
+
+Next:
+- Continue with cloud-device/HTTPS evidence or carefully scoped scene expansion after updating schema, samples, Android mapping, eval cases, and validators together.
+
 ## 2026-05-26 / Round 126
 
 Goal: Harden Android backend base URL normalization to strip path/query/fragment and add unit-test coverage.

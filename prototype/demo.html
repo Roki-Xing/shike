@@ -387,9 +387,9 @@
 	        <p class="lead">一个可直接打开的演示入口：左侧展示核心首页，右侧给出 3 分钟讲解路径、验收指标和交付包核对命令；完整七页原型入口为 <code>prototype/index.html</code>。</p>
 	        <div class="grid">
 	          <div class="metric"><strong>22/22</strong><span>REAL_WORLD_READY_METRIC</span></div>
-	          <div class="metric"><strong>16/16</strong><span>DEMO_ACCEPTANCE_METRIC</span></div>
+	          <div class="metric"><strong>18/18</strong><span>DEMO_ACCEPTANCE_METRIC</span></div>
 		          <div class="metric"><strong>31/31</strong><span>ANDROID_STRUCTURE_METRIC</span></div>
-	          <div class="metric"><strong>61/61</strong><span>ANDROID_UNIT_TEST_METRIC</span></div>
+	          <div class="metric"><strong>64/64</strong><span>ANDROID_UNIT_TEST_METRIC</span></div>
 	          <div class="metric"><strong>APK</strong><span>可安装 Debug 包</span></div>
 	        </div>
 	        <p class="note">指标来自下方命令输出；录屏前请重新运行验收，避免静态展示替代真实日志。</p>
@@ -399,10 +399,20 @@
         <h3>3 分钟演示路线</h3>
         <ol>
           <li>打开今日行动台，说明拾刻不是聊天首页，而是行动首页。</li>
-	          <li>走课程截图链路：选择截图、编辑 OCR 文本草稿、后端解析课程、确认修正、加日历。</li>
-	          <li>走活动拍照链路：拍照导入、后端解析活动、确认修正、提醒和地图。</li>
+	          <li>走课程截图链路：选择截图、编辑 OCR 文本草稿、解析当前草稿、确认修正、加日历。</li>
+	          <li>走活动拍照链路：拍照导入、活动样例解析、确认修正、提醒和地图。</li>
+	          <li>复赛追问时展示扩展场景：<code>assignment_deadline</code>、<code>meeting_notice</code>、<code>interview_notice</code>、<code>travel_ticket</code>。</li>
 	          <li>展示后端失败回退到 <code>MockModelAdapter</code>，再展示重启恢复。</li>
 	          <li>扫过交付物自检中心、风险与缺失字段和 <code>06-delivery-readiness.mp4</code>，说明可交付状态。</li>
+        </ol>
+      </div>
+
+      <div class="panel">
+        <h3>云真机 strict 录制前门禁</h3>
+        <ol>
+          <li>先核对桌面指导源 <code>/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md</code>，再确认 <code>materials/evidence/requirement-matrix.md</code> 通过 <code>REQUIREMENT_MATRIX_METRIC 9/9</code>。</li>
+          <li>录制前保留 strict 阻断边界：当前仍为 <code>LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE 3/7</code>，缺失真实云真机 MP4 和云真机测试报告时不得改口为通过。</li>
+          <li>完成录制后再回填 <code>materials/evidence/cloud-device/</code>、<code>materials/evidence/release-evidence-index.md</code> 和 <code>docs/optimization-log.md</code>。</li>
         </ol>
       </div>
 

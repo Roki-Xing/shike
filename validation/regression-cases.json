@@ -1139,8 +1139,8 @@
     ]
   },
   {
-    "id": "travel-plan-001",
-    "scene": "travel_plan",
+    "id": "travel-ticket-001",
+    "scene": "travel_ticket",
     "input": "高铁出行今晚10:00在西安北站集合，提前15分钟到达并检查证件。",
     "expected_fields": [
       "time",
@@ -1155,8 +1155,8 @@
     "edge": "出行行程"
   },
   {
-    "id": "travel-plan-002",
-    "scene": "travel_plan",
+    "id": "travel-ticket-002",
+    "scene": "travel_ticket",
     "input": "校车预约明早12:30在南校区东门集合，提前15分钟到达并检查证件。",
     "expected_fields": [
       "time",
@@ -1171,8 +1171,8 @@
     "edge": "地点明确"
   },
   {
-    "id": "travel-plan-003",
-    "scene": "travel_plan",
+    "id": "travel-ticket-003",
+    "scene": "travel_ticket",
     "input": "机场集合周三14:00在机场T3集合，提前15分钟到达并检查证件。",
     "expected_fields": [
       "time",
@@ -1187,8 +1187,8 @@
     "edge": "集合时间"
   },
   {
-    "id": "travel-plan-004",
-    "scene": "travel_plan",
+    "id": "travel-ticket-004",
+    "scene": "travel_ticket",
     "input": "比赛报到周五16:30在会议中心签到处集合，提前15分钟到达并检查证件。",
     "expected_fields": [
       "time",
@@ -1203,8 +1203,8 @@
     "edge": "票务提醒"
   },
   {
-    "id": "travel-plan-005",
-    "scene": "travel_plan",
+    "id": "travel-ticket-005",
+    "scene": "travel_ticket",
     "input": "实习通勤本周六18:00在地铁站A口集合，提前15分钟到达并检查证件。",
     "expected_fields": [
       "task"
@@ -1219,8 +1219,8 @@
     ]
   },
   {
-    "id": "travel-plan-006",
-    "scene": "travel_plan",
+    "id": "travel-ticket-006",
+    "scene": "travel_ticket",
     "input": "高铁出行今晚8:30在西安北站集合，提前15分钟到达并检查证件。",
     "expected_fields": [
       "time",
@@ -1235,8 +1235,8 @@
     "edge": "出行行程"
   },
   {
-    "id": "travel-plan-007",
-    "scene": "travel_plan",
+    "id": "travel-ticket-007",
+    "scene": "travel_ticket",
     "input": "校车预约明早10:00在南校区东门集合，提前15分钟到达并检查证件。",
     "expected_fields": [
       "time",
@@ -1251,8 +1251,8 @@
     "edge": "地点明确"
   },
   {
-    "id": "travel-plan-008",
-    "scene": "travel_plan",
+    "id": "travel-ticket-008",
+    "scene": "travel_ticket",
     "input": "机场集合周三12:30在机场T3集合，提前15分钟到达并检查证件。",
     "expected_fields": [
       "time",
@@ -1267,8 +1267,8 @@
     "edge": "集合时间"
   },
   {
-    "id": "travel-plan-009",
-    "scene": "travel_plan",
+    "id": "travel-ticket-009",
+    "scene": "travel_ticket",
     "input": "比赛报到周五14:00在会议中心签到处集合，提前15分钟到达并检查证件。",
     "expected_fields": [
       "time",
@@ -1283,9 +1283,171 @@
     "edge": "票务提醒"
   },
   {
-    "id": "travel-plan-010",
-    "scene": "travel_plan",
+    "id": "travel-ticket-010",
+    "scene": "travel_ticket",
     "input": "实习通勤本周六16:30在地铁站A口集合，提前15分钟到达并检查证件。",
+    "expected_fields": [
+      "task"
+    ],
+    "expected_actions": [
+      "reminder"
+    ],
+    "edge": "低置信度",
+    "expected_missing_fields": [
+      "time",
+      "location"
+    ]
+  },
+  {
+    "id": "interview-notice-001",
+    "scene": "interview_notice",
+    "input": "产品实习生面试明天14:00在腾讯会议进行，请提前准备简历和作品集。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "面试通知"
+  },
+  {
+    "id": "interview-notice-002",
+    "scene": "interview_notice",
+    "input": "算法岗笔试明早10:00在线上会议室进行，请提前测试网络并准备身份证件。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "笔试安排"
+  },
+  {
+    "id": "interview-notice-003",
+    "scene": "interview_notice",
+    "input": "HR通知：周三15:00进行二面，会议链接待确认，请提前准备项目经历。",
+    "expected_fields": [
+      "time",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder"
+    ],
+    "edge": "地点缺失",
+    "expected_missing_fields": [
+      "location"
+    ]
+  },
+  {
+    "id": "interview-notice-004",
+    "scene": "interview_notice",
+    "input": "设计实习生面试周五16:30在创新中心204进行，请携带作品集。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "线下面试"
+  },
+  {
+    "id": "interview-notice-005",
+    "scene": "interview_notice",
+    "input": "候选人沟通本周六18:00进行，具体地点待确认，请等待HR补充。",
+    "expected_fields": [
+      "task"
+    ],
+    "expected_actions": [
+      "reminder"
+    ],
+    "edge": "低置信度",
+    "expected_missing_fields": [
+      "time",
+      "location"
+    ]
+  },
+  {
+    "id": "interview-notice-006",
+    "scene": "interview_notice",
+    "input": "产品实习生面试明天8:30在腾讯会议进行，请提前准备简历和作品集。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "面试通知"
+  },
+  {
+    "id": "interview-notice-007",
+    "scene": "interview_notice",
+    "input": "运营岗笔试明早12:30在线上会议室进行，请提前测试网络并准备身份证件。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "笔试安排"
+  },
+  {
+    "id": "interview-notice-008",
+    "scene": "interview_notice",
+    "input": "HR通知：周三10:00进行终面，会议链接待确认，请提前准备项目经历。",
+    "expected_fields": [
+      "time",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder"
+    ],
+    "edge": "地点缺失",
+    "expected_missing_fields": [
+      "location"
+    ]
+  },
+  {
+    "id": "interview-notice-009",
+    "scene": "interview_notice",
+    "input": "研究助理面试周五14:00在学院楼B402进行，请携带成绩单。",
+    "expected_fields": [
+      "time",
+      "location",
+      "task"
+    ],
+    "expected_actions": [
+      "calendar",
+      "reminder",
+      "map"
+    ],
+    "edge": "线下面试"
+  },
+  {
+    "id": "interview-notice-010",
+    "scene": "interview_notice",
+    "input": "候选人沟通本周六16:30进行，具体地点待确认，请等待HR补充。",
     "expected_fields": [
       "task"
     ],

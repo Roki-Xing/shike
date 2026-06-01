@@ -1,5 +1,6 @@
 package cn.shike.app.ui
 
+import cn.shike.app.data.InboxItemEntity
 import cn.shike.app.domain.ShikeItem
 
 const val inboxAllStatusFilter = "全部"
@@ -63,6 +64,19 @@ fun inboxWorkbenchEntryFrom(
         explanation = modelExplanation(item),
         executionSummary = executionResults.joinToString("；") { "${it.action}:${it.status}" },
         startEpochMillis = item.startEpochMillis,
+    )
+
+fun inboxWorkbenchEntryFromEntity(entity: InboxItemEntity): InboxWorkbenchEntry =
+    InboxWorkbenchEntry(
+        title = entity.title,
+        status = entity.status,
+        scene = entity.scene,
+        location = entity.location,
+        source = entity.source,
+        rawText = entity.rawText,
+        explanation = "长期收件箱记录：${entity.scene}，状态 ${entity.status}",
+        executionSummary = entity.actionLabels.joinToString("；") { "$it:待执行" },
+        startEpochMillis = entity.startEpochMillis,
     )
 
 /**

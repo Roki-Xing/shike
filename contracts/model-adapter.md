@@ -36,6 +36,15 @@ data class ShikeModelOutput(
 )
 ```
 
+`sourceType` 当前固定为四类入口，后端 `/v1/analyze` 按同一契约校验：
+
+| source_type | 入口 | 说明 |
+|---|---|---|
+| `screenshot` | 相册截图 / 截图导入 | OCR 草稿来自图片识别或演示样例 |
+| `camera` | 拍照导入 | OCR 草稿来自相机图片识别或演示样例 |
+| `share_text` | 系统文本分享 | 文本由 Android share sheet 传入，默认不上传原图 |
+| `manual` | 手动输入 | 用户直接编辑草稿后解析 |
+
 ## 适配方式
 
 | 适配器 | 用途 | 上层是否需要改动 |
@@ -46,12 +55,15 @@ data class ShikeModelOutput(
 
 ## 模型职责
 
-- 判断 `scene_type`：`course_notice`、`event_poster`、`unknown`。
+- 判断 `scene_type`。当前公开输出契约仅允许 `course_notice`、`event_poster`、`unknown`。
+- 输出 `task.topic`：`course`、`event`、`unknown`。
 - 输出 `confidence`，低于 0.65 时规则层默认进入人工确认优先。
 - 抽取 `time`、`location`、`task`。
 - 建议 `calendar`、`reminder`、`map` 三类动作。
 - 标出 `missing_fields`，例如 `registration_url`、`exact_date`、`building_name`。
 - 用 `explanation` 解释为什么建议处理。
+
+说明：回归样例集仍覆盖会议/作业/面试/出行等扩展场景，但在不扩展公开 schema 的前提下，这些场景应输出 `scene_type=unknown`，并用 `title`/`task.summary`/`explanation` 表达语义，同时给出合理动作建议。
 
 ## 规则层职责
 
@@ -74,6 +86,8 @@ data class ShikeModelOutput(
   "user_timezone": "Asia/Shanghai"
 }
 ```
+
+文本分享和手动输入也走同一后端路径，只改变 `source_type`，输出仍必须匹配 `contracts/model-output.schema.json`。
 
 ## 样例响应
 
@@ -107,4 +121,3 @@ data class ShikeModelOutput(
   "explanation": "文本包含课程、时间、地点和截止事项，适合转成行动卡。"
 }
 ```
-

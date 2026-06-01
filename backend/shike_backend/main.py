@@ -35,6 +35,9 @@ def _get_adapter() -> object:
             timeout_seconds=settings.bluelm_timeout_seconds,
             max_retries=settings.bluelm_max_retries,
             temperature=settings.bluelm_temperature,
+            thinking_mode=settings.bluelm_thinking_mode,
+            request_id_param=settings.bluelm_request_id_param,
+            response_format_enabled=settings.bluelm_response_format_enabled,
         )
         _ADAPTER = adapter
         return adapter
@@ -49,6 +52,9 @@ def _get_adapter() -> object:
             timeout_seconds=settings.bluelm_timeout_seconds,
             max_retries=settings.bluelm_max_retries,
             temperature=settings.bluelm_temperature,
+            thinking_mode=settings.bluelm_thinking_mode,
+            request_id_param=settings.bluelm_request_id_param,
+            response_format_enabled=settings.bluelm_response_format_enabled,
         )
         recorded = RecordedBlueLMAdapter(recording_dir=Path(settings.recorded_dir), base=base if base.is_configured() else None)
         _ADAPTER = recorded

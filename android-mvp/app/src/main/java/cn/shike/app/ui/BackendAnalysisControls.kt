@@ -26,13 +26,13 @@ fun BackendAnalysisControls(
             enabled = cloudEnhancedEnabled,
             modifier = Modifier.weight(1f),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2563EB)),
-        ) { Text("后端解析课程") }
+        ) { Text("解析当前草稿") }
         Button(
             onClick = onBackendEvent,
             enabled = cloudEnhancedEnabled,
             modifier = Modifier.weight(1f),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF97316)),
-        ) { Text("后端解析活动") }
+        ) { Text("活动样例解析") }
     }
     if (!cloudEnhancedEnabled) {
         Text("关闭云侧增强时不请求后端；可用离线样例或手动草稿继续。", color = Color(0xFFF97316), fontSize = 12.sp)

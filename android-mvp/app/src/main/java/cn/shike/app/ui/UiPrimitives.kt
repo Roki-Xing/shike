@@ -24,19 +24,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun SectionCard(title: String, content: @Composable () -> Unit) {
+fun SectionCard(title: String, modifier: Modifier = Modifier, content: @Composable () -> Unit) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        modifier = modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = ShikeColors.Surface),
         shape = RoundedCornerShape(14.dp),
-        border = BorderStroke(1.dp, Color(0xFFE6EDF1)),
+        border = BorderStroke(1.dp, ShikeColors.Line),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
     ) {
         Column(
-            modifier = Modifier.padding(14.dp),
+            modifier = Modifier.padding(ShikeSpacing.Lg),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = Color(0xFF101828))
+            Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = ShikeColors.Ink)
             content()
         }
     }
@@ -49,8 +49,8 @@ fun KeyValue(label: String, value: String) {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(label, color = Color(0xFF667085), fontSize = 12.sp)
-        Text(value, fontWeight = FontWeight.SemiBold, color = Color(0xFF101828), fontSize = 12.sp, textAlign = TextAlign.End)
+        Text(label, color = ShikeColors.Muted, fontSize = 12.sp)
+        Text(value, fontWeight = FontWeight.SemiBold, color = ShikeColors.Ink, fontSize = 12.sp, textAlign = TextAlign.End)
     }
 }
 

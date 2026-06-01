@@ -37,6 +37,9 @@ fun courseBackendAnalysisInput(): BackendAnalysisInput =
 fun eventBackendAnalysisInput(): BackendAnalysisInput =
     BackendAnalysisInput("camera", sampleEvent())
 
+fun backendAnalysisInputForCurrentDraft(captureSource: String, fallback: ShikeItem): BackendAnalysisInput =
+    BackendAnalysisInput(backendSourceTypeFromCaptureSource(captureSource), fallback)
+
 /**
  * Chooses the editable OCR text sent to the backend.
  *

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="cn.shike.app.ReminderPermissionFallbackTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-05-26T09:01:51" hostname="LAPTOP-B84BKQGP" time="0.0">
+<testsuite name="cn.shike.app.ReminderPermissionFallbackTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-05-29T04:53:43" hostname="LAPTOP-B84BKQGP" time="0.0">
   <properties/>
   <testcase name="reminderPermissionFallbackCopyFor_namesPermissionBlockedAndKeepsCard" classname="cn.shike.app.ReminderPermissionFallbackTest" time="0.0"/>
   <testcase name="reminderExecutionResult_usesSharedPermissionFallbackCopy" classname="cn.shike.app.ReminderPermissionFallbackTest" time="0.0"/>

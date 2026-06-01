@@ -1,106 +1,122 @@
 # Model Eval Report
 
-- cases: 46/100 passed
+- provider: `mock`
+- cases file: `validation/regression-cases.json`
+- report file: `docs/model-eval-report.md`
+- selection: `110` of `110` valid cases
+- slice: `offset=0` `limit=all`
+- passed: `110/110`
+- elapsed seconds: `0.60`
 
-| id | expected_scene | result | reason |
-| --- | --- | --- | --- |
-| course-notice-001 | course_notice | PASS | ok |
-| course-notice-002 | course_notice | PASS | ok |
-| course-notice-003 | course_notice | FAIL | missing_fields_not_marked |
-| course-notice-004 | course_notice | PASS | ok |
-| course-notice-005 | course_notice | FAIL | missing_fields_not_marked |
-| course-notice-006 | course_notice | PASS | ok |
-| course-notice-007 | course_notice | PASS | ok |
-| course-notice-008 | course_notice | FAIL | missing_fields_not_marked |
-| course-notice-009 | course_notice | PASS | ok |
-| course-notice-010 | course_notice | FAIL | missing_fields_not_marked |
-| course-notice-011 | course_notice | PASS | ok |
-| course-notice-012 | course_notice | PASS | ok |
-| course-notice-013 | course_notice | FAIL | missing_fields_not_marked |
-| course-notice-014 | course_notice | PASS | ok |
-| course-notice-015 | course_notice | FAIL | missing_fields_not_marked |
-| course-notice-016 | course_notice | PASS | ok |
-| course-notice-017 | course_notice | PASS | ok |
-| course-notice-018 | course_notice | FAIL | missing_fields_not_marked |
-| course-notice-019 | course_notice | PASS | ok |
-| course-notice-020 | course_notice | FAIL | missing_fields_not_marked |
-| event-poster-001 | event_poster | PASS | ok |
-| event-poster-002 | event_poster | PASS | ok |
-| event-poster-003 | event_poster | PASS | ok |
-| event-poster-004 | event_poster | PASS | ok |
-| event-poster-005 | event_poster | FAIL | missing_fields_not_marked |
-| event-poster-006 | event_poster | PASS | ok |
-| event-poster-007 | event_poster | PASS | ok |
-| event-poster-008 | event_poster | PASS | ok |
-| event-poster-009 | event_poster | PASS | ok |
-| event-poster-010 | event_poster | FAIL | missing_fields_not_marked |
-| event-poster-011 | event_poster | PASS | ok |
-| event-poster-012 | event_poster | PASS | ok |
-| event-poster-013 | event_poster | PASS | ok |
-| event-poster-014 | event_poster | PASS | ok |
-| event-poster-015 | event_poster | FAIL | missing_fields_not_marked |
-| event-poster-016 | event_poster | PASS | ok |
-| event-poster-017 | event_poster | PASS | ok |
-| event-poster-018 | event_poster | PASS | ok |
-| event-poster-019 | event_poster | PASS | ok |
-| event-poster-020 | event_poster | FAIL | missing_fields_not_marked |
-| meeting-notice-001 | meeting_notice | FAIL | actions_missing |
-| meeting-notice-002 | meeting_notice | FAIL | actions_missing |
-| meeting-notice-003 | meeting_notice | FAIL | actions_missing |
-| meeting-notice-004 | meeting_notice | FAIL | actions_missing |
-| meeting-notice-005 | meeting_notice | PASS | ok |
-| meeting-notice-006 | meeting_notice | FAIL | actions_missing |
-| meeting-notice-007 | meeting_notice | FAIL | actions_missing |
-| meeting-notice-008 | meeting_notice | FAIL | actions_missing |
-| meeting-notice-009 | meeting_notice | FAIL | actions_missing |
-| meeting-notice-010 | meeting_notice | PASS | ok |
-| meeting-notice-011 | meeting_notice | FAIL | actions_missing |
-| meeting-notice-012 | meeting_notice | FAIL | actions_missing |
-| meeting-notice-013 | meeting_notice | FAIL | actions_missing |
-| meeting-notice-014 | meeting_notice | FAIL | actions_missing |
-| meeting-notice-015 | meeting_notice | PASS | ok |
-| assignment-deadline-001 | assignment_deadline | FAIL | actions_missing |
-| assignment-deadline-002 | assignment_deadline | PASS | ok |
-| assignment-deadline-003 | assignment_deadline | FAIL | missing_fields_not_marked |
-| assignment-deadline-004 | assignment_deadline | PASS | ok |
-| assignment-deadline-005 | assignment_deadline | PASS | ok |
-| assignment-deadline-006 | assignment_deadline | FAIL | actions_missing |
-| assignment-deadline-007 | assignment_deadline | PASS | ok |
-| assignment-deadline-008 | assignment_deadline | FAIL | missing_fields_not_marked |
-| assignment-deadline-009 | assignment_deadline | PASS | ok |
-| assignment-deadline-010 | assignment_deadline | PASS | ok |
-| assignment-deadline-011 | assignment_deadline | FAIL | actions_missing |
-| assignment-deadline-012 | assignment_deadline | PASS | ok |
-| assignment-deadline-013 | assignment_deadline | FAIL | missing_fields_not_marked |
-| assignment-deadline-014 | assignment_deadline | PASS | ok |
-| assignment-deadline-015 | assignment_deadline | PASS | ok |
-| travel-plan-001 | travel_plan | FAIL | actions_missing |
-| travel-plan-002 | travel_plan | FAIL | actions_missing |
-| travel-plan-003 | travel_plan | FAIL | actions_missing |
-| travel-plan-004 | travel_plan | FAIL | actions_missing |
-| travel-plan-005 | travel_plan | PASS | ok |
-| travel-plan-006 | travel_plan | FAIL | actions_missing |
-| travel-plan-007 | travel_plan | FAIL | actions_missing |
-| travel-plan-008 | travel_plan | FAIL | actions_missing |
-| travel-plan-009 | travel_plan | FAIL | actions_missing |
-| travel-plan-010 | travel_plan | PASS | ok |
-| low-quality-fragment-001 | low_quality_fragment | FAIL | missing_fields_not_marked |
-| low-quality-fragment-002 | low_quality_fragment | FAIL | missing_fields_not_marked |
-| low-quality-fragment-003 | low_quality_fragment | PASS | ok |
-| low-quality-fragment-004 | low_quality_fragment | FAIL | missing_fields_not_marked |
-| low-quality-fragment-005 | low_quality_fragment | PASS | ok |
-| low-quality-fragment-006 | low_quality_fragment | FAIL | missing_fields_not_marked |
-| low-quality-fragment-007 | low_quality_fragment | FAIL | missing_fields_not_marked |
-| low-quality-fragment-008 | low_quality_fragment | PASS | ok |
-| low-quality-fragment-009 | low_quality_fragment | FAIL | missing_fields_not_marked |
-| low-quality-fragment-010 | low_quality_fragment | PASS | ok |
-| negative-fragment-001 | negative_fragment | FAIL | missing_fields_not_marked |
-| negative-fragment-002 | negative_fragment | FAIL | missing_fields_not_marked |
-| negative-fragment-003 | negative_fragment | FAIL | missing_fields_not_marked |
-| negative-fragment-004 | negative_fragment | FAIL | missing_fields_not_marked |
-| negative-fragment-005 | negative_fragment | FAIL | missing_fields_not_marked |
-| negative-fragment-006 | negative_fragment | FAIL | missing_fields_not_marked |
-| negative-fragment-007 | negative_fragment | FAIL | missing_fields_not_marked |
-| negative-fragment-008 | negative_fragment | FAIL | missing_fields_not_marked |
-| negative-fragment-009 | negative_fragment | FAIL | missing_fields_not_marked |
-| negative-fragment-010 | negative_fragment | FAIL | missing_fields_not_marked |
+| source_index | id | expected_scene | result | reason |
+| --- | --- | --- | --- | --- |
+| 1 | course-notice-001 | course_notice | PASS | ok |
+| 2 | course-notice-002 | course_notice | PASS | ok |
+| 3 | course-notice-003 | course_notice | PASS | ok |
+| 4 | course-notice-004 | course_notice | PASS | ok |
+| 5 | course-notice-005 | course_notice | PASS | ok |
+| 6 | course-notice-006 | course_notice | PASS | ok |
+| 7 | course-notice-007 | course_notice | PASS | ok |
+| 8 | course-notice-008 | course_notice | PASS | ok |
+| 9 | course-notice-009 | course_notice | PASS | ok |
+| 10 | course-notice-010 | course_notice | PASS | ok |
+| 11 | course-notice-011 | course_notice | PASS | ok |
+| 12 | course-notice-012 | course_notice | PASS | ok |
+| 13 | course-notice-013 | course_notice | PASS | ok |
+| 14 | course-notice-014 | course_notice | PASS | ok |
+| 15 | course-notice-015 | course_notice | PASS | ok |
+| 16 | course-notice-016 | course_notice | PASS | ok |
+| 17 | course-notice-017 | course_notice | PASS | ok |
+| 18 | course-notice-018 | course_notice | PASS | ok |
+| 19 | course-notice-019 | course_notice | PASS | ok |
+| 20 | course-notice-020 | course_notice | PASS | ok |
+| 21 | event-poster-001 | event_poster | PASS | ok |
+| 22 | event-poster-002 | event_poster | PASS | ok |
+| 23 | event-poster-003 | event_poster | PASS | ok |
+| 24 | event-poster-004 | event_poster | PASS | ok |
+| 25 | event-poster-005 | event_poster | PASS | ok |
+| 26 | event-poster-006 | event_poster | PASS | ok |
+| 27 | event-poster-007 | event_poster | PASS | ok |
+| 28 | event-poster-008 | event_poster | PASS | ok |
+| 29 | event-poster-009 | event_poster | PASS | ok |
+| 30 | event-poster-010 | event_poster | PASS | ok |
+| 31 | event-poster-011 | event_poster | PASS | ok |
+| 32 | event-poster-012 | event_poster | PASS | ok |
+| 33 | event-poster-013 | event_poster | PASS | ok |
+| 34 | event-poster-014 | event_poster | PASS | ok |
+| 35 | event-poster-015 | event_poster | PASS | ok |
+| 36 | event-poster-016 | event_poster | PASS | ok |
+| 37 | event-poster-017 | event_poster | PASS | ok |
+| 38 | event-poster-018 | event_poster | PASS | ok |
+| 39 | event-poster-019 | event_poster | PASS | ok |
+| 40 | event-poster-020 | event_poster | PASS | ok |
+| 41 | meeting-notice-001 | meeting_notice | PASS | ok |
+| 42 | meeting-notice-002 | meeting_notice | PASS | ok |
+| 43 | meeting-notice-003 | meeting_notice | PASS | ok |
+| 44 | meeting-notice-004 | meeting_notice | PASS | ok |
+| 45 | meeting-notice-005 | meeting_notice | PASS | ok |
+| 46 | meeting-notice-006 | meeting_notice | PASS | ok |
+| 47 | meeting-notice-007 | meeting_notice | PASS | ok |
+| 48 | meeting-notice-008 | meeting_notice | PASS | ok |
+| 49 | meeting-notice-009 | meeting_notice | PASS | ok |
+| 50 | meeting-notice-010 | meeting_notice | PASS | ok |
+| 51 | meeting-notice-011 | meeting_notice | PASS | ok |
+| 52 | meeting-notice-012 | meeting_notice | PASS | ok |
+| 53 | meeting-notice-013 | meeting_notice | PASS | ok |
+| 54 | meeting-notice-014 | meeting_notice | PASS | ok |
+| 55 | meeting-notice-015 | meeting_notice | PASS | ok |
+| 56 | assignment-deadline-001 | assignment_deadline | PASS | ok |
+| 57 | assignment-deadline-002 | assignment_deadline | PASS | ok |
+| 58 | assignment-deadline-003 | assignment_deadline | PASS | ok |
+| 59 | assignment-deadline-004 | assignment_deadline | PASS | ok |
+| 60 | assignment-deadline-005 | assignment_deadline | PASS | ok |
+| 61 | assignment-deadline-006 | assignment_deadline | PASS | ok |
+| 62 | assignment-deadline-007 | assignment_deadline | PASS | ok |
+| 63 | assignment-deadline-008 | assignment_deadline | PASS | ok |
+| 64 | assignment-deadline-009 | assignment_deadline | PASS | ok |
+| 65 | assignment-deadline-010 | assignment_deadline | PASS | ok |
+| 66 | assignment-deadline-011 | assignment_deadline | PASS | ok |
+| 67 | assignment-deadline-012 | assignment_deadline | PASS | ok |
+| 68 | assignment-deadline-013 | assignment_deadline | PASS | ok |
+| 69 | assignment-deadline-014 | assignment_deadline | PASS | ok |
+| 70 | assignment-deadline-015 | assignment_deadline | PASS | ok |
+| 71 | travel-ticket-001 | travel_ticket | PASS | ok |
+| 72 | travel-ticket-002 | travel_ticket | PASS | ok |
+| 73 | travel-ticket-003 | travel_ticket | PASS | ok |
+| 74 | travel-ticket-004 | travel_ticket | PASS | ok |
+| 75 | travel-ticket-005 | travel_ticket | PASS | ok |
+| 76 | travel-ticket-006 | travel_ticket | PASS | ok |
+| 77 | travel-ticket-007 | travel_ticket | PASS | ok |
+| 78 | travel-ticket-008 | travel_ticket | PASS | ok |
+| 79 | travel-ticket-009 | travel_ticket | PASS | ok |
+| 80 | travel-ticket-010 | travel_ticket | PASS | ok |
+| 81 | interview-notice-001 | interview_notice | PASS | ok |
+| 82 | interview-notice-002 | interview_notice | PASS | ok |
+| 83 | interview-notice-003 | interview_notice | PASS | ok |
+| 84 | interview-notice-004 | interview_notice | PASS | ok |
+| 85 | interview-notice-005 | interview_notice | PASS | ok |
+| 86 | interview-notice-006 | interview_notice | PASS | ok |
+| 87 | interview-notice-007 | interview_notice | PASS | ok |
+| 88 | interview-notice-008 | interview_notice | PASS | ok |
+| 89 | interview-notice-009 | interview_notice | PASS | ok |
+| 90 | interview-notice-010 | interview_notice | PASS | ok |
+| 91 | low-quality-fragment-001 | low_quality_fragment | PASS | ok |
+| 92 | low-quality-fragment-002 | low_quality_fragment | PASS | ok |
+| 93 | low-quality-fragment-003 | low_quality_fragment | PASS | ok |
+| 94 | low-quality-fragment-004 | low_quality_fragment | PASS | ok |
+| 95 | low-quality-fragment-005 | low_quality_fragment | PASS | ok |
+| 96 | low-quality-fragment-006 | low_quality_fragment | PASS | ok |
+| 97 | low-quality-fragment-007 | low_quality_fragment | PASS | ok |
+| 98 | low-quality-fragment-008 | low_quality_fragment | PASS | ok |
+| 99 | low-quality-fragment-009 | low_quality_fragment | PASS | ok |
+| 100 | low-quality-fragment-010 | low_quality_fragment | PASS | ok |
+| 101 | negative-fragment-001 | negative_fragment | PASS | ok |
+| 102 | negative-fragment-002 | negative_fragment | PASS | ok |
+| 103 | negative-fragment-003 | negative_fragment | PASS | ok |
+| 104 | negative-fragment-004 | negative_fragment | PASS | ok |
+| 105 | negative-fragment-005 | negative_fragment | PASS | ok |
+| 106 | negative-fragment-006 | negative_fragment | PASS | ok |
+| 107 | negative-fragment-007 | negative_fragment | PASS | ok |
+| 108 | negative-fragment-008 | negative_fragment | PASS | ok |
+| 109 | negative-fragment-009 | negative_fragment | PASS | ok |
+| 110 | negative-fragment-010 | negative_fragment | PASS | ok |

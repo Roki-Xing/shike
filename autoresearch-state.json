@@ -24,56 +24,44 @@
   "run_tag": "shike-5-feature-optimizations",
   "state": {
     "baseline_metric": 0,
-    "best_iteration": 140,
-    "best_metric": 140,
-    "blocked": 0,
+    "best_iteration": 269,
+    "best_metric": 268,
+    "blocked": 1,
     "consecutive_discards": 0,
     "crashes": 0,
     "current_labels": [
-      "feature/prototype-home-polish",
-      "guard/deliverables",
-      "guard/persistence",
-      "guard/android-structure",
-      "guard/android-unit-tests",
-      "guard/action-execution",
-      "guard/model-bridge",
-      "guard/demo-acceptance",
-      "guard/real-world-ready",
-      "guard/landable",
-      "guard/backend",
-      "guard/spike"
+      "guard/closeout",
+      "guard/requirement-matrix",
+      "guard/source-restored",
+      "guard/release-candidate",
+      "guard/strict-blocker-boundary",
+      "guard/secret-hygiene"
     ],
-    "current_metric": 140,
+    "current_metric": 268,
     "discards": 0,
-    "iteration": 140,
-    "keeps": 140,
+    "iteration": 270,
+    "keeps": 267,
     "last_commit": "no-git",
     "last_repo_commits": {
       "/home/xing-12_26/projects/codex-workspace/shike": "no-git"
     },
-    "last_status": "keep",
+    "last_status": "blocked",
     "last_trial_commit": "no-git",
     "last_trial_labels": [
-      "feature/prototype-home-polish",
-      "guard/deliverables",
-      "guard/persistence",
-      "guard/android-structure",
-      "guard/android-unit-tests",
-      "guard/action-execution",
-      "guard/model-bridge",
-      "guard/demo-acceptance",
-      "guard/real-world-ready",
-      "guard/landable",
-      "guard/backend",
-      "guard/spike"
+      "protocol/fingerprint-check",
+      "guard/final-audit",
+      "guard/source-restored",
+      "guard/release-candidate",
+      "guard/strict-blocker-boundary",
+      "guard/secret-hygiene"
     ],
-    "last_trial_metric": 140,
+    "last_trial_metric": 268,
     "last_trial_repo_commits": {
       "/home/xing-12_26/projects/codex-workspace/shike": "no-git"
     },
-    "no_ops": 0,
+    "no_ops": 2,
     "pivot_count": 0
   },
-  "updated_at": "2026-05-26T10:21:03Z",
+  "updated_at": "2026-05-31T09:10:54Z",
   "version": 1
 }

@@ -353,13 +353,13 @@ backend-redacted-access-log.txt
 apk-sha256.txt
 ```
 
-### 5.5 新增云真机验收脚本
-
-新增：
+### 5.5 云真机验收脚本
 
 ```bash
 python3 shike/validation/validate_cloud_device_package.py
 ```
+
+录制云真机前先运行 `python3 shike/scripts/prepare_cloud_device_evidence.py`；当前准备门禁是 `CLOUD_DEVICE_PREP_METRIC 5/5`，在未收齐真实录屏前 `CLOUD_DEVICE_PREP_MISSING_VIDEOS 9/9` 是预期状态。当前非 strict 通过标准是 `CLOUD_DEVICE_PACKAGE_METRIC 27/27`，它先证明云真机证据包结构、脱敏面、device-runbook release handoff 步骤、生成脚本 handoff 模板和发布交接口径齐备；真实云真机录屏和已填写报告收齐后，再执行 `python3 shike/validation/validate_cloud_device_package.py --strict` 与 `python3 shike/validation/validate_landing_release_candidate.py --strict` 做最终发布核验。缺外部证据时，strict 预期保持 `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE 3/7`，并以 `materials/evidence/blocking-report.md` 记录阻断项；本地发布证据索引见 `materials/evidence/release-evidence-index.md`。正式录制前还必须在 `cloud-device-test-report.md` 的 `Pre-recording Evidence Gate` 中确认 `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md` 仍是桌面指导源，`materials/evidence/requirement-matrix.md` 仍通过 `REQUIREMENT_MATRIX_METRIC 9/9`，all 9 real cloud-device MP4 files 均已采集，且 no placeholder fields remain after capture。
 
 检查项：
 
@@ -369,6 +369,8 @@ python3 shike/validation/validate_cloud_device_package.py
 - `backend-redacted-access-log.txt` 不含 AppKEY、不含真实个人信息。
 - `device-runbook.md` 已区分 USB 真机、模拟器、云真机三种网络配置。
 - `README.md` 已加入云真机验收命令。
+- `materials/evidence/release-evidence-index.md` 汇总本地门禁、BlueLM 脱敏证据、strict 阻断项、APK hash、依赖安全重跑命令、`docs/optimization-log.md` 当前交接摘要、README 公开入口、`validation/traceability.md` 的 SHIKE-070 交付追踪和脱敏规则；当前门禁为 `RELEASE_EVIDENCE_INDEX_METRIC 10/10`。
+- `materials/evidence/blocking-report.md` 列出缺失 MP4、待填报告字段、复跑命令和脱敏警告。
 
 ---
 
@@ -691,7 +693,7 @@ any -> archived
 | 3 | 云真机测试证据 | 机型、系统、录屏、通过项、失败降级 |
 | 4 | 真实 App 前端升级 | 多页面截图：今日、导入、确认、编排、收件箱、设置 |
 | 5 | 隐私与安全 | 密钥不进 APK、OCR 脱敏、用户确认、数据清除 |
-| 6 | 评测集与质量 | 100 条样例、课程/活动/会议/作业/低质量反例 |
+| 6 | 评测集与质量 | 110 条样例、课程/活动/会议/作业/面试/出行票务/低质量反例 |
 | 7 | 失败降级 | BlueLM 不可用、权限拒绝、地图不可用、OCR 失败 |
 | 8 | 与 vivo 场景结合 | 手机生态入口、云真机、OriginOS/蓝心能力增强方向 |
 
@@ -726,7 +728,7 @@ any -> archived
 python3 shike/validation/validate_landing_release_candidate.py
 ```
 
-建议总分 50 项：
+当前本地门禁总分 52 项：
 
 | 模块 | 分值 | 检查内容 |
 |---|---:|---|
@@ -739,20 +741,24 @@ python3 shike/validation/validate_landing_release_candidate.py
 | 收件箱 | 4 | 多条、筛选、搜索、状态机 |
 | 隐私 | 3 | 脱敏、一键清除、云侧开关 |
 | 材料 | 3 | PDF/PPT/脚本/证据包更新 |
+| Strict 阻断报告 | 1 | 缺失外部证据时生成可执行 blocking report |
+| 发布证据索引 | 1 | 汇总本地门禁、BlueLM 脱敏证据、云真机阻断项、README 公开入口、优化日志交接摘要和重跑命令 |
 
 通过标准：
 
 ```text
-LANDING_RELEASE_CANDIDATE_METRIC 50/50
+LANDING_RELEASE_CANDIDATE_METRIC 52/52
 ```
 
 允许在开发中先设宽松标准：
 
 ```text
->= 40/50 可录屏
->= 45/50 可提交复赛材料
-50/50 可作为最终交付包
+>= 42/52 可录屏
+>= 47/52 可提交复赛材料
+52/52 可作为本地 Release Candidate 交付包
 ```
+
+`validate_landing_release_candidate.py --strict` 仍然只在真实 BlueLM 在线日志、真实云真机录屏和填写后的设备报告齐备后作为最终发布证明；缺外部证据时以 `materials/evidence/blocking-report.md` 记录阻断项，不伪造结果。
 
 ---
 
@@ -773,13 +779,13 @@ LANDING_RELEASE_CANDIDATE_METRIC 50/50
 ### Goal 2：BlueLM 结构化 Prompt 与模型评测
 
 ```text
-/goal 为拾刻建立 BlueLM 结构化抽取 prompt、100 条回归样例评测和模型输出质量报告。模型只能输出符合 ShikeModelOutput 的 JSON；失败时进入人工确认。完成条件：validate_model_contract_strict.py 通过；课程、活动、会议、作业、低质量反例均覆盖；生成 docs/model-eval-report.md。
+/goal 为拾刻建立 BlueLM 结构化抽取 prompt、110 条回归样例评测和模型输出质量报告。模型只能输出符合 ShikeModelOutput 的 JSON；失败时进入人工确认。完成条件：validate_model_contract_strict.py 通过；课程、活动、会议、作业、面试、出行票务、低质量反例均覆盖；生成 docs/model-eval-report.md。
 ```
 
 ### Goal 3：云真机后端访问与测试包
 
 ```text
-/goal 升级 device-runbook.md 和 device-demo-checklist.md，明确模拟器、USB 真机、云真机三种网络配置；新增 validate_cloud_device_package.py；新增 cloud-device-test-report.md 模板。完成条件：文档不再把 10.0.2.2 当作云真机方案；录屏证据目录和 9 段文件名被脚本检查；README 有云真机验收命令。
+/goal 升级 device-runbook.md 和 device-demo-checklist.md，明确模拟器、USB 真机、云真机三种网络配置；维护 validate_cloud_device_package.py 和 cloud-device-test-report.md 模板。完成条件：文档不再把 10.0.2.2 当作云真机方案；录屏证据目录和 9 段文件名被脚本检查；README 有云真机验收命令；device-runbook 保留 release handoff 步骤；`prepare_cloud_device_evidence.py` 保持 `CLOUD_DEVICE_PREP_METRIC 5/5` 和预期 `CLOUD_DEVICE_PREP_MISSING_VIDEOS 9/9`；生成脚本不会回退 release handoff；`CLOUD_DEVICE_PACKAGE_METRIC 27/27`、`materials/evidence/release-evidence-index.md`、`materials/evidence/blocking-report.md` 和 strict `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE 3/7` 外部证据边界保持同步。
 ```
 
 ### Goal 4：前端从演示控制台升级为真实 App 多页面
@@ -791,7 +797,7 @@ LANDING_RELEASE_CANDIDATE_METRIC 50/50
 ### Goal 5：OCR 与导入产品化
 
 ```text
-/goal 建立 CaptureDraft 与 OcrEngine 分层，统一相册、相机、分享文本、手动输入入口。保留 ManualTextFallback，OCR 失败时可手动继续；不默认上传图片。完成条件：相册/相机/分享/手动四类输入都能进入同一解析流程；OCR 失败不会中断主链路；新增 validate_capture_ocr_pipeline.py。
+/goal 建立 CaptureDraft 与 OcrEngine 分层，统一相册、相机、分享文本、手动输入入口。保留 ManualTextFallback，OCR 失败时可手动继续；不默认上传图片。完成条件：相册/相机/分享/手动四类输入都能进入同一解析流程；OCR 失败不会中断主链路；`validate_ocr_engine_layer.py` 和 `validate_ocr_input.py` 通过。
 ```
 
 ### Goal 6：收件箱长期工作台
@@ -803,13 +809,13 @@ LANDING_RELEASE_CANDIDATE_METRIC 50/50
 ### Goal 7：材料升级为复赛落地证据
 
 ```text
-/goal 在初赛材料基础上更新 PDF/PPT 大纲、演示脚本、device-demo-checklist 和 README，加入 BlueLM 接入、云真机证据、真实 App 前端、隐私安全、失败降级和评分映射。完成条件：materials/final-demo-script.md、materials/landing-deck-outline.md、docs/scoring-evidence-map.md 存在；validate_landing_materials.py 通过。
+/goal 在初赛材料基础上更新演示脚本、device-demo-checklist、submission-checklist、release evidence index 和 README，加入 BlueLM 接入、云真机证据、真实 App 前端、隐私安全、失败降级、评分映射和 `docs/optimization-log.md` 当前交接摘要。完成条件：materials/demo-script.md、materials/preliminary-deck.md、materials/submission-checklist.md、materials/evidence/release-evidence-index.md 和 docs/delivery-boundary-and-scoring.md 存在；README 公开入口、优化日志交接摘要、`RELEASE_EVIDENCE_INDEX_METRIC 10/10`、validate_deliverables.py 和 validate_release_evidence_index.py 通过。
 ```
 
 ### Goal 8：最终 Release Candidate
 
 ```text
-/goal 建立 validate_landing_release_candidate.py，将 BlueLM、密钥安全、云真机、前端、OCR、执行闭环、收件箱、隐私和材料整合成 50 项验收。逐项补齐直到达到 LANDING_RELEASE_CANDIDATE_METRIC 50/50。不得删除现有 validate_real_world_ready.py、validate_demo_acceptance.py、validate_action_execution.py。遇到 BlueLM 凭据、云真机平台或外部网络阻塞时生成 blocking-report.md。
+/goal 建立 validate_landing_release_candidate.py，将 BlueLM、密钥安全、云真机、前端、OCR、执行闭环、收件箱、隐私、材料、strict 阻断报告和发布证据索引整合成 52 项本地验收。逐项补齐直到达到 LANDING_RELEASE_CANDIDATE_METRIC 52/52。不得删除现有 validate_real_world_ready.py、validate_demo_acceptance.py、validate_action_execution.py。遇到 BlueLM 凭据、云真机平台或外部网络阻塞时生成 blocking-report.md；最终 strict 发布证明必须等待真实云真机录屏和填写后的设备报告。
 ```
 
 ---
@@ -852,7 +858,13 @@ python3 shike/validation/validate_bluelm_adapter.py
 
 ```bash
 python3 shike/validation/validate_cloud_device_package.py
+python3 shike/validation/validate_release_blocking_report.py
+python3 shike/validation/validate_release_evidence_index.py
+python3 shike/validation/validate_landing_release_candidate.py
+python3 shike/validation/validate_landing_release_candidate.py --strict
 ```
+
+`validate_landing_release_candidate.py --strict` 在真实云真机录屏和填写后的设备报告齐备前应保持 `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE 3/7` 阻断，不能用占位视频或伪造报告字段通过。录制前必须先完成 `cloud-device-test-report.md` 的 `Pre-recording Evidence Gate`：桌面指导源仍是 `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md`，`materials/evidence/requirement-matrix.md` 仍通过 `REQUIREMENT_MATRIX_METRIC 9/9`，all 9 real cloud-device MP4 files 已进入证据包，且 no placeholder fields remain after capture。
 
 ### 第三阶段：前端像真实 App
 
@@ -885,7 +897,8 @@ python3 shike/validation/validate_frontend_polish.py
 验收：
 
 ```bash
-python3 shike/validation/validate_capture_ocr_pipeline.py
+python3 shike/validation/validate_ocr_engine_layer.py
+python3 shike/validation/validate_ocr_input.py
 python3 shike/validation/validate_inbox_workbench_landing.py
 ```
 
@@ -895,16 +908,19 @@ python3 shike/validation/validate_inbox_workbench_landing.py
 
 交付：
 
-- `materials/landing-deck-outline.md`
-- `materials/final-demo-script.md`
-- `docs/scoring-evidence-map.md`
+- `materials/preliminary-deck.md`
+- `materials/demo-script.md`
+- `materials/submission-checklist.md`
+- `materials/evidence/release-evidence-index.md`
+- `docs/delivery-boundary-and-scoring.md`
 - `materials/evidence/cloud-device/*.mp4`
 - `apk-sha256.txt`
 
 验收：
 
 ```bash
-python3 shike/validation/validate_landing_materials.py
+python3 shike/validation/validate_deliverables.py
+python3 shike/validation/validate_release_evidence_index.py
 python3 shike/validation/validate_landing_release_candidate.py
 ```
 
@@ -920,24 +936,28 @@ python3 shike/validation/validate_landing_release_candidate.py
   docs/
     product-spec.md
     bluelm-integration-runbook.md
-    cloud-device-test-report.md
     device-runbook.md
-    scoring-evidence-map.md
-    privacy-and-security.md
+    delivery-boundary-and-scoring.md
   backend/
-    main.py
-    adapters/
+    shike_backend/main.py
+    shike_backend/adapters/
+    shike_backend/prompts/
     requirements.txt
-    env.example
   contracts/
     model-output.schema.json
     sample-course-request.json
     sample-course-response.json
   materials/
-    final-demo-script.md
-    landing-deck-outline.md
+    demo-script.md
+    preliminary-deck.md
+    submission-checklist.md
     evidence/
+      release-evidence-index.md
+      blocking-report.md
       cloud-device/
+        cloud-device-test-report.md
+        backend-redacted-access-log.txt
+        apk-sha256.txt
         01-cloud-install-open.mp4
         02-cloud-gallery-bluelm.mp4
         03-cloud-camera-bluelm.mp4
@@ -952,6 +972,11 @@ python3 shike/validation/validate_landing_release_candidate.py
     validate_bluelm_adapter.py
     validate_cloud_device_package.py
     validate_frontend_polish.py
+    validate_demo_acceptance.py
+    validate_real_world_ready.py
+    validate_release_blocking_report.py
+    validate_release_evidence_index.py
+    validate_deliverables.py
     validate_landing_release_candidate.py
 ```
 

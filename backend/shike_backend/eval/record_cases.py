@@ -48,6 +48,9 @@ def main() -> int:
         timeout_seconds=settings.bluelm_timeout_seconds,
         max_retries=settings.bluelm_max_retries,
         temperature=settings.bluelm_temperature,
+        thinking_mode=settings.bluelm_thinking_mode,
+        request_id_param=settings.bluelm_request_id_param,
+        response_format_enabled=settings.bluelm_response_format_enabled,
     )
     if not base.is_configured():
         print("ERR\tbluelm_not_configured")
@@ -83,4 +86,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

@@ -24,6 +24,7 @@ from shike_backend.schemas import AnalyzeRequest, AnalyzeResponse, load_model_ou
 _PROMPTS_DIR = Path(__file__).resolve().parents[1] / "prompts"
 _SYSTEM_PROMPT_PATH = _PROMPTS_DIR / "analyze_system_prompt.txt"
 _USER_TEMPLATE_PATH = _PROMPTS_DIR / "analyze_user_template.txt"
+_DEFAULT_THINKING_MODE = "provider_default"
 
 
 def _read_prompt(path: Path) -> str:
@@ -48,6 +49,96 @@ def _extract_json(text: str) -> Any:
         raise
 
 
+def _normalized_thinking_mode(mode: str | None) -> str:
+    value = (mode or _DEFAULT_THINKING_MODE).strip().lower().replace("-", "_")
+    return value or _DEFAULT_THINKING_MODE
+
+
+def _apply_model_thinking_field(payload: dict[str, Any], *, model: str, thinking_mode: str | None) -> None:
+    """Apply vivo model-specific thinking fields to a request body.
+
+    Args:
+        payload: Request JSON body being prepared.
+        model: vivo model name.
+        thinking_mode: One of provider_default, omit, disabled, enabled, enable, true, or false.
+
+    Returns:
+        None. The payload is modified in place.
+    """
+
+    mode = _normalized_thinking_mode(thinking_mode)
+    if mode in {_DEFAULT_THINKING_MODE, "default", "auto", "omit"}:
+        return
+
+    model_name = (model or "").lower()
+    qwen_model = "qwen" in model_name
+
+    if qwen_model:
+        if mode in {"disabled", "disable", "false", "off", "0"}:
+            payload["enable_thinking"] = False
+            return
+        if mode in {"enabled", "enable", "true", "on", "1"}:
+            payload["enable_thinking"] = True
+            return
+        raise AdapterError("invalid_bluelm_thinking_mode")
+
+    if mode in {"disabled", "disable", "false", "off", "0"}:
+        payload["thinking"] = {"type": "disabled"}
+        return
+    if mode == "enable":
+        # The current doc center table names this value as "enable" while the
+        # explanatory text also mentions "enabled"; keep both modes explicit.
+        payload["thinking"] = {"type": "enable"}
+        return
+    if mode in {"enabled", "true", "on", "1"}:
+        payload["thinking"] = {"type": "enabled"}
+        return
+
+    raise AdapterError("invalid_bluelm_thinking_mode")
+
+
+def build_bluelm_payload(
+    *,
+    model: str,
+    system_prompt: str,
+    user_prompt: str,
+    session_id: str,
+    temperature: float,
+    thinking_mode: str | None,
+    response_format_enabled: bool,
+) -> dict[str, Any]:
+    """Build the OpenAI-compatible vivo chat-completions request body.
+
+    Args:
+        model: vivo model name.
+        system_prompt: System prompt content.
+        user_prompt: User prompt content.
+        session_id: Provider session identifier.
+        temperature: Sampling temperature.
+        thinking_mode: Deep-thinking field policy.
+        response_format_enabled: Whether to request JSON-object mode.
+
+    Returns:
+        Request payload dictionary ready for `requests.post(json=...)`.
+    """
+
+    payload: dict[str, Any] = {
+        "messages": [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt},
+        ],
+        "model": model,
+        "sessionId": session_id,
+        "stream": False,
+        "temperature": temperature,
+    }
+    if response_format_enabled:
+        payload["response_format"] = {"type": "json_object"}
+
+    _apply_model_thinking_field(payload, model=model, thinking_mode=thinking_mode)
+    return payload
+
+
 class BlueLMModelAdapter:
     def __init__(
         self,
@@ -60,6 +151,9 @@ class BlueLMModelAdapter:
         timeout_seconds: int,
         max_retries: int,
         temperature: float,
+        thinking_mode: str = _DEFAULT_THINKING_MODE,
+        request_id_param: str = "requestId",
+        response_format_enabled: bool = True,
     ) -> None:
         self._app_id = (app_id or "").strip()
         self._app_key = (app_key or "").strip()
@@ -69,6 +163,9 @@ class BlueLMModelAdapter:
         self._timeout_seconds = max(1, timeout_seconds)
         self._max_retries = max(0, max_retries)
         self._temperature = temperature
+        self._thinking_mode = _normalized_thinking_mode(thinking_mode)
+        self._request_id_param = (request_id_param or "requestId").strip() or "requestId"
+        self._response_format_enabled = response_format_enabled
 
         self._system_prompt = _read_prompt(_SYSTEM_PROMPT_PATH)
         self._user_template = _read_prompt(_USER_TEMPLATE_PATH)
@@ -87,9 +184,7 @@ class BlueLMModelAdapter:
 
         request_id = str(uuid.uuid4())
         session_id = str(uuid.uuid4())
-        # Doc center requires requestId as a query param. Empirically both `requestId` and
-        # `request_id` are accepted, but we follow the doc spelling.
-        params = {"requestId": request_id}
+        params = {self._request_id_param: request_id}
 
         user_prompt = self._user_template.format(
             input_id=request.input_id,
@@ -102,33 +197,15 @@ class BlueLMModelAdapter:
             schema_json=json.dumps(self._schema, ensure_ascii=False),
         )
 
-        payload: dict[str, Any] = {
-            "messages": [
-                {"role": "system", "content": self._system_prompt},
-                {"role": "user", "content": user_prompt},
-            ],
-            "model": self._model,
-            # These fields are tolerated by the OpenAI-compatible endpoint, and may be required
-            # by legacy endpoints. Keep them to reduce friction when switching URIs.
-            "sessionId": session_id,
-            "extra": {"temperature": self._temperature},
-            # Reduce “helpful formatting”: when supported, this makes the model emit raw JSON
-            # without ``` fences. Unknown fields are typically ignored, but if a given model
-            # rejects it we'll fall back to parsing anyway.
-            "response_format": {"type": "json_object"},
-            "stream": False,
-            "temperature": self._temperature,
-        }
-
-        # "Deep thinking" flags differ by model (per doc center).
-        # Keep defaults conservative: we don't need deep reasoning for schema filling.
-        model_name = (self._model or "").lower()
-        if "qwen" in model_name:
-            payload["enable_thinking"] = False
-        else:
-            # Doc center: for DeepSeek/Doubao models `thinking.type` accepts "enabled" / "disabled".
-            # "enable" (without the trailing "d") is rejected by the provider.
-            payload["thinking"] = {"type": "disabled"}
+        payload = build_bluelm_payload(
+            model=self._model,
+            system_prompt=self._system_prompt,
+            user_prompt=user_prompt,
+            session_id=session_id,
+            temperature=self._temperature,
+            thinking_mode=self._thinking_mode,
+            response_format_enabled=self._response_format_enabled,
+        )
 
         # AIGC doc "鉴权方式" uses Bearer AppKey (not gateway signature headers).
         # Keep headers minimal and never log/return secrets.

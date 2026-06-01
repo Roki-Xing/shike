@@ -1,0 +1,8 @@
+{
+  "input_id": "sample-manual-001",
+  "source_type": "manual",
+  "ocr_text": "高数A班今晚18:30改到B203，作业第5章今晚22:00前提交。",
+  "locale": "zh-CN",
+  "scene_hint": "course_notice",
+  "user_timezone": "Asia/Shanghai"
+}

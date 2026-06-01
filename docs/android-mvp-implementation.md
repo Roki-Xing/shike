@@ -79,6 +79,8 @@ Content-Type: application/json
 }
 ```
 
+`source_type` 支持 `screenshot`、`camera`、`share_text`、`manual`，分别对应相册截图、拍照导入、系统文本分享和手动输入；Android 会按当前采集来源映射，不把分享/手动内容伪装成截图。
+
 响应必须符合 `contracts/model-output.schema.json`。
 
 ## 验证命令
@@ -130,6 +132,7 @@ python3 shike/backend/verify_backend.py
 | 地图 | `geo:` deeplink + `Uri.encode` | 使用当前行动卡地点打开地图 |
 | 分享导入 | `ACTION_SEND` + `Intent.EXTRA_TEXT` | 从其他应用分享文本到拾刻生成行动卡 |
 | 本地恢复 | `SharedPreferences` 收件箱缓存 | 保存当前行动卡、动作、时间、地点和采集来源，应用重启后恢复 |
+| 长期收件箱 | SQLite `inbox_items` + 旧快照迁移 | 多条行动卡、状态、来源、OCR 摘要和动作列表进入长期收件箱；`SharedPreferences` 仅保留旧快照/轻配置兜底 |
 | 后端解析 | `HttpURLConnection` -> `POST /v1/analyze` | 模拟器默认访问 `http://10.0.2.2:8000`，映射 JSON 响应到行动卡 |
 | 失败回退 | `runCatching` + 本地样例 | 后端超时、未启动或返回非 2xx 时回退本地 MockModelAdapter |
 | OCR 草稿 | `OutlinedTextField` + `ocrDraft` | 相册、相机、样例和分享导入后可编辑 OCR 文本草稿，再提交到 `/v1/analyze` |
@@ -137,4 +140,21 @@ python3 shike/backend/verify_backend.py
 | 手动修正 | `ParseConfirmPanel` + `onReviewed` | 用户可编辑标题、时间、地点和状态，点“确认修正”后持久化 |
 | 忽略动作 | `status = "已忽略"` | 低置信度或字段不可信时保留记录但不推进执行 |
 
+### OCR 分层
+
+导入入口统一先生成 `CaptureInput`，再通过 `OcrEngine` 输出 `OcrResult`，最后汇入 `CaptureDraft`。当前已落地两类可测试实现：
+
+| 引擎 | 入口 | 行为 |
+|---|---|---|
+| `ManualOcrEngine` | 分享文本、手动输入、OCR 失败兜底 | 保留用户文本；空文本返回低置信度和“手动粘贴”提示，不阻断主链路 |
+| `MockOcrEngine` | 相册、相机演示入口 | 产出课程通知和活动海报两组合成 OCR 草稿，供无真 OCR 环境下演示与单测复现 |
+
+`CaptureDraft` 会记录 `sourceType`、`ocrText`、`ocrConfidence`、`ocrEngineName`、`privacyLevel`、`cloudAllowed` 和 `imageCleared`。分享文本默认使用 `ManualOcrEngine` 且 `allowCloudEnhancement = false`，避免把用户从其他应用分享来的原文自动送云；相册/相机当前使用 `MockOcrEngine`，后续可替换为端侧或云侧 OCR，但必须保留手动继续路径。
+
 权限细节、安装命令和失败排查见 `docs/device-runbook.md`。离线演示继续使用 `MockModelAdapter` 和页面内“课程样例/活动样例”兜底，保证无网络、无图片或相机权限被拒绝时仍能跑通课程通知和活动海报主链路。
+
+收件箱长期化已新增 `InboxItemEntity`、`CaptureDraftEntity`、`ActionDraftEntity`、`ExecutionResultEntity` 和 SQLite `InboxDatabase`。`saveSnapshot` 继续保留重启恢复快照，同时写入长期收件箱；启动时优先读取 SQLite 历史记录，旧 `SharedPreferences` 快照作为迁移兜底。落地守卫为：
+
+```bash
+python3 shike/validation/validate_inbox_workbench_landing.py
+```

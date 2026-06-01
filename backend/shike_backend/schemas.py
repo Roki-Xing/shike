@@ -22,8 +22,10 @@ def load_model_output_schema() -> dict[str, object]:
 class AnalyzeRequest(BaseModel):
     """Analyze endpoint request."""
 
+    model_config = ConfigDict(extra="forbid")
+
     input_id: str
-    source_type: Literal["screenshot", "camera"]
+    source_type: Literal["screenshot", "camera", "share_text", "manual"]
     ocr_text: str
     locale: str = "zh-CN"
     # Keep this flexible: clients may send extra hint values for experiments,

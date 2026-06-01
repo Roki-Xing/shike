@@ -10,7 +10,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import cn.shike.app.data.BackendAnalysisInput
 import cn.shike.app.data.BackendAnalysisOutcome
+import cn.shike.app.data.InboxItemEntity
 import cn.shike.app.data.InitialTodayState
+import cn.shike.app.data.backendAnalysisInputForCurrentDraft
+import cn.shike.app.data.inboxItemEntityFrom
 import cn.shike.app.domain.ShikeItem
 import cn.shike.app.ui.ShikeMainScreen
 import cn.shike.app.ui.TodayAgendaState
@@ -22,6 +25,7 @@ fun ShikeApp(
     initialCaptureSource: String,
     initialTodayState: InitialTodayState,
     initialBackendUrl: String,
+    initialInboxHistory: List<InboxItemEntity>,
     onPersist: (ShikeItem, String) -> Unit,
     onSaveBackendUrl: (String) -> Unit,
     onClearLocalData: () -> Unit,
@@ -39,6 +43,7 @@ fun ShikeApp(
     var executionResults by remember { mutableStateOf(pendingExecutionResults()) }
     var todayAgendaState by remember { mutableStateOf(initialTodayState.toTodayAgendaState()) }
     var cloudEnhancedEnabled by remember { mutableStateOf(true) }
+    var inboxHistory by remember { mutableStateOf(initialInboxHistory) }
     val mainHandler = remember { Handler(Looper.getMainLooper()) }
 
     fun persistSelection(item: ShikeItem, source: String) {
@@ -49,6 +54,7 @@ fun ShikeApp(
         todayAgendaState = TodayAgendaState.Ready
         executionResults = pendingExecutionResults()
         onPersist(item, source)
+        inboxHistory = listOf(inboxItemEntityFrom(item, source, System.currentTimeMillis())) + inboxHistory
     }
     fun updateReviewedItem(item: ShikeItem) { modelStatus = applyReviewedItemSelection(item, ::persistSelection) }
     fun applyBackendOutcome(outcome: BackendAnalysisOutcome) { capturedBitmap = null; modelStatus = applyBackendOutcomeSelection(outcome, ::persistSelection) }
@@ -56,7 +62,6 @@ fun ShikeApp(
     fun applyEventSample() { capturedBitmap = null; applyEventSampleSelection(::persistSelection) }
     fun applyCameraPreview(bitmap: Bitmap) { capturedBitmap = bitmap; applyCameraPreviewSelection(bitmap, ::persistSelection) }
     fun applyGalleryImage(label: String) { capturedBitmap = null; applyGalleryImageSelection(label, ::persistSelection) }
-
     fun analyzeWithBackend(input: BackendAnalysisInput) {
         if (!cloudEnhancedEnabled) {
             val fallback = cloudEnhancementDisabledFallback()
@@ -77,17 +82,14 @@ fun ShikeApp(
         todayAgendaState = TodayAgendaState.Error
         onSaveBackendUrl(result.endpoint)
     }
-
     fun analyzeCourseWithBackend() = analyzeCourseWithBackendAction(::analyzeWithBackend)
-
     fun analyzeEventWithBackend() = analyzeEventWithBackendAction(::analyzeWithBackend)
-
+    fun analyzeCurrentDraftWithBackend() = analyzeWithBackend(backendAnalysisInputForCurrentDraft(captureSource, selected))
     fun saveBackendEndpoint() {
         val result = saveBackendEndpointAction(backendUrl, onSaveBackendUrl)
         backendUrl = result.endpoint
         modelStatus = result.statusMessage
     }
-
     fun clearLocalDataSelection() {
         onClearLocalData()
         val cleared = clearedLocalDataState()
@@ -131,6 +133,7 @@ fun ShikeApp(
         ocrDraft = ocrDraft,
         onOcrDraftChange = { ocrDraft = it },
         backendUrl = backendUrl,
+        inboxHistory = inboxHistory,
         onBackendUrlChange = { backendUrl = it },
         onSaveBackendUrl = ::saveBackendEndpoint,
         onGallery = captureLaunchers.launchGallery,
@@ -139,7 +142,7 @@ fun ShikeApp(
             todayAgendaState = TodayAgendaState.Ready
             captureSource = "手动输入入口：请编辑 OCR 文本草稿后选择后端解析或离线样例。"
         },
-        onBackendCourse = ::analyzeCourseWithBackend,
+        onBackendCourse = ::analyzeCurrentDraftWithBackend,
         onBackendEvent = ::analyzeEventWithBackend,
         onCourse = ::applyCourseSample,
         onEvent = ::applyEventSample,

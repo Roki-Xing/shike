@@ -1,0 +1,8 @@
+{
+  "input_id": "sample-interview-001",
+  "source_type": "screenshot",
+  "ocr_text": "HR通知：明天14:00线上会议室进行产品实习生面试，请提前准备简历。",
+  "locale": "zh-CN",
+  "scene_hint": "interview_notice",
+  "user_timezone": "Asia/Shanghai"
+}

@@ -1,0 +1,28 @@
+{
+  "scene_type": "unknown",
+  "confidence": 0.89,
+  "title": "出行集合提醒",
+  "time": {
+    "start_text": "今晚10:00",
+    "deadline_text": null,
+    "normalized_start": "2026-04-24T18:30:00+08:00",
+    "normalized_deadline": null
+  },
+  "location": {
+    "raw": "西安北站",
+    "map_query": "西安北站",
+    "confidence": 0.84
+  },
+  "task": {
+    "summary": "按集合时间到达并检查证件",
+    "priority": "high",
+    "topic": "unknown"
+  },
+  "suggested_actions": [
+    {"type": "calendar", "label": "加入出行日历", "requires_permission": true},
+    {"type": "reminder", "label": "出发前提醒", "requires_permission": true},
+    {"type": "map", "label": "打开集合地点", "requires_permission": false}
+  ],
+  "missing_fields": [],
+  "explanation": "识别到出行语义，但当前公开契约不扩展 scene_type，按 unknown 处理并给出可执行动作。"
+}

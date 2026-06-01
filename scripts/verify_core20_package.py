@@ -51,8 +51,8 @@ ACTION_EXECUTION_GUARD_REFERENCES = {
 }
 
 UNIT_TEST_GUARD_REFERENCES = {
-    "README.md": ("validate_android_unit_tests.py", "ANDROID_UNIT_TEST_METRIC 61/61"),
-    "materials/device-demo-checklist.md": ("validate_android_unit_tests.py", "ANDROID_UNIT_TEST_METRIC 61/61"),
+    "README.md": ("validate_android_unit_tests.py", "ANDROID_UNIT_TEST_METRIC 64/64"),
+    "materials/device-demo-checklist.md": ("validate_android_unit_tests.py", "ANDROID_UNIT_TEST_METRIC 64/64"),
     "validation/validate_demo_acceptance.py": ("validate_android_unit_tests.py", "workspace_command_style_consistent"),
 }
 

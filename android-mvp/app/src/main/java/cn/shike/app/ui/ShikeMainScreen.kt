@@ -9,9 +9,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import cn.shike.app.data.InboxItemEntity
 import cn.shike.app.domain.ShikeItem
 
 @Composable
@@ -26,6 +30,7 @@ fun ShikeMainScreen(
     ocrDraft: String,
     onOcrDraftChange: (String) -> Unit,
     backendUrl: String,
+    inboxHistory: List<InboxItemEntity>,
     onBackendUrlChange: (String) -> Unit,
     onSaveBackendUrl: () -> Unit,
     onGallery: () -> Unit,
@@ -43,60 +48,65 @@ fun ShikeMainScreen(
     onReminder: (ShikeItem) -> Unit,
     onOpenMap: (ShikeItem) -> Unit,
 ) {
+    var selectedSection by remember { mutableStateOf(ShikeMainSection.Home) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF3F8F7))
+            .background(ShikeColors.Surface)
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 14.dp, vertical = 12.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        SystemStatusRow()
-        DashboardHeader()
-        DateStrip()
-        HomeAgendaList(
-            item = selected,
-            state = todayAgendaState,
-            onGallery = onGallery,
-            onCamera = onCamera,
-            onManualInput = onManualInput,
+        when (selectedSection) {
+            ShikeMainSection.Home -> HomeActionScreen(
+                selected = selected,
+                todayAgendaState = todayAgendaState,
+                isConfirmed = isConfirmed,
+                onGallery = onGallery,
+                onCamera = onCamera,
+                onManualInput = onManualInput,
+                onAddCalendar = onAddCalendar,
+                onReminder = onReminder,
+                onOpenMap = onOpenMap,
+            )
+            ShikeMainSection.Import -> {
+                CaptureHubScreen(
+                    captureSource = captureSource,
+                    capturedBitmap = capturedBitmap,
+                    modelStatus = modelStatus,
+                    ocrDraft = ocrDraft,
+                    onOcrDraftChange = onOcrDraftChange,
+                    cloudEnhancedEnabled = cloudEnhancedEnabled,
+                    onGallery = onGallery,
+                    onCamera = onCamera,
+                    onManualInput = onManualInput,
+                    onBackendCourse = onBackendCourse,
+                    onBackendEvent = onBackendEvent,
+                )
+                ParseConfirmScreen(selected, onReviewed = onReviewed)
+                ActionPlanScreen(selected, isConfirmed, executionResults, onAddCalendar, onReminder, onOpenMap)
+            }
+            ShikeMainSection.Inbox -> InboxScreen(selected, captureSource, executionResults, inboxHistory)
+            ShikeMainSection.Settings -> PrivacySettingsScreen(
+                cloudEnhancedEnabled = cloudEnhancedEnabled,
+                onCloudEnhancedChange = onCloudEnhancedChange,
+                onClearLocalData = onClearLocalData,
+                backendUrl = backendUrl,
+                onBackendUrlChange = onBackendUrlChange,
+                onSaveBackendUrl = onSaveBackendUrl,
+            )
+            ShikeMainSection.Debug -> DebugDemoScreen(
+                backendUrl = backendUrl,
+                onBackendUrlChange = onBackendUrlChange,
+                onSaveBackendUrl = onSaveBackendUrl,
+                onCourse = onCourse,
+                onEvent = onEvent,
+            )
+        }
+        BottomNavBar(
+            selectedSection = selectedSection,
+            onSelected = { selectedSection = it },
         )
-        ConfirmBanner(
-            selected = selected,
-            isConfirmed = isConfirmed,
-            onAddCalendar = onAddCalendar,
-            onReminder = onReminder,
-            onOpenMap = onOpenMap,
-        )
-        TodaySummaryPanel()
-        DemoRoutePanel()
-        ImportPanel(
-            captureSource = captureSource,
-            capturedBitmap = capturedBitmap,
-            modelStatus = modelStatus,
-            ocrDraft = ocrDraft,
-            onOcrDraftChange = onOcrDraftChange,
-            backendUrl = backendUrl,
-            onBackendUrlChange = onBackendUrlChange,
-            onSaveBackendUrl = onSaveBackendUrl,
-            cloudEnhancedEnabled = cloudEnhancedEnabled,
-            onGallery = onGallery,
-            onCamera = onCamera,
-            onManualInput = onManualInput,
-            onBackendCourse = onBackendCourse,
-            onBackendEvent = onBackendEvent,
-            onCourse = onCourse,
-            onEvent = onEvent,
-        )
-        ParseConfirmPanel(selected, onReviewed = onReviewed)
-        ActionPlannerPanel(selected, isConfirmed, executionResults, onAddCalendar, onReminder, onOpenMap)
-        InboxPanel(selected, captureSource, executionResults)
-        DeliveryReadinessPanel()
-        PrivacyPanel(
-            cloudEnhancedEnabled = cloudEnhancedEnabled,
-            onCloudEnhancedChange = onCloudEnhancedChange,
-            onClearLocalData = onClearLocalData,
-        )
-        BottomNavBar()
     }
 }

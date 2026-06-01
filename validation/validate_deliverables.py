@@ -89,8 +89,32 @@ CHECKS = (
     Check(
         "SHIKE-070",
         "初赛材料包包含 PPT、海报、演示脚本和录屏分镜",
-        ("materials/preliminary-deck.md", "materials/poster-copy.md", "materials/demo-script.md", "prototype/demo-storyboard.md", "materials/submission-checklist.md"),
-        ("PPT", "海报", "演示脚本", "录屏", "作品简介", "用户洞察", "创新点", "架构", "大模型应用"),
+        (
+            "materials/preliminary-deck.md",
+            "materials/poster-copy.md",
+            "materials/demo-script.md",
+            "prototype/demo-storyboard.md",
+            "materials/submission-checklist.md",
+            "materials/evidence/release-evidence-index.md",
+            "materials/evidence/requirement-matrix.md",
+        ),
+        (
+            "PPT",
+            "海报",
+            "演示脚本",
+            "录屏",
+            "作品简介",
+            "用户洞察",
+            "创新点",
+            "架构",
+            "大模型应用",
+            "LANDING_RELEASE_CANDIDATE_METRIC 52/52",
+            "REAL_WORLD_READY_METRIC 22/22",
+            "provider=bluelm",
+            "REQUIREMENT_MATRIX_METRIC 9/9",
+            "LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE 3/7",
+            "Redaction",
+        ),
     ),
     Check(
         "SHIKE-080",
@@ -166,6 +190,127 @@ def validate_check(check: Check) -> tuple[bool, str]:
 
     if not numeric_metric(check, combined):
         return False, f"{check.issue_id}: 数量型验收未达标"
+
+    if check.issue_id == "SHIKE-000":
+        scoring_doc = read_text("docs/delivery-boundary-and-scoring.md")
+        required_scoring_tokens = (
+            "评分证据包映射",
+            "materials/evidence/release-evidence-index.md",
+            "validation/traceability.md",
+            "SHIKE-070",
+            "/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md",
+            "materials/evidence/requirement-matrix.md",
+            "DEMO_ACCEPTANCE_METRIC 18/18",
+            "REQUIREMENT_MATRIX_METRIC 9/9",
+            "LANDING_RELEASE_CANDIDATE_METRIC 52/52",
+            "DELIVERABLES_METRIC 10/10",
+            "CLOUD_DEVICE_PREP_METRIC 5/5",
+            "CLOUD_DEVICE_PACKAGE_METRIC 27/27",
+            "LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE 3/7",
+            "Pre-recording Evidence Gate",
+            "all 9 real cloud-device MP4 files",
+            "no placeholder fields remain after capture",
+            "PASS secret_hygiene",
+        )
+        missing_scoring_tokens = [token for token in required_scoring_tokens if token not in scoring_doc]
+        if missing_scoring_tokens:
+            return False, f"{check.issue_id}: 评分映射缺少发布证据链 {missing_scoring_tokens}"
+
+    if check.issue_id == "SHIKE-070":
+        submission = read_text("materials/submission-checklist.md")
+        traceability = read_text("validation/traceability.md")
+        demo_script = read_text("materials/demo-script.md")
+        deck = read_text("materials/preliminary-deck.md")
+        required_submission_tokens = (
+            "materials/evidence/cloud-device/",
+            "materials/evidence/blocking-report.md",
+            "materials/evidence/requirement-matrix.md",
+            "/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md",
+            "REQUIREMENT_MATRIX_METRIC 9/9",
+            "RELEASE_EVIDENCE_INDEX_METRIC 10/10",
+            "DELIVERABLES_METRIC 10/10",
+            "CLOUD_DEVICE_PREP_METRIC 5/5",
+            "CLOUD_DEVICE_PREP_MISSING_VIDEOS 9/9",
+            "CLOUD_DEVICE_PACKAGE_METRIC 27/27",
+            "docs/optimization-log.md",
+            "当前交接摘要",
+            "validation/traceability.md",
+            "SHIKE-070",
+            "LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE 3/7",
+            "预期阻断状态",
+            "不应当作为已发布完成证明",
+            "Pre-recording Evidence Gate",
+            "all 9 real cloud-device MP4 files",
+            "no placeholder fields remain after capture",
+        )
+        missing_submission_tokens = [token for token in required_submission_tokens if token not in submission]
+        if missing_submission_tokens:
+            return False, f"{check.issue_id}: 提交清单缺少 strict 证据交接 {missing_submission_tokens}"
+        required_traceability_tokens = (
+            "materials/submission-checklist.md",
+            "materials/device-demo-checklist.md",
+            "materials/evidence/release-evidence-index.md",
+            "RELEASE_EVIDENCE_INDEX_METRIC 10/10",
+            "/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md",
+            "materials/evidence/requirement-matrix.md",
+            "REQUIREMENT_MATRIX_METRIC 9/9",
+            "materials/evidence/blocking-report.md",
+            "materials/evidence/cloud-device/",
+            "CLOUD_DEVICE_PREP_METRIC 5/5",
+            "CLOUD_DEVICE_PREP_MISSING_VIDEOS 9/9",
+            "CLOUD_DEVICE_PACKAGE_METRIC 27/27",
+            "LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE 3/7",
+            "Pre-recording Evidence Gate",
+            "all 9 real cloud-device MP4 files",
+            "no placeholder fields remain after capture",
+        )
+        missing_traceability_tokens = [token for token in required_traceability_tokens if token not in traceability]
+        if missing_traceability_tokens:
+            return False, f"{check.issue_id}: 追踪矩阵缺少发布证据交接 {missing_traceability_tokens}"
+        required_demo_tokens = (
+            "validate_landing_release_candidate.py",
+            "LANDING_RELEASE_CANDIDATE_METRIC 52/52",
+            "validate_deliverables.py",
+            "DELIVERABLES_METRIC 10/10",
+            "validation/traceability.md",
+            "SHIKE-070",
+            "LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE 3/7",
+            "materials/evidence/blocking-report.md",
+            "materials/evidence/release-evidence-index.md",
+            "/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md",
+            "materials/evidence/requirement-matrix.md",
+            "REQUIREMENT_MATRIX_METRIC 9/9",
+            "Pre-recording Evidence Gate",
+            "all 9 real cloud-device MP4 files",
+            "no placeholder fields remain after capture",
+        )
+        missing_demo_tokens = [token for token in required_demo_tokens if token not in demo_script]
+        if missing_demo_tokens:
+            return False, f"{check.issue_id}: 演示脚本缺少发布证据答辩口径 {missing_demo_tokens}"
+        required_deck_tokens = (
+            "复赛落地证据包",
+            "BlueLM 接入证据",
+            "云真机测试",
+            "失败降级",
+            "隐私安全",
+            "模型评测",
+            "评分证据",
+            "materials/evidence/release-evidence-index.md",
+            "LANDING_RELEASE_CANDIDATE_METRIC 52/52",
+            "LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE 3/7",
+            "materials/evidence/blocking-report.md",
+            "/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md",
+            "materials/evidence/requirement-matrix.md",
+            "REQUIREMENT_MATRIX_METRIC 9/9",
+            "validation/traceability.md",
+            "SHIKE-070",
+            "Pre-recording Evidence Gate",
+            "all 9 real cloud-device MP4 files",
+            "no placeholder fields remain after capture",
+        )
+        missing_deck_tokens = [token for token in required_deck_tokens if token not in deck]
+        if missing_deck_tokens:
+            return False, f"{check.issue_id}: PPT 大纲缺少落地证据页 {missing_deck_tokens}"
 
     return True, f"{check.issue_id}: {check.description}"
 

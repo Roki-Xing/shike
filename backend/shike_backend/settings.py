@@ -51,6 +51,9 @@ class Settings:
     bluelm_timeout_seconds: int
     bluelm_max_retries: int
     bluelm_temperature: float
+    bluelm_thinking_mode: str
+    bluelm_request_id_param: str
+    bluelm_response_format_enabled: bool
     recorded_dir: str
 
     @staticmethod
@@ -79,6 +82,10 @@ class Settings:
         except ValueError:
             temperature = 0.2
 
+        bluelm_thinking_mode = _env("BLUELM_THINKING_MODE", "provider_default") or "provider_default"
+        bluelm_request_id_param = _env("BLUELM_REQUEST_ID_PARAM", "requestId") or "requestId"
+        bluelm_response_format_enabled = _env_bool("BLUELM_RESPONSE_FORMAT", True)
+
         default_recorded_dir = str((Path(__file__).resolve().parent / "eval/recordings").resolve())
         recorded_dir = _env("SHIKE_RECORDED_DIR", default_recorded_dir) or default_recorded_dir
 
@@ -93,6 +100,9 @@ class Settings:
             bluelm_timeout_seconds=bluelm_timeout_seconds,
             bluelm_max_retries=bluelm_max_retries,
             bluelm_temperature=temperature,
+            bluelm_thinking_mode=bluelm_thinking_mode,
+            bluelm_request_id_param=bluelm_request_id_param,
+            bluelm_response_format_enabled=bluelm_response_format_enabled,
             recorded_dir=recorded_dir,
         )
 

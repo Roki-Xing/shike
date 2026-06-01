@@ -1,0 +1,8 @@
+{
+  "input_id": "sample-assignment-001",
+  "source_type": "share_text",
+  "ocr_text": "数据库实验报告今晚22:00前通过教学平台提交，逾期将标记为迟交。",
+  "locale": "zh-CN",
+  "scene_hint": "assignment_deadline",
+  "user_timezone": "Asia/Shanghai"
+}

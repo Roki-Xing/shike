@@ -133,10 +133,13 @@ def build_checks() -> list[BetaCheck]:
 
     android_source = read_android_source(ROOT)
     home_agenda = read("android-mvp/app/src/main/java/cn/shike/app/ui/HomeAgendaList.kt")
+    main_flow = read("android-mvp/app/src/main/java/cn/shike/app/ui/MainFlowScreens.kt")
+    capture_entry = read("android-mvp/app/src/main/java/cn/shike/app/ui/CaptureEntryPanel.kt")
     inbox_panel = read("android-mvp/app/src/main/java/cn/shike/app/ui/InboxPanel.kt")
     inbox_workbench = read("android-mvp/app/src/main/java/cn/shike/app/ui/InboxWorkbench.kt")
     inbox_source = inbox_panel + "\n" + inbox_workbench
     import_panel = read("android-mvp/app/src/main/java/cn/shike/app/ui/ImportPanel.kt")
+    import_surface = "\n".join([import_panel, capture_entry, main_flow])
     action_controls = read("android-mvp/app/src/main/java/cn/shike/app/ui/ActionPlannerExecutionControls.kt")
     system_actions = read("android-mvp/app/src/main/java/cn/shike/app/system/SystemActions.kt")
     share_mapper = read("android-mvp/app/src/main/java/cn/shike/app/data/ShareImportMapper.kt")
@@ -145,6 +148,7 @@ def build_checks() -> list[BetaCheck]:
     confirm_panel = read("android-mvp/app/src/main/java/cn/shike/app/ui/ParseConfirmPanel.kt")
     model_schema = read("contracts/model-output.schema.json")
     optimization_log = read("docs/optimization-log.md")
+    current_status = read("docs/current-validation-status.md")
     sample_cases = load_regression_case_count()
 
     today_ranking_passes = file_exists("validation/validate_today_ranking.py") and command_passes(
@@ -161,8 +165,13 @@ def build_checks() -> list[BetaCheck]:
     home_uses_current_item = (
         "fun HomeAgendaList(" in home_agenda
         and "item: ShikeItem" in home_agenda
-        and "HomeAgendaList(" in main_screen
-        and ("HomeAgendaList(selected)" in main_screen or "item = selected" in main_screen)
+        and ("HomeAgendaList(" in main_screen or "HomeAgendaList(" in main_flow)
+        and (
+            "HomeAgendaList(selected)" in main_screen
+            or "item = selected" in main_screen
+            or "HomeAgendaList(selected)" in main_flow
+            or "item = selected" in main_flow
+        )
     )
     inbox_status_tokens = ["待确认", "已安排", "即将截止", "已完成", "已忽略"]
     cloud_toggle_mentions = android_source.count("云侧增强")
@@ -255,13 +264,14 @@ def build_checks() -> list[BetaCheck]:
         ),
         check(
             "manual_input_analyze",
-            "手动" in import_panel and ("解析" in import_panel or "继续" in import_panel),
-            "manual input mention" if "手动" in import_panel else "missing",
+            "手动" in import_surface and ("解析" in import_surface or "继续" in import_surface),
+            "manual input mention" if "手动" in import_surface else "missing",
             "增加手动输入入口，允许无 OCR 或 OCR 失败时直接进入解析。",
         ),
         check(
             "ocr_failure_manual_continue",
-            "OCR 失败" in android_source and ("手动" in android_source or "继续" in android_source),
+            ("OCR 失败" in android_source or "未识别到稳定文字" in android_source)
+            and ("手动" in android_source or "继续" in android_source),
             "OCR failure fallback" if "OCR 失败" in android_source else "missing",
             "将 OCR 失败分类为 no_text、low_quality、permission_denied、timeout，并提供手动继续。",
         ),
@@ -338,16 +348,24 @@ def build_checks() -> list[BetaCheck]:
             "保持 /v1/schema 与 Android 契约一致，并让后端分析结果进入 schema 校验。",
         ),
         check(
-            "model_eval_100_cases",
-            sample_cases >= 100 or has_any_file("backend/**/run_model_evals.py"),
+            "model_eval_110_cases",
+            sample_cases >= 110,
             f"synthetic cases={sample_cases}",
-            "建立不少于 100 条合成模型评测样例，覆盖课程、活动、会议、作业、出行、低质量和反例。",
+            "建立不少于 110 条合成模型评测样例，覆盖课程、活动、会议、作业、面试、出行票务、低质量和反例。",
         ),
         check(
             "optimization_log_updated",
-            "Round 074" in optimization_log and "PRODUCT_BETA_METRIC" in optimization_log,
-            "Product Beta optimization round present" if "Round 074" in optimization_log else "missing",
-            "每轮继续更新 docs/optimization-log.md，记录目标、证据、风险和下一步。",
+            "Round 074" in optimization_log
+            and "PRODUCT_BETA_METRIC" in optimization_log
+            and "Product Beta readiness now passes at `30/30`" in current_status
+            and "`python3 shike/validation/validate_advanced_product_beta.py --strict` | PASS" in current_status
+            and "Do not treat `validate_advanced_product_beta.py --strict` as a required pass until Product Beta exits the S2 workstream." not in current_status,
+            (
+                "Product Beta optimization round and current-status completion present"
+                if "Round 074" in optimization_log and "Product Beta readiness now passes at `30/30`" in current_status
+                else "missing"
+            ),
+            "每轮继续更新 docs/optimization-log.md，并保持 docs/current-validation-status.md 不回退到 Product Beta strict 未完成口径。",
         ),
     ]
 

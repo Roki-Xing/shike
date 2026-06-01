@@ -105,7 +105,7 @@ Codex 需要在以下情况暂停，而不是无限循环：
 暂停时生成：
 
 ```text
-docs/blocking-report.md
+materials/evidence/blocking-report.md
 ```
 
 内容包括：阻塞点、已尝试方案、失败日志、建议人工动作、恢复命令。
@@ -486,7 +486,7 @@ python3 shike/spike/run_spike.py --all
 ### Goal C：收件箱持久化升级
 
 ```text
-/goal 把当前 SharedPreferences 当前卡片快照升级为 Room/SQLite 收件箱。保留后端地址等轻配置在 SharedPreferences。实现 InboxItem、Action、ExecutionResult 的本地持久化、状态筛选和重启恢复。完成条件：至少 10 条历史行动卡可持久化，待确认/已安排/即将截止/已完成/已忽略可筛选，用户确认前不可执行系统动作。
+/goal 把当前 SharedPreferences 当前卡片快照升级为 SQLite 收件箱。保留后端地址等轻配置在 SharedPreferences，并提供旧快照迁移。实现 InboxItem、Action、ExecutionResult 的本地持久化、状态筛选、搜索、归档/恢复和重启恢复。完成条件：至少 50 条历史行动卡合成种子可持久化，待确认/已安排/即将截止/已完成/已忽略五状态可筛选，用户确认前不可执行系统动作，`python3 shike/validation/validate_inbox_workbench_landing.py` 输出 `INBOX_WORKBENCH_LANDING_METRIC 12/12`。
 ```
 
 ### Goal D：模型契约与后端适配器
@@ -522,11 +522,12 @@ python3 shike/spike/run_spike.py --all
 ```text
 docs/optimization-log.md
 docs/current-validation-status.md
-docs/blocking-report.md
+materials/evidence/blocking-report.md
 backend/verify_backend.py
 validation/*.py
 android-mvp/app/src/test/**
-android-mvp/app/src/androidTest/**
+docs/device-runbook.md
+materials/device-demo-checklist.md
 ```
 
 `docs/optimization-log.md` 推荐格式：

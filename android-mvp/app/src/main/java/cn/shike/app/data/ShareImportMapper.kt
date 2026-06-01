@@ -3,10 +3,14 @@ package cn.shike.app.data
 import cn.shike.app.domain.ShikeItem
 
 fun sharedTextCaptureDraft(text: String?): CaptureDraft =
-    CaptureDraft(
-        channel = "share",
-        sourceLabel = "系统分享文本",
-        rawText = text.orEmpty(),
+    captureDraftFromInput(
+        CaptureInput(
+            sourceType = CaptureSourceType.ShareText,
+            sourceLabel = "系统分享文本",
+            manualText = text.orEmpty(),
+            allowCloudEnhancement = false,
+        ),
+        ManualOcrEngine(),
     )
 
 /**

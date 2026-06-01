@@ -68,6 +68,8 @@ def command_passes(command: list[str]) -> bool:
 def main() -> int:
     android_source = read_android_source(ROOT)
     local_inbox_store = read("android-mvp/app/src/main/java/cn/shike/app/data/LocalInboxStore.kt")
+    legacy_inbox_snapshot = read("android-mvp/app/src/main/java/cn/shike/app/data/LegacyInboxSnapshot.kt")
+    inbox_database = read("android-mvp/app/src/main/java/cn/shike/app/data/InboxDatabase.kt")
     backend_config_store = read("android-mvp/app/src/main/java/cn/shike/app/data/BackendConfigStore.kt")
     reminder_scheduler = read("android-mvp/app/src/main/java/cn/shike/app/system/ReminderScheduler.kt")
     docs = "\n".join(
@@ -112,7 +114,15 @@ def main() -> int:
             and clear_inbox_snapshot_removes_only_snapshot_keys
             and clear_inbox_snapshot_does_not_clear_all,
         ),
-        ("load_saved_item_present", "fun loadSavedItem" in android_source and "prefs.getString(KEY_TITLE" in android_source),
+        (
+            "load_saved_item_present",
+            "fun loadSavedItem" in android_source
+            and (
+                "preferences.getString(KEY_TITLE" in legacy_inbox_snapshot
+                or "loadInboxHistory(context, limit = 1)" in local_inbox_store
+            )
+            and "SQLiteOpenHelper" in inbox_database,
+        ),
         ("capture_source_persisted", "KEY_CAPTURE_SOURCE" in android_source and "loadSavedCaptureSource" in android_source),
         ("gallery_persists_selection", "相册图片" in android_source and "persistSelection(item, source)" in android_source),
         ("camera_persists_selection", "相机拍照预览" in android_source and "persistSelection(item, source)" in android_source),

@@ -1,0 +1,2 @@
+APK path: shike/android-mvp/app/build/outputs/apk/debug/app-debug.apk
+APK SHA-256: a9bdea5a67e687ea71c7884d86fb84d722417326385b521a2d8ab8a5c9cd222d

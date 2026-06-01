@@ -8,18 +8,18 @@ internal const val INBOX_PREFERENCES_NAME = "shike_inbox_state"
 private const val ACTION_SEPARATOR = "|"
 private const val DEFAULT_CAPTURE_SOURCE = "尚未采集图片，已加载离线样例。"
 private const val DEFAULT_RAW_TEXT = "已从本地缓存恢复。"
-private const val KEY_TITLE = "title"
-private const val KEY_SCENE = "scene"
-private const val KEY_TIME = "time"
-private const val KEY_LOCATION = "location"
-private const val KEY_STATUS = "status"
-private const val KEY_ACTIONS = "actions"
-private const val KEY_START = "start_epoch_millis"
-private const val KEY_RAW_TEXT = "raw_text"
-private const val KEY_CAPTURE_SOURCE = "capture_source"
+internal const val KEY_TITLE = "title"
+internal const val KEY_SCENE = "scene"
+internal const val KEY_TIME = "time"
+internal const val KEY_LOCATION = "location"
+internal const val KEY_STATUS = "status"
+internal const val KEY_ACTIONS = "actions"
+internal const val KEY_START = "start_epoch_millis"
+internal const val KEY_RAW_TEXT = "raw_text"
+internal const val KEY_CAPTURE_SOURCE = "capture_source"
 
 private fun preferences(context: Context): SharedPreferences =
-    context.getSharedPreferences(INBOX_PREFERENCES_NAME, Context.MODE_PRIVATE)
+    legacyInboxPreferences(context)
 
 /**
  * Saves the current inbox action card as the restart restore snapshot.
@@ -30,6 +30,14 @@ private fun preferences(context: Context): SharedPreferences =
  *     captureSource: Human-readable source text shown in the import panel.
  */
 fun saveSnapshot(context: Context, item: ShikeItem, captureSource: String) {
+    upsertInboxItem(
+        context,
+        inboxItemEntityFrom(
+            item = item,
+            captureSource = captureSource,
+            updatedEpochMillis = System.currentTimeMillis(),
+        ),
+    )
     preferences(context).edit()
         .putString(KEY_TITLE, item.title)
         .putString(KEY_SCENE, item.scene)
@@ -61,6 +69,7 @@ fun clearLocalData(context: Context) {
  * - This makes "清空收件箱缓存" semantics predictable without wiping other local settings.
  */
 fun clearInboxSnapshot(context: Context) {
+    clearInboxHistory(context)
     preferences(context).edit()
         .remove(KEY_TITLE)
         .remove(KEY_SCENE)
@@ -98,19 +107,8 @@ internal fun clearInboxSnapshotFromPreferences(preferences: SharedPreferences) {
  *     A saved `ShikeItem`, or null when no snapshot exists yet.
  */
 fun loadSavedItem(context: Context): ShikeItem? {
-    val prefs = preferences(context)
-    val title = prefs.getString(KEY_TITLE, null) ?: return null
-    val actions = decodeInboxActions(prefs.getString(KEY_ACTIONS, null))
-    return ShikeItem(
-        title = title,
-        scene = prefs.getString(KEY_SCENE, "课程通知") ?: "课程通知",
-        time = prefs.getString(KEY_TIME, "待确认") ?: "待确认",
-        location = prefs.getString(KEY_LOCATION, "待确认") ?: "待确认",
-        status = prefs.getString(KEY_STATUS, "待确认") ?: "待确认",
-        actions = actions.ifEmpty { listOf("加入日历", "课前提醒", "打开地图") },
-        startEpochMillis = prefs.getLong(KEY_START, sampleCourse().startEpochMillis),
-        rawText = sanitizeInboxRawText(prefs.getString(KEY_RAW_TEXT, null)),
-    )
+    loadInboxHistory(context, limit = 1).firstOrNull()?.let { return shikeItemFromInboxEntity(it) }
+    return legacyInboxItemFromPreferences(preferences(context))
 }
 
 /**
@@ -123,7 +121,24 @@ fun loadSavedItem(context: Context): ShikeItem? {
  *     A saved source label, or the offline sample fallback label.
  */
 fun loadSavedCaptureSource(context: Context): String =
-    sanitizeInboxCaptureSource(preferences(context).getString(KEY_CAPTURE_SOURCE, null))
+    loadInboxHistory(context, limit = 1).firstOrNull()?.source
+        ?: legacyInboxCaptureSourceFromPreferences(preferences(context))
+
+fun loadSavedInboxHistory(context: Context): List<InboxItemEntity> =
+    loadInboxHistory(context).ifEmpty {
+        legacyInboxItemFromPreferences(preferences(context))?.let { saved ->
+            listOf(
+                inboxItemEntityFrom(
+                    item = saved,
+                    captureSource = preferences(context).getString(KEY_CAPTURE_SOURCE, null).orEmpty(),
+                    updatedEpochMillis = System.currentTimeMillis(),
+                ),
+            )
+        } ?: emptyList()
+    }
+
+fun loadSavedCaptureSourceFromPreferences(context: Context): String =
+    legacyInboxCaptureSourceFromPreferences(preferences(context))
 
 /**
  * Encodes action labels for the local inbox snapshot.

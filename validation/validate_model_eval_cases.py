@@ -15,7 +15,8 @@ REQUIRED_SCENES = {
     "event_poster",
     "meeting_notice",
     "assignment_deadline",
-    "travel_plan",
+    "interview_notice",
+    "travel_ticket",
     "low_quality_fragment",
     "negative_fragment",
 }
@@ -69,7 +70,7 @@ def main() -> int:
     }
 
     checks = [
-        ("case_count_at_least_100", len(cases) >= 100, str(len(cases))),
+        ("case_count_at_least_110", len(cases) >= 110, str(len(cases))),
         ("unique_case_ids", len(ids) == len(set(ids)), str(len(set(ids)))),
         ("required_scene_coverage", REQUIRED_SCENES.issubset(scenes), ",".join(sorted(scenes))),
         ("balanced_core_scenes", all(scenes[scene] >= 10 for scene in REQUIRED_SCENES), str(dict(scenes))),

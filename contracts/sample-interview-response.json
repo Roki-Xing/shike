@@ -1,0 +1,28 @@
+{
+  "scene_type": "unknown",
+  "confidence": 0.9,
+  "title": "面试安排",
+  "time": {
+    "start_text": "明天14:00",
+    "deadline_text": null,
+    "normalized_start": "2026-04-24T18:30:00+08:00",
+    "normalized_deadline": null
+  },
+  "location": {
+    "raw": "线上会议室",
+    "map_query": "线上会议室",
+    "confidence": 0.84
+  },
+  "task": {
+    "summary": "准备面试材料并按时参加",
+    "priority": "high",
+    "topic": "unknown"
+  },
+  "suggested_actions": [
+    {"type": "calendar", "label": "加入面试日历", "requires_permission": true},
+    {"type": "reminder", "label": "面试前提醒", "requires_permission": true},
+    {"type": "map", "label": "打开面试地点", "requires_permission": false}
+  ],
+  "missing_fields": [],
+  "explanation": "识别到面试语义，但当前公开契约不扩展 scene_type，按 unknown 处理并给出可执行动作。"
+}

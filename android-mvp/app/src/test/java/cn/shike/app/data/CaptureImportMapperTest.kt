@@ -38,4 +38,12 @@ class CaptureImportMapperTest {
         assertEquals("相册导入的课程通知", selection.item.title)
         assertEquals("高数A班今晚18:30改到B203", selection.item.rawText)
     }
+
+    @Test
+    fun backendSourceTypeFromCaptureSource_mapsAllProductEntrypoints() {
+        assertEquals("screenshot", backendSourceTypeFromCaptureSource("相册图片 course-screenshot.png"))
+        assertEquals("camera", backendSourceTypeFromCaptureSource("相机拍照预览 1080x1440"))
+        assertEquals("share_text", backendSourceTypeFromCaptureSource("文本分享入口（待确认，未落盘）"))
+        assertEquals("manual", backendSourceTypeFromCaptureSource("手动输入入口：请编辑 OCR 文本草稿后选择后端解析或离线样例。"))
+    }
 }

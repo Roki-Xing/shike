@@ -1,0 +1,5 @@
+# Cloud device logcat placeholder
+# Keep only redacted, session-level diagnostics here.
+I/Shike: cloud device session started
+I/Shike: install-open verified
+I/Shike: gallery-bluelm verified

@@ -19,14 +19,20 @@ import androidx.compose.ui.unit.dp
 import cn.shike.app.domain.ShikeItem
 
 @Composable
-fun InboxPanel(item: ShikeItem, captureSource: String, executionResults: List<ExecutionResult>) {
+fun InboxPanel(
+    item: ShikeItem,
+    captureSource: String,
+    executionResults: List<ExecutionResult>,
+    historyEntries: List<InboxWorkbenchEntry> = emptyList(),
+) {
     var selectedStatus by remember(item.status) { mutableStateOf(selectedInboxStatusFor(item.status)) }
     var searchQuery by remember { mutableStateOf("") }
     var isArchived by remember(item.title, item.rawText) { mutableStateOf(false) }
     val currentEntry = inboxWorkbenchEntryFrom(item, captureSource, executionResults)
+    val allEntries = (historyEntries + currentEntry).distinctBy { it.archiveKey }
     val archivedKeys = if (isArchived) setOf(currentEntry.archiveKey) else emptySet()
     val visibleEntries = visibleInboxEntries(
-        entries = listOf(currentEntry),
+        entries = allEntries,
         selectedStatus = selectedStatus,
         query = searchQuery,
         archivedKeys = archivedKeys,
@@ -67,7 +73,7 @@ fun InboxPanel(item: ShikeItem, captureSource: String, executionResults: List<Ex
             visibleEntries.forEach { entry ->
                 InboxWorkbenchRow(
                     entry = entry,
-                    isArchived = isArchived,
+                    isArchived = isArchived && entry.archiveKey == currentEntry.archiveKey,
                     onArchive = { isArchived = true },
                     onRestore = { isArchived = false },
                 )

@@ -11,6 +11,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import cn.shike.app.data.loadBackendBaseUrl
+import cn.shike.app.data.loadSavedInboxHistory
 import cn.shike.app.data.loadInitialSelection
 import cn.shike.app.data.clearInboxSnapshot
 import cn.shike.app.data.clearBackendBaseUrl
@@ -62,6 +63,7 @@ class MainActivity : ComponentActivity() {
                         initialCaptureSource = initialSelection.captureSource,
                         initialTodayState = initialSelection.todayState,
                         initialBackendUrl = loadBackendBaseUrl(this),
+                        initialInboxHistory = loadSavedInboxHistory(this),
                         onPersist = { item, source -> saveSnapshot(this, item, source) },
                         onSaveBackendUrl = { url -> saveBackendBaseUrl(this, url) },
                         onClearLocalData = ::clearAllLocalData,

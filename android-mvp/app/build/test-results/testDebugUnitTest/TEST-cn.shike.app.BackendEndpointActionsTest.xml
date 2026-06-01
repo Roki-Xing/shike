@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="cn.shike.app.BackendEndpointActionsTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-05-26T09:01:51" hostname="LAPTOP-B84BKQGP" time="0.009">
+<testsuite name="cn.shike.app.BackendEndpointActionsTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-05-29T04:53:43" hostname="LAPTOP-B84BKQGP" time="0.009">
   <properties/>
   <testcase name="saveBackendEndpointAction_addsHttpSchemeAndTrimsSlash" classname="cn.shike.app.BackendEndpointActionsTest" time="0.008"/>
-  <testcase name="saveBackendEndpointAction_keepsHttpsEndpoint" classname="cn.shike.app.BackendEndpointActionsTest" time="0.001"/>
-  <testcase name="saveBackendEndpointAction_blankInputFallsBackToDefault" classname="cn.shike.app.BackendEndpointActionsTest" time="0.0"/>
+  <testcase name="saveBackendEndpointAction_keepsHttpsEndpoint" classname="cn.shike.app.BackendEndpointActionsTest" time="0.0"/>
+  <testcase name="saveBackendEndpointAction_blankInputFallsBackToDefault" classname="cn.shike.app.BackendEndpointActionsTest" time="0.001"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

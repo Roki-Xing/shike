@@ -35,6 +35,12 @@ def main() -> int:
         "05-restart-restore.mp4",
         "06-delivery-readiness.mp4",
     ]
+    extended_scene_tokens = [
+        "assignment_deadline",
+        "meeting_notice",
+        "interview_notice",
+        "travel_ticket",
+    ]
     workspace_commands = [
         "python3 shike/validation/validate_android_structure.py",
         "python3 shike/validation/validate_android_unit_tests.py",
@@ -50,14 +56,72 @@ def main() -> int:
         ("adb_install_documented", "adb install -r" in checklist),
         ("evidence_directory_documented", "shike/materials/evidence/" in checklist),
         ("recording_files_named", all(name in checklist for name in evidence_files)),
-        ("course_flow_documented", all(token in checklist for token in ["选择截图", "OCR 文本草稿", "后端解析课程", "确认修正", "加日历"])),
-        ("event_flow_documented", all(token in checklist for token in ["拍照导入", "后端解析活动", "提醒", "地图"])),
+        ("course_flow_documented", all(token in checklist for token in ["选择截图", "OCR 文本草稿", "解析当前草稿", "确认修正", "加日历"])),
+        ("event_flow_documented", all(token in checklist for token in ["拍照导入", "活动样例解析", "提醒", "地图"])),
+        (
+            "extended_scene_flow_documented",
+            all(token in checklist for token in extended_scene_tokens)
+            and all(token in read("materials/demo-script.md") for token in extended_scene_tokens)
+            and all(token in submission for token in extended_scene_tokens),
+        ),
         ("fallback_flow_documented", all(token in checklist for token in ["后端不可用", "MockModelAdapter", "相机权限拒绝", "已忽略"])),
         ("restart_restore_documented", "SharedPreferences" in checklist and "后端地址" in checklist),
         ("final_acceptance_commands_present", "validate_demo_acceptance.py" in checklist and "validate_real_world_ready.py" in checklist),
+        (
+            "cloud_strict_handoff_documented",
+            all(
+                token in checklist
+                for token in [
+                    "materials/evidence/cloud-device/",
+                    "materials/evidence/release-evidence-index.md",
+                    "RELEASE_EVIDENCE_INDEX_METRIC 10/10",
+                    "docs/optimization-log.md",
+                    "README 公开入口",
+                    "validation/traceability.md",
+                    "SHIKE-070",
+                    "DELIVERABLES_METRIC 10/10",
+                    "prepare_cloud_device_evidence.py",
+                    "CLOUD_DEVICE_PREP_METRIC 5/5",
+                    "CLOUD_DEVICE_PREP_MISSING_VIDEOS 9/9",
+                    "validate_cloud_device_package.py",
+                    "CLOUD_DEVICE_PACKAGE_METRIC 27/27",
+                    "/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md",
+                    "materials/evidence/requirement-matrix.md",
+                    "REQUIREMENT_MATRIX_METRIC 9/9",
+                    "validate_requirement_matrix.py",
+                    "materials/evidence/blocking-report.md",
+                    "Pre-recording Evidence Gate",
+                    "all 9 real cloud-device MP4 files",
+                    "no placeholder fields remain after capture",
+                    "LANDING_RELEASE_CANDIDATE_METRIC 52/52",
+                    "LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE 3/7",
+                    "01-cloud-install-open.mp4",
+                    "09-cloud-final-route.mp4",
+                    "HTTPS 后端地址",
+                    "AppKEY",
+                    "backend tokens",
+                ]
+            ),
+        ),
         ("submission_references_demo_checklist", "device-demo-checklist.md" in submission or "device-demo-checklist.md" in readme or "device-demo-checklist.md" in runbook),
-        ("demo_page_checked", "拾刻 Demo 控制台" in demo and "validate_demo_acceptance.py" in demo and "prototype/index.html" in demo),
-        ("demo_page_flows_match_checklist", all(token in demo for token in ["后端解析课程", "后端解析活动", "06-delivery-readiness.mp4"])),
+        (
+            "demo_page_checked",
+            "拾刻 Demo 控制台" in demo
+            and "validate_demo_acceptance.py" in demo
+            and "prototype/index.html" in demo
+            and "DEMO_ACCEPTANCE_METRIC" in demo
+            and "18/18" in demo
+            and "/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md" in demo
+            and "materials/evidence/requirement-matrix.md" in demo
+            and "REQUIREMENT_MATRIX_METRIC 9/9" in demo
+            and "LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE 3/7" in demo
+            and "17/17" not in demo,
+        ),
+        (
+            "demo_page_flows_match_checklist",
+            all(token in demo for token in ["解析当前草稿", "活动样例解析", "06-delivery-readiness.mp4"])
+            and all(token in demo for token in extended_scene_tokens),
+        ),
         ("android_structure_guard_listed", all(token in checklist and token in readme and token in demo for token in ["validate_android_structure.py", "ANDROID_STRUCTURE_METRIC"])),
         ("workspace_command_style_consistent", all(command in checklist and command in readme and command in demo for command in workspace_commands)),
         ("six_recordings_documented_in_readme", "六段证据文件" in readme),

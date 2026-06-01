@@ -1,0 +1,8 @@
+{
+  "input_id": "sample-meeting-001",
+  "source_type": "manual",
+  "ocr_text": "项目周会定于今晚10:00在腾讯会议进行，请准备进展和待协调事项。",
+  "locale": "zh-CN",
+  "scene_hint": "meeting_notice",
+  "user_timezone": "Asia/Shanghai"
+}

@@ -31,6 +31,60 @@ class ModelApiClientTest {
     }
 
     @Test
+    fun buildAnalyzeRequestPayload_acceptsShareTextAndManualSourceTypes() {
+        val sharePayload = buildAnalyzeRequestPayload(
+            inputId = "android-share-test",
+            sourceType = "share_text",
+            ocrText = "活动报名今晚截止",
+            scene = "活动海报",
+        )
+        val manualPayload = buildAnalyzeRequestPayload(
+            inputId = "android-manual-test",
+            sourceType = "manual",
+            ocrText = "高数A班今晚18:30改到B203",
+            scene = "课程通知",
+        )
+
+        assertEquals("share_text", sharePayload.getString("source_type"))
+        assertEquals("event_poster", sharePayload.getString("scene_hint"))
+        assertEquals("manual", manualPayload.getString("source_type"))
+        assertEquals("course_notice", manualPayload.getString("scene_hint"))
+    }
+
+    @Test
+    fun buildAnalyzeRequestPayload_mapsExtendedSceneHints() {
+        val assignmentPayload = buildAnalyzeRequestPayload(
+            inputId = "android-assignment-test",
+            sourceType = "manual",
+            ocrText = "数据库实验报告今晚22:00前提交",
+            scene = "作业截止",
+        )
+        val meetingPayload = buildAnalyzeRequestPayload(
+            inputId = "android-meeting-test",
+            sourceType = "share_text",
+            ocrText = "项目周会今晚10:00在腾讯会议进行",
+            scene = "会议通知",
+        )
+        val interviewPayload = buildAnalyzeRequestPayload(
+            inputId = "android-interview-test",
+            sourceType = "screenshot",
+            ocrText = "HR通知明天14:00线上面试",
+            scene = "面试通知",
+        )
+        val travelPayload = buildAnalyzeRequestPayload(
+            inputId = "android-travel-test",
+            sourceType = "camera",
+            ocrText = "高铁出行今晚10:00在西安北站集合",
+            scene = "出行票务",
+        )
+
+        assertEquals("assignment_deadline", assignmentPayload.getString("scene_hint"))
+        assertEquals("meeting_notice", meetingPayload.getString("scene_hint"))
+        assertEquals("interview_notice", interviewPayload.getString("scene_hint"))
+        assertEquals("travel_ticket", travelPayload.getString("scene_hint"))
+    }
+
+    @Test
     fun itemFromAnalyzeJson_courseNoticeCombinesTimeLocationAndActions() {
         val json = JSONObject()
             .put("scene_type", "course_notice")
@@ -75,6 +129,25 @@ class ModelApiClientTest {
         assertEquals(listOf("稍后确认"), item.actions)
         assertEquals(sampleEvent().startEpochMillis, item.startEpochMillis)
         assertEquals("后端 /v1/analyze：OCR 原文兜底", item.rawText)
+    }
+
+    @Test
+    fun itemFromAnalyzeJson_unknownSceneFallsBackToPendingLabel() {
+        val item = itemFromAnalyzeJson(
+            JSONObject()
+                .put("scene_type", "unknown")
+                .put("title", "会议通知")
+                .put("time", JSONObject().put("start_text", "今晚10:00").put("deadline_text", ""))
+                .put("location", JSONObject().put("raw", "腾讯会议"))
+                .put("suggested_actions", JSONArray().put(JSONObject().put("label", "加入会议日历")))
+                .put("explanation", "识别到会议语义，但按 unknown 输出"),
+            fallbackText = "fallback",
+        )
+
+        assertEquals("待确认", item.scene)
+        assertEquals("今晚10:00", item.time)
+        assertEquals(listOf("加入会议日历"), item.actions)
+        assertEquals(sampleCourse().startEpochMillis, item.startEpochMillis)
     }
 
     @Test

@@ -78,7 +78,14 @@ fun actionsFromJson(actions: JSONArray?): List<String> {
 }
 
 fun sceneHint(scene: String): String =
-    if ("活动" in scene) "event_poster" else "course_notice"
+    when {
+        "活动" in scene -> "event_poster"
+        "作业" in scene || "截止" in scene -> "assignment_deadline"
+        "会议" in scene || "周会" in scene || "例会" in scene -> "meeting_notice"
+        "面试" in scene || "笔试" in scene -> "interview_notice"
+        "出行" in scene || "车票" in scene || "高铁" in scene || "航班" in scene -> "travel_ticket"
+        else -> "course_notice"
+    }
 
 fun normalizeBackendUrl(url: String): String {
     val trimmed = url.trim()
