@@ -1,0 +1,14 @@
+id: img-travel-002
+scene: travel_ticket
+source_type: photo_picker
+fixture_type: synthetic_descriptor
+
+ocr_text_hint:
+机票截图主体：航班MU567，周六13:40起飞，浦东机场T1。
+
+expected:
+must_not_extract_status_bar_time: True
+title_contains: MU567, 起飞
+time_required: True
+location_required: True
+actions: calendar, reminder, map

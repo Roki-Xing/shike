@@ -116,7 +116,7 @@ def regression_case_count() -> int:
 
 
 def build_local_checks() -> list[Check]:
-    """Build the 52 local release-candidate checks.
+    """Build the 63 local release-candidate checks.
 
     Returns:
         Check objects grouped by release surface.
@@ -153,8 +153,15 @@ def build_local_checks() -> list[Check]:
     prototype = read("prototype/demo.html")
     delivery_tree = landing_guide.split("## 13. 最终交付包建议", 1)[-1].split("## 14.", 1)[0]
     landing_guide_current = (
-        "当前本地门禁总分 52 项" in landing_guide
-        and "LANDING_RELEASE_CANDIDATE_METRIC 52/52" in landing_guide
+        "当前本地门禁总分 63 项" in landing_guide
+        and "LANDING_RELEASE_CANDIDATE_METRIC 63/63" in landing_guide
+        and "validate_backend_audit_log.py" in landing_guide
+        and "BACKEND_AUDIT_LOG_METRIC 8/8" in landing_guide
+        and "validate_live_smoke_evidence.py" in landing_guide
+        and "LIVE_SMOKE_EVIDENCE_METRIC 7/7" in landing_guide
+        and "validate_android_image_preprocess.py" in landing_guide
+        and "ANDROID_IMAGE_PREPROCESS_METRIC 15/15" in landing_guide
+        and "validate_no_default_image_upload.py" in landing_guide
         and "LANDING_RELEASE_CANDIDATE_METRIC 50/50" not in landing_guide
         and "validate_capture_ocr_pipeline.py" not in landing_guide
         and "validate_landing_materials.py" not in landing_guide
@@ -170,7 +177,7 @@ def build_local_checks() -> list[Check]:
         and "prepare_cloud_device_evidence.py" in landing_guide
         and "CLOUD_DEVICE_PREP_METRIC 5/5" in landing_guide
         and "CLOUD_DEVICE_PREP_MISSING_VIDEOS 9/9" in landing_guide
-        and "CLOUD_DEVICE_PACKAGE_METRIC 27/27" in landing_guide
+        and "CLOUD_DEVICE_PACKAGE_METRIC 30/30" in landing_guide
         and "LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE 3/7" in landing_guide
         and "validate_cloud_device_package.py --strict" in landing_guide
         and "validate_release_blocking_report.py" in landing_guide
@@ -215,9 +222,19 @@ def build_local_checks() -> list[Check]:
     command_checks = [
         Check("secret_hygiene_passes", command_passes(["python3", "shike/validation/validate_secret_hygiene.py"]), "validate_secret_hygiene.py"),
         Check("bluelm_adapter_passes", command_passes(["python3", "shike/validation/validate_bluelm_adapter.py"]), "validate_bluelm_adapter.py"),
+        Check("vivo_ocr_adapter_passes", command_passes(["python3", "shike/validation/validate_vivo_ocr_adapter.py"]), "validate_vivo_ocr_adapter.py"),
+        Check("vivo_multimodal_contract_passes", command_passes(["python3", "shike/validation/validate_vivo_multimodal_contract.py"]), "validate_vivo_multimodal_contract.py"),
         Check("cloud_backend_ready_passes", command_passes(["python3", "shike/validation/validate_cloud_backend_ready.py"]), "validate_cloud_backend_ready.py"),
+        Check("backend_audit_log_passes", command_passes(["python3", "shike/validation/validate_backend_audit_log.py"]), "validate_backend_audit_log.py"),
         Check("model_contract_strict_passes", command_passes(["python3", "shike/validation/validate_model_contract_strict.py"]), "validate_model_contract_strict.py"),
         Check("backend_smoke_passes", command_passes(["python3", "shike/backend/verify_backend.py"]), "verify_backend.py"),
+        Check("no_sample_contamination_passes", command_passes(["python3", "shike/validation/validate_no_sample_contamination.py"]), "validate_no_sample_contamination.py"),
+        Check("no_default_image_upload_passes", command_passes(["python3", "shike/validation/validate_no_default_image_upload.py"]), "validate_no_default_image_upload.py"),
+        Check("android_image_preprocess_passes", command_passes(["python3", "shike/validation/validate_android_image_preprocess.py"]), "validate_android_image_preprocess.py"),
+        Check("screenshot_assist_passes", command_passes(["python3", "shike/validation/validate_screenshot_assist.py"]), "validate_screenshot_assist.py"),
+        Check("screenshot_cleanup_passes", command_passes(["python3", "shike/validation/validate_screenshot_cleanup.py"]), "validate_screenshot_cleanup.py"),
+        Check("user_facing_copy_passes", command_passes(["python3", "shike/validation/validate_user_facing_copy.py"]), "validate_user_facing_copy.py"),
+        Check("home_one_screen_passes", command_passes(["python3", "shike/validation/validate_home_one_screen.py"]), "validate_home_one_screen.py"),
         Check("model_eval_cases_pass", command_passes(["python3", "shike/validation/validate_model_eval_cases.py"]), "validate_model_eval_cases.py"),
         Check("android_structure_passes", command_passes(["python3", "shike/validation/validate_android_structure.py"]), "validate_android_structure.py"),
         Check("android_unit_tests_pass", command_passes(["python3", "shike/validation/validate_android_unit_tests.py"]), "validate_android_unit_tests.py"),
@@ -234,6 +251,7 @@ def build_local_checks() -> list[Check]:
         Check("cloud_device_package_passes", command_passes(["python3", "shike/validation/validate_cloud_device_package.py"]), "validate_cloud_device_package.py"),
         Check("release_blocking_report_passes", command_passes(["python3", "shike/validation/validate_release_blocking_report.py"]), "validate_release_blocking_report.py"),
         Check("release_evidence_index_passes", command_passes(["python3", "shike/validation/validate_release_evidence_index.py"]), "validate_release_evidence_index.py"),
+        Check("live_smoke_evidence_passes", command_passes(["python3", "shike/validation/validate_live_smoke_evidence.py"]), "validate_live_smoke_evidence.py"),
         Check("manual_review_passes", command_passes(["python3", "shike/validation/validate_manual_review.py"]), "validate_manual_review.py"),
         Check("backend_config_passes", command_passes(["python3", "shike/validation/validate_backend_config.py"]), "validate_backend_config.py"),
         Check("model_bridge_passes", command_passes(["python3", "shike/validation/validate_model_bridge.py"]), "validate_model_bridge.py"),
@@ -266,11 +284,11 @@ def build_local_checks() -> list[Check]:
         Check("submission_checklist_exists", file_nonempty("materials/submission-checklist.md") and "device-demo-checklist.md" in submission, "materials/submission-checklist.md"),
         Check("scoring_map_exists", file_nonempty("docs/delivery-boundary-and-scoring.md") and contains_all(scoring, ("创新性", "应用价值", "大模型应用能力")), "docs/delivery-boundary-and-scoring.md"),
         Check("prototype_demo_console_lists_guards", "validate_landing_release_candidate.py" in prototype or "validate_real_world_ready.py" in prototype, "prototype/demo.html"),
-        Check("readme_lists_release_candidate_gate", "validate_landing_release_candidate.py" in readme and "LANDING_RELEASE_CANDIDATE_METRIC 52/52" in readme, "README.md"),
+        Check("readme_lists_release_candidate_gate", "validate_landing_release_candidate.py" in readme and "LANDING_RELEASE_CANDIDATE_METRIC 63/63" in readme, "README.md"),
         Check(
             "public_docs_list_release_candidate_gate",
             "validate_landing_release_candidate.py" in status
-            and "LANDING_RELEASE_CANDIDATE_METRIC 52/52" in status
+            and "LANDING_RELEASE_CANDIDATE_METRIC 63/63" in status
             and landing_guide_current
             and goal_mode_guide_current,
             "docs/current-validation-status.md + docs/SHIKE_LANDING_APP_OPTIMIZATION_GUIDE.md",
@@ -278,8 +296,8 @@ def build_local_checks() -> list[Check]:
     ]
 
     checks = command_checks + local_checks
-    if len(checks) != 52:
-        raise AssertionError(f"release-candidate check count must stay 52, got {len(checks)}")
+    if len(checks) != 63:
+        raise AssertionError(f"release-candidate check count must stay 63, got {len(checks)}")
     return checks
 
 
@@ -375,7 +393,7 @@ def write_blocking_report(blockers: list[Check]) -> None:
             "Refresh `apk-sha256.txt` and `cloud-device-capture-todo.md` with `python3 shike/scripts/prepare_cloud_device_evidence.py`, "
             "then confirm `CLOUD_DEVICE_PREP_METRIC 5/5` and the expected pre-capture state `CLOUD_DEVICE_PREP_MISSING_VIDEOS 9/9`."
         )
-        actions.append("Rerun `python3 shike/validation/validate_cloud_device_package.py` so the non-strict package handoff remains at `CLOUD_DEVICE_PACKAGE_METRIC 27/27` before strict validation.")
+        actions.append("Rerun `python3 shike/validation/validate_cloud_device_package.py` so the non-strict package handoff remains at `CLOUD_DEVICE_PACKAGE_METRIC 30/30` before strict validation.")
         actions.append("Rerun `python3 shike/validation/validate_release_evidence_index.py` so the release evidence index still matches the refreshed cloud-device package.")
         actions.append("Rerun `python3 shike/validation/validate_requirement_matrix.py` so the desktop guidance stages A-E still map to refreshed cloud-device blockers.")
         actions.append(

@@ -2,6 +2,7 @@ package cn.shike.app
 
 import android.Manifest
 import android.graphics.Bitmap
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
@@ -42,10 +43,10 @@ fun rememberCaptureLaunchers(
         }
     }
     val galleryLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.GetContent()
+        ActivityResultContracts.PickVisualMedia()
     ) { uri ->
         if (uri != null) {
-            onGalleryImage("${uri.lastPathSegment ?: uri}")
+            onGalleryImage(uri.toString())
         } else {
             onGalleryUnavailable()
         }
@@ -61,7 +62,9 @@ fun rememberCaptureLaunchers(
                 }
             },
             launchGallery = {
-                galleryLauncher.launch("image/*")
+                galleryLauncher.launch(
+                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                )
             },
         )
     }

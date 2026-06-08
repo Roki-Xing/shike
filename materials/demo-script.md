@@ -10,7 +10,7 @@
 
 拾刻解决的是这条链路：截图或拍照进入，AI 解析信息，用户确认后生成日历、提醒和地图动作，最后进入收件箱和今日行动台持续追踪。
 
-第一条演示链路是课程通知。用户截图后，系统浮出“交给拾刻”的动作卡。拾刻识别到这不是普通图片，而是一条课程变更通知。进入解析页后，可以看到课程名、时间、地点、任务和置信度。用户确认后，拾刻生成加入日历、课前提醒和打开地图三项动作。安排完成后，这件事会出现在今日行动台，不会像普通截图一样沉到相册里。
+第一条演示链路是课程通知。用户从系统分享面板或相册把截图交给拾刻；如果用户主动开启最近截图助手，也只会收到通知式导入提示。拾刻识别到这不是普通图片，而是一条课程变更通知。进入解析页后，可以看到课程名、时间、地点、任务和置信度。用户确认后，拾刻生成加入日历、课前提醒和打开地图三项动作。安排完成后，这件事会出现在今日行动台，不会像普通截图一样沉到相册里。
 
 第二条演示链路是活动海报。用户在校园里拍一张海报，拾刻识别活动时间、地点和报名截止。如果报名链接缺失，页面会明确标出缺失字段，而不是黑盒执行。用户可以先创建截止提醒和地图入口，活动卡会进入收件箱，并在临近截止时标记为即将处理。
 
@@ -25,7 +25,7 @@
 | 步骤 | 操作 | 展示页 | 讲解重点 |
 |---|---|---|---|
 | 1 | 打开今日行动台 | 今日行动台 | 产品不是聊天首页，而是行动首页 |
-| 2 | 展示课程截图 | 截图动作卡 | 系统入口和是否值得处理判断 |
+| 2 | 分享或选择课程截图 | 截图导入卡 | 用户触发入口和是否值得处理判断 |
 | 3 | 点击交给拾刻 | AI 解析确认页 | 字段、置信度、缺失项、用户可编辑 |
 | 4 | 点击确认处理 | 行动编排页 | 日历、提醒、地图三动作 |
 | 5 | 返回首页 | 今日行动台 | 执行后继续追踪 |
@@ -37,7 +37,7 @@
 
 | 段落 | 操作 | 目的 |
 |---|---|---|
-| 课程截图 | 选择截图 -> 课程样例 -> 确认修正 | 展示从截图到行动卡的主路径 |
+| 课程截图 | 选择截图 -> 课程样例 -> 确认并安排 | 展示从截图到行动卡的主路径 |
 | 活动拍照 | 拍照导入 -> 活动样例 -> 即将截止 | 展示拍海报也能转成行动 |
 | 后端回退 | 填不可用后端地址 -> 解析当前草稿 | 展示失败时回退本地 MockModelAdapter |
 | 重启恢复 | 关闭重开 App -> 查看今日行动台 | 展示收件箱缓存与持续追踪 |
@@ -62,5 +62,5 @@
 | 模型不稳定怎么办？ | 保留置信度、缺失字段、用户确认和模板化降级路径。 |
 | 场景扩展会不会失控？ | 后端 schema 只允许固定 `scene_type`，当前覆盖课程、活动、作业、会议、面试、出行和 unknown；Android 映射、样例响应、110 条回归样例和 `validate_backend_scene_contract.py` 一起锁定。 |
 | 权限拿不到怎么办？ | 降级成本地行动卡、应用内倒计时、复制地点，不静默失败。 |
-| 如何证明当前不是只做材料？ | 本地发布候选用 `python3 shike/validation/validate_landing_release_candidate.py` 复测，当前门禁是 `LANDING_RELEASE_CANDIDATE_METRIC 52/52`；提交材料追踪用 `validate_deliverables.py`，当前是 `DELIVERABLES_METRIC 10/10`，并由 `validation/traceability.md` 的 SHIKE-070 行串起演示脚本、真机验收清单、发布证据索引和云真机证据包。 |
+| 如何证明当前不是只做材料？ | 本地发布候选用 `python3 shike/validation/validate_landing_release_candidate.py` 复测，当前门禁是 `LANDING_RELEASE_CANDIDATE_METRIC 63/63`；提交材料追踪用 `validate_deliverables.py`，当前是 `DELIVERABLES_METRIC 10/10`，并由 `validation/traceability.md` 的 SHIKE-070 行串起演示脚本、真机验收清单、发布证据索引和云真机证据包。 |
 | 云真机证据收齐了吗？ | 还没有把 strict 发布当作完成项。真实 9 段云真机 MP4 和填写后的 `cloud-device-test-report.md` 未收齐前，`LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE 3/7` 是预期阻断；录制前先完成报告里的 `Pre-recording Evidence Gate`，确认 `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md` 仍是桌面指导源，`materials/evidence/requirement-matrix.md` 仍通过 `REQUIREMENT_MATRIX_METRIC 9/9`，all 9 real cloud-device MP4 files 已进入证据包，且 no placeholder fields remain after capture；阻断报告在 `materials/evidence/blocking-report.md`，总入口是 `materials/evidence/release-evidence-index.md`。 |

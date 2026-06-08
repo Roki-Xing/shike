@@ -71,7 +71,6 @@ fun HomeAgendaList(
     item: ShikeItem,
     state: TodayAgendaState,
     onGallery: () -> Unit,
-    onCamera: () -> Unit,
     onManualInput: () -> Unit,
 ) {
     when (state) {
@@ -81,7 +80,6 @@ fun HomeAgendaList(
                 description = "还没有本地收件箱任务。可以从截图、拍照、分享或手动输入开始，不会自动执行日历、提醒或地图动作。",
                 tone = Color(0xFF0F766E),
                 onGallery = onGallery,
-                onCamera = onCamera,
                 onManualInput = onManualInput,
             )
             return
@@ -92,7 +90,6 @@ fun HomeAgendaList(
                 description = "本地数据加载失败或后端不可用时，拾刻会保留当前行动卡，并提示改用截图、拍照、分享或手动输入继续。",
                 tone = Color(0xFFF97316),
                 onGallery = onGallery,
-                onCamera = onCamera,
                 onManualInput = onManualInput,
             )
             return
@@ -142,7 +139,6 @@ private fun TodayStateCard(
     description: String,
     tone: Color,
     onGallery: () -> Unit,
-    onCamera: () -> Unit,
     onManualInput: () -> Unit,
 ) {
     Card(
@@ -168,13 +164,12 @@ private fun TodayStateCard(
             }
             Text(description, color = Color(0xFF667085), fontSize = 12.sp, lineHeight = 18.sp)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                OutlinedButton(onClick = onGallery, modifier = Modifier.weight(1f)) { Text("截图") }
-                OutlinedButton(onClick = onManualInput, modifier = Modifier.weight(1f)) { Text("手动") }
                 Button(
-                    onClick = onCamera,
-                    modifier = Modifier.weight(1f),
+                    onClick = onGallery,
+                    modifier = Modifier.weight(1.35f),
                     colors = ButtonDefaults.buttonColors(containerColor = tone),
-                ) { Text("拍照") }
+                ) { Text("导入截图") }
+                OutlinedButton(onClick = onManualInput, modifier = Modifier.weight(1f)) { Text("手动输入") }
             }
         }
     }

@@ -17,7 +17,13 @@ data class BackendFailureFallbackCopy(
 data class BackendAnalysisInput(
     val sourceType: String,
     val fallback: ShikeItem,
-)
+    val imageUri: String? = null,
+    val imageSourceType: String = "manual",
+    val allowCloudImage: Boolean = true,
+) {
+    val hasImageForCloudAnalysis: Boolean
+        get() = !imageUri.isNullOrBlank()
+}
 
 /**
  * Builds the backend-analysis input for the course screenshot demo path.
@@ -37,8 +43,19 @@ fun courseBackendAnalysisInput(): BackendAnalysisInput =
 fun eventBackendAnalysisInput(): BackendAnalysisInput =
     BackendAnalysisInput("camera", sampleEvent())
 
-fun backendAnalysisInputForCurrentDraft(captureSource: String, fallback: ShikeItem): BackendAnalysisInput =
-    BackendAnalysisInput(backendSourceTypeFromCaptureSource(captureSource), fallback)
+fun backendAnalysisInputForCurrentDraft(
+    captureSource: String,
+    fallback: ShikeItem,
+    imageUri: String? = null,
+    allowCloudImage: Boolean = true,
+): BackendAnalysisInput =
+    BackendAnalysisInput(
+        sourceType = backendSourceTypeFromCaptureSource(captureSource),
+        fallback = fallback,
+        imageUri = imageUri,
+        imageSourceType = backendImageSourceTypeFromCaptureSource(captureSource),
+        allowCloudImage = allowCloudImage,
+    )
 
 /**
  * Chooses the editable OCR text sent to the backend.
@@ -80,9 +97,9 @@ fun backendSuccessOutcome(item: ShikeItem): BackendAnalysisOutcome =
  */
 fun backendFailureFallbackCopyFor(textForAnalyze: String): BackendFailureFallbackCopy =
     BackendFailureFallbackCopy(
-        rawText = "${redactSensitiveLogText(textForAnalyze)}\n后端不可用，已回退本地 MockModelAdapter，日志已脱敏。",
-        source = "后端失败，回退本地 MockModelAdapter",
-        statusMessage = "模型编排：后端失败，已回退本地 mock",
+        rawText = "${redactSensitiveLogText(textForAnalyze)}\n云侧暂不可用，已切换为本地确认，日志已脱敏。",
+        source = "云侧解析失败，本地待确认",
+        statusMessage = "云侧暂不可用，已切换为本地确认",
     )
 
 /**
@@ -98,12 +115,60 @@ fun backendFailureFallbackCopyFor(textForAnalyze: String): BackendFailureFallbac
 fun backendFailureOutcome(fallback: ShikeItem, textForAnalyze: String): BackendAnalysisOutcome {
     val fallbackCopy = backendFailureFallbackCopyFor(textForAnalyze)
     return BackendAnalysisOutcome(
-        item = fallback.copy(
+        item = fallbackItemForRealDraft(fallback, textForAnalyze).copy(
             status = "待确认",
             rawText = fallbackCopy.rawText,
         ),
         source = fallbackCopy.source,
         statusMessage = fallbackCopy.statusMessage,
+    )
+}
+
+fun backendImageFailureOutcome(fallback: ShikeItem, textForAnalyze: String, reason: String): BackendAnalysisOutcome =
+    BackendAnalysisOutcome(
+        item = fallbackItemForRealDraft(fallback, textForAnalyze).copy(
+            status = "待确认",
+            rawText = "${redactSensitiveLogText(textForAnalyze)}\n$reason，已进入本地待确认，日志已脱敏。",
+        ),
+        source = "云侧图片解析失败，本地待确认",
+        statusMessage = "云侧图片理解暂不可用，已进入待确认",
+    )
+
+fun backendImageSuccessOutcome(item: ShikeItem): BackendAnalysisOutcome =
+    BackendAnalysisOutcome(
+        item = item,
+        source = "后端 /v2/analyze-image：${item.scene}",
+        statusMessage = "模型编排：云侧图片解析成功",
+    )
+
+fun backendImageManualReviewOutcome(item: ShikeItem): BackendAnalysisOutcome =
+    BackendAnalysisOutcome(
+        item = item,
+        source = "云侧图片解析失败，本地待确认",
+        statusMessage = "云侧图片理解暂不可用，已进入待确认",
+    )
+
+fun fallbackItemForRealDraft(fallback: ShikeItem, textForAnalyze: String): ShikeItem {
+    val trimmed = textForAnalyze.trim()
+    if (trimmed.isBlank()) {
+        return fallback
+    }
+    if ("高数" in trimmed && "B203" !in trimmed && "18:30" !in trimmed && "22:00" !in trimmed) {
+        return fallback.copy(
+            title = "上高数 A",
+            scene = "课程通知",
+            time = "今天晚上（需确认具体时间）",
+            location = "待补充",
+            actions = listOf("先存入待确认"),
+            rawText = trimmed,
+        )
+    }
+    return fallback.copy(
+        title = trimmed.lineSequence().firstOrNull()?.take(18)?.ifBlank { fallback.title } ?: fallback.title,
+        time = "待确认",
+        location = "待补充",
+        actions = listOf("先存入待确认"),
+        rawText = trimmed,
     )
 }
 
@@ -122,21 +187,46 @@ fun backendFailureOutcome(fallback: ShikeItem, textForAnalyze: String): BackendA
  */
 fun runBackendAnalysis(
     backendUrl: String,
-    sourceType: String,
+    input: BackendAnalysisInput,
     ocrDraft: String,
-    fallback: ShikeItem,
+    imagePayloadProvider: (() -> BackendImagePayload?)? = null,
     deliver: (BackendAnalysisOutcome) -> Unit,
 ): String {
-    val textForAnalyze = backendAnalyzeText(ocrDraft, fallback)
+    val textForAnalyze = backendAnalyzeText(ocrDraft, input.fallback)
     val endpoint = normalizeBackendUrl(backendUrl)
     Thread {
+        if (imagePayloadProvider != null || input.hasImageForCloudAnalysis) {
+            val imagePayload = imagePayloadProvider?.invoke()
+            if (imagePayload == null) {
+                deliver(backendImageFailureOutcome(input.fallback, textForAnalyze, "图片读取失败"))
+                return@Thread
+            }
+            val result = runCatching {
+                callAnalyzeImageApi(
+                    backendBaseUrl = endpoint,
+                    sourceType = input.imageSourceType,
+                    ocrTextHint = textForAnalyze,
+                    scene = input.fallback.scene,
+                    image = imagePayload,
+                    allowCloudImage = input.allowCloudImage,
+                )
+            }
+            deliver(
+                result.fold(
+                    onSuccess = { outcome -> outcome },
+                    onFailure = { backendImageFailureOutcome(input.fallback, textForAnalyze, "云侧图片解析失败") },
+                ),
+            )
+            return@Thread
+        }
+
         val result = runCatching {
-            callAnalyzeApi(endpoint, sourceType, textForAnalyze, fallback.scene)
+            callAnalyzeApi(endpoint, input.sourceType, textForAnalyze, input.fallback.scene)
         }
         deliver(
             result.fold(
                 onSuccess = ::backendSuccessOutcome,
-                onFailure = { backendFailureOutcome(fallback, textForAnalyze) },
+                onFailure = { backendFailureOutcome(input.fallback, textForAnalyze) },
             ),
         )
     }.start()

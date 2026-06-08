@@ -5,10 +5,10 @@ source_type: {source_type}
 locale: {locale}
 scene_hint: {scene_hint}
 user_timezone: {user_timezone}
+current_date: {current_date}
 
 OCR_TEXT:
 {ocr_text}
 
 你必须严格遵守以下 JSON Schema（additionalProperties=false 等约束也必须遵守）：
 {schema_json}
-

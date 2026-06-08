@@ -1,0 +1,14 @@
+id: img-assignment-002
+scene: assignment_deadline
+source_type: photo_picker
+fixture_type: synthetic_descriptor
+
+ocr_text_hint:
+课程平台主体：实验报告周日23:59截止，需上传PDF和数据表。
+
+expected:
+must_not_extract_status_bar_time: True
+title_contains: 实验报告, 截止
+time_required: True
+location_required: False
+actions: reminder

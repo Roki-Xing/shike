@@ -7,6 +7,51 @@ from collections.abc import Iterable
 from shike_backend.schemas import AnalyzeRequest, AnalyzeResponse
 
 
+COURSE_TOPIC_TOKENS = ("高数", "课程", "上课", "课")
+SPECIFIC_TIME_TOKENS = ("18:30", "22:00", "10:00", "8:30", "14:00", "16:30")
+LOCATION_TOKENS = ("B203", "教室", "报告厅", "会议室", "教学楼")
+
+
+def is_sparse_course_text(text: str, hint: str | None = None) -> bool:
+    """Detect course text that lacks exact time and location.
+
+    Args:
+        text: OCR or manually entered text.
+        hint: Optional scene hint from the client.
+
+    Returns:
+        True when the backend must keep the card in user-confirmation mode.
+    """
+
+    has_course_topic = hint == "course_notice" or any(token in text for token in COURSE_TOPIC_TOKENS)
+    has_specific_time = any(token in text for token in SPECIFIC_TIME_TOKENS)
+    has_location = any(token in text for token in LOCATION_TOKENS)
+    return has_course_topic and not has_specific_time and not has_location
+
+
+def sparse_course_output(text: str) -> AnalyzeResponse:
+    """Build a safe confirmation-first course response for incomplete text."""
+
+    title = "上高数 A" if "高数" in text else "课程事项待确认"
+    start_text = "今天晚上" if "今天晚上" in text else None
+    return AnalyzeResponse(
+        scene_type="course_notice",
+        confidence=0.72,
+        title=title,
+        time={
+            "start_text": start_text,
+            "deadline_text": None,
+            "normalized_start": None,
+            "normalized_deadline": None,
+        },
+        location=None,
+        task={"summary": text, "priority": "medium", "topic": "course"},
+        suggested_actions=[{"type": "reminder", "label": "先存入待确认", "requires_permission": True}],
+        missing_fields=["exact_start_time", "location"],
+        explanation="文本包含课程关键词和相对时间，但缺少具体上课时间和地点，因此需要用户确认后再安排。",
+    )
+
+
 class MockModelAdapter:
     """A deterministic adapter that simulates model output for MVP scenes."""
 
@@ -48,6 +93,10 @@ class MockModelAdapter:
     @staticmethod
     def _is_course(text: str, hint: str | None) -> bool:
         return hint == "course_notice" or any(token in text for token in ["课", "教室", "调课", "签到"])
+
+    @staticmethod
+    def _is_sparse_course_text(text: str) -> bool:
+        return is_sparse_course_text(text)
 
     @staticmethod
     def _is_event(text: str, hint: str | None) -> bool:
@@ -172,6 +221,8 @@ class MockModelAdapter:
 
     @staticmethod
     def _course_output(text: str) -> AnalyzeResponse:
+        if MockModelAdapter._is_sparse_course_text(text):
+            return MockModelAdapter._sparse_course_output(text)
         deadline = "今晚22:00" if "22:00" in text else "今晚22:00"
         missing_fields = MockModelAdapter._missing_fields_for_text(text)
         return AnalyzeResponse(
@@ -192,6 +243,10 @@ class MockModelAdapter:
             missing_fields=missing_fields,
             explanation="文本包含课程、时间、地点和截止事项，适合转成行动卡。",
         )
+
+    @staticmethod
+    def _sparse_course_output(text: str) -> AnalyzeResponse:
+        return sparse_course_output(text)
 
     @staticmethod
     def _event_output(text: str) -> AnalyzeResponse:

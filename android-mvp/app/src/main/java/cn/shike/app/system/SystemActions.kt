@@ -18,6 +18,18 @@ import cn.shike.app.domain.ShikeItem
 internal const val REMINDER_CHANNEL_ID = "shike_reminders"
 
 /**
+ * Builds the user-visible description for Android's calendar insert page.
+ *
+ * Args:
+ *     item: Confirmed action card.
+ *
+ * Returns:
+ *     Calendar event description that avoids claiming the event was saved.
+ */
+fun calendarInsertDescriptionFor(item: ShikeItem): String =
+    "由拾刻从${item.scene}解析，用户确认后打开系统日历新增页，由用户在日历中保存。"
+
+/**
  * Creates the Android notification channel used by local reminders.
  *
  * Args:
@@ -48,7 +60,7 @@ fun buildCalendarInsertIntent(item: ShikeItem): Intent {
         putExtra(CalendarContract.Events.EVENT_LOCATION, item.location)
         putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, startMillis)
         putExtra(CalendarContract.EXTRA_EVENT_END_TIME, startMillis + 60 * 60 * 1000)
-        putExtra(CalendarContract.Events.DESCRIPTION, "由拾刻从${item.scene}生成，确认后写入。")
+        putExtra(CalendarContract.Events.DESCRIPTION, calendarInsertDescriptionFor(item))
     }
 }
 

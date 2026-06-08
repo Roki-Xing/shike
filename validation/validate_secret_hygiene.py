@@ -4,6 +4,7 @@
 This validator is intentionally conservative and filesystem-only:
 
 - It scans plaintext project files under the Shike module for secret-like patterns.
+- It delegates APK artifact scanning to validate_apk_secret_hygiene.py.
 - It never prints full matched values (to avoid leaking secrets via logs).
 - It does NOT require any real BlueLM credentials to exist.
 
@@ -14,6 +15,8 @@ android-mvp/, backend/, contracts/, docs/, materials/, prototype/, validation/, 
 from __future__ import annotations
 
 import re
+import subprocess
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -141,7 +144,7 @@ def _find_in_text(path: Path, text: str) -> list[Finding]:
     #
     # We intentionally anchor to beginning-of-line to avoid false positives in:
     # - documentation mentions like "`AppKEY=`"
-    # - grep/rg command examples like "BLUELM_APP_KEY=|AppKEY=|sk-"
+    # - grep/rg command examples that separately mention env keys and sk-style prefixes
     #
     # This remains a "guardrail" not a full secret scanner.
     appkey_assign_re = re.compile(r"^\s*(?:export\s+)?AppKEY\s*=\s*([^\s#]+)")
@@ -248,6 +251,25 @@ def _check_gitignore_env_rules() -> list[str]:
     return problems
 
 
+def _check_apk_secret_hygiene() -> list[str]:
+    """Run the APK artifact secret hygiene validator.
+
+    Returns:
+        Empty list when the APK validator passes; safe redacted output lines otherwise.
+    """
+
+    result = subprocess.run(
+        [sys.executable, str(ROOT / "validation/validate_apk_secret_hygiene.py")],
+        cwd=WORKSPACE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True,
+    )
+    if result.returncode == 0:
+        return []
+    return [line for line in result.stdout.splitlines() if line.strip()]
+
+
 def main() -> int:
     missing_targets = [str(p.relative_to(WORKSPACE)) for p in SCAN_TARGETS if not p.exists()]
     if missing_targets:
@@ -264,6 +286,7 @@ def main() -> int:
     findings.extend(_check_android_must_not_mention_tokens())
 
     gitignore_problems = _check_gitignore_env_rules()
+    apk_secret_problems = _check_apk_secret_hygiene()
 
     passed = True
     if gitignore_problems:
@@ -276,6 +299,12 @@ def main() -> int:
         for f in findings:
             rel = f.path.relative_to(WORKSPACE)
             print(f"FAIL\t{f.rule}\t{rel}:{f.line_no}\t{f.preview}")
+
+    if apk_secret_problems:
+        passed = False
+        print("FAIL\tapk_secret_hygiene\tvalidation/validate_apk_secret_hygiene.py")
+        for line in apk_secret_problems:
+            print(line)
 
     if passed:
         print("PASS\tsecret_hygiene")

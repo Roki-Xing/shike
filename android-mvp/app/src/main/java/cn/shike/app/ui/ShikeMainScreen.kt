@@ -2,21 +2,29 @@ package cn.shike.app.ui
 
 import android.graphics.Bitmap
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import cn.shike.app.data.ImageCleanupStatus
 import cn.shike.app.data.InboxItemEntity
+import cn.shike.app.data.ScreenshotCandidate
 import cn.shike.app.domain.ShikeItem
+import cn.shike.app.system.VisibleScreenCapturePrompt
 
 @Composable
 fun ShikeMainScreen(
@@ -42,71 +50,139 @@ fun ShikeMainScreen(
     onEvent: () -> Unit,
     cloudEnhancedEnabled: Boolean,
     onCloudEnhancedChange: (Boolean) -> Unit,
+    localMultimodalStatus: LocalMultimodalStatus,
+    onLocalMultimodalPreferenceChange: (LocalMultimodalPreference) -> Unit,
+    screenshotAssistEnabled: Boolean,
+    onScreenshotAssistChange: (Boolean) -> Unit,
+    pendingScreenshotCandidate: ScreenshotCandidate?,
+    onImportScreenshotCandidate: (ScreenshotCandidate) -> Unit,
+    onIgnoreScreenshotCandidate: () -> Unit,
+    visibleScreenCapturePrompt: VisibleScreenCapturePrompt?,
+    onImportVisibleScreenCapture: () -> Unit,
+    onDismissVisibleScreenCapture: () -> Unit,
     onClearLocalData: () -> Unit,
     onReviewed: (ShikeItem) -> Unit,
+    sourceImageCleanupStatus: ImageCleanupStatus,
+    selectedSourceMediaStoreUri: String?,
+    onDeleteSourceImage: () -> Unit,
+    onKeepSourceImage: () -> Unit,
     onAddCalendar: (ShikeItem) -> Unit,
     onReminder: (ShikeItem) -> Unit,
     onOpenMap: (ShikeItem) -> Unit,
 ) {
-    var selectedSection by remember { mutableStateOf(ShikeMainSection.Home) }
+    var selectedSection by remember {
+        mutableStateOf(if (pendingScreenshotCandidate != null) ShikeMainSection.Import else ShikeMainSection.Home)
+    }
+    var developerModeState by remember { mutableStateOf(DeveloperModeState()) }
 
-    Column(
+    LaunchedEffect(pendingScreenshotCandidate) {
+        if (pendingScreenshotCandidate != null) {
+            selectedSection = ShikeMainSection.Import
+        }
+    }
+    LaunchedEffect(visibleScreenCapturePrompt) {
+        if (visibleScreenCapturePrompt != null) {
+            selectedSection = ShikeMainSection.Import
+        }
+    }
+
+    Scaffold(
         modifier = Modifier
             .fillMaxSize()
-            .background(ShikeColors.Surface)
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = 14.dp, vertical = 12.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        when (selectedSection) {
-            ShikeMainSection.Home -> HomeActionScreen(
-                selected = selected,
-                todayAgendaState = todayAgendaState,
-                isConfirmed = isConfirmed,
-                onGallery = onGallery,
-                onCamera = onCamera,
-                onManualInput = onManualInput,
-                onAddCalendar = onAddCalendar,
-                onReminder = onReminder,
-                onOpenMap = onOpenMap,
+            .background(ShikeColors.Surface),
+        containerColor = ShikeColors.Surface,
+        contentWindowInsets = WindowInsets.safeDrawing,
+        bottomBar = {
+            BottomNavBar(
+                selectedSection = selectedSection,
+                onSelected = { selectedSection = it },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .navigationBarsPadding()
+                    .padding(horizontal = 14.dp, vertical = 8.dp),
             )
-            ShikeMainSection.Import -> {
-                CaptureHubScreen(
-                    captureSource = captureSource,
-                    capturedBitmap = capturedBitmap,
-                    modelStatus = modelStatus,
-                    ocrDraft = ocrDraft,
-                    onOcrDraftChange = onOcrDraftChange,
-                    cloudEnhancedEnabled = cloudEnhancedEnabled,
+        },
+    ) { padding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(ShikeColors.Surface)
+                .verticalScroll(rememberScrollState())
+                .padding(padding)
+                .padding(horizontal = 14.dp, vertical = 12.dp),
+            verticalArrangement = ShikeSpacing.Screen,
+        ) {
+            when (selectedSection) {
+                ShikeMainSection.Home -> HomeActionScreen(
+                    selected = selected,
+                    todayAgendaState = todayAgendaState,
+                    executionResults = executionResults,
+                    isConfirmed = isConfirmed,
                     onGallery = onGallery,
-                    onCamera = onCamera,
                     onManualInput = onManualInput,
-                    onBackendCourse = onBackendCourse,
-                    onBackendEvent = onBackendEvent,
+                    onAddCalendar = onAddCalendar,
+                    onReminder = onReminder,
+                    onOpenMap = onOpenMap,
                 )
-                ParseConfirmScreen(selected, onReviewed = onReviewed)
-                ActionPlanScreen(selected, isConfirmed, executionResults, onAddCalendar, onReminder, onOpenMap)
+                ShikeMainSection.Import -> {
+                    CaptureHubScreen(
+                        captureSource = captureSource,
+                        capturedBitmap = capturedBitmap,
+                        modelStatus = modelStatus,
+                        ocrDraft = ocrDraft,
+                        onOcrDraftChange = onOcrDraftChange,
+                        cloudEnhancedEnabled = cloudEnhancedEnabled,
+                        onGallery = onGallery,
+                        onCamera = onCamera,
+                        onManualInput = onManualInput,
+                        onBackendCourse = onBackendCourse,
+                        onBackendEvent = onBackendEvent,
+                        pendingScreenshotCandidate = pendingScreenshotCandidate,
+                        onImportScreenshotCandidate = onImportScreenshotCandidate,
+                        onIgnoreScreenshotCandidate = onIgnoreScreenshotCandidate,
+                        visibleScreenCapturePrompt = visibleScreenCapturePrompt,
+                        onImportVisibleScreenCapture = onImportVisibleScreenCapture,
+                        onDismissVisibleScreenCapture = onDismissVisibleScreenCapture,
+                    )
+                    ParseConfirmScreen(selected, onReviewed = onReviewed)
+                    ActionPlanScreen(
+                        selected = selected,
+                        isConfirmed = isConfirmed,
+                        executionResults = executionResults,
+                        sourceImageCleanupStatus = sourceImageCleanupStatus,
+                        selectedSourceMediaStoreUri = selectedSourceMediaStoreUri,
+                        onDeleteSourceImage = onDeleteSourceImage,
+                        onKeepSourceImage = onKeepSourceImage,
+                        onAddCalendar = onAddCalendar,
+                        onReminder = onReminder,
+                        onOpenMap = onOpenMap,
+                    )
+                }
+                ShikeMainSection.Inbox -> InboxScreen(selected, captureSource, executionResults, inboxHistory)
+                ShikeMainSection.Settings -> PrivacySettingsScreen(
+                    cloudEnhancedEnabled = cloudEnhancedEnabled,
+                    onCloudEnhancedChange = onCloudEnhancedChange,
+                    localMultimodalStatus = localMultimodalStatus,
+                    onLocalMultimodalPreferenceChange = onLocalMultimodalPreferenceChange,
+                    screenshotAssistEnabled = screenshotAssistEnabled,
+                    onScreenshotAssistChange = onScreenshotAssistChange,
+                    onClearLocalData = onClearLocalData,
+                    developerModeState = developerModeState,
+                    onVersionTap = {
+                        val result = developerModeStateAfterVersionTap(developerModeState)
+                        developerModeState = result.state
+                        selectedSection = result.targetSection
+                    },
+                )
+                ShikeMainSection.Debug -> DebugDemoScreen(
+                    backendUrl = backendUrl,
+                    onBackendUrlChange = onBackendUrlChange,
+                    onSaveBackendUrl = onSaveBackendUrl,
+                    onCourse = onCourse,
+                    onEvent = onEvent,
+                    localMultimodalStatus = localMultimodalStatus,
+                )
             }
-            ShikeMainSection.Inbox -> InboxScreen(selected, captureSource, executionResults, inboxHistory)
-            ShikeMainSection.Settings -> PrivacySettingsScreen(
-                cloudEnhancedEnabled = cloudEnhancedEnabled,
-                onCloudEnhancedChange = onCloudEnhancedChange,
-                onClearLocalData = onClearLocalData,
-                backendUrl = backendUrl,
-                onBackendUrlChange = onBackendUrlChange,
-                onSaveBackendUrl = onSaveBackendUrl,
-            )
-            ShikeMainSection.Debug -> DebugDemoScreen(
-                backendUrl = backendUrl,
-                onBackendUrlChange = onBackendUrlChange,
-                onSaveBackendUrl = onSaveBackendUrl,
-                onCourse = onCourse,
-                onEvent = onEvent,
-            )
         }
-        BottomNavBar(
-            selectedSection = selectedSection,
-            onSelected = { selectedSection = it },
-        )
     }
 }

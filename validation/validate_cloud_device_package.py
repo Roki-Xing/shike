@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import re
+import subprocess
 from pathlib import Path
 
 WORKSPACE = Path(__file__).resolve().parents[2]
@@ -26,6 +27,11 @@ ROOT_README_PATH = ROOT / "README.md"
 CURRENT_STATUS_PATH = ROOT / "docs/current-validation-status.md"
 RUNBOOK_PATH = ROOT / "docs/device-runbook.md"
 PREP_SCRIPT_PATH = ROOT / "scripts/prepare_cloud_device_evidence.py"
+COLLECT_SCRIPT_PATH = ROOT / "scripts/collect_cloud_device_evidence.py"
+COLLECT_TEST_PATH = ROOT / "scripts/test_collect_cloud_device_evidence.py"
+PREFLIGHT_SCRIPT_PATH = ROOT / "scripts/preflight_cloud_backend.py"
+PREFLIGHT_TEST_PATH = ROOT / "scripts/test_preflight_cloud_backend.py"
+HANDOFF_SCRIPT_PATH = ROOT / "scripts/run_release_handoff_checks.py"
 
 REQUIRED_VIDEO_NAMES = [
     "01-cloud-install-open.mp4",
@@ -38,6 +44,20 @@ REQUIRED_VIDEO_NAMES = [
     "08-cloud-ui-polish.mp4",
     "09-cloud-final-route.mp4",
 ]
+
+REQUIRED_ANDROID16_GUIDE_RECORDING_TOKENS = (
+    "## Android 16 Guide Acceptance Coverage",
+    "14.1 无假信息",
+    "14.2 截图分享导入",
+    "14.3 确认后打开日历",
+    "14.4 通知权限与提醒",
+    "14.5 地图",
+    "14.6 删除原截图",
+    "14.7 最近截图助手",
+    "系统截图浮层分享",
+    "04-cloud-share-text.mp4",
+    "09-cloud-final-route.mp4",
+)
 
 REQUIRED_TEXT_ARTIFACTS = [
     "cloud-device-test-report.md",
@@ -65,7 +85,7 @@ REQUIRED_MANIFEST_HANDOFF_TOKENS = (
     "no placeholder fields remain after capture",
     "must not be treated as release-ready strict evidence",
     "materials/evidence/blocking-report.md",
-    "LANDING_RELEASE_CANDIDATE_METRIC 52/52",
+    "LANDING_RELEASE_CANDIDATE_METRIC 63/63",
     "LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE 3/7",
 )
 
@@ -73,18 +93,26 @@ REQUIRED_REPORT_FIELDS = ("机型", "Android 版本", "测试时间", "后端地
 REQUIRED_REPORT_HANDOFF_TOKENS = (
     "## Pre-recording Evidence Gate",
     "/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md",
+    "/mnt/c/Users/Xing/Desktop/SHIKE_ANDROID16_REAL_IMPLEMENTATION_GUIDE (1).md",
+    "ANDROID16_REAL_IMPLEMENTATION_GUIDE_METRIC 12/12",
+    "ANDROID16_DOD_COVERAGE_METRIC 28/28",
     "materials/evidence/requirement-matrix.md",
     "REQUIREMENT_MATRIX_METRIC 9/9",
     "LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE 3/7",
     "9 real cloud-device MP4",
     "no placeholder fields",
+    *REQUIRED_ANDROID16_GUIDE_RECORDING_TOKENS,
 )
 REQUIRED_REPORT_TODO_GATE_TOKENS = (
     "### Report Evidence Gate Fields",
     "Pre-recording Evidence Gate",
     "Desktop guidance source checked",
+    "Android 16 real implementation guide checked",
+    "Android 16 Definition of Done checked",
     "Requirement matrix checked",
     "Requirement matrix gate",
+    "Android 16 guide gate",
+    "Android 16 DoD gate",
     "Strict release gate before filling this report",
     "All 9 real cloud-device MP4 files present",
     "No placeholder fields remain after capture",
@@ -103,16 +131,32 @@ REQUIRED_CAPTURE_TODO_TOKENS = (
     "### Report Video Evidence Still TBD",
     "generated from the current evidence package",
     "## Required Videos",
+        "## Android 16 Guide Acceptance Coverage",
+        "desktop guide section 14 manual acceptance scripts",
+        *REQUIRED_ANDROID16_GUIDE_RECORDING_TOKENS,
         "## Report Fields",
         "### Report Evidence Gate Fields",
     "## Report Video Evidence Section",
     "Add a `## Video Evidence` section",
     "List all 9 MP4 filenames",
     "Replace every video evidence `TBD` note",
-        "## Pre-capture Checks",
+    "## Pre-capture Checks",
     "## Release Handoff",
     "python3 shike/scripts/prepare_cloud_device_evidence.py",
+    "python3 shike/scripts/collect_cloud_device_evidence.py --list",
+    "python3 shike/scripts/collect_cloud_device_evidence.py --record <1-9> --duration-seconds 180",
+    "python3 shike/scripts/collect_cloud_device_evidence.py --capture-logcat --write-report-draft --backend-url https://roky.chat",
+    "python3 shike/scripts/test_collect_cloud_device_evidence.py",
+    "python3 shike/scripts/test_preflight_cloud_backend.py",
+    "python3 shike/scripts/preflight_cloud_backend.py --base-url https://roky.chat",
+    "python3 shike/scripts/collect_cloud_device_evidence.py --preflight-backend --backend-url https://roky.chat",
+    "--allow-cloud-image",
+    "CLOUD_BACKEND_PREFLIGHT_METRIC",
+    "python3 shike/validation/validate_android16_real_implementation_guide.py",
+    "python3 shike/validation/validate_android16_definition_of_done.py",
     "CLOUD_DEVICE_PREP_METRIC 5/5",
+    "ANDROID16_REAL_IMPLEMENTATION_GUIDE_METRIC 12/12",
+    "ANDROID16_DOD_COVERAGE_METRIC 28/28",
     "CLOUD_DEVICE_PREP_MISSING_VIDEOS 9/9",
     "HTTPS backend URL",
     "provider=bluelm",
@@ -124,16 +168,21 @@ REQUIRED_CAPTURE_TODO_TOKENS = (
     "RELEASE_EVIDENCE_INDEX_METRIC 10/10",
     "docs/optimization-log.md",
     "README public entrypoint",
+    "/mnt/c/Users/Xing/Desktop/SHIKE_ANDROID16_REAL_IMPLEMENTATION_GUIDE (1).md",
+    "SHIKE-P0-001 through SHIKE-P1-012",
     "/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md",
     "materials/evidence/requirement-matrix.md",
     "REQUIREMENT_MATRIX_METRIC 9/9",
     "materials/evidence/blocking-report.md",
-    "LANDING_RELEASE_CANDIDATE_METRIC 52/52",
+    "LANDING_RELEASE_CANDIDATE_METRIC 63/63",
     "LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE 3/7",
     "All 9 real cloud-device MP4 files present",
     "No placeholder fields remain after capture",
     "validate_cloud_device_package.py",
     "validate_release_evidence_index.py",
+    "validate_live_smoke_evidence.py",
+    "LIVE_SMOKE_EVIDENCE_METRIC 7/7",
+    "run_release_handoff_checks.py",
     "Keep AppKEY",
     "RELEASE_EVIDENCE_INDEX_METRIC 10/10",
     "docs/optimization-log.md",
@@ -181,6 +230,13 @@ def contains_secret(text: str) -> bool:
     return False
 
 
+def command_passes(command: list[str]) -> bool:
+    """Run a validator command from the workspace root."""
+
+    result = subprocess.run(command, cwd=WORKSPACE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+    return result.returncode == 0
+
+
 def has_valid_sha256(text: str) -> bool:
     return re.search(r"\b[a-fA-F0-9]{64}\b", text) is not None
 
@@ -197,8 +253,11 @@ def build_checks(strict: bool) -> list[tuple[str, bool, str]]:
     current_status_text = read(CURRENT_STATUS_PATH) if CURRENT_STATUS_PATH.is_file() else ""
     package_readme_text = read(PACKAGE_README_PATH) if PACKAGE_README_PATH.is_file() else ""
     prep_script_text = read(PREP_SCRIPT_PATH) if PREP_SCRIPT_PATH.is_file() else ""
+    collect_script_text = read(COLLECT_SCRIPT_PATH) if COLLECT_SCRIPT_PATH.is_file() else ""
+    preflight_script_text = read(PREFLIGHT_SCRIPT_PATH) if PREFLIGHT_SCRIPT_PATH.is_file() else ""
     current_status_handoff_commands = (
         "python3 shike/validation/validate_cloud_device_package.py",
+        "python3 shike/validation/validate_live_smoke_evidence.py",
         "python3 shike/validation/validate_requirement_matrix.py",
         "python3 shike/validation/validate_release_evidence_index.py",
         "python3 shike/validation/validate_landing_release_candidate.py",
@@ -215,7 +274,34 @@ def build_checks(strict: bool) -> list[tuple[str, bool, str]]:
         ("access_log_exists", file_nonempty(ACCESS_LOG_PATH), "backend-redacted-access-log.txt"),
         ("apk_sha_exists", file_nonempty(APK_SHA_PATH), "apk-sha256.txt"),
         ("capture_todo_exists", file_nonempty(CAPTURE_TODO_PATH), "cloud-device-capture-todo.md"),
-        ("prep_script_exists", file_nonempty(PREP_SCRIPT_PATH), "scripts/prepare_cloud_device_evidence.py"),
+        (
+            "prep_script_exists",
+            file_nonempty(PREP_SCRIPT_PATH)
+            and file_nonempty(COLLECT_SCRIPT_PATH)
+            and file_nonempty(COLLECT_TEST_PATH)
+            and file_nonempty(PREFLIGHT_SCRIPT_PATH)
+            and file_nonempty(PREFLIGHT_TEST_PATH)
+            and command_passes(["python3", "shike/scripts/test_collect_cloud_device_evidence.py"]),
+            "prep + adb collection + backend preflight scripts",
+        ),
+        (
+            "preflight_script_passes",
+            command_passes(["python3", "shike/scripts/test_preflight_cloud_backend.py"])
+            and contains_all(
+                preflight_script_text,
+                (
+                    "https://roky.chat",
+                    "/health",
+                    "/v2/schema",
+                    "/v2/analyze-image",
+                    "allow_cloud_image",
+                    "CLOUD_BACKEND_PREFLIGHT_METRIC",
+                    "HOST_REDACTED",
+                    "CONFIRMATION_DISABLED_REASON",
+                ),
+            ),
+            "public backend preflight",
+        ),
         ("manifest_lists_video_names", contains_all(manifest_text, REQUIRED_VIDEO_NAMES), "video names"),
         ("manifest_lists_text_artifacts", contains_all(manifest_text, REQUIRED_TEXT_ARTIFACTS), "text artifacts"),
         ("manifest_links_release_handoff", contains_all(manifest_text, REQUIRED_MANIFEST_HANDOFF_TOKENS), "release handoff"),
@@ -231,23 +317,75 @@ def build_checks(strict: bool) -> list[tuple[str, bool, str]]:
         (
             "prep_script_keeps_release_handoff_current",
             contains_all(
-                prep_script_text,
+                prep_script_text + collect_script_text + preflight_script_text,
                 (
                     "RELEASE_EVIDENCE_INDEX_METRIC 10/10",
                     "docs/optimization-log.md",
                     "README public entrypoint",
+                    "/mnt/c/Users/Xing/Desktop/SHIKE_ANDROID16_REAL_IMPLEMENTATION_GUIDE (1).md",
+                    "ANDROID16_REAL_IMPLEMENTATION_GUIDE_METRIC 12/12",
+                    "ANDROID16_DOD_COVERAGE_METRIC 28/28",
                     "/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md",
                     "REQUIREMENT_MATRIX_METRIC 9/9",
+                    "run_release_handoff_checks.py",
+                    "collect_cloud_device_evidence.py",
+                    "preflight_cloud_backend.py",
+                    "preflight-backend",
+                    "build_preflight_commands",
+                    "--allow-cloud-image",
+                    "CLOUD_BACKEND_PREFLIGHT_METRIC",
+                    "REQUIRED_SCENARIOS",
+                    "screenrecord",
+                    "cloud-device-logcat.txt",
+                    "redact_log_text",
+                    "write_report_draft",
+                    "ANDROID16_GUIDE_RECORDING_COVERAGE",
                 ),
             ),
-            "prep script release handoff",
+            "prep + collection script release handoff",
+        ),
+        ("handoff_script_exists", file_nonempty(HANDOFF_SCRIPT_PATH), "scripts/run_release_handoff_checks.py"),
+        (
+            "handoff_script_lists_release_commands",
+            contains_all(
+                read(HANDOFF_SCRIPT_PATH) if HANDOFF_SCRIPT_PATH.is_file() else "",
+                (
+                    "validate_requirement_matrix.py",
+                    "validate_release_blocking_report.py",
+                    "validate_release_evidence_index.py",
+                    "validate_cloud_device_package.py",
+                    "validate_android16_real_implementation_guide.py",
+                    "validate_image_semantic_cases.py",
+                    "validate_landing_release_candidate.py",
+                    "validate_secret_hygiene.py",
+                    "test_collect_cloud_device_evidence.py",
+                    "test_preflight_cloud_backend.py",
+                    "--disable-cloud-image",
+                    "--strict-ready",
+                    "RELEASE_HANDOFF_CHECKS_METRIC",
+                ),
+            ),
+            "release handoff runner",
         ),
         (
             "report_has_required_fields",
             contains_all(report_text, REQUIRED_REPORT_FIELDS + REQUIRED_REPORT_HANDOFF_TOKENS),
             "report fields + pre-recording gate",
         ),
-        ("access_log_redacted", not contains_secret(access_log_text), "redaction"),
+        (
+            "access_log_redacted",
+            not contains_secret(access_log_text)
+            and contains_all(
+                access_log_text,
+                (
+                    "public-live-image-preflight-redacted",
+                    "allow_cloud_image=true",
+                    "actions_disabled=true",
+                    "CLOUD_BACKEND_PREFLIGHT_METRIC=1/1",
+                ),
+            ),
+            "redaction + public live image preflight",
+        ),
         ("runbook_has_cloud_sections", contains_all(runbook_text, ("模拟器", "USB 真机", "云真机", "https://your-domain.example.com")), "runbook"),
         (
             "runbook_links_release_handoff_gates",
@@ -257,7 +395,7 @@ def build_checks(strict: bool) -> list[tuple[str, bool, str]]:
                     "prepare_cloud_device_evidence.py",
                     "CLOUD_DEVICE_PREP_METRIC 5/5",
                     "CLOUD_DEVICE_PREP_MISSING_VIDEOS 9/9",
-                    "CLOUD_DEVICE_PACKAGE_METRIC 27/27",
+                    "CLOUD_DEVICE_PACKAGE_METRIC 30/30",
                     "RELEASE_EVIDENCE_INDEX_METRIC 10/10",
                     "/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md",
                     "materials/evidence/requirement-matrix.md",
@@ -265,7 +403,9 @@ def build_checks(strict: bool) -> list[tuple[str, bool, str]]:
                     "docs/optimization-log.md",
                     "release handoff",
                     "validate_release_evidence_index.py",
+                    "validate_live_smoke_evidence.py",
                     "validate_cloud_device_package.py --strict",
+                    "LIVE_SMOKE_EVIDENCE_METRIC 7/7",
                     "9 个真实云真机 MP4",
                     "cloud-device-test-report.md",
                 ),
@@ -279,10 +419,10 @@ def build_checks(strict: bool) -> list[tuple[str, bool, str]]:
                 (
                     "validate_cloud_device_package.py",
                     "materials/evidence/cloud-device/",
-                    "CLOUD_DEVICE_PACKAGE_METRIC 27/27",
+                    "CLOUD_DEVICE_PACKAGE_METRIC 30/30",
                     "materials/evidence/release-evidence-index.md",
                     "materials/evidence/blocking-report.md",
-                    "LANDING_RELEASE_CANDIDATE_METRIC 52/52",
+                    "LANDING_RELEASE_CANDIDATE_METRIC 63/63",
                     "LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE 3/7",
                     "/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md",
                     "materials/evidence/requirement-matrix.md",
@@ -297,18 +437,20 @@ def build_checks(strict: bool) -> list[tuple[str, bool, str]]:
                 current_status_text,
                 (
                     "validate_cloud_device_package.py",
-                    "CLOUD_DEVICE_PACKAGE_METRIC 27/27",
+                    "CLOUD_DEVICE_PACKAGE_METRIC 30/30",
                     "validate_release_blocking_report.py",
                     "RELEASE_BLOCKING_REPORT_METRIC 8/8",
                     "validate_release_evidence_index.py",
                     "RELEASE_EVIDENCE_INDEX_METRIC 10/10",
+                    "validate_live_smoke_evidence.py",
+                    "LIVE_SMOKE_EVIDENCE_METRIC 7/7",
                     "prepare_cloud_device_evidence.py",
                     "CLOUD_DEVICE_PREP_METRIC 5/5",
                     "CLOUD_DEVICE_PREP_MISSING_VIDEOS 9/9",
                     "REQUIREMENT_MATRIX_METRIC 9/9",
                     "LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE 3/7",
                     "Before release handoff, also re-run:",
-                    "27-item non-strict handoff gate",
+                    "30-item non-strict handoff gate",
                     "dependency-safe handoff order",
                     "validate_landing_release_candidate.py --strict",
                 ),
@@ -323,6 +465,17 @@ def build_checks(strict: bool) -> list[tuple[str, bool, str]]:
         (
             "package_readme_mentions_prep_and_strict_mode",
             "prepare_cloud_device_evidence.py" in package_readme_text
+            and "collect_cloud_device_evidence.py --list" in package_readme_text
+            and "collect_cloud_device_evidence.py --preflight-backend --backend-url https://roky.chat" in package_readme_text
+            and "validate_live_smoke_evidence.py" in package_readme_text
+            and "LIVE_SMOKE_EVIDENCE_METRIC 7/7" in package_readme_text
+            and "collect_cloud_device_evidence.py --record 1" in package_readme_text
+            and "preflight_cloud_backend.py --base-url https://roky.chat" in package_readme_text
+            and "--allow-cloud-image" in package_readme_text
+            and "allow_cloud_image=true" in package_readme_text
+            and "CLOUD_BACKEND_PREFLIGHT_METRIC" in package_readme_text
+            and "test_collect_cloud_device_evidence.py" in package_readme_text
+            and "test_preflight_cloud_backend.py" in package_readme_text
             and "CLOUD_DEVICE_PREP_METRIC 5/5" in package_readme_text
             and "CLOUD_DEVICE_PREP_MISSING_VIDEOS 9/9" in package_readme_text
             and "--strict" in package_readme_text
@@ -336,8 +489,9 @@ def build_checks(strict: bool) -> list[tuple[str, bool, str]]:
                 (
                     "materials/evidence/release-evidence-index.md",
                     "materials/evidence/blocking-report.md",
-                    "CLOUD_DEVICE_PACKAGE_METRIC 27/27",
+                    "CLOUD_DEVICE_PACKAGE_METRIC 30/30",
                     "RELEASE_EVIDENCE_INDEX_METRIC 10/10",
+                    "LIVE_SMOKE_EVIDENCE_METRIC 7/7",
                     "docs/optimization-log.md",
                     "README public entrypoint",
                     "/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md",
@@ -346,11 +500,13 @@ def build_checks(strict: bool) -> list[tuple[str, bool, str]]:
                     "Pre-recording Evidence Gate",
                     "all 9 real cloud-device MP4 files",
                     "no placeholder fields remain after capture",
-                    "LANDING_RELEASE_CANDIDATE_METRIC 52/52",
+                    "LANDING_RELEASE_CANDIDATE_METRIC 63/63",
                     "LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE 3/7",
                     "AppKEY",
                     "backend tokens",
                     "full OCR text",
+                    "Android 16 Guide Acceptance Coverage",
+                    "14.2 截图分享导入",
                 ),
             ),
             "package README release handoff",

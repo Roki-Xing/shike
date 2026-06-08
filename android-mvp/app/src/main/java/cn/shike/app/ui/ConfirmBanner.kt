@@ -22,6 +22,7 @@ import cn.shike.app.domain.ShikeItem
 fun ConfirmBanner(
     selected: ShikeItem,
     isConfirmed: Boolean,
+    executionResults: List<ExecutionResult>,
     onAddCalendar: (ShikeItem) -> Unit,
     onReminder: (ShikeItem) -> Unit,
     onOpenMap: (ShikeItem) -> Unit,
@@ -44,7 +45,7 @@ fun ConfirmBanner(
                 Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
                     Text("确认后安排", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
                     Text(
-                        if (isConfirmed) "当前行动卡已确认，可继续打开系统日历、提醒和路线。" else "请先在下方确认修正，再执行日历、提醒和地图动作。",
+                        if (isConfirmed) "当前行动卡已确认，可继续打开系统日历、提醒和路线。" else "请先在下方确认并安排，再执行日历、提醒和地图动作。",
                         color = Color.White.copy(alpha = 0.85f),
                         fontSize = 12.sp,
                     )
@@ -54,6 +55,7 @@ fun ConfirmBanner(
             ConfirmBannerActions(
                 selected = selected,
                 isConfirmed = isConfirmed,
+                executionResults = executionResults,
                 onAddCalendar = onAddCalendar,
                 onReminder = onReminder,
                 onOpenMap = onOpenMap,

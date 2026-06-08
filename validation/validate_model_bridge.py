@@ -53,7 +53,7 @@ def main() -> int:
     checks = [
         ("persistence_checks_pass", command_passes(["python3", "shike/validation/validate_persistence.py"])),
         ("internet_permission_present", "android.permission.INTERNET" in manifest),
-        ("backend_base_url_present", "BACKEND_BASE_URL" in android_source and "10.0.2.2:8000" in android_source),
+        ("backend_base_url_present", "BACKEND_BASE_URL" in android_source and "https://roky.chat" in android_source),
         ("http_client_present", "HttpURLConnection" in android_source and "requestMethod = \"POST\"" in android_source),
         ("analyze_endpoint_called", "/v1/analyze" in android_source),
         ("json_request_body_present", "JSONObject()" in android_source and "scene_hint" in android_source and "ocr_text" in android_source),
@@ -61,10 +61,15 @@ def main() -> int:
         ("actions_mapping_present", "actionsFromJson" in android_source and "optJSONArray" in android_source),
         ("backend_buttons_present", "解析当前草稿" in android_source and "活动样例解析" in android_source),
         ("model_status_visible", "modelStatus" in android_source and "模型状态" in android_source),
-        ("fallback_to_mock_present", "后端失败，回退本地 MockModelAdapter" in android_source),
-        ("network_timeout_present", "connectTimeout = 1500" in android_source and "readTimeout = 2500" in android_source),
+        (
+            "fallback_to_local_confirmation_present",
+            "backendFailureOutcome(" in android_source
+            and "云侧解析失败，本地待确认" in android_source
+            and "云侧暂不可用，已切换为本地确认" in android_source,
+        ),
+        ("network_timeout_present", "connectTimeout = 8000" in android_source and "readTimeout = 60000" in android_source),
         ("backend_smoke_still_passes", command_passes(["python3", "shike/backend/verify_backend.py"])),
-        ("bridge_documented", "10.0.2.2:8000" in docs and "/v1/analyze" in docs and "回退本地 MockModelAdapter" in docs),
+        ("bridge_documented", "https://roky.chat" in docs and "10.0.2.2:8000" in docs and "/v1/analyze" in docs and "回退本地 MockModelAdapter" in docs),
     ]
 
     passed = sum(1 for _, ok in checks if ok)

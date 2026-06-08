@@ -4,3 +4,27 @@ GET /health 200 request_id=...
 GET /v1/schema 200 request_id=...
 POST /v1/analyze 200 request_id=...
 POST /v1/analyze 200 provider=bluelm result_schema_valid=true request_id=live-smoke-redacted ocr_length=35
+POST /v1/analyze 200 provider=bluelm result_schema_valid=true scene_type=course_notice actions=calendar,reminder,map latency_ms=7565 request_id=live-blue-redacted ocr_length=34
+POST /v1/ocr 200 provider=vivo_general_ocr ocr_status=pass image_persisted=false image_cleared=true ocr_text_length=65 latency_ms=521 request_id=live-ocr-redacted
+POST /v1/analyze 200 provider=bluelm result_schema_valid=true scene_type=course_notice actions=calendar,reminder,map latency_ms=12655 request_id=live-blue-redacted ocr_length=34
+POST /v1/ocr 200 provider=vivo_general_ocr ocr_status=pass image_persisted=false image_cleared=true ocr_text_length=160 latency_ms=2884 request_id=live-ocr-redacted
+POST /v2/analyze-image 200 provider=vivo_cloud_multimodal route_v2_status=pass route_v2_schema_valid=true route_v2_actions_disabled=true ignored_regions=top_status_bar,bottom_navigation_bar risk=text_fallback latency_ms=24667 request_id=live-route-v2-redacted
+POST /v2/analyze-image 200 provider=vivo_cloud_multimodal multimodal_configured=true multimodal_status=fail multimodal_error=provider_model_does_not_support_image tested_models=5 request_id=live-multimodal-redacted
+POST /v2/analyze-image 200 provider=vivo_cloud_multimodal multimodal_status=pass first_failed_model=Volc-DeepSeek-V3.2 selected_model=Doubao-Seed-2.0-mini multimodal_schema_valid=true scene_type=meeting_notice request_id=live-multimodal-redacted
+POST /v1/analyze 200 provider=bluelm result_schema_valid=true scene_type=course_notice actions=calendar,reminder,map latency_ms=15251 request_id=live-blue-redacted ocr_length=34
+POST /v1/ocr 200 provider=vivo_general_ocr ocr_status=pass image_persisted=false image_cleared=true ocr_text_length=160 latency_ms=3063 request_id=live-ocr-redacted
+POST /v2/analyze-image 200 provider=vivo_cloud_multimodal route_v2_status=pass route_v2_schema_valid=true route_v2_actions_disabled=true ignored_regions=top_status_bar,bottom_navigation_bar scene_type=course_notice latency_ms=21737 request_id=live-route-v2-redacted
+POST /v1/analyze 200 provider=bluelm result_schema_valid=true scene_type=course_notice actions=calendar,reminder,map latency_ms=11576 request_id=live-blue-redacted ocr_length=34
+POST /v1/ocr 200 provider=vivo_general_ocr ocr_status=pass image_persisted=false image_cleared=true ocr_text_length=160 latency_ms=2983 request_id=live-ocr-redacted
+POST /v2/analyze-image 200 provider=vivo_cloud_multimodal multimodal_status=fail multimodal_error=provider_model_does_not_support_image selected_model=Volc-DeepSeek-V3.2 latency_ms=2603 request_id=live-multimodal-redacted
+POST /v2/analyze-image 200 provider=vivo_cloud_multimodal multimodal_status=pass selected_model=Doubao-Seed-2.0-mini multimodal_schema_valid=true scene_type=course_notice latency_ms=16335 request_id=live-multimodal-redacted
+POST /v2/analyze-image 200 provider=vivo_cloud_multimodal route_v2_status=pass route_v2_schema_valid=true route_v2_actions_disabled=true ignored_regions=top_status_bar,bottom_navigation_bar scene_type=course_notice latency_ms=20822 request_id=live-route-v2-redacted live_smoke_metric=4/4
+POST /v1/analyze 200 provider=bluelm result_schema_valid=true scene_type=course_notice actions=calendar,reminder,map latency_ms=9803 request_id=live-blue-redacted ocr_length=34
+POST /v1/ocr 200 provider=vivo_general_ocr ocr_status=pass image_persisted=false image_cleared=true ocr_text_length=160 latency_ms=2500 request_id=live-ocr-redacted
+POST /v2/analyze-image 200 provider=vivo_cloud_multimodal multimodal_status=fail multimodal_error=provider_model_does_not_support_image selected_model=Volc-DeepSeek-V3.2 latency_ms=2576 request_id=live-multimodal-redacted
+POST /v2/analyze-image 200 provider=vivo_cloud_multimodal multimodal_status=pass selected_model=Doubao-Seed-2.0-mini multimodal_schema_valid=true scene_type=course_notice latency_ms=14779 request_id=live-multimodal-redacted
+POST /v2/analyze-image 200 provider=vivo_cloud_multimodal route_v2_status=pass route_v2_schema_valid=true route_v2_actions_disabled=true route_v2_ignored_regions_allowed=true ignored_regions=top_status_bar,bottom_navigation_bar scene_type=course_notice latency_ms=23539 request_id=live-route-v2-redacted live_smoke_metric=4/4
+GET /health 200 public_preflight=true request_id=public-preflight-redacted
+GET /v2/schema 200 public_preflight=true request_id=public-preflight-redacted
+POST /v2/analyze-image 200 public_preflight=true allow_cloud_image=false actions_disabled=true ignored_regions=top_status_bar,bottom_navigation_bar request_id=public-preflight-redacted CLOUD_BACKEND_PREFLIGHT_METRIC=1/1
+POST /v2/analyze-image 200 public_preflight=true allow_cloud_image=true actions_disabled=true ignored_regions=top_status_bar,bottom_navigation_bar request_id=public-live-image-preflight-redacted CLOUD_BACKEND_PREFLIGHT_METRIC=1/1

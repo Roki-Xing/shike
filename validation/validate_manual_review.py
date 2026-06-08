@@ -56,12 +56,12 @@ def main() -> int:
         ("editable_time_present", "draftTime" in android_source and "label = { Text(\"时间\") }" in android_source),
         ("editable_location_present", "draftLocation" in android_source and "label = { Text(\"地点\") }" in android_source),
         ("editable_status_present", "draftStatus" in android_source and "label = { Text(\"状态\") }" in android_source),
-        ("confirm_button_present", "确认修正" in android_source),
+        ("confirm_button_present", "确认并安排" in android_source),
         ("ignore_button_present", "Text(\"忽略\")" in android_source and "已忽略" in android_source),
         ("confirmed_item_persisted", "persistSelection(reviewedItem, \"用户确认修正" in android_source),
         ("manual_review_updates_model_status", "模型编排：用户已确认" in android_source and "模型编排：用户已忽略" in android_source),
         ("execution_guard_copy_present", "未确认前不会打开外部日历、通知或地图" in android_source),
-        ("manual_review_documented", "确认修正" in docs and "已忽略" in docs and "手动修正" in docs),
+        ("manual_review_documented", "确认并安排" in docs and "已忽略" in docs and "手动修正" in docs),
     ]
 
     passed = sum(1 for _, ok in checks if ok)

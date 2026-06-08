@@ -53,7 +53,7 @@ Strict release mode is blocked by external evidence gaps. No secret values are r
 3. Replace `cloud-device-logcat.txt` placeholder text with redacted session-level diagnostics from the actual cloud-device run.
 4. In the report's `Pre-recording Evidence Gate`, confirm the desktop guidance source, requirement matrix file, `REQUIREMENT_MATRIX_METRIC 9/9`, `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE 3/7`, all 9 real cloud-device MP4 files, and no placeholder fields remain after capture.
 5. Refresh `apk-sha256.txt` and `cloud-device-capture-todo.md` with `python3 shike/scripts/prepare_cloud_device_evidence.py`, then confirm `CLOUD_DEVICE_PREP_METRIC 5/5` and the expected pre-capture state `CLOUD_DEVICE_PREP_MISSING_VIDEOS 9/9`.
-6. Rerun `python3 shike/validation/validate_cloud_device_package.py` so the non-strict package handoff remains at `CLOUD_DEVICE_PACKAGE_METRIC 27/27` before strict validation.
+6. Rerun `python3 shike/validation/validate_cloud_device_package.py` so the non-strict package handoff remains at `CLOUD_DEVICE_PACKAGE_METRIC 30/30` before strict validation.
 7. Rerun `python3 shike/validation/validate_release_evidence_index.py` so the release evidence index still matches the refreshed cloud-device package.
 8. Rerun `python3 shike/validation/validate_requirement_matrix.py` so the desktop guidance stages A-E still map to refreshed cloud-device blockers.
 9. Before recording, confirm `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md` is still the desktop guidance source and `materials/evidence/requirement-matrix.md` still passes `REQUIREMENT_MATRIX_METRIC 9/9`.

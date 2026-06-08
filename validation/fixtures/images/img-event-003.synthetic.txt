@@ -1,0 +1,14 @@
+id: img-event-003
+scene: event_poster
+source_type: camera
+fixture_type: synthetic_descriptor
+
+ocr_text_hint:
+路演海报主体：创新创业比赛报名截止本周日，线下说明会地点为双创中心。
+
+expected:
+must_not_extract_status_bar_time: True
+title_contains: 创新创业比赛, 报名
+time_required: True
+location_required: True
+actions: calendar, reminder, map

@@ -4,8 +4,8 @@ import cn.shike.app.data.BackendAnalysisOutcome
 import cn.shike.app.data.redactSensitiveLogText
 import cn.shike.app.domain.ShikeItem
 
-private const val DEFAULT_BACKEND_SOURCE = "后端 /v1/analyze：结果待确认"
-private const val DEFAULT_BACKEND_STATUS = "模型编排：后端结果待确认"
+private const val DEFAULT_BACKEND_SOURCE = "云侧解析结果待确认"
+private const val DEFAULT_BACKEND_STATUS = "云侧解析结果待确认"
 
 fun applyBackendOutcomeSelection(
     outcome: BackendAnalysisOutcome,

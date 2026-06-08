@@ -2,6 +2,10 @@ package cn.shike.app
 
 import cn.shike.app.ui.ExecutionResult
 import cn.shike.app.ui.calendarExecutionResult
+import cn.shike.app.ui.imageCleanupDeletedResult
+import cn.shike.app.ui.imageCleanupFailedResult
+import cn.shike.app.ui.imageCleanupKeptResult
+import cn.shike.app.ui.imageCleanupRequestedResult
 import cn.shike.app.ui.mapExecutionResult
 import cn.shike.app.ui.pendingExecutionResults
 import cn.shike.app.ui.recordExecutionResult
@@ -41,5 +45,17 @@ class ExecutionResultStateTest {
         assertTrue(reminderExecutionResult().detail.contains("permission_blocked"))
         assertEquals("已请求", mapExecutionResult().status)
         assertTrue(mapExecutionResult().detail.contains("地图不可用"))
+    }
+
+    @Test
+    fun imageCleanupResults_distinguishSystemConfirmationStates() {
+        assertEquals("已请求", imageCleanupRequestedResult().status)
+        assertTrue(imageCleanupRequestedResult().detail.contains("系统确认"))
+        assertEquals("已删除", imageCleanupDeletedResult().status)
+        assertTrue(imageCleanupDeletedResult().detail.contains("原截图已删除"))
+        assertEquals("已保留", imageCleanupKeptResult().status)
+        assertTrue(imageCleanupKeptResult().detail.contains("用户选择保留"))
+        assertEquals("未完成", imageCleanupFailedResult().status)
+        assertTrue(imageCleanupFailedResult().detail.contains("未修改原截图"))
     }
 }

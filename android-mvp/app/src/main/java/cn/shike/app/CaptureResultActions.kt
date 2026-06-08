@@ -1,8 +1,10 @@
 package cn.shike.app
 
 import android.graphics.Bitmap
+import cn.shike.app.data.ScreenshotCandidate
 import cn.shike.app.data.cameraSelectionFromPreview
 import cn.shike.app.data.gallerySelectionFromImage
+import cn.shike.app.data.screenshotSelectionFromCandidate
 import cn.shike.app.domain.ShikeItem
 
 fun applyCameraPreviewSelection(
@@ -37,4 +39,12 @@ fun applyGalleryImageSelection(
     val item = selection.item
     val source = selection.source
     persistSelection(item, source)
+}
+
+fun applyScreenshotCandidateSelection(
+    candidate: ScreenshotCandidate,
+    persistSelection: (ShikeItem, String) -> Unit,
+) {
+    val selection = screenshotSelectionFromCandidate(candidate)
+    persistSelection(selection.item, selection.source)
 }

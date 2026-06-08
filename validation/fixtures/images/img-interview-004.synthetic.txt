@@ -1,0 +1,14 @@
+id: img-interview-004
+scene: interview_notice
+source_type: recent_screenshot_assist
+fixture_type: synthetic_descriptor
+
+ocr_text_hint:
+邮件截图主体：终面安排下周二16:00，公司会议室，地址见邮件底部。
+
+expected:
+must_not_extract_status_bar_time: True
+title_contains: 终面安排
+time_required: True
+location_required: True
+actions: calendar, reminder, map

@@ -58,6 +58,6 @@ fun ParseConfirmPanel(item: ShikeItem, onReviewed: (ShikeItem) -> Unit) {
             draftStatus = draftStatus,
             onReviewed = onReviewed,
         )
-        Text("低置信度或字段缺失时保持待人工确认；确认修正后才建议执行日历、提醒和地图动作。", color = Color(0xFFF97316), fontSize = 12.sp)
+        Text("低置信度或字段缺失时保持待人工确认；确认并安排后才建议执行日历、提醒和地图动作。", color = Color(0xFFF97316), fontSize = 12.sp)
     }
 }

@@ -38,6 +38,6 @@ fun CaptureEntryPanel(
             onBackendCourse = onBackendCourse,
             onBackendEvent = onBackendEvent,
         )
-        Text("云侧不可用时可手动确认继续，后端地址和样例按钮在设置或调试页管理。", style = ShikeTypography.Caption)
+        Text("云侧不可用时可手动确认继续，样例和连接配置仅在开发者模式中显示。", style = ShikeTypography.Caption)
     }
 }

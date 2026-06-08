@@ -1,0 +1,14 @@
+id: img-course-004
+scene: course_notice
+source_type: screenshot_share
+fixture_type: synthetic_descriptor
+
+ocr_text_hint:
+教务通知主体：数据结构补课，周三晚上，地点待定，请关注后续通知。
+
+expected:
+must_not_extract_status_bar_time: True
+title_contains: 数据结构, 补课
+time_required: True
+location_required: False
+actions: calendar, reminder

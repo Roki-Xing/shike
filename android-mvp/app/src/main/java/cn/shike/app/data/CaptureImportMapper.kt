@@ -7,6 +7,24 @@ data class CaptureSelection(
     val source: String,
 )
 
+enum class ImageCleanupStatus {
+    NOT_REQUESTED,
+    NOT_SUPPORTED,
+    USER_KEPT,
+    DELETE_REQUESTED,
+    DELETED,
+    FAILED,
+}
+
+enum class ScreenshotDeleteState {
+    NotAvailable,
+    NotRequested,
+    RequestingSystemConfirmation,
+    Deleted,
+    Denied,
+    Failed,
+}
+
 data class CaptureDraft(
     val channel: String,
     val sourceLabel: String,
@@ -15,13 +33,35 @@ data class CaptureDraft(
     val id: String = stableInboxItemId(sourceLabel, rawText, createdEpochMillis),
     val sourceType: CaptureSourceType = captureSourceTypeFromChannel(channel),
     val localImageUri: String? = null,
+    val sourceMediaStoreUri: String? = localImageUri,
+    val thumbnailUri: String? = null,
     val ocrText: String = rawText,
     val ocrConfidence: Float = 1f,
     val ocrEngineName: String = "manual",
     val privacyLevel: PrivacyLevel = PrivacyLevel.Synthetic,
     val cloudAllowed: Boolean = true,
     val imageCleared: Boolean = channel == "share",
-)
+    val imageCleanupStatus: ImageCleanupStatus =
+        if (sourceMediaStoreUri == null) ImageCleanupStatus.NOT_SUPPORTED else ImageCleanupStatus.NOT_REQUESTED,
+) {
+    val canDeleteOriginal: Boolean
+        get() = sourceMediaStoreUri != null
+
+    val deleteState: ScreenshotDeleteState
+        get() {
+            if (!canDeleteOriginal) {
+                return ScreenshotDeleteState.NotAvailable
+            }
+            return when (imageCleanupStatus) {
+                ImageCleanupStatus.NOT_SUPPORTED -> ScreenshotDeleteState.NotAvailable
+                ImageCleanupStatus.NOT_REQUESTED -> ScreenshotDeleteState.NotRequested
+                ImageCleanupStatus.USER_KEPT -> ScreenshotDeleteState.Denied
+                ImageCleanupStatus.DELETE_REQUESTED -> ScreenshotDeleteState.RequestingSystemConfirmation
+                ImageCleanupStatus.DELETED -> ScreenshotDeleteState.Deleted
+                ImageCleanupStatus.FAILED -> ScreenshotDeleteState.Failed
+            }
+        }
+}
 
 fun cameraCaptureSource(width: Int, height: Int): String = "相机拍照预览 ${width}x${height}"
 
@@ -60,6 +100,27 @@ fun itemFromGalleryDraft(draft: CaptureDraft): ShikeItem =
 fun gallerySelectionFromImage(label: String): CaptureSelection =
     selectionFromCaptureDraft(galleryDraftFromImage(label))
 
+fun screenshotCaptureSource(candidate: ScreenshotCandidate): String =
+    candidate.sourceLabel.takeIf { it.isNotBlank() } ?: "截图助手导入 ${candidate.width}x${candidate.height}"
+
+fun itemFromScreenshotCandidate(candidate: ScreenshotCandidate): ShikeItem =
+    ShikeItem(
+        title = "待解析截图",
+        scene = "截图导入",
+        time = "待确认",
+        location = "待确认",
+        status = "待确认",
+        actions = listOf("先存入待确认"),
+        startEpochMillis = candidate.createdAtMillis,
+        rawText = "截图助手导入：将自动请求云侧解析，可在 OCR 文本草稿中校对后重试。",
+    )
+
+fun screenshotSelectionFromCandidate(candidate: ScreenshotCandidate): CaptureSelection =
+    CaptureSelection(
+        item = itemFromScreenshotCandidate(candidate),
+        source = screenshotCaptureSource(candidate),
+    )
+
 fun selectionFromCaptureDraft(draft: CaptureDraft): CaptureSelection {
     val item = if (draft.channel == "camera") itemFromCameraDraft(draft) else itemFromGalleryDraft(draft)
     return CaptureSelection(item = item, source = draft.sourceLabel)
@@ -85,6 +146,8 @@ fun captureDraftFromInput(input: CaptureInput, engine: OcrEngine): CaptureDraft 
         sourceLabel = input.sourceLabel,
         rawText = result.text,
         localImageUri = input.localImageUri,
+        sourceMediaStoreUri = input.localImageUri,
+        thumbnailUri = input.thumbnailUri,
         ocrConfidence = result.confidence,
         ocrEngineName = result.engineName,
         privacyLevel = if (input.allowCloudEnhancement) PrivacyLevel.CloudAllowed else PrivacyLevel.LocalOnly,

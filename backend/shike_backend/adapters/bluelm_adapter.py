@@ -9,10 +9,12 @@ This adapter is designed to be optional:
 
 from __future__ import annotations
 
+from datetime import datetime
 import json
 import uuid
 from pathlib import Path
 from typing import Any
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 import requests
 
@@ -47,6 +49,23 @@ def _extract_json(text: str) -> Any:
         if start != -1 and end != -1 and end > start:
             return json.loads(candidate[start : end + 1])
         raise
+
+
+def _current_date_for_timezone(user_timezone: str) -> str:
+    """Return the current local date for relative-time normalization.
+
+    Args:
+        user_timezone: IANA timezone supplied by the client.
+
+    Returns:
+        ISO date string in the requested timezone, falling back to Asia/Shanghai.
+    """
+
+    try:
+        zone = ZoneInfo(user_timezone)
+    except ZoneInfoNotFoundError:
+        zone = ZoneInfo("Asia/Shanghai")
+    return datetime.now(zone).date().isoformat()
 
 
 def _normalized_thinking_mode(mode: str | None) -> str:
@@ -192,6 +211,7 @@ class BlueLMModelAdapter:
             locale=request.locale,
             scene_hint=request.scene_hint or "",
             user_timezone=request.user_timezone,
+            current_date=_current_date_for_timezone(request.user_timezone),
             ocr_text=request.ocr_text,
             ocr_text_redacted=redact_ocr_text(request.ocr_text),
             schema_json=json.dumps(self._schema, ensure_ascii=False),

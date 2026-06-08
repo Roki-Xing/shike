@@ -359,7 +359,7 @@ apk-sha256.txt
 python3 shike/validation/validate_cloud_device_package.py
 ```
 
-录制云真机前先运行 `python3 shike/scripts/prepare_cloud_device_evidence.py`；当前准备门禁是 `CLOUD_DEVICE_PREP_METRIC 5/5`，在未收齐真实录屏前 `CLOUD_DEVICE_PREP_MISSING_VIDEOS 9/9` 是预期状态。当前非 strict 通过标准是 `CLOUD_DEVICE_PACKAGE_METRIC 27/27`，它先证明云真机证据包结构、脱敏面、device-runbook release handoff 步骤、生成脚本 handoff 模板和发布交接口径齐备；真实云真机录屏和已填写报告收齐后，再执行 `python3 shike/validation/validate_cloud_device_package.py --strict` 与 `python3 shike/validation/validate_landing_release_candidate.py --strict` 做最终发布核验。缺外部证据时，strict 预期保持 `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE 3/7`，并以 `materials/evidence/blocking-report.md` 记录阻断项；本地发布证据索引见 `materials/evidence/release-evidence-index.md`。正式录制前还必须在 `cloud-device-test-report.md` 的 `Pre-recording Evidence Gate` 中确认 `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md` 仍是桌面指导源，`materials/evidence/requirement-matrix.md` 仍通过 `REQUIREMENT_MATRIX_METRIC 9/9`，all 9 real cloud-device MP4 files 均已采集，且 no placeholder fields remain after capture。
+录制云真机前先运行 `python3 shike/scripts/prepare_cloud_device_evidence.py`；当前准备门禁是 `CLOUD_DEVICE_PREP_METRIC 5/5`，在未收齐真实录屏前 `CLOUD_DEVICE_PREP_MISSING_VIDEOS 9/9` 是预期状态。随后运行 `python3 shike/scripts/test_preflight_cloud_backend.py` 与 `python3 shike/scripts/preflight_cloud_backend.py --base-url https://roky.chat`，确认 `CLOUD_BACKEND_PREFLIGHT_METRIC` 且公网后端证据已脱敏。当前非 strict 通过标准是 `CLOUD_DEVICE_PACKAGE_METRIC 30/30`，它先证明云真机证据包结构、脱敏面、device-runbook release handoff 步骤、生成脚本 handoff 模板、公网后端预检、`run_release_handoff_checks.py` 复验入口和发布交接口径齐备；截图语义样例门禁是 `IMAGE_SEMANTIC_CASES_METRIC 9/9`，用于锁定 Android 16 指导文件第 16 章 40 条合成截图/拍照语义样例；live-smoke 脱敏证据门禁是 `LIVE_SMOKE_EVIDENCE_METRIC 7/7`，用于机械校验后端私有环境实测链路。真实云真机录屏和已填写报告收齐后，再执行 `python3 shike/scripts/run_release_handoff_checks.py --strict-ready`、`python3 shike/validation/validate_cloud_device_package.py --strict` 与 `python3 shike/validation/validate_landing_release_candidate.py --strict` 做最终发布核验。缺外部证据时，`python3 shike/scripts/run_release_handoff_checks.py --strict` 应通过 `RELEASE_HANDOFF_CHECKS_METRIC 24/24` 并把 strict 门禁视为预期阻断；strict 预期保持 `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE 3/7`，并以 `materials/evidence/blocking-report.md` 记录阻断项；本地发布证据索引见 `materials/evidence/release-evidence-index.md`。正式录制前还必须在 `cloud-device-test-report.md` 的 `Pre-recording Evidence Gate` 中确认 `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md` 仍是桌面指导源，`materials/evidence/requirement-matrix.md` 仍通过 `REQUIREMENT_MATRIX_METRIC 9/9`，all 9 real cloud-device MP4 files 均已采集，且 no placeholder fields remain after capture。
 
 检查项：
 
@@ -728,37 +728,43 @@ any -> archived
 python3 shike/validation/validate_landing_release_candidate.py
 ```
 
-当前本地门禁总分 52 项：
+当前本地门禁总分 63 项：
 
 | 模块 | 分值 | 检查内容 |
 |---|---:|---|
 | BlueLM 接入 | 8 | Adapter、鉴权、schema、fallback、错误处理 |
+| vivo OCR 导入 | 1 | 服务端 `/v1/ocr` 对齐通用 OCR API，Android 不持有密钥 |
+| vivo 多模态图片契约 | 1 | `/v2/analyze-image`、图片 payload、OCR blocks、状态栏/导航栏过滤、route-v2 smoke、用户确认前禁用动作 |
+| 后端审计日志 | 1 | `validate_backend_audit_log.py` 输出 `BACKEND_AUDIT_LOG_METRIC 8/8`，守卫 `/v2/analyze-image` 只记录 provider、source type、SHA-256 前缀、OCR block 数量、key-present、耗时、状态和 `input_id_hash` |
+| Android 图片预处理 | 1 | `validate_android_image_preprocess.py` 输出 `ANDROID_IMAGE_PREPROCESS_METRIC 15/15`，守卫 `ImagePayloadPreprocessor`、`ImageThumbnailCache`、输入 MIME 魔数识别、非图片拒绝、EXIF 旋转、1600 长边采样、截图 UI chrome 裁剪、私有缩略图缓存、JPEG data URL、SHA-256 和 `MainActivity` 委托边界 |
 | 密钥安全 | 6 | AppKEY 不进 Android/Git/日志/文档 |
 | 云真机 | 8 | 后端 HTTPS、录屏、机型、logcat、报告 |
 | 前端精修 | 8 | 多页面、状态、设计系统、Debug 隐藏 |
 | OCR 与导入 | 5 | 相册、拍照、分享、手动、OCR 失败 |
+| 默认图片上传边界 | 1 | `validate_no_default_image_upload.py` 守卫分享、相册、相机、最近截图助手和手动输入不默认上传图片，用户点“解析当前草稿”后才构造图片 payload |
 | 执行闭环 | 5 | 日历、提醒、地图、权限、结果记录 |
 | 收件箱 | 4 | 多条、筛选、搜索、状态机 |
 | 隐私 | 3 | 脱敏、一键清除、云侧开关 |
 | 材料 | 3 | PDF/PPT/脚本/证据包更新 |
 | Strict 阻断报告 | 1 | 缺失外部证据时生成可执行 blocking report |
 | 发布证据索引 | 1 | 汇总本地门禁、BlueLM 脱敏证据、云真机阻断项、README 公开入口、优化日志交接摘要和重跑命令 |
+| live-smoke 脱敏证据 | 1 | `validate_live_smoke_evidence.py` 输出 `LIVE_SMOKE_EVIDENCE_METRIC 7/7`，机械校验 BlueLM 文本解析、vivo OCR、图片模型 fallback、`/v2/analyze-image` route-v2 schema、用户确认动作闸门和脱敏日志 |
 
 通过标准：
 
 ```text
-LANDING_RELEASE_CANDIDATE_METRIC 52/52
+LANDING_RELEASE_CANDIDATE_METRIC 63/63
 ```
 
 允许在开发中先设宽松标准：
 
 ```text
->= 42/52 可录屏
->= 47/52 可提交复赛材料
-52/52 可作为本地 Release Candidate 交付包
+>= 53/63 可录屏
+>= 58/63 可提交复赛材料
+63/63 可作为本地 Release Candidate 交付包
 ```
 
-`validate_landing_release_candidate.py --strict` 仍然只在真实 BlueLM 在线日志、真实云真机录屏和填写后的设备报告齐备后作为最终发布证明；缺外部证据时以 `materials/evidence/blocking-report.md` 记录阻断项，不伪造结果。
+`validate_landing_release_candidate.py --strict` 仍然只在真实 BlueLM/OCR 在线日志、真实云真机录屏和填写后的设备报告齐备后作为最终发布证明；缺外部证据时以 `materials/evidence/blocking-report.md` 记录阻断项，不伪造结果。
 
 ---
 
@@ -785,7 +791,7 @@ LANDING_RELEASE_CANDIDATE_METRIC 52/52
 ### Goal 3：云真机后端访问与测试包
 
 ```text
-/goal 升级 device-runbook.md 和 device-demo-checklist.md，明确模拟器、USB 真机、云真机三种网络配置；维护 validate_cloud_device_package.py 和 cloud-device-test-report.md 模板。完成条件：文档不再把 10.0.2.2 当作云真机方案；录屏证据目录和 9 段文件名被脚本检查；README 有云真机验收命令；device-runbook 保留 release handoff 步骤；`prepare_cloud_device_evidence.py` 保持 `CLOUD_DEVICE_PREP_METRIC 5/5` 和预期 `CLOUD_DEVICE_PREP_MISSING_VIDEOS 9/9`；生成脚本不会回退 release handoff；`CLOUD_DEVICE_PACKAGE_METRIC 27/27`、`materials/evidence/release-evidence-index.md`、`materials/evidence/blocking-report.md` 和 strict `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE 3/7` 外部证据边界保持同步。
+/goal 升级 device-runbook.md 和 device-demo-checklist.md，明确模拟器、USB 真机、云真机三种网络配置；维护 validate_cloud_device_package.py、run_release_handoff_checks.py 和 cloud-device-test-report.md 模板。完成条件：文档不再把 10.0.2.2 当作云真机方案；录屏证据目录和 9 段文件名被脚本检查；README 有云真机验收命令；device-runbook 保留 release handoff 步骤；`prepare_cloud_device_evidence.py` 保持 `CLOUD_DEVICE_PREP_METRIC 5/5` 和预期 `CLOUD_DEVICE_PREP_MISSING_VIDEOS 9/9`；`test_preflight_cloud_backend.py` 与 `preflight_cloud_backend.py --base-url https://roky.chat` 保持 `CLOUD_BACKEND_PREFLIGHT_METRIC` 录制前预检；生成脚本不会回退 release handoff；`CLOUD_DEVICE_PACKAGE_METRIC 30/30`、`IMAGE_SEMANTIC_CASES_METRIC 9/9`、`LIVE_SMOKE_EVIDENCE_METRIC 7/7`、`RELEASE_HANDOFF_CHECKS_METRIC 24/24`、`materials/evidence/release-evidence-index.md`、`materials/evidence/blocking-report.md` 和 strict `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE 3/7` 外部证据边界保持同步。
 ```
 
 ### Goal 4：前端从演示控制台升级为真实 App 多页面
@@ -815,7 +821,7 @@ LANDING_RELEASE_CANDIDATE_METRIC 52/52
 ### Goal 8：最终 Release Candidate
 
 ```text
-/goal 建立 validate_landing_release_candidate.py，将 BlueLM、密钥安全、云真机、前端、OCR、执行闭环、收件箱、隐私、材料、strict 阻断报告和发布证据索引整合成 52 项本地验收。逐项补齐直到达到 LANDING_RELEASE_CANDIDATE_METRIC 52/52。不得删除现有 validate_real_world_ready.py、validate_demo_acceptance.py、validate_action_execution.py。遇到 BlueLM 凭据、云真机平台或外部网络阻塞时生成 blocking-report.md；最终 strict 发布证明必须等待真实云真机录屏和填写后的设备报告。
+/goal 建立 validate_landing_release_candidate.py，将 BlueLM、vivo OCR、vivo 多模态图片契约、后端审计日志、live-smoke 脱敏证据、密钥安全、默认图片上传边界、Android 图片预处理、云真机、前端、OCR、执行闭环、收件箱、隐私、材料、strict 阻断报告和发布证据索引整合成 63 项本地验收。逐项补齐直到达到 LANDING_RELEASE_CANDIDATE_METRIC 63/63。不得删除现有 validate_real_world_ready.py、validate_demo_acceptance.py、validate_action_execution.py。遇到 BlueLM/OCR 凭据、云真机平台或外部网络阻塞时生成 blocking-report.md；最终 strict 发布证明必须等待真实云真机录屏和填写后的设备报告。
 ```
 
 ---

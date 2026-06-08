@@ -1,0 +1,14 @@
+id: img-assignment-001
+scene: assignment_deadline
+source_type: screenshot_share
+fixture_type: synthetic_descriptor
+
+ocr_text_hint:
+学习通截图主体：第5章作业今晚22:00前提交，逾期不可补交。
+
+expected:
+must_not_extract_status_bar_time: True
+title_contains: 第5章作业, 提交
+time_required: True
+location_required: False
+actions: reminder

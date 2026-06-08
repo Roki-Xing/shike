@@ -23,6 +23,23 @@ class InitialSelectionMapperTest {
     }
 
     @Test
+    fun buildRuntimeSharedTextSelection_mapsNewIntentTextToReadyDraft() {
+        val selection = buildRuntimeSharedTextSelection("产品评审会 明天 10:00 腾讯会议")
+
+        assertEquals("分享导入的课程通知", selection?.item?.title)
+        assertEquals("文本分享入口（待确认，未落盘）", selection?.captureSource)
+        assertEquals(InitialTodayState.Ready, selection?.todayState)
+        assertTrue(selection?.item?.rawText.orEmpty().contains("产品评审会"))
+    }
+
+    @Test
+    fun buildRuntimeSharedTextSelection_ignoresBlankText() {
+        val selection = buildRuntimeSharedTextSelection("   ")
+
+        assertEquals(null, selection)
+    }
+
+    @Test
     fun buildInitialSelection_savedSnapshotRestoresReadyState() {
         val saved = sampleEvent().copy(title = "已恢复的活动")
 

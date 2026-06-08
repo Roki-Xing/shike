@@ -1,0 +1,14 @@
+id: img-meeting-004
+scene: meeting_notice
+source_type: recent_screenshot_assist
+fixture_type: synthetic_descriptor
+
+ocr_text_hint:
+群通知主体：实验室安全培训会，周五10:00，主楼201。
+
+expected:
+must_not_extract_status_bar_time: True
+title_contains: 安全培训会
+time_required: True
+location_required: True
+actions: calendar, reminder, map

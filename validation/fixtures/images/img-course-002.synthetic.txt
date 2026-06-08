@@ -1,0 +1,14 @@
+id: img-course-002
+scene: course_notice
+source_type: photo_picker
+fixture_type: synthetic_descriptor
+
+ocr_text_hint:
+课程通知主体：线性代数明天上午8点半改到综合楼C301，上课前签到。
+
+expected:
+must_not_extract_status_bar_time: True
+title_contains: 线性代数, 改到
+time_required: True
+location_required: True
+actions: calendar, reminder, map

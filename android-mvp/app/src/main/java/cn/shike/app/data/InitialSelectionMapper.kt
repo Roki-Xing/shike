@@ -30,14 +30,10 @@ fun buildInitialSelection(
     savedItem: ShikeItem?,
     savedCaptureSource: String?,
 ): InitialSelection {
-    val importedItem = itemFromSharedText(sharedText)
-    if (!sharedText.isNullOrBlank()) {
-        return InitialSelection(
-            item = importedItem,
-            captureSource = "文本分享入口（待确认，未落盘）",
-            todayState = InitialTodayState.Ready,
-        )
+    buildRuntimeSharedTextSelection(sharedText)?.let { selection ->
+        return selection
     }
+    val importedItem = itemFromSharedText(sharedText)
     return InitialSelection(
         item = savedItem ?: importedItem,
         captureSource = if (savedItem == null) {
@@ -46,6 +42,26 @@ fun buildInitialSelection(
             savedCaptureSource ?: "尚未采集图片，已加载离线样例。"
         },
         todayState = if (savedItem == null) InitialTodayState.Empty else InitialTodayState.Ready,
+    )
+}
+
+/**
+ * Builds a ready review card from text received while the app is already open.
+ *
+ * Args:
+ *     sharedText: Optional text received from a new `Intent.ACTION_SEND` event.
+ *
+ * Returns:
+ *     A ready text-share selection, or null when the incoming text is blank.
+ */
+fun buildRuntimeSharedTextSelection(sharedText: String?): InitialSelection? {
+    if (sharedText.isNullOrBlank()) {
+        return null
+    }
+    return InitialSelection(
+        item = itemFromSharedText(sharedText),
+        captureSource = "文本分享入口（待确认，未落盘）",
+        todayState = InitialTodayState.Ready,
     )
 }
 

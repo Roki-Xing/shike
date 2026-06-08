@@ -33,20 +33,20 @@ class BackendOutcomeActionsTest {
         val persisted = mutableListOf<Pair<ShikeItem, String>>()
         val item = sampleCourse().copy(
             status = "待确认",
-            rawText = "脱敏后的 OCR 文本\n后端不可用，已回退本地 MockModelAdapter，日志已脱敏。",
+            rawText = "脱敏后的 OCR 文本\n云侧暂不可用，已切换为本地确认，日志已脱敏。",
         )
         val outcome = BackendAnalysisOutcome(
             item = item,
-            source = "后端失败，回退本地 MockModelAdapter",
-            statusMessage = "模型编排：后端失败，已回退本地 mock",
+            source = "云侧解析失败，本地待确认",
+            statusMessage = "云侧暂不可用，已切换为本地确认",
         )
 
         val status = applyBackendOutcomeSelection(outcome) { savedItem, source ->
             persisted += savedItem to source
         }
 
-        assertEquals("模型编排：后端失败，已回退本地 mock", status)
-        assertEquals(listOf(item to "后端失败，回退本地 MockModelAdapter"), persisted)
+        assertEquals("云侧暂不可用，已切换为本地确认", status)
+        assertEquals(listOf(item to "云侧解析失败，本地待确认"), persisted)
     }
 
     @Test
@@ -72,7 +72,7 @@ class BackendOutcomeActionsTest {
         assertFalse(persisted.single().second.contains("demo@example.com"))
         assertFalse(status.contains("2026123456"))
         assertFalse(status.contains("10.0.2.2"))
-        assertEquals("后端 /v1/analyze：结果待确认", sanitizeBackendOutcomeSource("  "))
-        assertEquals("模型编排：后端结果待确认", sanitizeBackendOutcomeStatus(null))
+        assertEquals("云侧解析结果待确认", sanitizeBackendOutcomeSource("  "))
+        assertEquals("云侧解析结果待确认", sanitizeBackendOutcomeStatus(null))
     }
 }

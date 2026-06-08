@@ -3,6 +3,8 @@ package cn.shike.app
 import android.os.Handler
 import cn.shike.app.data.BackendAnalysisInput
 import cn.shike.app.data.BackendAnalysisOutcome
+import cn.shike.app.data.BackendImagePayload
+import cn.shike.app.data.backendAnalysisPathFor
 import cn.shike.app.data.runBackendAnalysis
 
 data class BackendAnalysisResult(
@@ -15,13 +17,14 @@ fun runBackendAnalysisAction(
     input: BackendAnalysisInput,
     ocrDraft: String,
     mainHandler: Handler,
+    imagePayloadProvider: (() -> BackendImagePayload?)? = null,
     onOutcome: (BackendAnalysisOutcome) -> Unit,
 ): BackendAnalysisResult {
     val endpoint = runBackendAnalysis(
         backendUrl = backendUrl,
-        sourceType = input.sourceType,
+        input = input,
         ocrDraft = ocrDraft,
-        fallback = input.fallback,
+        imagePayloadProvider = imagePayloadProvider,
     ) { outcome ->
         mainHandler.post {
             onOutcome(outcome)
@@ -29,6 +32,6 @@ fun runBackendAnalysisAction(
     }
     return BackendAnalysisResult(
         endpoint = endpoint,
-        statusMessage = "模型编排：请求后端 /v1/analyze",
+        statusMessage = if (backendAnalysisPathFor(input) == "/v2/analyze-image") "云侧图片解析中" else "云侧解析中",
     )
 }

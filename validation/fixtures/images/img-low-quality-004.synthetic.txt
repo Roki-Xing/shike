@@ -1,0 +1,14 @@
+id: img-low-quality-004
+scene: low_quality_fragment
+source_type: recent_screenshot_assist
+fixture_type: synthetic_descriptor
+
+ocr_text_hint:
+聊天截图主体包含老师说今晚前完成，但任务对象和具体材料不完整。
+
+expected:
+must_not_extract_status_bar_time: True
+title_contains: 今晚前完成
+time_required: True
+location_required: False
+actions: reminder

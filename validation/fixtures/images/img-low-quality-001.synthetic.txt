@@ -1,0 +1,14 @@
+id: img-low-quality-001
+scene: low_quality_fragment
+source_type: camera
+fixture_type: synthetic_descriptor
+
+ocr_text_hint:
+模糊海报主体只清晰看到讲座和报告厅，时间区域被遮挡。
+
+expected:
+must_not_extract_status_bar_time: True
+title_contains: 讲座
+time_required: False
+location_required: True
+actions: map

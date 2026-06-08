@@ -1,0 +1,14 @@
+id: img-interview-002
+scene: interview_notice
+source_type: photo_picker
+fixture_type: synthetic_descriptor
+
+ocr_text_hint:
+短信截图主体：宣讲会后现场面试，周四14:00，就业中心三楼。
+
+expected:
+must_not_extract_status_bar_time: True
+title_contains: 现场面试
+time_required: True
+location_required: True
+actions: calendar, reminder, map

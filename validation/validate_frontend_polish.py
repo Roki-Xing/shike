@@ -78,8 +78,9 @@ def main() -> int:
             "home/import",
         ),
         (
-            "settings_keeps_backend_endpoint",
-            "fun PrivacySettingsScreen" in main_flow and "BackendEndpointControls" in main_flow,
+            "settings_hides_backend_endpoint",
+            "fun PrivacySettingsScreen" in main_flow
+            and "BackendEndpointControls" not in body_between(main_flow, "fun PrivacySettingsScreen", "private fun HomePendingReviewPanel"),
             "settings",
         ),
         (
@@ -89,13 +90,17 @@ def main() -> int:
         ),
         (
             "bottom_nav_routes_real_sections",
-            all(name in bottom_nav for name in ["ShikeMainSection.Home", "ShikeMainSection.Import", "ShikeMainSection.Inbox", "ShikeMainSection.Settings", "ShikeMainSection.Debug"]),
+            all(name in bottom_nav for name in ["ShikeMainSection.Home", "ShikeMainSection.Import", "ShikeMainSection.Inbox", "ShikeMainSection.Settings"])
+            and "ShikeMainSection.Debug" not in bottom_nav,
             "bottom nav",
         ),
         (
             "home_has_quick_import",
-            "QuickImportPanel" in home_body and "fun QuickImportPanel" in main_flow and "ImportCaptureActions" in main_flow,
-            "quick import",
+            "QuickImportPanel" not in home_body
+            and "HomeAgendaList(" in home_body
+            and "导入截图" in read("HomeAgendaList.kt")
+            and "ImportCaptureActions" in capture_entry,
+            "home import cta",
         ),
     ]
 

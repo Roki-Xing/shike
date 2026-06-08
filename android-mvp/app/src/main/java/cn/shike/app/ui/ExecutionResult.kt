@@ -37,6 +37,18 @@ fun reminderExecutionResult(item: ShikeItem? = null): ExecutionResult =
 fun mapExecutionResult(): ExecutionResult =
     ExecutionResult("地图", "已请求", "已打开地图 deeplink；地图不可用时保留地点。")
 
+fun imageCleanupRequestedResult(): ExecutionResult =
+    ExecutionResult("原截图", "已请求", "已打开系统确认页；用户确认后才会删除系统相册原截图。")
+
+fun imageCleanupDeletedResult(): ExecutionResult =
+    ExecutionResult("原截图", "已删除", "系统已确认，原截图已删除。")
+
+fun imageCleanupKeptResult(): ExecutionResult =
+    ExecutionResult("原截图", "已保留", "用户选择保留原截图，拾刻不会修改相册。")
+
+fun imageCleanupFailedResult(): ExecutionResult =
+    ExecutionResult("原截图", "未完成", "系统确认未完成或来源不支持，未修改原截图。")
+
 @Composable
 fun ExecutionResultPanel(results: List<ExecutionResult>) {
     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {

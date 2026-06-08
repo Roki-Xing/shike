@@ -1,0 +1,14 @@
+id: img-event-005
+scene: event_poster
+source_type: photo_picker
+fixture_type: synthetic_descriptor
+
+ocr_text_hint:
+展览海报主体：摄影展今日开展，展期到月底，图书馆一层展厅。
+
+expected:
+must_not_extract_status_bar_time: True
+title_contains: 摄影展
+time_required: True
+location_required: True
+actions: calendar, reminder, map

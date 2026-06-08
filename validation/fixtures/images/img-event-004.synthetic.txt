@@ -1,0 +1,14 @@
+id: img-event-004
+scene: event_poster
+source_type: screenshot_share
+fixture_type: synthetic_descriptor
+
+ocr_text_hint:
+公众号海报主体：志愿服务培训，周六9:00，志愿者之家二楼会议室。
+
+expected:
+must_not_extract_status_bar_time: True
+title_contains: 志愿服务, 培训
+time_required: True
+location_required: True
+actions: calendar, reminder, map

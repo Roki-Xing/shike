@@ -234,7 +234,7 @@ def build_checks() -> list[BetaCheck]:
         ),
         check(
             "can_edit_title_time_location",
-            all(token in confirm_panel for token in ["title", "time", "location"]) and "确认修正" in android_source,
+            all(token in confirm_panel for token in ["title", "time", "location"]) and "确认并安排" in android_source,
             "confirm fields title/time/location=" + str(all(token in confirm_panel for token in ["title", "time", "location"])),
             "确认页保留标题、时间、地点二次编辑，并补充对应行为验证。",
         ),
@@ -283,15 +283,15 @@ def build_checks() -> list[BetaCheck]:
         ),
         check(
             "missing_location_disables_map",
-            "缺少地点" in android_source and "地图" in action_controls,
-            "missing location map guard" if "缺少地点" in android_source else "missing",
-            "需要地图但缺少地点时禁用地图动作，并解释缺失原因。",
+            "补充地点后可用" in android_source and "查看路线" in android_source,
+            "missing location map guard" if "补充地点后可用" in android_source else "missing",
+            "需要查看路线但缺少地点时禁用地图动作，并解释缺失原因。",
         ),
         check(
             "missing_time_disables_calendar",
-            "缺少时间" in android_source and "加日历" in action_controls,
-            "missing time calendar guard" if "缺少时间" in android_source else "missing",
-            "需要日历但缺少时间时禁用日历动作，并要求用户修正。",
+            "补充时间后可用" in android_source and "打开日历" in android_source and "设置提醒" in android_source,
+            "missing time calendar/reminder guard" if "补充时间后可用" in android_source else "missing",
+            "需要打开日历或设置提醒但缺少时间时禁用对应动作，并要求用户修正。",
         ),
         check(
             "relative_time_prompt",
@@ -307,9 +307,9 @@ def build_checks() -> list[BetaCheck]:
         ),
         check(
             "reminder_permission_fallback",
-            "通知权限" in android_source and ("permission_blocked" in android_source or "权限拒绝" in android_source),
+            "通知权限" in android_source and "permission_blocked" in android_source and "去开启通知" in android_source,
             "notification permission fallback",
-            "通知权限拒绝时保留行动卡，进入 permission_blocked 或 fallback_ready。",
+            "通知权限拒绝时保留行动卡，进入 permission_blocked，并把提醒按钮改成去开启通知。",
         ),
         check(
             "map_unavailable_copy_location",

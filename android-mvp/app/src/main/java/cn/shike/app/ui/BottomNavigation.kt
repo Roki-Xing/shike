@@ -18,9 +18,10 @@ import androidx.compose.ui.unit.dp
 fun BottomNavBar(
     selectedSection: ShikeMainSection,
     onSelected: (ShikeMainSection) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = ShikeColors.Surface),
         shape = RoundedCornerShape(16.dp),
         border = BorderStroke(1.dp, ShikeColors.Line),
@@ -37,7 +38,6 @@ fun BottomNavBar(
             BottomNavItem("导入", "入", selectedSection == ShikeMainSection.Import, Modifier.clickable { onSelected(ShikeMainSection.Import) })
             BottomNavItem("收件箱", "箱", selectedSection == ShikeMainSection.Inbox, Modifier.clickable { onSelected(ShikeMainSection.Inbox) })
             BottomNavItem("设置", "设", selectedSection == ShikeMainSection.Settings, Modifier.clickable { onSelected(ShikeMainSection.Settings) })
-            BottomNavItem("调试", "测", selectedSection == ShikeMainSection.Debug, Modifier.clickable { onSelected(ShikeMainSection.Debug) })
         }
     }
 }

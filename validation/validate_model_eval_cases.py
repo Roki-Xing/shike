@@ -4,11 +4,13 @@
 from __future__ import annotations
 
 import json
+import subprocess
 from collections import Counter
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 CASES_PATH = ROOT / "validation/regression-cases.json"
+WORKSPACE = ROOT.parent
 
 REQUIRED_SCENES = {
     "course_notice",
@@ -22,6 +24,13 @@ REQUIRED_SCENES = {
 }
 REQUIRED_EDGE_KEYWORDS = ("低质量", "缺失", "相对", "反例")
 VALID_ACTIONS = {"calendar", "reminder", "map"}
+
+
+def command_passes(command: list[str]) -> bool:
+    """Run a validation command from the workspace root."""
+
+    result = subprocess.run(command, cwd=WORKSPACE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+    return result.returncode == 0
 
 
 def load_cases() -> list[dict[str, object]]:
@@ -81,6 +90,11 @@ def main() -> int:
             "negative_cases_have_no_actions",
             all(item.get("expected_actions") == [] for item in cases if item.get("scene") == "negative_fragment"),
             "negative_fragment",
+        ),
+        (
+            "image_semantic_cases_pass",
+            command_passes(["python3", "shike/validation/validate_image_semantic_cases.py"]),
+            "IMAGE_SEMANTIC_CASES_METRIC 9/9",
         ),
     ]
 

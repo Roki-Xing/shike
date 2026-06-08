@@ -1,0 +1,24 @@
+请解析这张图片，生成拾刻行动卡 JSON。
+
+上下文：
+- current_date: {current_date}
+- user_timezone: {user_timezone}
+- locale: {locale}
+- source_type: {source_type}
+- scene_hint: {scene_hint}
+
+OCR hint（可能包含错误、状态栏、导航栏或按钮文案，必须结合图片判断）：
+{ocr_text_hint}
+
+OCR blocks（坐标为图片像素或比例，供你过滤状态栏/底部导航）：
+{ocr_blocks_json}
+
+已知需忽略区域：
+- top_status_bar: 图片顶部约 0%-9%
+- bottom_navigation_bar: 图片底部约 91%-100%
+- screenshot_toolbar_or_overlay: 若图片中有截图工具条、翻译浮层或系统浮层，也忽略
+
+输出 Schema：
+{schema_json}
+
+只输出 JSON。

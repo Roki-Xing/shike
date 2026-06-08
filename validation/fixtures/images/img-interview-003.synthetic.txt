@@ -1,0 +1,14 @@
+id: img-interview-003
+scene: interview_notice
+source_type: screenshot_share
+fixture_type: synthetic_descriptor
+
+ocr_text_hint:
+招聘平台主体：笔试提醒，今晚19:30开始，需提前下载客户端。
+
+expected:
+must_not_extract_status_bar_time: True
+title_contains: 笔试提醒
+time_required: True
+location_required: False
+actions: calendar, reminder

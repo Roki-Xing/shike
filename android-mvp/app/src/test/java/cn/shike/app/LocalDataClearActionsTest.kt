@@ -35,7 +35,34 @@ class LocalDataClearActionsTest {
     fun clearedLocalDataState_explainsSafeRestartPath() {
         val state = clearedLocalDataState()
 
-        assertTrue(state.captureSource.contains("已一键清除本地收件箱和设置"))
+        assertTrue(state.captureSource.contains("已清除拾刻缓存"))
         assertTrue(state.modelStatus.contains("重新从截图、拍照、分享或手动输入开始"))
+    }
+
+    @Test
+    fun requestLocalDataClearConfirmation_requiresSecondAppConfirmation() {
+        val result = requestLocalDataClearConfirmation(LocalDataClearConfirmationState())
+
+        assertTrue(result.state.isAwaitingConfirmation)
+        assertEquals(false, result.shouldClearLocalData)
+    }
+
+    @Test
+    fun cancelLocalDataClearConfirmation_keepsCacheAndDismissesPrompt() {
+        val result = cancelLocalDataClearConfirmation(LocalDataClearConfirmationState(isAwaitingConfirmation = true))
+
+        assertEquals(LocalDataClearConfirmationState(), result.state)
+        assertEquals(false, result.shouldClearLocalData)
+    }
+
+    @Test
+    fun confirmLocalDataClearConfirmation_onlyClearsAfterPromptIsVisible() {
+        val coldResult = confirmLocalDataClearConfirmation(LocalDataClearConfirmationState())
+        val armedResult = confirmLocalDataClearConfirmation(LocalDataClearConfirmationState(isAwaitingConfirmation = true))
+
+        assertEquals(false, coldResult.shouldClearLocalData)
+        assertEquals(LocalDataClearConfirmationState(), coldResult.state)
+        assertEquals(true, armedResult.shouldClearLocalData)
+        assertEquals(LocalDataClearConfirmationState(), armedResult.state)
     }
 }

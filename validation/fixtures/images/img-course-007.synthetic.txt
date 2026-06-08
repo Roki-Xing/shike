@@ -1,0 +1,14 @@
+id: img-course-007
+scene: course_notice
+source_type: screenshot_share
+fixture_type: synthetic_descriptor
+
+ocr_text_hint:
+课程群截图主体：思政讨论课改为线上腾讯会议，周五19:00，会议号见群公告。
+
+expected:
+must_not_extract_status_bar_time: True
+title_contains: 思政讨论, 线上
+time_required: True
+location_required: False
+actions: calendar, reminder

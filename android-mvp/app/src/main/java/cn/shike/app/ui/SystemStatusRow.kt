@@ -15,11 +15,9 @@ import androidx.compose.ui.unit.sp
 fun SystemStatusRow() {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
+        horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text("10:28", fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = Color(0xFF111827))
-        Text("拾刻", fontSize = 12.sp, color = Color(0xFF667085))
-        Text("100%", fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = Color(0xFF111827))
+        Text("拾刻", fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = Color(0xFF667085))
     }
 }

@@ -1,0 +1,14 @@
+id: img-meeting-003
+scene: meeting_notice
+source_type: screenshot_share
+fixture_type: synthetic_descriptor
+
+ocr_text_hint:
+部门通知主体：班委例会今晚21:00，线上，讨论期末安排。
+
+expected:
+must_not_extract_status_bar_time: True
+title_contains: 班委例会
+time_required: True
+location_required: False
+actions: calendar, reminder

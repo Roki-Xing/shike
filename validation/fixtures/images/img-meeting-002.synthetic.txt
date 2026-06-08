@@ -1,0 +1,14 @@
+id: img-meeting-002
+scene: meeting_notice
+source_type: photo_picker
+fixture_type: synthetic_descriptor
+
+ocr_text_hint:
+会议截图主体：腾讯会议答辩预演，周三20:00，会议链接见通知主体。
+
+expected:
+must_not_extract_status_bar_time: True
+title_contains: 答辩预演
+time_required: True
+location_required: False
+actions: calendar, reminder

@@ -17,6 +17,7 @@ data class CaptureInput(
     val sourceType: CaptureSourceType,
     val sourceLabel: String,
     val localImageUri: String? = null,
+    val thumbnailUri: String? = null,
     val manualText: String = "",
     val width: Int? = null,
     val height: Int? = null,

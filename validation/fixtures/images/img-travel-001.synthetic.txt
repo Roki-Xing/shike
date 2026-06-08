@@ -1,0 +1,14 @@
+id: img-travel-001
+scene: travel_ticket
+source_type: screenshot_share
+fixture_type: synthetic_descriptor
+
+ocr_text_hint:
+车票截图主体：G1234，6月20日08:15出发，南京南站到上海虹桥。
+
+expected:
+must_not_extract_status_bar_time: True
+title_contains: G1234, 出发
+time_required: True
+location_required: True
+actions: calendar, reminder, map

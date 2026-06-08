@@ -1,7 +1,9 @@
 package cn.shike.app
 
+import cn.shike.app.data.ScreenshotCandidate
 import cn.shike.app.domain.ShikeItem
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Test
 
 class CaptureResultActionsTest {
@@ -37,5 +39,34 @@ class CaptureResultActionsTest {
             "相册 OCR 草稿：高数A班今晚18:30改到B203，作业第5章今晚22:00前提交。",
             persisted.single().first.rawText,
         )
+    }
+
+    @Test
+    fun applyScreenshotCandidateSelection_persistsPendingDraftWithoutSampleFields() {
+        val persisted = mutableListOf<Pair<ShikeItem, String>>()
+        val candidate = ScreenshotCandidate(
+            contentUri = "content://media/external/images/media/42",
+            createdAtMillis = 1_777_000_000_000L,
+            width = 1260,
+            height = 2800,
+            displayNameDigest = "abc123",
+        )
+
+        applyScreenshotCandidateSelection(candidate) { item, source ->
+            persisted += item to source
+        }
+
+        val item = persisted.single().first
+        assertEquals("截图助手导入 1260x2800", persisted.single().second)
+        assertEquals("待解析截图", item.title)
+        assertEquals("截图导入", item.scene)
+        assertEquals("待确认", item.time)
+        assertEquals("待确认", item.location)
+        assertEquals("待确认", item.status)
+        assertEquals(listOf("先存入待确认"), item.actions)
+        assertFalse(item.rawText.contains("B203"))
+        assertFalse(item.rawText.contains("18:30"))
+        assertFalse(item.rawText.contains("22:00"))
+        assertFalse(item.rawText.contains("第5章"))
     }
 }

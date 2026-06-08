@@ -1,0 +1,14 @@
+id: img-event-001
+scene: event_poster
+source_type: camera
+fixture_type: synthetic_descriptor
+
+ocr_text_hint:
+海报主体：AI应用分享会，6月18日19:00，大学生活动中心报告厅。
+
+expected:
+must_not_extract_status_bar_time: True
+title_contains: AI应用分享会
+time_required: True
+location_required: True
+actions: calendar, reminder, map

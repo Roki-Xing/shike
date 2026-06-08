@@ -3,6 +3,7 @@ package cn.shike.app.ui
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -24,6 +25,7 @@ object ShikeSpacing {
     val Md = 12.dp
     val Lg = 16.dp
     val Xl = 20.dp
+    val Screen = Arrangement.spacedBy(12.dp)
 }
 
 object ShikeTypography {

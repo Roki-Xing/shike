@@ -10,15 +10,20 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @Composable
 fun DateStrip() {
+    val todayText = remember { formatTodayForHome(LocalDate.now()) }
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
@@ -38,10 +43,16 @@ fun DateStrip() {
                 Text("日", color = Color(0xFF0F766E), fontSize = 13.sp, fontWeight = FontWeight.Bold)
             }
             Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                Text("5月24日  星期五  农历四月十七", color = Color(0xFF344054), fontSize = 13.sp)
-                Text("今天的日程会自动按截止时间和地点排序", color = Color(0xFF98A2B3), fontSize = 11.sp)
+                Text("今天  $todayText", color = Color(0xFF344054), fontSize = 13.sp)
+                Text(dateStripSubtitle(), color = Color(0xFF98A2B3), fontSize = 11.sp)
             }
         }
         Pill("全部日程", Color.White, Color(0xFF667085), Color(0xFFE3E8EF))
     }
 }
+
+fun formatTodayForHome(date: LocalDate): String =
+    date.format(DateTimeFormatter.ofPattern("M月d日 EEEE", Locale.CHINA))
+
+fun dateStripSubtitle(): String =
+    "系统日期仅用于排序提示，不作为任务时间"

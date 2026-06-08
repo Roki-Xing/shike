@@ -1,0 +1,14 @@
+id: img-course-008
+scene: course_notice
+source_type: photo_picker
+fixture_type: synthetic_descriptor
+
+ocr_text_hint:
+导员通知主体：机器学习实验验收，明晚20:00前到信远楼机房完成登记。
+
+expected:
+must_not_extract_status_bar_time: True
+title_contains: 机器学习, 验收
+time_required: True
+location_required: True
+actions: calendar, reminder, map

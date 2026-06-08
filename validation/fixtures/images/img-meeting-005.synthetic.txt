@@ -1,0 +1,14 @@
+id: img-meeting-005
+scene: meeting_notice
+source_type: photo_picker
+fixture_type: synthetic_descriptor
+
+ocr_text_hint:
+通知主体：导师一对一沟通，时间另约，地点办公室A412。
+
+expected:
+must_not_extract_status_bar_time: True
+title_contains: 导师, 沟通
+time_required: False
+location_required: True
+actions: map

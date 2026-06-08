@@ -1,0 +1,14 @@
+id: img-course-001
+scene: course_notice
+source_type: screenshot_share
+fixture_type: synthetic_descriptor
+
+ocr_text_hint:
+群公告主体：高等数学调课，今晚18:30，教学楼B203，课前完成预习。
+
+expected:
+must_not_extract_status_bar_time: True
+title_contains: 高等数学, 调课
+time_required: True
+location_required: True
+actions: calendar, reminder, map

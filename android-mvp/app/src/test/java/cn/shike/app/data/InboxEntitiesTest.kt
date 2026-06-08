@@ -40,4 +40,20 @@ class InboxEntitiesTest {
         assertEquals("待确认", item.status)
         assertEquals(entity.actionLabels, item.actions)
     }
+
+    @Test
+    fun captureDraftEntity_keepsOriginalAndThumbnailUrisSeparate() {
+        val entity = CaptureDraftEntity(
+            id = "capture-1",
+            sourceType = "screenshot",
+            localImageUri = "content://media/external/images/media/42",
+            thumbnailUri = "file:/private-cache/shike-image-thumbnails/thumb-42.jpg",
+            ocrText = "今晚 18:30 B203",
+            createdEpochMillis = 1_777_000_000_000L,
+            privacyLevel = "CloudAllowed",
+        )
+
+        assertEquals("content://media/external/images/media/42", entity.localImageUri)
+        assertEquals("file:/private-cache/shike-image-thumbnails/thumb-42.jpg", entity.thumbnailUri)
+    }
 }

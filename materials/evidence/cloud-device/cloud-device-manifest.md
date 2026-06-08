@@ -37,7 +37,7 @@ Status: staging package
 - Requirement matrix gate: `REQUIREMENT_MATRIX_METRIC 9/9`
 - Before recording, complete the `cloud-device-test-report.md` `Pre-recording Evidence Gate`: confirm the desktop guidance source, `REQUIREMENT_MATRIX_METRIC 9/9`, all 9 real cloud-device MP4 files, and no placeholder fields remain after capture; this manifest is only a staging checklist and must not be treated as release-ready strict evidence.
 - `materials/evidence/blocking-report.md`
-- Default local release gate: `LANDING_RELEASE_CANDIDATE_METRIC 52/52`
+- Default local release gate: `LANDING_RELEASE_CANDIDATE_METRIC 63/63`
 - Expected strict blocker before real recordings/report: `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE 3/7`
 
 ## Capture notes

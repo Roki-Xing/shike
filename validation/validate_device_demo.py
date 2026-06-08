@@ -73,7 +73,14 @@ def main() -> int:
         ("android_build_report_passed", "状态: 通过" in read("android-mvp/build-report.md")),
         ("landable_checks_pass", command_passes(["python3", "shike/validation/validate_landable.py"])),
         ("share_import_present", "ACTION_SEND" in android_source and "Intent.EXTRA_TEXT" in android_source),
-        ("gallery_picker_present", "ActivityResultContracts.GetContent" in android_source and "image/*" in android_source),
+        (
+            "gallery_picker_present",
+            (
+                "ActivityResultContracts.PickVisualMedia" in android_source
+                and "PickVisualMedia.ImageOnly" in android_source
+            )
+            or ("ActivityResultContracts.GetContent" in android_source and "image/*" in android_source),
+        ),
         ("camera_preview_present", "ActivityResultContracts.TakePicturePreview" in android_source),
         ("camera_permission_runtime_present", "RequestPermission" in android_source and "Manifest.permission.CAMERA" in android_source),
         ("capture_source_feedback_present", "captureSource" in android_source and "采集来源" in android_source),

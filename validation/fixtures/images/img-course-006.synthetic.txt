@@ -1,0 +1,14 @@
+id: img-course-006
+scene: course_notice
+source_type: camera
+fixture_type: synthetic_descriptor
+
+ocr_text_hint:
+黑板拍照主体：概率论习题课，今天16:30，图书馆研讨室2。
+
+expected:
+must_not_extract_status_bar_time: True
+title_contains: 概率论, 习题课
+time_required: True
+location_required: True
+actions: calendar, reminder, map

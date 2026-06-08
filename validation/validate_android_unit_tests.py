@@ -68,6 +68,7 @@ def main() -> int:
     model_explanation_test = read("android-mvp/app/src/test/java/cn/shike/app/ModelExplanationTest.kt")
     model_api_client_source = read("android-mvp/app/src/main/java/cn/shike/app/data/ModelApiClient.kt")
     model_api_client_test = read("android-mvp/app/src/test/java/cn/shike/app/ModelApiClientTest.kt")
+    analyze_image_api_client_test = read("android-mvp/app/src/test/java/cn/shike/app/data/AnalyzeImageApiClientTest.kt")
     today_action_item_test = read("android-mvp/app/src/test/java/cn/shike/app/TodayActionItemMapperTest.kt")
     execution_action_gate_source = read("android-mvp/app/src/main/java/cn/shike/app/ui/ExecutionActionGate.kt")
     execution_action_gate_test = read("android-mvp/app/src/test/java/cn/shike/app/ExecutionActionGateTest.kt")
@@ -77,6 +78,14 @@ def main() -> int:
     reminder_payload_test = read("android-mvp/app/src/test/java/cn/shike/app/ReminderPayloadTest.kt")
     execution_test = read("android-mvp/app/src/test/java/cn/shike/app/ExecutionResultActionsTest.kt")
     execution_state_test = read("android-mvp/app/src/test/java/cn/shike/app/ExecutionResultStateTest.kt")
+    date_strip_source = read("android-mvp/app/src/main/java/cn/shike/app/ui/DateStrip.kt")
+    date_strip_test = read("android-mvp/app/src/test/java/cn/shike/app/DateStripTest.kt")
+    system_actions_source = read("android-mvp/app/src/main/java/cn/shike/app/system/SystemActions.kt")
+    system_actions_test = read("android-mvp/app/src/test/java/cn/shike/app/SystemActionsTest.kt")
+    screen_capture_prompt_source = read("android-mvp/app/src/main/java/cn/shike/app/system/VisibleScreenCapturePrompt.kt")
+    screen_capture_prompt_test = read("android-mvp/app/src/test/java/cn/shike/app/ScreenCapturePromptTest.kt")
+    screenshot_cleanup_prompt_source = read("android-mvp/app/src/main/java/cn/shike/app/ui/ScreenshotCleanupPrompt.kt")
+    screenshot_cleanup_prompt_test = read("android-mvp/app/src/test/java/cn/shike/app/ScreenshotCleanupPromptTest.kt")
     reminder_permission_fallback_source = read("android-mvp/app/src/main/java/cn/shike/app/ReminderPermissionFallback.kt")
     reminder_permission_fallback_test = read("android-mvp/app/src/test/java/cn/shike/app/ReminderPermissionFallbackTest.kt")
     backend_analysis_runner_source = read("android-mvp/app/src/main/java/cn/shike/app/data/BackendAnalysisRunner.kt")
@@ -86,11 +95,27 @@ def main() -> int:
     backend_outcome_source = read("android-mvp/app/src/main/java/cn/shike/app/BackendOutcomeActions.kt")
     backend_outcome_test = read("android-mvp/app/src/test/java/cn/shike/app/BackendOutcomeActionsTest.kt")
     sample_actions_test = read("android-mvp/app/src/test/java/cn/shike/app/SampleActionsTest.kt")
+    inbox_entities_source = read("android-mvp/app/src/main/java/cn/shike/app/data/InboxEntities.kt")
+    inbox_entities_test = read("android-mvp/app/src/test/java/cn/shike/app/data/InboxEntitiesTest.kt")
     local_inbox_store_source = read("android-mvp/app/src/main/java/cn/shike/app/data/LocalInboxStore.kt")
     legacy_inbox_snapshot_source = read("android-mvp/app/src/main/java/cn/shike/app/data/LegacyInboxSnapshot.kt")
     local_inbox_store_test = read("android-mvp/app/src/test/java/cn/shike/app/data/LocalInboxStoreTest.kt")
+    readiness_sections = read("android-mvp/app/src/main/java/cn/shike/app/ui/ReadinessSections.kt")
+    local_data_clear_source = read("android-mvp/app/src/main/java/cn/shike/app/LocalDataClearActions.kt")
     local_data_clear_test = read("android-mvp/app/src/test/java/cn/shike/app/LocalDataClearActionsTest.kt")
     cloud_enhancement_test = read("android-mvp/app/src/test/java/cn/shike/app/CloudEnhancementActionsTest.kt")
+    developer_mode_source = read("android-mvp/app/src/main/java/cn/shike/app/ui/DeveloperModeUnlock.kt")
+    developer_mode_test = read("android-mvp/app/src/test/java/cn/shike/app/DeveloperModeUnlockTest.kt")
+    local_multimodal_source = read("android-mvp/app/src/main/java/cn/shike/app/ui/LocalMultimodalStatus.kt")
+    local_multimodal_test = read("android-mvp/app/src/test/java/cn/shike/app/LocalMultimodalStatusTest.kt")
+    local_multimodal_runtime_source = read("android-mvp/app/src/main/java/cn/shike/app/data/LocalMultimodalRuntime.kt")
+    local_multimodal_runtime_test = read("android-mvp/app/src/test/java/cn/shike/app/data/LocalMultimodalRuntimeTest.kt")
+    image_preprocess_policy_source = read("android-mvp/app/src/main/java/cn/shike/app/data/ImagePreprocessPolicy.kt")
+    image_preprocess_policy_test = read("android-mvp/app/src/test/java/cn/shike/app/data/ImagePreprocessPolicyTest.kt")
+    image_thumbnail_cache_source = read("android-mvp/app/src/main/java/cn/shike/app/data/ImageThumbnailCache.kt")
+    image_thumbnail_cache_test = read("android-mvp/app/src/test/java/cn/shike/app/data/ImageThumbnailCacheTest.kt")
+    screenshot_candidate_store_source = read("android-mvp/app/src/main/java/cn/shike/app/data/ScreenshotCandidateStore.kt")
+    screenshot_candidate_store_test = read("android-mvp/app/src/test/java/cn/shike/app/data/ScreenshotCandidateStoreTest.kt")
     docs = "\n".join(
         read(path)
         for path in [
@@ -141,11 +166,39 @@ def main() -> int:
         (
             "capture_import_unit_test_exists",
             "class CaptureImportMapperTest" in capture_test
-            and capture_test.count("@Test") == 4
+            and capture_test.count("@Test") == 8
             and "cameraSelectionFromPreview_mapsPreviewToEventDraft" in capture_test
             and "gallerySelectionFromImage_mapsImageLabelToCourseDraft" in capture_test
+            and "screenshotSelectionFromCandidate_keepsAssistantDraftPendingAndSampleFree" in capture_test
             and "selectionFromCaptureDraft_routesOnlyCameraDraftToEventSample" in capture_test
+            and "captureDraftFromInput_preservesOriginalAndThumbnailUrisSeparately" in capture_test
+            and "captureDraftFromInput_keepsCameraThumbnailOutOfOriginalMediaUri" in capture_test
+            and "captureDraftDeleteState_tracksSystemConfirmationStates" in capture_test
             and "backendSourceTypeFromCaptureSource_mapsAllProductEntrypoints" in capture_test,
+        ),
+        (
+            "capture_draft_thumbnail_contract_unit_tested",
+            "val thumbnailUri: String? = null" in ocr_engine_source
+            and "val thumbnailUri: String? = null" in read("android-mvp/app/src/main/java/cn/shike/app/data/CaptureImportMapper.kt")
+            and "thumbnailUri = input.thumbnailUri" in read("android-mvp/app/src/main/java/cn/shike/app/data/CaptureImportMapper.kt")
+            and "file:/private-cache/shike-image-thumbnails/thumb-42.jpg" in capture_test
+            and "assertEquals(\"content://media/external/images/media/42\", draft.sourceMediaStoreUri)" in capture_test
+            and "assertEquals(null, draft.sourceMediaStoreUri)" in capture_test,
+        ),
+        (
+            "capture_draft_delete_state_contract_unit_tested",
+            "enum class ScreenshotDeleteState" in read("android-mvp/app/src/main/java/cn/shike/app/data/CaptureImportMapper.kt")
+            and "val canDeleteOriginal: Boolean" in read("android-mvp/app/src/main/java/cn/shike/app/data/CaptureImportMapper.kt")
+            and "val deleteState: ScreenshotDeleteState" in read("android-mvp/app/src/main/java/cn/shike/app/data/CaptureImportMapper.kt")
+            and "ScreenshotDeleteState.NotAvailable" in read("android-mvp/app/src/main/java/cn/shike/app/data/CaptureImportMapper.kt")
+            and "ScreenshotDeleteState.RequestingSystemConfirmation" in read("android-mvp/app/src/main/java/cn/shike/app/data/CaptureImportMapper.kt")
+            and "ScreenshotDeleteState.Deleted" in read("android-mvp/app/src/main/java/cn/shike/app/data/CaptureImportMapper.kt")
+            and "captureDraftDeleteState_tracksSystemConfirmationStates" in capture_test
+            and "assertEquals(true, draft.canDeleteOriginal)" in capture_test
+            and "assertEquals(false, draft.canDeleteOriginal)" in capture_test
+            and "ImageCleanupStatus.DELETE_REQUESTED" in capture_test
+            and "ImageCleanupStatus.DELETED" in capture_test
+            and "ImageCleanupStatus.FAILED" in capture_test,
         ),
         (
             "share_import_unit_test_exists",
@@ -162,6 +215,7 @@ def main() -> int:
                 for token in [
                     "相机拍照预览",
                     "相册图片",
+                    "截图助手导入",
                     "系统分享文本",
                     "分享导入的活动",
                     "分享导入的课程通知",
@@ -173,7 +227,7 @@ def main() -> int:
             test_result_passed(
                 "android-mvp/app/build/test-results/testDebugUnitTest/TEST-cn.shike.app.data.CaptureImportMapperTest.xml",
                 "cn.shike.app.data.CaptureImportMapperTest",
-                4,
+                8,
             )
             and test_result_passed(
                 "android-mvp/app/build/test-results/testDebugUnitTest/TEST-cn.shike.app.data.ShareImportMapperTest.xml",
@@ -205,9 +259,12 @@ def main() -> int:
         (
             "initial_selection_unit_test_exists",
             "fun buildInitialSelection(" in initial_selection_source
+            and "fun buildRuntimeSharedTextSelection(" in initial_selection_source
             and "class InitialSelectionMapperTest" in initial_selection_test
-            and initial_selection_test.count("@Test") == 3
+            and initial_selection_test.count("@Test") == 5
             and "buildInitialSelection_sharedTextWinsOverSavedSnapshot" in initial_selection_test
+            and "buildRuntimeSharedTextSelection_mapsNewIntentTextToReadyDraft" in initial_selection_test
+            and "buildRuntimeSharedTextSelection_ignoresBlankText" in initial_selection_test
             and "buildInitialSelection_savedSnapshotRestoresReadyState" in initial_selection_test
             and "buildInitialSelection_noShareNoSavedShowsEmptyState" in initial_selection_test
             and "文本分享入口（待确认，未落盘）" in initial_selection_test
@@ -218,7 +275,7 @@ def main() -> int:
             test_result_passed(
                 "android-mvp/app/build/test-results/testDebugUnitTest/TEST-cn.shike.app.data.InitialSelectionMapperTest.xml",
                 "cn.shike.app.data.InitialSelectionMapperTest",
-                3,
+                5,
             ),
         ),
         (
@@ -241,10 +298,11 @@ def main() -> int:
         (
             "execution_result_state_unit_test_exists",
             "class ExecutionResultStateTest" in execution_state_test
-            and execution_state_test.count("@Test") == 3
+            and execution_state_test.count("@Test") == 4
             and "pendingExecutionResults_startsAllActionsInConfirmationState" in execution_state_test
             and "recordExecutionResult_replacesOnlyMatchingActionAndAppendsLatestResult" in execution_state_test
             and "executionResultFactories_keepPermissionAndFallbackWording" in execution_state_test
+            and "imageCleanupResults_distinguishSystemConfirmationStates" in execution_state_test
             and "permission_blocked" in execution_state_test
             and "地图不可用" in execution_state_test,
         ),
@@ -253,7 +311,85 @@ def main() -> int:
             test_result_passed(
                 "android-mvp/app/build/test-results/testDebugUnitTest/TEST-cn.shike.app.ExecutionResultStateTest.xml",
                 "cn.shike.app.ExecutionResultStateTest",
-                3,
+                4,
+            ),
+        ),
+        (
+            "date_strip_date_boundary_unit_tested",
+            "fun formatTodayForHome(date: LocalDate): String" in date_strip_source
+            and "fun dateStripSubtitle(): String" in date_strip_source
+            and "系统日期仅用于排序提示，不作为任务时间" in date_strip_source
+            and "农历" not in date_strip_source
+            and "5月24日" not in date_strip_source
+            and "class DateStripTest" in date_strip_test
+            and date_strip_test.count("@Test") == 2
+            and "formatTodayForHome_usesInjectedSystemDateWithoutLunarOrFixedDemoDate" in date_strip_test
+            and "dateStripSubtitle_statesDateIsSortingHintNotTaskTime" in date_strip_test
+            and test_result_passed(
+                "android-mvp/app/build/test-results/testDebugUnitTest/TEST-cn.shike.app.DateStripTest.xml",
+                "cn.shike.app.DateStripTest",
+                2,
+            ),
+        ),
+        (
+            "calendar_system_action_copy_unit_tested",
+            "fun calendarInsertDescriptionFor(item: ShikeItem): String" in system_actions_source
+            and "calendarInsertDescriptionFor(item)" in system_actions_source
+            and "确认后写入" not in system_actions_source
+            and "打开系统日历新增页" in system_actions_source
+            and "由用户在日历中保存" in system_actions_source
+            and "class SystemActionsTest" in system_actions_test
+            and system_actions_test.count("@Test") == 1
+            and "calendarInsertDescriptionFor_onlyDescribesSystemInsertPage" in system_actions_test
+            and 'assertFalse(description.contains("确认后写入"))' in system_actions_test
+            and test_result_passed(
+                "android-mvp/app/build/test-results/testDebugUnitTest/TEST-cn.shike.app.SystemActionsTest.xml",
+                "cn.shike.app.SystemActionsTest",
+                1,
+            ),
+        ),
+        (
+            "visible_screen_capture_prompt_copy_unit_tested",
+            "data class VisibleScreenCapturePrompt" in screen_capture_prompt_source
+            and "fun visibleScreenCapturePrompt(): VisibleScreenCapturePrompt" in screen_capture_prompt_source
+            and "不会直接获得图片" in screen_capture_prompt_source
+            and "导入页选择这张截图" in screen_capture_prompt_source
+            and "删除原截图" in screen_capture_prompt_source
+            and "后台监听" not in screen_capture_prompt_source
+            and "全局监听" not in screen_capture_prompt_source
+            and "自动读取" not in screen_capture_prompt_source
+            and "class ScreenCapturePromptTest" in screen_capture_prompt_test
+            and screen_capture_prompt_test.count("@Test") == 1
+            and "visibleScreenCapturePrompt_keepsAndroidCallbackBoundaryHonest" in screen_capture_prompt_test
+            and test_result_passed(
+                "android-mvp/app/build/test-results/testDebugUnitTest/TEST-cn.shike.app.ScreenCapturePromptTest.xml",
+                "cn.shike.app.ScreenCapturePromptTest",
+                1,
+            ),
+        ),
+        (
+            "screenshot_cleanup_prompt_copy_unit_tested",
+            "fun cleanupStatusLabel(status: ImageCleanupStatus): String" in screenshot_cleanup_prompt_source
+            and "status.name" not in screenshot_cleanup_prompt_source
+            and all(
+                token in screenshot_cleanup_prompt_source
+                for token in [
+                    "当前来源不支持删除原图",
+                    "等待你的选择",
+                    "已选择保留原图",
+                    "正在等待系统确认删除",
+                    "已删除原截图",
+                    "系统确认未完成",
+                ]
+            )
+            and "class ScreenshotCleanupPromptTest" in screenshot_cleanup_prompt_test
+            and screenshot_cleanup_prompt_test.count("@Test") == 1
+            and "cleanupStatusLabel_usesUserFacingChineseCopy" in screenshot_cleanup_prompt_test
+            and 'assertFalse(labels.any { it.contains("_") })' in screenshot_cleanup_prompt_test
+            and test_result_passed(
+                "android-mvp/app/build/test-results/testDebugUnitTest/TEST-cn.shike.app.ScreenshotCleanupPromptTest.xml",
+                "cn.shike.app.ScreenshotCleanupPromptTest",
+                1,
             ),
         ),
         (
@@ -313,9 +449,10 @@ def main() -> int:
         (
             "capture_result_actions_unit_test_exists",
             "class CaptureResultActionsTest" in capture_result_test
-            and capture_result_test.count("@Test") == 2
+            and capture_result_test.count("@Test") == 3
             and "applyCameraPreviewSizeSelection_persistsCameraDraftAndSource" in capture_result_test
             and "applyGalleryImageSelection_persistsGalleryDraftAndSource" in capture_result_test
+            and "applyScreenshotCandidateSelection_persistsPendingDraftWithoutSampleFields" in capture_result_test
             and "相机拍照预览 1080x1440" in capture_result_test
             and "相册图片 course-screenshot.png" in capture_result_test,
         ),
@@ -324,7 +461,7 @@ def main() -> int:
             test_result_passed(
                 "android-mvp/app/build/test-results/testDebugUnitTest/TEST-cn.shike.app.CaptureResultActionsTest.xml",
                 "cn.shike.app.CaptureResultActionsTest",
-                2,
+                3,
             ),
         ),
         (
@@ -424,6 +561,25 @@ def main() -> int:
             ),
         ),
         (
+            "analyze_image_api_client_unit_test_exists",
+            "fun buildAnalyzeImageRequestPayload(" in model_api_client_source
+            and "allowCloudImage: Boolean = true" in model_api_client_source
+            and ".put(\"allow_cloud_image\", allowCloudImage)" in model_api_client_source
+            and "class AnalyzeImageApiClientTest" in analyze_image_api_client_test
+            and analyze_image_api_client_test.count("@Test") == 4
+            and "buildAnalyzeImageRequestPayload_includesImageOcrHintAndUserContext" in analyze_image_api_client_test
+            and "buildAnalyzeImageRequestPayload_canDisableCloudImageUpload" in analyze_image_api_client_test
+            and "backendAnalysisInputForCurrentDraft_keepsImageUriForV2Route" in analyze_image_api_client_test
+            and "backendAnalysisPathFor_textOnlyDraftStaysOnV1" in analyze_image_api_client_test
+            and "allowCloudImage = false" in analyze_image_api_client_test
+            and "assertFalse(payload.getBoolean(\"allow_cloud_image\"))" in analyze_image_api_client_test
+            and test_result_passed(
+                "android-mvp/app/build/test-results/testDebugUnitTest/TEST-cn.shike.app.data.AnalyzeImageApiClientTest.xml",
+                "cn.shike.app.data.AnalyzeImageApiClientTest",
+                4,
+            ),
+        ),
+        (
             "today_action_item_mapper_unit_test_exists",
             "class TodayActionItemMapperTest" in today_action_item_test
             and today_action_item_test.count("@Test") == 3
@@ -445,21 +601,44 @@ def main() -> int:
             "execution_action_gate_unit_test_exists",
             "fun executionActionGateFor(" in execution_action_gate_source
             and "canUseCalendar = isConfirmed && !missingTime" in execution_action_gate_source
-            and "canUseReminder = isConfirmed" in execution_action_gate_source
+            and "canUseReminder = isConfirmed && !missingTime" in execution_action_gate_source
             and "canUseMap = isConfirmed && !missingLocation" in execution_action_gate_source
             and "class ExecutionActionGateTest" in execution_action_gate_test
-            and execution_action_gate_test.count("@Test") == 3
+            and execution_action_gate_test.count("@Test") == 7
             and "executionActionGateFor_unconfirmedItemBlocksAllSensitiveActions" in execution_action_gate_test
             and "executionActionGateFor_confirmedItemAllowsCompleteFields" in execution_action_gate_test
-            and "executionActionGateFor_missingFieldsBlockCalendarAndMapOnly" in execution_action_gate_test
+            and "executionActionGateFor_missingFieldsBlockCalendarReminderAndMap" in execution_action_gate_test
             and "assertFalse(gate.canUseCalendar)" in execution_action_gate_test,
+        ),
+        (
+            "execution_action_button_label_unit_test_exists",
+            "data class ExecutionActionButtonLabels" in execution_action_gate_source
+            and "fun executionActionButtonLabelsFor(" in execution_action_gate_source
+            and "打开日历" in execution_action_gate_source
+            and "设置提醒" in execution_action_gate_source
+            and "查看路线" in execution_action_gate_source
+            and "补充时间后可用" in execution_action_gate_source
+            and "补充地点后可用" in execution_action_gate_source
+            and "去开启通知" in execution_action_gate_source
+            and "executionResults.hasReminderPermissionBlocked()" in execution_action_gate_source
+            and "executionActionButtonLabelsFor_usesGuideActionCopyAfterConfirmation" in execution_action_gate_test
+            and "executionActionButtonLabelsFor_namesMissingFieldRecovery" in execution_action_gate_test
+            and "executionActionButtonLabelsFor_blocksUnconfirmedActionsWithReviewCopy" in execution_action_gate_test,
+        ),
+        (
+            "execution_action_notification_recovery_label_unit_tested",
+            "REMINDER_PERMISSION_BLOCKED_STATUS" in execution_action_gate_source
+            and "hasReminderPermissionBlocked" in execution_action_gate_source
+            and "executionActionButtonLabelsFor_namesNotificationRecoveryAfterPermissionBlocked" in execution_action_gate_test
+            and "assertEquals(\"去开启通知\", labels.reminder)" in execution_action_gate_test
+            and "permission_blocked" in execution_action_gate_test,
         ),
         (
             "gradle_execution_action_gate_test_passed",
             test_result_passed(
                 "android-mvp/app/build/test-results/testDebugUnitTest/TEST-cn.shike.app.ExecutionActionGateTest.xml",
                 "cn.shike.app.ExecutionActionGateTest",
-                3,
+                7,
             ),
         ),
         (
@@ -552,13 +731,14 @@ def main() -> int:
             and "fun backendAnalysisInputForCurrentDraft(" in backend_analysis_runner_source
             and "data class BackendFailureFallbackCopy" in backend_analysis_runner_source
             and "class BackendAnalysisRunnerTest" in backend_analysis_runner_test
-            and backend_analysis_runner_test.count("@Test") == 5
+            and backend_analysis_runner_test.count("@Test") == 6
             and "backendAnalysisInputForCurrentDraft_usesCaptureSourceSpecificBackendType" in backend_analysis_runner_test
             and "backendAnalyzeText_prefersEditedOcrDraftAndFallsBackToSampleRawText" in backend_analysis_runner_test
             and "backendFailureOutcome_redactsSensitiveTextAndKeepsFallbackReviewState" in backend_analysis_runner_test
+            and "backendFailureOutcomeForRealMathDraft_doesNotInjectCourseSampleFields" in backend_analysis_runner_test
             and "backendFailureFallbackCopyFor_redactsEvidenceBeforeUiPersistence" in backend_analysis_runner_test
             and "backendSuccessOutcome_preservesReturnedItemAndBackendSource" in backend_analysis_runner_test
-            and "后端不可用，已回退本地 MockModelAdapter" in backend_analysis_runner_test
+            and "云侧暂不可用，已切换为本地确认" in backend_analysis_runner_test
             and "[手机号已脱敏]" in backend_analysis_runner_test,
         ),
         (
@@ -575,24 +755,28 @@ def main() -> int:
             test_result_passed(
                 "android-mvp/app/build/test-results/testDebugUnitTest/TEST-cn.shike.app.BackendAnalysisRunnerTest.xml",
                 "cn.shike.app.BackendAnalysisRunnerTest",
-                5,
+                6,
             ),
         ),
         (
             "backend_endpoint_unit_test_exists",
             "class BackendEndpointActionsTest" in backend_endpoint_test
-            and backend_endpoint_test.count("@Test") == 3
+            and backend_endpoint_test.count("@Test") == 4
             and "saveBackendEndpointAction_addsHttpSchemeAndTrimsSlash" in backend_endpoint_test
             and "saveBackendEndpointAction_keepsHttpsEndpoint" in backend_endpoint_test
             and "saveBackendEndpointAction_blankInputFallsBackToDefault" in backend_endpoint_test
-            and "模型编排：后端地址已保存" in backend_endpoint_test,
+            and "migrateLegacyBackendBaseUrl_replacesOldEmulatorDefaultOnly" in backend_endpoint_test
+            and "migrateLegacyBackendBaseUrl" in backend_endpoint_test
+            and "http://10.0.2.2:8000" in backend_endpoint_test
+            and "DEFAULT_BACKEND_BASE_URL" in backend_endpoint_test
+            and "云侧连接已保存" in backend_endpoint_test,
         ),
         (
             "gradle_backend_endpoint_test_passed",
             test_result_passed(
                 "android-mvp/app/build/test-results/testDebugUnitTest/TEST-cn.shike.app.BackendEndpointActionsTest.xml",
                 "cn.shike.app.BackendEndpointActionsTest",
-                3,
+                4,
             ),
         ),
         (
@@ -622,8 +806,8 @@ def main() -> int:
             and "applyBackendOutcomeSelection_preservesFallbackStatusMessage" in backend_outcome_test
             and "sanitizeBackendOutcomeCopy_redactsSensitiveTokensAndFallsBackToDefaults" in backend_outcome_test
             and "后端 /v1/analyze：活动海报" in backend_outcome_test
-            and "后端失败，回退本地 MockModelAdapter" in backend_outcome_test
-            and "后端 /v1/analyze：结果待确认" in backend_outcome_test,
+            and "云侧解析失败，本地待确认" in backend_outcome_test
+            and "云侧解析结果待确认" in backend_outcome_test,
         ),
         (
             "backend_outcome_copy_sanitization_unit_tested",
@@ -641,8 +825,7 @@ def main() -> int:
             and "学号：2026123456" in backend_outcome_test
             and "10.0.2.2:8000" in backend_outcome_test
             and "assertFalse(status.contains(\"2026123456\"))" in backend_outcome_test
-            and "后端 /v1/analyze：结果待确认" in backend_outcome_test
-            and "模型编排：后端结果待确认" in backend_outcome_test,
+            and "云侧解析结果待确认" in backend_outcome_test,
         ),
         (
             "gradle_backend_outcome_test_passed",
@@ -667,6 +850,22 @@ def main() -> int:
                 "android-mvp/app/build/test-results/testDebugUnitTest/TEST-cn.shike.app.SampleActionsTest.xml",
                 "cn.shike.app.SampleActionsTest",
                 2,
+            ),
+        ),
+        (
+            "inbox_entities_thumbnail_uri_contract_unit_tested",
+            "data class CaptureDraftEntity" in inbox_entities_source
+            and "val localImageUri: String?" in inbox_entities_source
+            and "val thumbnailUri: String?" in inbox_entities_source
+            and "class InboxEntitiesTest" in inbox_entities_test
+            and inbox_entities_test.count("@Test") == 4
+            and "captureDraftEntity_keepsOriginalAndThumbnailUrisSeparate" in inbox_entities_test
+            and "content://media/external/images/media/42" in inbox_entities_test
+            and "file:/private-cache/shike-image-thumbnails/thumb-42.jpg" in inbox_entities_test
+            and test_result_passed(
+                "android-mvp/app/build/test-results/testDebugUnitTest/TEST-cn.shike.app.data.InboxEntitiesTest.xml",
+                "cn.shike.app.data.InboxEntitiesTest",
+                4,
             ),
         ),
         (
@@ -717,10 +916,13 @@ def main() -> int:
         (
             "local_data_clear_unit_test_exists",
             "class LocalDataClearActionsTest" in local_data_clear_test
-            and local_data_clear_test.count("@Test") == 4
+            and local_data_clear_test.count("@Test") == 7
             and "clearedLocalDataState_resetsToCourseSampleAndEmptyTodayState" in local_data_clear_test
             and "clearedLocalDataState_resetsBackendUrlToDefault" in local_data_clear_test
             and "clearedLocalDataState_explainsSafeRestartPath" in local_data_clear_test
+            and "requestLocalDataClearConfirmation_requiresSecondAppConfirmation" in local_data_clear_test
+            and "cancelLocalDataClearConfirmation_keepsCacheAndDismissesPrompt" in local_data_clear_test
+            and "confirmLocalDataClearConfirmation_onlyClearsAfterPromptIsVisible" in local_data_clear_test
             and "TodayAgendaState.Empty" in local_data_clear_test,
         ),
         (
@@ -728,8 +930,19 @@ def main() -> int:
             test_result_passed(
                 "android-mvp/app/build/test-results/testDebugUnitTest/TEST-cn.shike.app.LocalDataClearActionsTest.xml",
                 "cn.shike.app.LocalDataClearActionsTest",
-                4,
+                7,
             ),
+        ),
+        (
+            "local_data_clear_requires_app_internal_confirmation",
+            "data class LocalDataClearConfirmationState" in local_data_clear_source
+            and "shouldClearLocalData = state.isAwaitingConfirmation" in local_data_clear_source
+            and "清除拾刻缓存" in readiness_sections
+            and "确认清除" in readiness_sections
+            and "不会删除系统相册原截图" in readiness_sections
+            and "requestLocalDataClearConfirmation(clearConfirmationState)" in readiness_sections
+            and "confirmLocalDataClearConfirmation(clearConfirmationState)" in readiness_sections
+            and "onClearLocalData()" in readiness_sections,
         ),
         (
             "cloud_enhancement_unit_test_exists",
@@ -749,9 +962,160 @@ def main() -> int:
             ),
         ),
         (
+            "developer_mode_unlock_unit_test_exists",
+            "const val DEVELOPER_MODE_UNLOCK_TAPS = 5" in developer_mode_source
+            and "data class DeveloperModeState" in developer_mode_source
+            and "fun developerModeStateAfterVersionTap(" in developer_mode_source
+            and "fun visibleSectionsForDeveloperMode(" in developer_mode_source
+            and "class DeveloperModeUnlockTest" in developer_mode_test
+            and developer_mode_test.count("@Test") == 3
+            and "developerModeStateAfterVersionTap_keepsDebugHiddenBeforeFifthTap" in developer_mode_test
+            and "developerModeStateAfterVersionTap_unlocksDebugOnFifthTapAndTargetsDebug" in developer_mode_test
+            and "developerModeStateAfterVersionTap_keepsUnlockedStateStableAfterExtraTaps" in developer_mode_test
+            and "ShikeMainSection.Debug" in developer_mode_test,
+        ),
+        (
+            "gradle_developer_mode_unlock_test_passed",
+            test_result_passed(
+                "android-mvp/app/build/test-results/testDebugUnitTest/TEST-cn.shike.app.DeveloperModeUnlockTest.xml",
+                "cn.shike.app.DeveloperModeUnlockTest",
+                3,
+            ),
+        ),
+        (
+            "local_multimodal_status_unit_test_exists",
+            "enum class LocalMultimodalInstallState" in local_multimodal_source
+            and "NotInstalled" in local_multimodal_source
+            and "Available" in local_multimodal_source
+            and "InitFailed" in local_multimodal_source
+            and "enum class LocalMultimodalPreference" in local_multimodal_source
+            and "fun allowCloudImageForPreference" in local_multimodal_source
+            and "fun localMultimodalUiState(" in local_multimodal_source
+            and "不打包模型" in local_multimodal_source
+            and "不会假装可用" in local_multimodal_source
+            and "同一 JSON Schema" in local_multimodal_source
+            and "class LocalMultimodalStatusTest" in local_multimodal_test
+            and local_multimodal_test.count("@Test") == 4
+            and "localMultimodalUiState_reportsNotInstalledWithoutClaimingAvailability" in local_multimodal_test
+            and "localMultimodalUiState_usesAvailableLocalOnlyWhenRequestedOrCloudDisabled" in local_multimodal_test
+            and "localMultimodalUiState_reportsInitializationFailureAsManualReviewBoundary" in local_multimodal_test
+            and "allowCloudImageForPreference_disablesImageUploadWhenLocalPreferred" in local_multimodal_test,
+        ),
+        (
+            "gradle_local_multimodal_status_test_passed",
+            test_result_passed(
+                "android-mvp/app/build/test-results/testDebugUnitTest/TEST-cn.shike.app.LocalMultimodalStatusTest.xml",
+                "cn.shike.app.LocalMultimodalStatusTest",
+                4,
+            ),
+        ),
+        (
+            "local_multimodal_runtime_contract_unit_test_exists",
+            "data class LocalMultimodalConfig" in local_multimodal_runtime_source
+            and "val multimodal: Boolean = true" in local_multimodal_runtime_source
+            and "interface LocalMultimodalEngine" in local_multimodal_runtime_source
+            and "fun init(config: LocalMultimodalConfig): Int" in local_multimodal_runtime_source
+            and "fun callVit(rgbBytes: ByteArray, width: Int, height: Int): Int" in local_multimodal_runtime_source
+            and "fun generate(prompt: String): String" in local_multimodal_runtime_source
+            and "class LocalMultimodalRuntime" in local_multimodal_runtime_source
+            and "local_multimodal_sdk_missing" in local_multimodal_runtime_source
+            and "schema_valid" in local_multimodal_runtime_source
+            and "用户确认前不可执行" in local_multimodal_runtime_source
+            and "class LocalMultimodalRuntimeTest" in local_multimodal_runtime_test
+            and local_multimodal_runtime_test.count("@Test") == 3
+            and "analyze_runsInitVitGenerateThenSchemaGateBeforeManualReviewCard" in local_multimodal_runtime_test
+            and "analyze_returnsUnavailableWithoutCallingSdkWhenEngineMissing" in local_multimodal_runtime_test
+            and "analyze_rejectsJsonMissingRequiredFieldsAndDoesNotInjectSample" in local_multimodal_runtime_test,
+        ),
+        (
+            "gradle_local_multimodal_runtime_test_passed",
+            test_result_passed(
+                "android-mvp/app/build/test-results/testDebugUnitTest/TEST-cn.shike.app.data.LocalMultimodalRuntimeTest.xml",
+                "cn.shike.app.data.LocalMultimodalRuntimeTest",
+                3,
+            ),
+        ),
+        (
+            "image_preprocess_policy_unit_test_exists",
+            "object ImagePreprocessPolicy" in image_preprocess_policy_source
+            and "const val MAX_EDGE = 1600" in image_preprocess_policy_source
+            and "const val JPEG_QUALITY = 82" in image_preprocess_policy_source
+            and 'const val OUTPUT_MIME = "image/jpeg"' in image_preprocess_policy_source
+            and "fun sampleSizeFor(" in image_preprocess_policy_source
+            and "fun outputDimensionsFor(" in image_preprocess_policy_source
+            and "fun mimeForBytes(bytes: ByteArray): String?" in image_preprocess_policy_source
+            and "fun thumbnailDimensionsFor(" in image_preprocess_policy_source
+            and "fun thumbnailFileNameFor(sha256: String): String" in image_preprocess_policy_source
+            and "fun chromeCropFor(" in image_preprocess_policy_source
+            and "enum class ImagePreprocessSource" in image_preprocess_policy_source
+            and "fun sha256Hex(bytes: ByteArray): String" in image_preprocess_policy_source
+            and "class ImagePreprocessPolicyTest" in image_preprocess_policy_test
+            and image_preprocess_policy_test.count("@Test") == 9
+            and "sampleSizeFor_limitsLongEdgeToConfiguredMaximum" in image_preprocess_policy_test
+            and "outputDimensionsFor_swapsWidthAndHeightForRotatedExifOrientations" in image_preprocess_policy_test
+            and "outputMimeAndDigest_matchBackendImageContract" in image_preprocess_policy_test
+            and "thumbnailDimensionsFor_limitsLongEdgeWithoutUpscalingSmallImages" in image_preprocess_policy_test
+            and "mimeForBytes_detectsSupportedImageFormatsByMagicBytes" in image_preprocess_policy_test
+            and "mimeForBytes_rejectsNonImageBytes" in image_preprocess_policy_test
+            and "chromeCropFor_cropsTallScreenshotChromeWithoutChangingWidth" in image_preprocess_policy_test
+            and "chromeCropFor_doesNotCropCameraImages" in image_preprocess_policy_test
+            and "chromeCropFor_keepsSmallScreenshotsUsable" in image_preprocess_policy_test,
+        ),
+        (
+            "gradle_image_preprocess_policy_test_passed",
+            test_result_passed(
+                "android-mvp/app/build/test-results/testDebugUnitTest/TEST-cn.shike.app.data.ImagePreprocessPolicyTest.xml",
+                "cn.shike.app.data.ImagePreprocessPolicyTest",
+                9,
+            ),
+        ),
+        (
+            "image_thumbnail_cache_unit_test_exists",
+            "object ImageThumbnailCache" in image_thumbnail_cache_source
+            and "fun cacheThumbnailBytes(" in image_thumbnail_cache_source
+            and "ImagePreprocessPolicy.THUMBNAIL_CACHE_DIR" in image_thumbnail_cache_source
+            and "class ImageThumbnailCacheTest" in image_thumbnail_cache_test
+            and image_thumbnail_cache_test.count("@Test") == 2
+            and "cacheThumbnailBytes_persistsPrivateDigestNamedJpeg" in image_thumbnail_cache_test
+            and "cacheThumbnailBytes_reusesExistingFileForSameDigest" in image_thumbnail_cache_test,
+        ),
+        (
+            "gradle_image_thumbnail_cache_test_passed",
+            test_result_passed(
+                "android-mvp/app/build/test-results/testDebugUnitTest/TEST-cn.shike.app.data.ImageThumbnailCacheTest.xml",
+                "cn.shike.app.data.ImageThumbnailCacheTest",
+                2,
+            ),
+        ),
+        (
+            "screenshot_candidate_store_unit_test_exists",
+            "fun isLikelyScreenshot(" in screenshot_candidate_store_source
+            and "screenWidth" not in screenshot_candidate_store_source
+            and "screenHeight" not in screenshot_candidate_store_source
+            and "setOf(width, height)" not in screenshot_candidate_store_source
+            and "fun loadScreenshotAssistEnabled(" in screenshot_candidate_store_source
+            and "fun saveScreenshotAssistEnabled(" in screenshot_candidate_store_source
+            and "fun clearScreenshotAssistPreference(" in screenshot_candidate_store_source
+            and "class ScreenshotCandidateStoreTest" in screenshot_candidate_store_test
+            and screenshot_candidate_store_test.count("@Test") == 7
+            and "isLikelyScreenshot_acceptsScreenshotNameOrPathSignals" in screenshot_candidate_store_test
+            and "isLikelyScreenshot_rejectsScreenSizedImagesWithoutScreenshotSignals" in screenshot_candidate_store_test
+            and "screenshotDisplayNameDigest_isStableAndDoesNotExposeTheName" in screenshot_candidate_store_test
+            and "shouldNotifyScreenshotCandidate_rejectsDuplicateContentUri" in screenshot_candidate_store_test
+            and "screenshotAssistLookbackWindow_matchesAndroid16Guide" in screenshot_candidate_store_test
+            and "screenshotCandidateFromNotificationImport_preservesCandidateMetadata" in screenshot_candidate_store_test
+            and "screenshotAssistPreference_persistsAcrossRestartAndCanBeCleared" in screenshot_candidate_store_test
+            and "KEY_SCREENSHOT_ASSIST_ENABLED" in screenshot_candidate_store_test
+            and test_result_passed(
+                "android-mvp/app/build/test-results/testDebugUnitTest/TEST-cn.shike.app.data.ScreenshotCandidateStoreTest.xml",
+                "cn.shike.app.data.ScreenshotCandidateStoreTest",
+                7,
+            ),
+        ),
+        (
             "android_unit_test_guard_documented",
             "validate_android_unit_tests.py" in docs
-            and "ANDROID_UNIT_TEST_METRIC 64/64" in docs
+            and "ANDROID_UNIT_TEST_METRIC 86/86" in docs
             and "testDebugUnitTest" in docs,
         ),
     ]

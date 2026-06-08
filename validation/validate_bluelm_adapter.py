@@ -49,6 +49,8 @@ def main() -> int:
     ]
     adapter_source = read("backend/shike_backend/adapters/bluelm_adapter.py")
     settings_source = read("backend/shike_backend/settings.py")
+    system_prompt = read("backend/shike_backend/prompts/analyze_system_prompt.txt")
+    user_template = read("backend/shike_backend/prompts/analyze_user_template.txt")
     runbook = read("docs/bluelm-integration-runbook.md")
 
     body_probe = """
@@ -106,6 +108,17 @@ assert body("Volc-DeepSeek-V3.2", "disabled")["thinking"]["type"] == "disabled"
             and "thinking.type" in runbook
             and "requestId" in runbook
             and "request_id" in runbook,
+        )
+    )
+    checks.append(
+        (
+            "relative_time_current_date_context_present",
+            "_current_date_for_timezone" in adapter_source
+            and "ZoneInfo" in adapter_source
+            and "current_date=_current_date_for_timezone(request.user_timezone)" in adapter_source
+            and "current_date: {current_date}" in user_template
+            and "current_date" in system_prompt
+            and "不要使用模型自身日期" in system_prompt,
         )
     )
 

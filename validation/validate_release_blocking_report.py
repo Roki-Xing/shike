@@ -53,7 +53,7 @@ REQUIRED_ACTION_TOKENS = (
     "CLOUD_DEVICE_PREP_METRIC 5/5",
     "CLOUD_DEVICE_PREP_MISSING_VIDEOS 9/9",
     "validate_cloud_device_package.py",
-    "CLOUD_DEVICE_PACKAGE_METRIC 27/27",
+    "CLOUD_DEVICE_PACKAGE_METRIC 30/30",
     "validate_release_evidence_index.py",
     "validate_requirement_matrix.py",
     "desktop guidance stages A-E",

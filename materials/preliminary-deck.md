@@ -71,18 +71,18 @@
 展示 7 个页面缩略图：
 
 - 今日行动台
-- 截图悬浮动作卡
+- 截图导入卡
 - 相机导办页
 - AI 解析确认页
 - 行动编排页
 - 收件箱页
 - 隐私与端云设置页
 
-## 10. 核心页面展示：截图动作卡
+## 10. 核心页面展示：截图导入卡
 
 讲法：
 
-“用户截图后，拾刻先判断这张图是否值得处理。它不是把所有截图都丢进收藏夹，而是识别到课程通知后给出明确动作建议。”
+“用户从分享面板或相册把截图交给拾刻后，拾刻先判断这张图是否值得处理。它不是把所有截图都丢进收藏夹，而是识别到课程通知后给出明确动作建议。”
 
 ## 11. 核心页面展示：AI 解析确认
 
@@ -117,15 +117,15 @@
 
 | 证据页 | 展示内容 | 对应门禁 |
 |---|---|---|
-| BlueLM 接入证据 | `ModelAdapter`、结构化输出、脱敏后端日志、Android 不持有 AppKEY | `BLUELM_ADAPTER_METRIC 7/7`、`PASS secret_hygiene` |
-| 云真机测试 | HTTPS 后端、9 段云真机录屏清单、APK hash、测试报告 | `CLOUD_DEVICE_PREP_METRIC 5/5`、`CLOUD_DEVICE_PACKAGE_METRIC 27/27` |
+| BlueLM 接入证据 | `ModelAdapter`、结构化输出、脱敏后端日志、Android 不持有 AppKEY | `BLUELM_ADAPTER_METRIC 8/8`、`PASS secret_hygiene` |
+| 云真机测试 | HTTPS 后端、9 段云真机录屏清单、APK hash、测试报告、Android 16 指导文件聚合门禁、截图语义样例门禁、live-smoke 脱敏证据门禁、release handoff runner、公网后端录制前预检 | `CLOUD_DEVICE_PREP_METRIC 5/5`、`CLOUD_BACKEND_PREFLIGHT_METRIC`、`CLOUD_DEVICE_PACKAGE_METRIC 30/30`、`ANDROID16_REAL_IMPLEMENTATION_GUIDE_METRIC 12/12`、`IMAGE_SEMANTIC_CASES_METRIC 9/9`、`LIVE_SMOKE_EVIDENCE_METRIC 7/7`、`RELEASE_HANDOFF_CHECKS_METRIC 24/24` |
 | 真实 App 前端 | 首页行动台、采集页、解析确认页、行动编排页、收件箱、Debug 页分离 | `FRONTEND_POLISH_METRIC 12/12`、`DEMO_ACCEPTANCE_METRIC 18/18` |
-| 失败降级 | 后端失败、权限拒绝、地图不可用、提醒权限不可用、用户确认门禁 | `REAL_WORLD_READY_METRIC 22/22`、`ACTION_EXECUTION_METRIC 17/17` |
+| 失败降级 | 后端失败、权限拒绝、地图不可用、提醒权限不可用、用户确认门禁 | `REAL_WORLD_READY_METRIC 22/22`、`ACTION_EXECUTION_METRIC 18/18` |
 | 隐私安全 | AppKEY 不进 APK、环境变量、日志脱敏、一键清除本地数据 | `PASS secret_hygiene` |
 | 模型评测 | 110 条样例、低质量输入、unknown 兜底、场景扩展契约 | `MODEL_EVAL_METRIC 110/110`、`MODEL_CONTRACT_STRICT_METRIC 10/10` |
-| 评分证据 | 创新性、应用价值、完成度、大模型应用能力逐项映射到代码/视频/文档 | `REQUIREMENT_MATRIX_METRIC 9/9`、`DELIVERABLES_METRIC 10/10` |
+| 评分证据 | 创新性、应用价值、完成度、大模型应用能力逐项映射到代码/视频/文档；用户访谈和问卷仍为 `待采集`，不得编造 | `USER_RESEARCH_EVIDENCE_METRIC 8/8`、`REQUIREMENT_MATRIX_METRIC 9/9`、`DELIVERABLES_METRIC 10/10` |
 
-本地发布候选入口是 `materials/evidence/release-evidence-index.md` 和 `python3 shike/validation/validate_landing_release_candidate.py`，当前为 `LANDING_RELEASE_CANDIDATE_METRIC 52/52`。真实 9 段云真机 MP4 和填写后的 `cloud-device-test-report.md` 未收齐前，strict 发布保持 `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE 3/7` 阻断；录制前必须完成 `cloud-device-test-report.md` 的 `Pre-recording Evidence Gate`，确认 `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md` 仍是桌面指导源，`materials/evidence/requirement-matrix.md` 仍通过 `REQUIREMENT_MATRIX_METRIC 9/9`，all 9 real cloud-device MP4 files 已进入证据包，且 no placeholder fields remain after capture。阻断报告为 `materials/evidence/blocking-report.md`。`validation/traceability.md` 的 SHIKE-070 行用于串起 PPT、演示脚本、真机验收清单、发布证据索引和云真机证据包。
+本地发布候选入口是 `materials/evidence/release-evidence-index.md` 和 `python3 shike/validation/validate_landing_release_candidate.py`，当前为 `LANDING_RELEASE_CANDIDATE_METRIC 63/63`，并直接纳入 `BACKEND_AUDIT_LOG_METRIC 8/8` 与 `LIVE_SMOKE_EVIDENCE_METRIC 7/7`。真实 9 段云真机 MP4 和填写后的 `cloud-device-test-report.md` 未收齐前，strict 发布保持 `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE 3/7` 阻断；录制前必须完成 `cloud-device-test-report.md` 的 `Pre-recording Evidence Gate`，确认 `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md` 仍是桌面指导源，`materials/evidence/requirement-matrix.md` 仍通过 `REQUIREMENT_MATRIX_METRIC 9/9`，all 9 real cloud-device MP4 files 已进入证据包，且 no placeholder fields remain after capture。阻断报告为 `materials/evidence/blocking-report.md`。`validation/traceability.md` 的 SHIKE-070 行用于串起 PPT、演示脚本、真机验收清单、发布证据索引和云真机证据包。
 
 ## 16. 竞争差异
 

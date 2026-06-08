@@ -1,0 +1,14 @@
+id: img-interview-001
+scene: interview_notice
+source_type: screenshot_share
+fixture_type: synthetic_descriptor
+
+ocr_text_hint:
+校招通知主体：产品实习面试，明天10:30，线上会议，请提前10分钟进入。
+
+expected:
+must_not_extract_status_bar_time: True
+title_contains: 产品实习, 面试
+time_required: True
+location_required: False
+actions: calendar, reminder

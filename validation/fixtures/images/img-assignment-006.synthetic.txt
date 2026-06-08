@@ -1,0 +1,14 @@
+id: img-assignment-006
+scene: assignment_deadline
+source_type: screenshot_share
+fixture_type: synthetic_descriptor
+
+ocr_text_hint:
+课程系统主体：阅读打卡本周五前完成，需连续三天有效记录。
+
+expected:
+must_not_extract_status_bar_time: True
+title_contains: 阅读打卡, 完成
+time_required: True
+location_required: False
+actions: reminder

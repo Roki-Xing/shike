@@ -90,8 +90,8 @@
       font-size: 12px;
       font-weight: 800;
       background: rgba(255, 255, 255, .9);
+      justify-content: center;
     }
-    .status span:nth-child(2) { color: transparent; }
     .screen { padding: 12px 14px 13px; }
     .top {
       display: grid;
@@ -305,13 +305,13 @@
 <body>
   <main>
     <section class="phone" aria-label="拾刻手机演示">
-      <div class="status"><span>10:28</span><span>拾刻</span><span>100%</span></div>
+      <div class="status"><span>拾刻导入闭环</span></div>
       <div class="screen">
         <div class="top"><span class="brand">拾刻</span><span class="title">今日行动台</span><span class="bell">铃</span></div>
         <div class="date">
           <div class="date-left">
             <span class="date-icon">日</span>
-            <div class="date-copy"><div class="date-main">5月24日 星期五 农历四月十七</div><div class="date-sub">按截止时间和地点自动排序</div></div>
+            <div class="date-copy"><div class="date-main">今日行动台</div><div class="date-sub">按截止时间和地点自动排序</div></div>
           </div>
           <span class="chip">全部日程</span>
         </div>
@@ -325,7 +325,7 @@
             </div>
             <span class="pill green">已安排</span>
           </div>
-          <div class="card-actions"><span class="action-note">由教务处通知 · 确认后可写入日历</span><span class="action-link">查看路线</span></div>
+          <div class="card-actions"><span class="action-note">由教务处通知 · 确认后打开系统日历新增页</span><span class="action-link">查看路线</span></div>
         </article>
 
         <article class="card action-card">
@@ -352,7 +352,7 @@
           <div class="card-actions"><span class="action-note">来源：学习通任务</span><span class="action-link blue">查看详情</span></div>
         </article>
 
-        <div class="cta"><strong>确认后安排</strong><span>确认后写入日历，并在适当时间提醒你</span></div>
+        <div class="cta"><strong>确认后安排</strong><span>打开系统日历新增页，由你保存；并在适当时间提醒你</span></div>
 
         <section class="card summary-card" aria-label="今日概要">
           <div class="summary-head"><span>今日概要</span><span class="summary-more">更多</span></div>
@@ -389,7 +389,8 @@
 	          <div class="metric"><strong>22/22</strong><span>REAL_WORLD_READY_METRIC</span></div>
 	          <div class="metric"><strong>18/18</strong><span>DEMO_ACCEPTANCE_METRIC</span></div>
 		          <div class="metric"><strong>31/31</strong><span>ANDROID_STRUCTURE_METRIC</span></div>
-	          <div class="metric"><strong>64/64</strong><span>ANDROID_UNIT_TEST_METRIC</span></div>
+	          <div class="metric"><strong>81/81</strong><span>ANDROID_UNIT_TEST_METRIC</span></div>
+	          <div class="metric"><strong>8/8</strong><span>ANDROID_IMAGE_PREPROCESS_METRIC</span></div>
 	          <div class="metric"><strong>APK</strong><span>可安装 Debug 包</span></div>
 	        </div>
 	        <p class="note">指标来自下方命令输出；录屏前请重新运行验收，避免静态展示替代真实日志。</p>
@@ -420,6 +421,7 @@
 	        <h3>验收命令</h3>
 		        <code class="cmd">python3 shike/validation/validate_android_structure.py</code><br />
 		        <code class="cmd">python3 shike/validation/validate_android_unit_tests.py</code><br />
+		        <code class="cmd">python3 shike/validation/validate_android_image_preprocess.py</code><br />
 		        <code class="cmd">python3 shike/validation/validate_action_execution.py</code><br />
 		        <code class="cmd">python3 shike/validation/validate_demo_acceptance.py</code><br />
 		        <code class="cmd">python3 shike/validation/validate_real_world_ready.py</code><br />

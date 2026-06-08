@@ -1,0 +1,14 @@
+id: img-assignment-005
+scene: assignment_deadline
+source_type: recent_screenshot_assist
+fixture_type: synthetic_descriptor
+
+ocr_text_hint:
+平台弹窗主体：补交窗口今天下午关闭，请尽快提交实验截图。
+
+expected:
+must_not_extract_status_bar_time: True
+title_contains: 补交窗口, 实验截图
+time_required: True
+location_required: False
+actions: reminder

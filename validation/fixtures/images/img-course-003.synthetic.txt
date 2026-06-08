@@ -1,0 +1,14 @@
+id: img-course-003
+scene: course_notice
+source_type: recent_screenshot_assist
+fixture_type: synthetic_descriptor
+
+ocr_text_hint:
+课程平台截图主体：物理实验本周六14:00，实验楼一区105，带实验记录本。
+
+expected:
+must_not_extract_status_bar_time: True
+title_contains: 物理实验
+time_required: True
+location_required: True
+actions: calendar, reminder, map

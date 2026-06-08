@@ -17,23 +17,25 @@ import cn.shike.app.domain.ShikeItem
 fun ActionPlannerExecutionControls(
     item: ShikeItem,
     isConfirmed: Boolean,
+    executionResults: List<ExecutionResult>,
     onAddCalendar: (ShikeItem) -> Unit,
     onReminder: (ShikeItem) -> Unit,
     onOpenMap: (ShikeItem) -> Unit,
 ) {
     val gate = executionActionGateFor(item, isConfirmed)
+    val labels = executionActionButtonLabelsFor(item, isConfirmed, executionResults)
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
         Button(
             onClick = { onAddCalendar(item) },
             enabled = gate.canUseCalendar,
             modifier = Modifier.weight(1f),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0F766E)),
-        ) { Text(if (gate.missingTime) "缺少时间" else "加日历") }
+        ) { Text(labels.calendar) }
         OutlinedButton(onClick = { onReminder(item) }, enabled = gate.canUseReminder, modifier = Modifier.weight(1f)) {
-            Text("提醒")
+            Text(labels.reminder)
         }
         OutlinedButton(onClick = { onOpenMap(item) }, enabled = gate.canUseMap, modifier = Modifier.weight(1f)) {
-            Text(if (gate.missingLocation) "缺少地点" else "地图")
+            Text(labels.map)
         }
     }
 }

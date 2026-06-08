@@ -1,5 +1,29 @@
 [
   {
+    "id": "course-short-need-math-001",
+    "scene": "course_notice",
+    "input": "今天晚上需要上高数A",
+    "expected_fields": [
+      "title",
+      "time"
+    ],
+    "expected_actions": [
+      "reminder"
+    ],
+    "expected_missing_fields": [
+      "exact_start_time",
+      "location"
+    ],
+    "forbidden_output_tokens": [
+      "B203",
+      "18:30",
+      "22:00",
+      "第5章",
+      "相册导入的课程通知"
+    ],
+    "edge": "禁止样例污染"
+  },
+  {
     "id": "course-notice-001",
     "scene": "course_notice",
     "input": "高数A今晚10:00调整到教学楼B203，课前完成预习并确认签到。",

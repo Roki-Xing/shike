@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import cn.shike.app.data.ImageCleanupStatus
 import cn.shike.app.domain.ShikeItem
 
 @Composable
@@ -16,6 +17,10 @@ fun ActionPlannerPanel(
     item: ShikeItem,
     isConfirmed: Boolean,
     executionResults: List<ExecutionResult>,
+    sourceImageCleanupStatus: ImageCleanupStatus,
+    selectedSourceMediaStoreUri: String?,
+    onDeleteSourceImage: () -> Unit,
+    onKeepSourceImage: () -> Unit,
     onAddCalendar: (ShikeItem) -> Unit,
     onReminder: (ShikeItem) -> Unit,
     onOpenMap: (ShikeItem) -> Unit,
@@ -29,6 +34,7 @@ fun ActionPlannerPanel(
         ActionPlannerExecutionControls(
             item = item,
             isConfirmed = isConfirmed,
+            executionResults = executionResults,
             onAddCalendar = onAddCalendar,
             onReminder = onReminder,
             onOpenMap = onOpenMap,
@@ -39,6 +45,13 @@ fun ActionPlannerPanel(
             color = Color(0xFF667085),
             fontSize = 12.sp,
         )
+        if (isConfirmed && selectedSourceMediaStoreUri != null && sourceImageCleanupStatus == ImageCleanupStatus.NOT_REQUESTED) {
+            ScreenshotCleanupPrompt(
+                status = sourceImageCleanupStatus,
+                onDelete = onDeleteSourceImage,
+                onKeep = onKeepSourceImage,
+            )
+        }
         ExecutionResultPanel(executionResults)
     }
 }

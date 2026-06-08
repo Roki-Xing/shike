@@ -34,3 +34,15 @@ fun canPostReminderNotification(context: Context): Boolean =
             context,
             Manifest.permission.POST_NOTIFICATIONS,
         ) == PackageManager.PERMISSION_GRANTED
+
+fun canPostScreenshotAssistNotification(context: Context): Boolean =
+    canPostReminderNotification(context)
+
+fun hasScreenshotMediaPermission(context: Context): Boolean {
+    val permission = if (Build.VERSION.SDK_INT >= 33) {
+        Manifest.permission.READ_MEDIA_IMAGES
+    } else {
+        Manifest.permission.READ_EXTERNAL_STORAGE
+    }
+    return ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
+}

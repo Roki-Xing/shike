@@ -1,0 +1,19 @@
+id: img-negative-002
+scene: negative_fragment
+source_type: photo_picker
+fixture_type: synthetic_descriptor
+
+ocr_text_hint:
+纯拾刻首页截图主体只有今日行动台空状态和导入按钮，没有外部事件。
+
+expected:
+must_not_extract_status_bar_time: True
+title_contains: 无行动
+time_required: False
+location_required: False
+actions: none
+output_scene: unknown
+missing_fields: task, time, location
+forbidden_title_terms: 今日行动台, 还没有今日行动, 导入截图, 手动输入, 快捷导入
+forbidden_location_terms: 首页, 导入, 收件箱, 设置
+forbidden_evidence_regions: top_status_bar, bottom_navigation_bar, shike_own_ui

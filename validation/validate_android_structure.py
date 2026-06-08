@@ -223,7 +223,7 @@ def main() -> int:
         (
             "confirm_banner_actions_boundary_extracted",
             "fun ConfirmBannerActions" in read("ui/ConfirmBannerActions.kt")
-            and "打开日历" in read("ui/ConfirmBannerActions.kt")
+            and "executionActionButtonLabelsFor" in read("ui/ConfirmBannerActions.kt")
             and "打开日历" not in read("ui/ConfirmBanner.kt"),
         ),
         (
@@ -235,8 +235,8 @@ def main() -> int:
         (
             "action_planner_execution_controls_boundary_extracted",
             "fun ActionPlannerExecutionControls" in read("ui/ActionPlannerExecutionControls.kt")
-            and "加日历" in read("ui/ActionPlannerExecutionControls.kt")
-            and "加日历" not in read("ui/ActionPlannerPanel.kt"),
+            and "executionActionButtonLabelsFor" in read("ui/ActionPlannerExecutionControls.kt")
+            and "打开日历" not in read("ui/ActionPlannerPanel.kt"),
         ),
         (
             "no_large_kotlin_file_over_220_lines",

@@ -1,5 +1,1829 @@
 # Optimization Log
 
+## 2026-06-08 / Round 277
+
+Goal: Promote Android image preprocessing to release handoff evidence. Current slice: make vivo cloud multimodal routing match the Android 16 guide's model-body warning without writing AppKEY or raw model inputs into repository evidence.
+Round focus: Add signed VisionChat fallback for vivo image models when the OpenAI-compatible `image_url` route rejects image input or returns provider auth errors.
+Release handoff compatibility: scoring evidence map; preliminary deck landing evidence package; `docs/delivery-boundary-and-scoring.md`; `materials/preliminary-deck.md`; `backend/shike_backend/adapters/vivo_cloud_multimodal_adapter.py`; `backend/shike_backend/settings.py`; `backend/tests/test_vivo_cloud_multimodal_adapter.py`; `backend/tests/test_settings_env_file.py`; `validation/validate_vivo_multimodal_contract.py`; `materials/evidence/release-evidence-index.md`; `docs/current-validation-status.md`; `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md`; `/mnt/c/Users/Xing/Desktop/SHIKE_ANDROID16_REAL_IMPLEMENTATION_GUIDE (1).md`; `materials/evidence/requirement-matrix.md`.
+No cloud recordings, report values, credentials, or personal data were fabricated.
+
+Current handoff summary:
+- Metrics: `LANDING_RELEASE_CANDIDATE_METRIC	63/63`, `CLOUD_DEVICE_PREP_METRIC	5/5`, `CLOUD_DEVICE_PACKAGE_METRIC	30/30`, `RELEASE_HANDOFF_CHECKS_METRIC	24/24`, `BACKEND_AUDIT_LOG_METRIC	8/8`, `LIVE_SMOKE_EVIDENCE_METRIC	7/7`, `CLOUD_BACKEND_PREFLIGHT_METRIC=1/1`, `BACKEND_CONFIG_METRIC	19/19`, `RELEASE_EVIDENCE_INDEX_METRIC	10/10`, `REQUIREMENT_MATRIX_METRIC	9/9`, `DEMO_ACCEPTANCE_METRIC	18/18`, `APK_SECRET_HYGIENE_METRIC	8/8`, `VIVO_MULTIMODAL_CONTRACT_METRIC	28/28`, signed VisionChat fallback, `NO_DEFAULT_IMAGE_UPLOAD_METRIC	12/12`, `ANDROID16_REAL_IMPLEMENTATION_GUIDE_METRIC	12/12`, `ANDROID16_DOD_COVERAGE_METRIC	28/28`, `SHIKE-P0-001 through SHIKE-P1-012`, `SCREENSHOT_ASSIST_METRIC	15/15`, `ANDROID_IMAGE_PREPROCESS_METRIC	15/15`, expected `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`.
+- Backend multimodal routing now defaults image analysis to `vivo-BlueLM-V-2.0`, keeps `BlueLM-Vision-prd` in the candidate chain, and falls back from OpenAI-compatible `image_url` errors to signed `/vivogpt/completions` VisionChat messages with `contentType=text/image`.
+- Release anchors remain intact: Real HTTP server smoke is now part of the unified handoff runner; `http_server_smoke_metric=1/1`; `http_smoke_actions_disabled=True`; `http_smoke_ignored_regions_allowed=True`; `allow_cloud_image=false`; `cloud_image_disabled`; ignored-region metadata allowlist; final server-side user-confirmation action gate; model-claimed executable actions remain overwritten before returning to Android.
+- Latest direct probe with the current test key: BlueLM text parsing passed; direct native image-model smoke reached signed VisionChat but both vision candidates returned `legacy_http_status:401`; route-level `/v2/analyze-image` still returned `route_v2_status=pass`, schema-valid fallback output, ignored-region allowlist, and user-confirmation-gated actions. Treat this as a provider permission/interface boundary, not as strict image-model success evidence.
+- Strict release evidence remains intentionally blocked on external cloud-device proof: 9 real MP4 recordings, a filled cloud-device report, and a real redacted logcat.
+
+Validation:
+- PASS `python3 shike/validation/validate_release_evidence_index.py`
+  - Evidence: `RELEASE_EVIDENCE_INDEX_METRIC	10/10`.
+- PASS `python3 shike/validation/validate_backend_config.py`
+  - Evidence: `BACKEND_CONFIG_METRIC	19/19`.
+- PASS `PYTHONPATH=backend python3 -m unittest backend.tests.test_settings_env_file backend.tests.test_analyze_image_text_fallback backend.tests.test_vivo_cloud_multimodal_adapter`
+  - Evidence: 10 tests passed; the only warning was httpx's `app` shortcut deprecation warning.
+- PASS `python3 shike/validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	63/63`.
+- PASS `python3 shike/scripts/run_release_handoff_checks.py --strict`
+  - Evidence: `RELEASE_HANDOFF_CHECKS_METRIC	24/24`; strict subchecks correctly remained expected blockers for missing real cloud-device MP4s, filled report values, and real redacted logcat.
+- PASS `python3 shike/validation/validate_secret_hygiene.py`
+  - Evidence: `PASS	secret_hygiene`.
+- PASS `python3 shike/validation/validate_apk_secret_hygiene.py`
+  - Evidence: `APK_SECRET_HYGIENE_METRIC	8/8`.
+- PASS `git -C shike diff --check`
+  - Evidence: no whitespace errors.
+- PASS broad repository secret scan over scripts, docs, materials, validation, backend, README, Android source, and Gradle config.
+  - Evidence: no `sk-*`, Bearer token, or provider AppKEY assignment was found.
+
+Closeout audit:
+- PASS `python3 shike/validation/validate_android16_real_implementation_guide.py`
+  - Evidence: `ANDROID16_REAL_IMPLEMENTATION_GUIDE_METRIC	12/12`; SHIKE-P0-001 through SHIKE-P1-012 are locally mapped to executable checks.
+- PASS `python3 shike/validation/validate_android16_definition_of_done.py`
+  - Evidence: `ANDROID16_DOD_COVERAGE_METRIC	28/28`; function, evidence, and safety DoD are covered locally while strict cloud-device evidence remains explicit.
+- PASS `python3 shike/validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	63/63`.
+- PASS `python3 shike/scripts/run_release_handoff_checks.py --strict`
+  - Evidence: `RELEASE_HANDOFF_CHECKS_METRIC	24/24`; expected strict blockers remain `strict_video_files_present`, `strict_report_filled`, and `strict_logcat_not_placeholder`.
+- PASS `python3 shike/validation/validate_apk_secret_hygiene.py`
+  - Evidence: `APK_SECRET_HYGIENE_METRIC	8/8`.
+- PASS `python3 shike/validation/validate_secret_hygiene.py`
+  - Evidence: `PASS	secret_hygiene`.
+- PASS `git -C shike diff --check`
+  - Evidence: no whitespace errors.
+- Final local closeout boundary: do not add more product code before external capture unless a new failing gate appears. The remaining work is operator evidence collection: record the 9 real cloud-device MP4s, fill `materials/evidence/cloud-device/cloud-device-test-report.md`, replace placeholder `cloud-device-logcat.txt` with real redacted logcat, then rerun `python3 shike/scripts/run_release_handoff_checks.py --strict-ready` and `python3 shike/validation/validate_landing_release_candidate.py --strict`.
+
+## 2026-06-08 / Round 276
+
+Goal: Promote Android image preprocessing to release handoff evidence. Current slice: make backend metadata-only audit logging a first-class release-candidate gate without writing AppKEY or raw model inputs into repository evidence.
+Round focus: Promote real HTTP server smoke into backend config and release handoff gates. Current slice: include `validate_backend_audit_log.py` in `validate_landing_release_candidate.py` so the default release candidate gate directly checks Android 16 guide section 15 log redaction rules.
+Release handoff compatibility: scoring evidence map; preliminary deck landing evidence package; `docs/delivery-boundary-and-scoring.md`; `materials/preliminary-deck.md`; `materials/evidence/cloud-device/backend-redacted-access-log.txt`; `materials/evidence/release-evidence-index.md`; `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md`; `/mnt/c/Users/Xing/Desktop/SHIKE_ANDROID16_REAL_IMPLEMENTATION_GUIDE (1).md`; `materials/evidence/requirement-matrix.md`.
+No cloud recordings, report values, credentials, or personal data were fabricated.
+
+Current handoff summary:
+- Metrics: `LANDING_RELEASE_CANDIDATE_METRIC	63/63`, `CLOUD_DEVICE_PREP_METRIC	5/5`, `CLOUD_DEVICE_PACKAGE_METRIC	30/30`, `RELEASE_HANDOFF_CHECKS_METRIC	24/24`, `BACKEND_AUDIT_LOG_METRIC	8/8`, `LIVE_SMOKE_EVIDENCE_METRIC	7/7`, `CLOUD_BACKEND_PREFLIGHT_METRIC=1/1`, `BACKEND_CONFIG_METRIC	18/18`, `RELEASE_EVIDENCE_INDEX_METRIC	10/10`, `REQUIREMENT_MATRIX_METRIC	9/9`, `DEMO_ACCEPTANCE_METRIC	18/18`, `APK_SECRET_HYGIENE_METRIC	8/8`, `VIVO_MULTIMODAL_CONTRACT_METRIC	25/25`, `NO_DEFAULT_IMAGE_UPLOAD_METRIC	12/12`, `ANDROID16_REAL_IMPLEMENTATION_GUIDE_METRIC	12/12`, `ANDROID16_DOD_COVERAGE_METRIC	28/28`, `SHIKE-P0-001 through SHIKE-P1-012`, `SCREENSHOT_ASSIST_METRIC	15/15`, `ANDROID_IMAGE_PREPROCESS_METRIC	15/15`, expected `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`.
+- Release anchors: Real HTTP server smoke is now part of the unified handoff runner; `http_server_smoke_metric=1/1`; `http_smoke_actions_disabled=True`; `http_smoke_ignored_regions_allowed=True`; `allow_cloud_image=false`; `cloud_image_disabled`; ignored-region metadata allowlist; final server-side user-confirmation action gate; model-claimed executable actions remain overwritten before returning to Android.
+- Backend audit logging is now part of the default release-candidate validator: `BACKEND_AUDIT_LOG_METRIC	8/8` verifies `/v2/analyze-image` emits metadata-only audit events, hashes user-controlled `input_id`, keeps PII redaction helpers covered, and avoids raw Authorization, AppKEY, base64 image payloads, full OCR text, and raw input IDs.
+- Secret-safe live smoke remains part of both the handoff runner and default release-candidate validator: `LIVE_SMOKE_EVIDENCE_METRIC	7/7` verifies `live_smoke_metric=4/4`, BlueLM schema-valid course notice, vivo OCR `image_cleared=true`, image-model fallback to `Doubao-Seed-2.0-mini`, route-v2 schema validity, and `route_v2_actions_disabled=true`.
+- Strict release evidence remains intentionally blocked on external cloud-device proof: 9 real MP4 recordings, a filled cloud-device report, and a real redacted logcat.
+
+## 2026-06-08 / Round 275
+
+Goal: Promote Android image preprocessing to release handoff evidence. Current slice: make the backend private-env live smoke a first-class release-candidate gate without writing AppKEY or raw model inputs into repository evidence.
+Round focus: Promote real HTTP server smoke into backend config and release handoff gates. Current slice: include `validate_live_smoke_evidence.py` in `validate_landing_release_candidate.py` so the default release candidate gate directly checks the redacted live-smoke evidence.
+Release handoff compatibility: scoring evidence map; preliminary deck landing evidence package; `docs/delivery-boundary-and-scoring.md`; `materials/preliminary-deck.md`; `materials/evidence/cloud-device/backend-redacted-access-log.txt`; `materials/evidence/release-evidence-index.md`; `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md`; `/mnt/c/Users/Xing/Desktop/SHIKE_ANDROID16_REAL_IMPLEMENTATION_GUIDE (1).md`; `materials/evidence/requirement-matrix.md`.
+No cloud recordings, report values, credentials, or personal data were fabricated.
+
+Current handoff summary:
+- Metrics: `LANDING_RELEASE_CANDIDATE_METRIC	62/62`, `CLOUD_DEVICE_PREP_METRIC	5/5`, `CLOUD_DEVICE_PACKAGE_METRIC	30/30`, `RELEASE_HANDOFF_CHECKS_METRIC	24/24`, `LIVE_SMOKE_EVIDENCE_METRIC	7/7`, `CLOUD_BACKEND_PREFLIGHT_METRIC=1/1`, `BACKEND_CONFIG_METRIC	18/18`, `BACKEND_AUDIT_LOG_METRIC	8/8`, `RELEASE_EVIDENCE_INDEX_METRIC	10/10`, `REQUIREMENT_MATRIX_METRIC	9/9`, `DEMO_ACCEPTANCE_METRIC	18/18`, `APK_SECRET_HYGIENE_METRIC	8/8`, `VIVO_MULTIMODAL_CONTRACT_METRIC	25/25`, `NO_DEFAULT_IMAGE_UPLOAD_METRIC	12/12`, `ANDROID16_REAL_IMPLEMENTATION_GUIDE_METRIC	12/12`, `ANDROID16_DOD_COVERAGE_METRIC	28/28`, `SHIKE-P0-001 through SHIKE-P1-012`, `SCREENSHOT_ASSIST_METRIC	15/15`, `ANDROID_IMAGE_PREPROCESS_METRIC	15/15`, expected `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`.
+- Release anchors: Real HTTP server smoke is now part of the unified handoff runner; `http_server_smoke_metric=1/1`; `http_smoke_actions_disabled=True`; `http_smoke_ignored_regions_allowed=True`; `allow_cloud_image=false`; `cloud_image_disabled`; ignored-region metadata allowlist; final server-side user-confirmation action gate; model-claimed executable actions remain overwritten before returning to Android.
+- Secret-safe live smoke is now part of both the handoff runner and default release-candidate validator: `LIVE_SMOKE_EVIDENCE_METRIC	7/7` verifies `live_smoke_metric=4/4`, BlueLM schema-valid course notice, vivo OCR `image_cleared=true`, image-model `provider_model_does_not_support_image` fallback from `Volc-DeepSeek-V3.2` to `Doubao-Seed-2.0-mini`, route-v2 schema validity, and `route_v2_actions_disabled=true`.
+- Strict release evidence remains intentionally blocked on external cloud-device proof: 9 real MP4 recordings, a filled cloud-device report, and a real redacted logcat.
+
+## 2026-06-08 / Round 274
+
+Goal: Promote Android image preprocessing to release handoff evidence. Current slice: make the backend private-env live smoke a mechanical release handoff gate without writing AppKEY or raw model inputs into repository evidence.
+Round focus: Promote real HTTP server smoke into backend config and release handoff gates. Current slice: add `validate_live_smoke_evidence.py` so the redacted log proves BlueLM text parsing, vivo OCR, vivo multimodal candidate fallback, and route-level `/v2/analyze-image` before cloud-device recording.
+Release handoff compatibility: scoring evidence map; preliminary deck landing evidence package; `docs/delivery-boundary-and-scoring.md`; `materials/preliminary-deck.md`; `materials/evidence/cloud-device/backend-redacted-access-log.txt`; `materials/evidence/release-evidence-index.md`; `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md`; `/mnt/c/Users/Xing/Desktop/SHIKE_ANDROID16_REAL_IMPLEMENTATION_GUIDE (1).md`; `materials/evidence/requirement-matrix.md`.
+No cloud recordings, report values, credentials, or personal data were fabricated.
+
+Current handoff summary:
+- Metrics: `LANDING_RELEASE_CANDIDATE_METRIC	61/61`, `CLOUD_DEVICE_PREP_METRIC	5/5`, `CLOUD_DEVICE_PACKAGE_METRIC	30/30`, `RELEASE_HANDOFF_CHECKS_METRIC	24/24`, `LIVE_SMOKE_EVIDENCE_METRIC	7/7`, `CLOUD_BACKEND_PREFLIGHT_METRIC=1/1`, `BACKEND_CONFIG_METRIC	18/18`, `BACKEND_AUDIT_LOG_METRIC	8/8`, `RELEASE_EVIDENCE_INDEX_METRIC	10/10`, `REQUIREMENT_MATRIX_METRIC	9/9`, `DEMO_ACCEPTANCE_METRIC	18/18`, `APK_SECRET_HYGIENE_METRIC	8/8`, `VIVO_MULTIMODAL_CONTRACT_METRIC	25/25`, `NO_DEFAULT_IMAGE_UPLOAD_METRIC	12/12`, `ANDROID16_REAL_IMPLEMENTATION_GUIDE_METRIC	12/12`, `ANDROID16_DOD_COVERAGE_METRIC	28/28`, `SHIKE-P0-001 through SHIKE-P1-012`, `SCREENSHOT_ASSIST_METRIC	15/15`, `ANDROID_IMAGE_PREPROCESS_METRIC	15/15`, expected `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`.
+- Release anchors: Real HTTP server smoke is now part of the unified handoff runner; `http_server_smoke_metric=1/1`; `http_smoke_actions_disabled=True`; `http_smoke_ignored_regions_allowed=True`; `allow_cloud_image=false`; `cloud_image_disabled`; ignored-region metadata allowlist; final server-side user-confirmation action gate; model-claimed executable actions remain overwritten before returning to Android.
+- Secret-safe live smoke is now mechanically checked: `LIVE_SMOKE_EVIDENCE_METRIC	7/7` verifies `live_smoke_metric=4/4`, BlueLM schema-valid course notice, vivo OCR `image_cleared=true`, image-model `provider_model_does_not_support_image` fallback from `Volc-DeepSeek-V3.2` to `Doubao-Seed-2.0-mini`, route-v2 schema validity, and `route_v2_actions_disabled=true`.
+- Strict release evidence remains intentionally blocked on external cloud-device proof: 9 real MP4 recordings, a filled cloud-device report, and a real redacted logcat.
+
+## 2026-06-08 / Round 273
+
+Goal: Promote Android image preprocessing to release handoff evidence. Current slice: refresh secret-safe backend private-env live smoke for the user-provided vivo/BlueLM test credentials without writing AppKEY into repository evidence.
+Round focus: Promote real HTTP server smoke into backend config and release handoff gates. Current slice: prove BlueLM text parsing, vivo OCR, vivo multimodal candidate fallback, and route-level `/v2/analyze-image` still work through private backend env.
+Release handoff compatibility: scoring evidence map; preliminary deck landing evidence package; `docs/delivery-boundary-and-scoring.md`; `materials/preliminary-deck.md`; `materials/evidence/cloud-device/backend-redacted-access-log.txt`; `materials/evidence/release-evidence-index.md`; `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md`; `/mnt/c/Users/Xing/Desktop/SHIKE_ANDROID16_REAL_IMPLEMENTATION_GUIDE (1).md`; `materials/evidence/requirement-matrix.md`.
+No cloud recordings, report values, credentials, or personal data were fabricated.
+
+Current handoff summary:
+- Metrics: `LANDING_RELEASE_CANDIDATE_METRIC	61/61`, `CLOUD_DEVICE_PREP_METRIC	5/5`, `CLOUD_DEVICE_PACKAGE_METRIC	30/30`, `RELEASE_HANDOFF_CHECKS_METRIC	23/23`, `CLOUD_BACKEND_PREFLIGHT_METRIC=1/1`, `BACKEND_CONFIG_METRIC	18/18`, `BACKEND_AUDIT_LOG_METRIC	8/8`, `RELEASE_EVIDENCE_INDEX_METRIC	10/10`, `REQUIREMENT_MATRIX_METRIC	9/9`, `DEMO_ACCEPTANCE_METRIC	18/18`, `APK_SECRET_HYGIENE_METRIC	8/8`, `VIVO_MULTIMODAL_CONTRACT_METRIC	25/25`, `NO_DEFAULT_IMAGE_UPLOAD_METRIC	12/12`, `ANDROID16_REAL_IMPLEMENTATION_GUIDE_METRIC	12/12`, `ANDROID16_DOD_COVERAGE_METRIC	28/28`, `SHIKE-P0-001 through SHIKE-P1-012`, `SCREENSHOT_ASSIST_METRIC	15/15`, `ANDROID_IMAGE_PREPROCESS_METRIC	15/15`, expected `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`.
+- Release anchors: Real HTTP server smoke is now part of the unified handoff runner; `http_server_smoke_metric=1/1`; `http_smoke_actions_disabled=True`; `http_smoke_ignored_regions_allowed=True`; `allow_cloud_image=false`; `cloud_image_disabled`; ignored-region metadata allowlist; final server-side user-confirmation action gate; model-claimed executable actions remain overwritten before returning to Android.
+- Secret-safe live smoke passed at `live_smoke_metric=4/4`: `bluelm_status=pass`, `ocr_status=pass`, `multimodal_status=pass`, `route_v2_status=pass`, and `route_v2_actions_disabled=true`.
+- Image-model routing remains honest: `Volc-DeepSeek-V3.2` returns `provider_model_does_not_support_image`, then `Doubao-Seed-2.0-mini` returns schema-valid `course_notice`.
+- Strict release evidence remains intentionally blocked on external cloud-device proof: 9 real MP4 recordings, a filled cloud-device report, and a real redacted logcat.
+
+## 2026-06-08 / Round 272
+
+Goal: Promote Android image preprocessing to release handoff evidence. Current slice: make Android 16 DoD coverage a pre-capture cloud-device operator gate, not only a release-index row.
+Round focus: Promote real HTTP server smoke into backend config and release handoff gates. Current slice: keep `cloud-device-test-report.md`, generated capture TODO, README entrypoints, and `validate_cloud_device_package.py` aligned with `ANDROID16_DOD_COVERAGE_METRIC	28/28`.
+Release handoff compatibility: scoring evidence map; preliminary deck landing evidence package; `docs/delivery-boundary-and-scoring.md`; `materials/preliminary-deck.md`; `materials/evidence/cloud-device/README.md`; `materials/device-demo-checklist.md`; `scripts/prepare_cloud_device_evidence.py`; `validation/validate_cloud_device_package.py`; `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md`; `/mnt/c/Users/Xing/Desktop/SHIKE_ANDROID16_REAL_IMPLEMENTATION_GUIDE (1).md`; `materials/evidence/requirement-matrix.md`.
+No cloud recordings, report values, credentials, or personal data were fabricated.
+
+Current handoff summary:
+- Metrics: `LANDING_RELEASE_CANDIDATE_METRIC	61/61`, `CLOUD_DEVICE_PREP_METRIC	5/5`, `CLOUD_DEVICE_PACKAGE_METRIC	30/30`, `RELEASE_HANDOFF_CHECKS_METRIC	23/23`, `CLOUD_BACKEND_PREFLIGHT_METRIC=1/1`, `BACKEND_CONFIG_METRIC	18/18`, `BACKEND_AUDIT_LOG_METRIC	8/8`, `RELEASE_EVIDENCE_INDEX_METRIC	10/10`, `REQUIREMENT_MATRIX_METRIC	9/9`, `DEMO_ACCEPTANCE_METRIC	18/18`, `APK_SECRET_HYGIENE_METRIC	8/8`, `VIVO_MULTIMODAL_CONTRACT_METRIC	25/25`, `NO_DEFAULT_IMAGE_UPLOAD_METRIC	12/12`, `ANDROID16_REAL_IMPLEMENTATION_GUIDE_METRIC	12/12`, `ANDROID16_DOD_COVERAGE_METRIC	28/28`, `SHIKE-P0-001 through SHIKE-P1-012`, `SCREENSHOT_ASSIST_METRIC	15/15`, `ANDROID_IMAGE_PREPROCESS_METRIC	15/15`, expected `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`.
+- Release anchors: Real HTTP server smoke is now part of the unified handoff runner; `http_server_smoke_metric=1/1`; `http_smoke_actions_disabled=True`; `http_smoke_ignored_regions_allowed=True`; `allow_cloud_image=false`; `cloud_image_disabled`; ignored-region metadata allowlist; final server-side user-confirmation action gate; model-claimed executable actions remain overwritten before returning to Android.
+- The generated cloud-device TODO and report now require operators to run `python3 shike/validation/validate_android16_definition_of_done.py` and confirm `ANDROID16_DOD_COVERAGE_METRIC	28/28` before recording.
+- Strict release evidence remains intentionally blocked on external cloud-device proof: 9 real MP4 recordings, a filled cloud-device report, and a real redacted logcat.
+
+## 2026-06-08 / Round 271
+
+Goal: Promote Android image preprocessing to release handoff evidence. Current slice: turn `SHIKE_ANDROID16_REAL_IMPLEMENTATION_GUIDE (1).md` section 19 Definition of Done into an executable release handoff gate.
+Round focus: Promote real HTTP server smoke into backend config and release handoff gates. Current slice: add Android 16 DoD coverage to the current evidence matrix and unified handoff runner so function, evidence, and safety DoD cannot drift separately.
+Release handoff compatibility: scoring evidence map; preliminary deck landing evidence package; `docs/delivery-boundary-and-scoring.md`; `materials/preliminary-deck.md`; `validation/validate_android16_definition_of_done.py`; `scripts/run_release_handoff_checks.py`; `materials/evidence/release-evidence-index.md`; `materials/evidence/requirement-matrix.md`; `docs/current-validation-status.md`; `README.md`; `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md`; `/mnt/c/Users/Xing/Desktop/SHIKE_ANDROID16_REAL_IMPLEMENTATION_GUIDE (1).md`.
+No cloud recordings, report values, credentials, or personal data were fabricated.
+
+Current handoff summary:
+- Metrics: `LANDING_RELEASE_CANDIDATE_METRIC	61/61`, `CLOUD_DEVICE_PREP_METRIC	5/5`, `CLOUD_DEVICE_PACKAGE_METRIC	30/30`, `RELEASE_HANDOFF_CHECKS_METRIC	23/23`, `CLOUD_BACKEND_PREFLIGHT_METRIC=1/1`, `BACKEND_AUDIT_LOG_METRIC	8/8`, `BACKEND_CONFIG_METRIC	18/18`, `RELEASE_EVIDENCE_INDEX_METRIC	10/10`, `REQUIREMENT_MATRIX_METRIC	9/9`, `DEMO_ACCEPTANCE_METRIC	18/18`, `APK_SECRET_HYGIENE_METRIC	8/8`, `VIVO_MULTIMODAL_CONTRACT_METRIC	25/25`, `VIVO_OCR_ADAPTER_METRIC	11/11`, `NO_DEFAULT_IMAGE_UPLOAD_METRIC	12/12`, `ANDROID16_REAL_IMPLEMENTATION_GUIDE_METRIC	12/12`, `ANDROID16_DOD_COVERAGE_METRIC	28/28`, `SHIKE-P0-001 through SHIKE-P1-012`, `SCREENSHOT_ASSIST_METRIC	15/15`, `ANDROID_IMAGE_PREPROCESS_METRIC	15/15`, expected `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`.
+- Release anchors: Real HTTP server smoke is now part of the unified handoff runner; `http_server_smoke_metric=1/1`; `http_smoke_actions_disabled=True`; `http_smoke_ignored_regions_allowed=True`; `allow_cloud_image=false`; `cloud_image_disabled`; ignored-region metadata allowlist; final server-side user-confirmation action gate; model-claimed executable actions remain overwritten before returning to Android.
+- The DoD gate maps Android 16 guide section 19 to executable checks across no fake device chrome, share/Photo Picker/camera/manual capture, vivo multimodal and OCR blocks, editable review, confirm-before-action execution, screenshot cleanup, inbox tracking, Debug sample hiding, redacted backend evidence, APK hash, and secret hygiene.
+- Strict release evidence remains intentionally blocked on external cloud-device proof: 9 real MP4 recordings, a filled cloud-device report, and a real redacted logcat.
+
+Validation:
+- PASS `python3 shike/validation/validate_android16_definition_of_done.py`
+  - Evidence: `ANDROID16_DOD_COVERAGE_METRIC	28/28`.
+- PASS `python3 shike/scripts/run_release_handoff_checks.py --strict`
+  - Evidence: `RELEASE_HANDOFF_CHECKS_METRIC	23/23`; strict mode still reports expected blockers for missing real MP4s, placeholder report fields, and placeholder logcat.
+
+## 2026-06-08 / Round 270
+
+Goal: Promote Android image preprocessing to release handoff evidence. Current slice: make the cloud-device evidence collector run public backend preflight branches before recording.
+Round focus: Promote real HTTP server smoke into backend config and release handoff gates. Current slice: add `collect_cloud_device_evidence.py --preflight-backend` as the single operator entrypoint for both no-cloud-image and live-image public backend checks.
+Release handoff compatibility: scoring evidence map; preliminary deck landing evidence package; `docs/delivery-boundary-and-scoring.md`; `materials/preliminary-deck.md`; `materials/evidence/cloud-device/README.md`; `materials/device-demo-checklist.md`; `materials/evidence/cloud-device/cloud-device-capture-todo.md`; `validation/validate_cloud_device_package.py`; `validation/validate_demo_acceptance.py`; `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md`; `/mnt/c/Users/Xing/Desktop/SHIKE_ANDROID16_REAL_IMPLEMENTATION_GUIDE (1).md`; `materials/evidence/requirement-matrix.md`.
+No cloud recordings, report values, credentials, or personal data were fabricated.
+
+Current handoff summary:
+- Metrics: `LANDING_RELEASE_CANDIDATE_METRIC	61/61`, `CLOUD_DEVICE_PREP_METRIC	5/5`, `CLOUD_DEVICE_PACKAGE_METRIC	30/30`, `RELEASE_HANDOFF_CHECKS_METRIC	22/22`, `CLOUD_BACKEND_PREFLIGHT_METRIC=1/1`, `BACKEND_AUDIT_LOG_METRIC	8/8`, `BACKEND_CONFIG_METRIC	18/18`, `RELEASE_EVIDENCE_INDEX_METRIC	10/10`, `REQUIREMENT_MATRIX_METRIC	9/9`, `DEMO_ACCEPTANCE_METRIC	18/18`, `APK_SECRET_HYGIENE_METRIC	8/8`, `VIVO_MULTIMODAL_CONTRACT_METRIC	25/25`, `NO_DEFAULT_IMAGE_UPLOAD_METRIC	12/12`, `ANDROID16_REAL_IMPLEMENTATION_GUIDE_METRIC	12/12`, `SHIKE-P0-001 through SHIKE-P1-012`, `SCREENSHOT_ASSIST_METRIC	15/15`, `ANDROID_IMAGE_PREPROCESS_METRIC	15/15`, expected `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`.
+- Release anchors: Real HTTP server smoke is now part of the unified handoff runner; `http_server_smoke_metric=1/1`; `http_smoke_actions_disabled=True`; `http_smoke_ignored_regions_allowed=True`; `allow_cloud_image=false`; `cloud_image_disabled`; ignored-region metadata allowlist; final server-side user-confirmation action gate; model-claimed executable actions overwrite behavior.
+- `collect_cloud_device_evidence.py --preflight-backend --backend-url https://roky.chat` now runs two preflight commands in order: default `allow_cloud_image=false`, then `--allow-cloud-image`.
+- The collector exits before recording if either backend preflight branch fails, so cloud-device evidence is not captured against an unreachable or ungated backend.
+- The generated capture TODO, cloud-device README, device-demo checklist, and validators now all reference the same unified preflight entrypoint.
+- Backend `/v2/analyze-image` audit evidence records user-controlled `input_id` only as `input_id_hash`, keeping raw input IDs, provider secrets, Authorization headers, image payloads, full OCR text, and common PII out of logs.
+- `validation/fixtures/image_cases.json` negative image cases now explicitly guard pure Shike UI, bottom navigation, and status-bar regions: negative cases must stay `unknown`, keep calendar/reminder/map actions empty, include task/time/location as missing fields, and forbid navigation or Shike own-UI copy from becoming title/location evidence.
+- Strict release evidence remains intentionally blocked on external cloud-device proof: 9 real MP4 recordings, a filled cloud-device report, and a real redacted logcat.
+
+Validation:
+- PASS `PYTHONPATH=backend python3 -m unittest discover -s backend/tests -p test_audit_log_redaction.py`
+  - Evidence: audit log redaction unit test passed; raw user-controlled input IDs stay out of backend logs.
+- PASS `python3 shike/validation/validate_backend_audit_log.py`
+  - Evidence: `BACKEND_AUDIT_LOG_METRIC	8/8`; audit events use `input_id_hash` and metadata-only fields.
+- PASS `python3 shike/validation/validate_cloud_backend_ready.py`
+  - Evidence: `CLOUD_BACKEND_READY_METRIC	9/9`.
+- PASS `python3 shike/validation/validate_release_evidence_index.py`
+  - Evidence: `RELEASE_EVIDENCE_INDEX_METRIC	10/10`.
+- PASS `python3 shike/scripts/test_collect_cloud_device_evidence.py`
+  - Evidence: 7 tests passed, including dry-run output for both backend preflight branches.
+- PASS `python3 shike/scripts/collect_cloud_device_evidence.py --preflight-backend --backend-url https://roky.chat`
+  - Evidence: both preflight branches returned `CLOUD_BACKEND_PREFLIGHT_METRIC=1/1`; actions stayed disabled and ignored-region metadata stayed allowlisted.
+- PASS `python3 shike/validation/validate_cloud_device_package.py`
+  - Evidence: `CLOUD_DEVICE_PACKAGE_METRIC	30/30`.
+- PASS `python3 shike/validation/validate_image_semantic_cases.py`
+  - Evidence: `IMAGE_SEMANTIC_CASES_METRIC	9/9`; negative cases include own-UI/navigation/status guards.
+- PASS `python3 shike/validation/validate_model_eval_cases.py`
+  - Evidence: `MODEL_EVAL_CASES_METRIC	9/9`; model case gate still chains the image semantic case gate.
+- PASS `python3 shike/scripts/run_release_handoff_checks.py --strict`
+  - Evidence: `RELEASE_HANDOFF_CHECKS_METRIC	22/22`; strict mode still reports expected blockers for missing real MP4s, placeholder report fields, and placeholder logcat.
+- PASS `git -C shike diff --check`
+  - Evidence: no whitespace errors reported.
+- PASS secret scans for provider key prefixes, bearer headers, provider AppKEY assignments, and exact private env values.
+
+## 2026-06-08 / Round 269
+
+Goal: Promote Android image preprocessing to release handoff evidence. Round focus: Promote real HTTP server smoke into backend config and release handoff gates.
+Deployment focus: expose the already-implemented Android 16 `/v2/analyze-image` backend through the public HTTPS gateway before cloud-device recording.
+Release handoff compatibility: scoring evidence map; preliminary deck landing evidence package; `docs/delivery-boundary-and-scoring.md`; `materials/preliminary-deck.md`; `materials/evidence/requirement-matrix.md`; `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md`.
+No cloud recordings, report values, credentials, or personal data were fabricated.
+
+Current handoff summary:
+- Metrics: `LANDING_RELEASE_CANDIDATE_METRIC	61/61`, `CLOUD_DEVICE_PACKAGE_METRIC	30/30`, `RELEASE_HANDOFF_CHECKS_METRIC	22/22`, `BACKEND_CONFIG_METRIC	18/18`, `RELEASE_EVIDENCE_INDEX_METRIC	10/10`, `REQUIREMENT_MATRIX_METRIC	9/9`, `DEMO_ACCEPTANCE_METRIC	18/18`, `APK_SECRET_HYGIENE_METRIC	8/8`, `VIVO_MULTIMODAL_CONTRACT_METRIC	25/25`, `NO_DEFAULT_IMAGE_UPLOAD_METRIC	12/12`, `ANDROID16_REAL_IMPLEMENTATION_GUIDE_METRIC	12/12`, `SHIKE-P0-001 through SHIKE-P1-012`, `SCREENSHOT_ASSIST_METRIC	15/15`, `ANDROID_IMAGE_PREPROCESS_METRIC	15/15`, expected `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`.
+- Public backend deployment: `/opt/shike/backend` now points at the release containing `/v2/schema` and `/v2/analyze-image`; the gateway now forwards `https://roky.chat/v2/*` to the same backend as `/health` and `/v1/*`.
+- Current release anchors: `CLOUD_BACKEND_PREFLIGHT_METRIC=1/1`; Real HTTP server smoke is now part of the unified handoff runner; public preflight on `https://roky.chat` keeps `allow_cloud_image=false`, `cloud_image_disabled`, `http_server_smoke_metric=1/1`, `http_smoke_actions_disabled=True`, and `http_smoke_ignored_regions_allowed=True`.
+- Public live image preflight also passes with `allow_cloud_image=true`, proving the HTTPS route can call the backend-only vivo image path through private server env while keeping all returned actions disabled until user confirmation.
+- `/v2/analyze-image` still preserves the ignored-region metadata allowlist, final server-side user-confirmation action gate, and model-claimed executable actions overwrite behavior before returning to Android.
+- Backend secrets remain backend-only through `/etc/shike/shike-backend.env`; no provider AppKEY, Authorization header, base64 image payload, full OCR text, phone number, email, or student ID was written into repository evidence.
+
+Validation:
+- PASS `python3 shike/scripts/preflight_cloud_backend.py --base-url https://roky.chat --timeout-seconds 35`
+  - Evidence: `CLOUD_BACKEND_PREFLIGHT_METRIC=1/1`; `cloud_backend_preflight_actions_disabled=True`; `cloud_backend_preflight_ignored_regions_allowed=True`; `cloud_backend_preflight_cloud_image_allowed=False`.
+- PASS server-side smoke before switching the release
+  - Evidence: `backend_passed`; local backend `/health` returned `{"status":"ok"}`; local `/v2/schema` exposed the `ParsedActionCard` schema.
+- PASS gateway reload
+  - Evidence: container `nginx -t` succeeded; `Host: roky.chat` local `/v2/schema` returned 200 after adding the `/v2/` proxy rule.
+- Strict release evidence remains intentionally blocked on external cloud-device proof: 9 real MP4 recordings, a filled cloud-device report, and a real redacted logcat.
+
+## 2026-06-08 / Round 268
+
+Goal: Close the Android 16 real-implementation handoff with strict validation, whitespace checks, and private-env secret scans after the backend live-smoke integration.
+Legacy release handoff tokens: Goal: Promote Android image preprocessing to release handoff evidence. Round focus: Promote real HTTP server smoke into backend config and release handoff gates.
+Release handoff compatibility: scoring evidence map; preliminary deck landing evidence package; `docs/delivery-boundary-and-scoring.md`; `materials/preliminary-deck.md`; `materials/device-demo-checklist.md`; `scripts/collect_cloud_device_evidence.py`; `scripts/preflight_cloud_backend.py`; `scripts/run_release_handoff_checks.py`; `/mnt/c/Users/Xing/Desktop/SHIKE_ANDROID16_REAL_IMPLEMENTATION_GUIDE (1).md`; `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md`; `materials/evidence/requirement-matrix.md`.
+No cloud recordings, report values, credentials, or personal data were fabricated.
+
+Current handoff summary:
+- Metrics: `LANDING_RELEASE_CANDIDATE_METRIC	61/61`, `CLOUD_DEVICE_PACKAGE_METRIC	30/30`, `RELEASE_HANDOFF_CHECKS_METRIC	22/22`, `IMAGE_SEMANTIC_CASES_METRIC	9/9`, `BACKEND_CONFIG_METRIC	18/18`, `RELEASE_EVIDENCE_INDEX_METRIC	10/10`, `REQUIREMENT_MATRIX_METRIC	9/9`, `DEMO_ACCEPTANCE_METRIC	18/18`, `APK_SECRET_HYGIENE_METRIC	8/8`, `VIVO_MULTIMODAL_CONTRACT_METRIC	25/25`, `NO_DEFAULT_IMAGE_UPLOAD_METRIC	12/12`, `ANDROID16_REAL_IMPLEMENTATION_GUIDE_METRIC	12/12`, `SHIKE-P0-001 through SHIKE-P1-012`, `SCREENSHOT_ASSIST_METRIC	15/15`, `ANDROID_IMAGE_PREPROCESS_METRIC	15/15`, expected `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`.
+- Current release anchors: `CLOUD_BACKEND_PREFLIGHT_METRIC`; Real HTTP server smoke is now part of the unified handoff runner; `http_server_smoke_metric=1/1`; `http_smoke_actions_disabled=True`; `http_smoke_ignored_regions_allowed=True`; `allow_cloud_image=false`; `cloud_image_disabled`.
+- `/v2/analyze-image` keeps the ignored-region metadata allowlist, final server-side user-confirmation action gate, and model-claimed executable actions overwrite evidence.
+- Android 16 guide section 14 manual acceptance scripts are now mapped into the strict cloud-device video package: no fake info, screenshot floating-share image import, calendar, notification/reminder, map, original screenshot deletion, and recent screenshot assistant.
+- Android 16 guide section 16 screenshot/photo semantic cases are now explicit in the unified release handoff runner through `validate_image_semantic_cases.py`, covering 40 synthetic image semantics across course, assignment, event, meeting, interview, travel, low-quality, and negative cases.
+- Strict release evidence remains intentionally blocked on external cloud-device proof: 9 real MP4 recordings, a filled cloud-device report, and a real redacted logcat.
+- Backend private-env live smoke remains the current model proof: `live_smoke_metric=4/4` covers BlueLM text, vivo OCR, vivo multimodal, and route-v2, while `route_v2_actions_disabled=true` confirms the user-confirmation gate.
+- This round added no code-path behavior changes; it verified the handoff after the previous backend/runtime integration and kept the provider AppKEY out of repository evidence.
+
+Validation:
+- PASS `python3 shike/scripts/run_release_handoff_checks.py --strict`
+  - Evidence: `RELEASE_HANDOFF_CHECKS_METRIC	22/22`; strict mode still reports expected blockers for missing real MP4s, placeholder report fields, and placeholder logcat, with `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`.
+- PASS `python3 shike/validation/validate_image_semantic_cases.py`
+  - Evidence: `IMAGE_SEMANTIC_CASES_METRIC	9/9`.
+- PASS `python3 shike/scripts/test_collect_cloud_device_evidence.py`
+  - Evidence: 4 tests passed, including Android 16 guide section 14 recording coverage.
+- PASS `python3 shike/validation/validate_cloud_device_package.py`
+  - Evidence: `CLOUD_DEVICE_PACKAGE_METRIC	30/30` with `Android 16 Guide Acceptance Coverage` in the generated TODO and report template.
+- PASS `python3 shike/validation/validate_demo_acceptance.py`
+  - Evidence: `DEMO_ACCEPTANCE_METRIC	18/18` with section 14 strict-video mapping in the device demo checklist.
+- PASS `git diff --check`
+  - Evidence: no whitespace errors reported.
+- PASS broad repository secret scan for provider key prefixes, partial test-key markers, bearer headers, and provider AppKEY assignments across scripts/docs/materials/validation/README.
+- PASS exact private-env value scan
+  - Evidence: configured backend private AppKEY values were searched by exact value without printing them; no repository hits.
+
+## 2026-06-08 / Round 267
+
+Goal: Add a secret-safe public backend preflight and backend private-env live smoke to the Android 16 cloud-device recording handoff.
+Legacy release handoff tokens: Goal: Promote Android image preprocessing to release handoff evidence. Round focus: Promote real HTTP server smoke into backend config and release handoff gates.
+Release handoff compatibility: scoring evidence map; preliminary deck landing evidence package; `docs/delivery-boundary-and-scoring.md`; `materials/preliminary-deck.md`; `materials/device-demo-checklist.md`; `scripts/collect_cloud_device_evidence.py`; `scripts/preflight_cloud_backend.py`; `scripts/run_release_handoff_checks.py`; `/mnt/c/Users/Xing/Desktop/SHIKE_ANDROID16_REAL_IMPLEMENTATION_GUIDE (1).md`; `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md`; `materials/evidence/requirement-matrix.md`; `materials/evidence/cloud-device/`.
+No cloud recordings, report values, credentials, or personal data were fabricated.
+
+Current handoff summary:
+- Metrics: `LANDING_RELEASE_CANDIDATE_METRIC	61/61`, `CLOUD_DEVICE_PACKAGE_METRIC	30/30`, `RELEASE_HANDOFF_CHECKS_METRIC	21/21`, `BACKEND_CONFIG_METRIC	18/18`, `RELEASE_EVIDENCE_INDEX_METRIC	10/10`, `REQUIREMENT_MATRIX_METRIC	9/9`, `DEMO_ACCEPTANCE_METRIC	18/18`, `APK_SECRET_HYGIENE_METRIC	8/8`, `VIVO_MULTIMODAL_CONTRACT_METRIC	25/25`, `NO_DEFAULT_IMAGE_UPLOAD_METRIC	12/12`, `ANDROID16_REAL_IMPLEMENTATION_GUIDE_METRIC	12/12`, `SHIKE-P0-001 through SHIKE-P1-012`, `SCREENSHOT_ASSIST_METRIC	15/15`, `ANDROID_IMAGE_PREPROCESS_METRIC	15/15`, expected `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`.
+- Public backend preflight: `CLOUD_BACKEND_PREFLIGHT_METRIC`; `allow_cloud_image=false`; host redacted; no tokens printed.
+- Backend private-env live smoke: `live_smoke_metric=4/4`; BlueLM text, vivo OCR, vivo multimodal, and route-v2 passed; `materials/evidence/cloud-device/backend-redacted-access-log.txt` stores redacted evidence.
+- Real HTTP server smoke is now part of the unified handoff runner: `http_server_smoke_metric=1/1`, `http_smoke_actions_disabled=True`, `http_smoke_ignored_regions_allowed=True`, `cloud_image_disabled`.
+- `/v2/analyze-image` keeps the ignored-region metadata allowlist, final server-side user-confirmation action gate, and model-claimed executable actions overwrite evidence.
+
+Validation:
+- PASS `python3 scripts/test_preflight_cloud_backend.py`
+  - Evidence: 3 tests passed.
+- PASS `python3 scripts/prepare_cloud_device_evidence.py`
+  - Evidence: `CLOUD_DEVICE_PREP_METRIC	5/5`; expected `CLOUD_DEVICE_PREP_MISSING_VIDEOS	9/9` remains until real recordings are captured.
+- PASS `python3 validation/validate_cloud_device_package.py`
+  - Evidence: `CLOUD_DEVICE_PACKAGE_METRIC	30/30`.
+- PASS `PYTHONPATH=shike/backend python3 -m shike_backend.eval.live_smoke --ocr-image /tmp/shike-live-course-notice.png --multimodal --multimodal-image /tmp/shike-live-course-notice.png --route-v2 --route-v2-image /tmp/shike-live-course-notice.png --timeout-seconds 60`
+  - Evidence: `bluelm_status=pass`, `ocr_status=pass`, `multimodal_status=pass`, `route_v2_status=pass`, `route_v2_actions_disabled=true`, and `live_smoke_metric=4/4`.
+
+## 2026-06-08 / Round 266
+
+Goal: Align the device-demo checklist with the current Android 16 cloud-device capture workflow.
+Legacy release handoff tokens: Goal: Promote Android image preprocessing to release handoff evidence. Round focus: Promote real HTTP server smoke into backend config and release handoff gates.
+Release handoff compatibility: scoring evidence map; preliminary deck landing evidence package; `docs/delivery-boundary-and-scoring.md`; `materials/preliminary-deck.md`; `materials/device-demo-checklist.md`; `validation/validate_demo_acceptance.py`; `scripts/collect_cloud_device_evidence.py`; `scripts/run_release_handoff_checks.py`; `/mnt/c/Users/Xing/Desktop/SHIKE_ANDROID16_REAL_IMPLEMENTATION_GUIDE (1).md`; `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md`; `materials/evidence/requirement-matrix.md`; `materials/evidence/cloud-device/`.
+No cloud recordings, report values, credentials, or personal data were fabricated.
+
+Current handoff summary:
+- Current local release metrics remain `LANDING_RELEASE_CANDIDATE_METRIC	61/61`, `CLOUD_DEVICE_PACKAGE_METRIC	29/29`, `RELEASE_HANDOFF_CHECKS_METRIC	20/20`, `BACKEND_CONFIG_METRIC	18/18`, `RELEASE_EVIDENCE_INDEX_METRIC	10/10`, `REQUIREMENT_MATRIX_METRIC	9/9`, `DEMO_ACCEPTANCE_METRIC	18/18`, `DEVICE_DEMO_METRIC	12/12`, `APK_SECRET_HYGIENE_METRIC	8/8`, `VIVO_MULTIMODAL_CONTRACT_METRIC	25/25`, `NO_DEFAULT_IMAGE_UPLOAD_METRIC	12/12`, `ANDROID16_REAL_IMPLEMENTATION_GUIDE_METRIC	12/12`, `SCREENSHOT_ASSIST_METRIC	15/15`, `ANDROID_IMAGE_PREPROCESS_METRIC	15/15`, and expected strict blocker `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`.
+- Real HTTP server smoke is now part of the unified handoff runner; current evidence remains `http_server_smoke_metric=1/1` with `http_smoke_actions_disabled=True` and `http_smoke_ignored_regions_allowed=True`. The no-cloud-image boundary remains `allow_cloud_image=false` with `cloud_image_disabled` risk evidence.
+- `/v2/analyze-image` keeps the ignored-region metadata allowlist, final server-side user-confirmation action gate, and model-claimed executable actions overwrite evidence. The Android 16 aggregate still maps SHIKE-P0-001 through SHIKE-P1-012.
+- `materials/device-demo-checklist.md` now points cloud-device operators to `scripts/test_collect_cloud_device_evidence.py`, `scripts/collect_cloud_device_evidence.py --list`, `--record <1-9>`, `--capture-logcat --write-report-draft`, and `run_release_handoff_checks.py --strict-ready` only after real recordings, logcat, and the filled report exist.
+- `validation/validate_demo_acceptance.py` now guards the same cloud-device capture flow, preventing the checklist from drifting back to the stale `RELEASE_HANDOFF_CHECKS_METRIC 19/19` path.
+
+Validation:
+- PASS `python3 validation/validate_demo_acceptance.py`
+  - Evidence: `DEMO_ACCEPTANCE_METRIC	18/18`.
+- PASS `python3 validation/validate_device_demo.py`
+  - Evidence: `DEVICE_DEMO_METRIC	12/12`.
+- PASS `python3 validation/validate_release_evidence_index.py`
+  - Evidence: `RELEASE_EVIDENCE_INDEX_METRIC	10/10`.
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS secret_hygiene`.
+- PASS `python3 scripts/run_release_handoff_checks.py --strict`
+  - Evidence: `RELEASE_HANDOFF_CHECKS_METRIC	20/20`; strict mode still reports expected blockers for missing real MP4s, placeholder report fields, and placeholder logcat, with `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`.
+
+## 2026-06-08 / Round 265
+
+Goal: Make the adb cloud-device collection helper a first-class release handoff gate.
+Legacy release handoff tokens: Goal: Promote Android image preprocessing to release handoff evidence. Round focus: Promote real HTTP server smoke into backend config and release handoff gates.
+Release handoff compatibility: scoring evidence map; preliminary deck landing evidence package; `docs/delivery-boundary-and-scoring.md`; `materials/preliminary-deck.md`; `/mnt/c/Users/Xing/Desktop/SHIKE_ANDROID16_REAL_IMPLEMENTATION_GUIDE (1).md`; `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md`; `materials/evidence/requirement-matrix.md`.
+No cloud recordings, report values, credentials, or personal data were fabricated.
+
+Current handoff summary:
+- Current local release metrics remain `LANDING_RELEASE_CANDIDATE_METRIC	61/61`, `CLOUD_DEVICE_PACKAGE_METRIC	29/29`, `RELEASE_HANDOFF_CHECKS_METRIC	20/20`, `BACKEND_CONFIG_METRIC	18/18`, `RELEASE_EVIDENCE_INDEX_METRIC	10/10`, `REQUIREMENT_MATRIX_METRIC	9/9`, `DEMO_ACCEPTANCE_METRIC	18/18`, `APK_SECRET_HYGIENE_METRIC	8/8`, `VIVO_MULTIMODAL_CONTRACT_METRIC	25/25`, `NO_DEFAULT_IMAGE_UPLOAD_METRIC	12/12`, `ANDROID16_REAL_IMPLEMENTATION_GUIDE_METRIC	12/12`, `SCREENSHOT_ASSIST_METRIC	15/15`, `ANDROID_IMAGE_PREPROCESS_METRIC	15/15`, and expected strict blocker `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`.
+- Real HTTP server smoke is now part of the unified handoff runner; current evidence remains `http_server_smoke_metric=1/1` with `http_smoke_actions_disabled=True` and `http_smoke_ignored_regions_allowed=True`. The no-cloud-image boundary remains `allow_cloud_image=false` with `cloud_image_disabled` risk evidence.
+- `/v2/analyze-image` keeps the ignored-region metadata allowlist, final server-side user-confirmation action gate, and model-claimed executable actions overwrite evidence. The Android 16 aggregate still maps SHIKE-P0-001 through SHIKE-P1-012.
+- `scripts/run_release_handoff_checks.py` now runs `scripts/test_collect_cloud_device_evidence.py` as an independent local handoff command before strict external-evidence gates, raising the current strict handoff runner to `20/20`.
+- `validation/validate_cloud_device_package.py`, `validation/validate_release_evidence_index.py`, `validation/validate_requirement_matrix.py`, `materials/evidence/release-evidence-index.md`, `materials/evidence/requirement-matrix.md`, `validation/traceability.md`, `docs/current-validation-status.md`, and `materials/evidence/cloud-device/README.md` now guard the `20/20` handoff metric.
+
+Validation:
+- PASS `python3 scripts/test_collect_cloud_device_evidence.py`
+  - Evidence: 3 tests passed.
+- PASS `python3 validation/validate_cloud_device_package.py`
+  - Evidence: `CLOUD_DEVICE_PACKAGE_METRIC	29/29`.
+- PASS `python3 validation/validate_requirement_matrix.py`
+  - Evidence: `REQUIREMENT_MATRIX_METRIC	9/9`.
+- PASS `python3 validation/validate_release_evidence_index.py`
+  - Evidence: `RELEASE_EVIDENCE_INDEX_METRIC	10/10`.
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS secret_hygiene`.
+- PASS `python3 validation/validate_apk_secret_hygiene.py`
+  - Evidence: `APK_SECRET_HYGIENE_METRIC	8/8`.
+- PASS `python3 scripts/run_release_handoff_checks.py --strict`
+  - Evidence: `RELEASE_HANDOFF_CHECKS_METRIC	20/20`; strict mode still reports expected blockers for missing real MP4s, placeholder report fields, and placeholder logcat, with `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`.
+
+## 2026-06-08 / Round 264
+
+Goal: Move strict cloud-device evidence from a manual TODO toward an executable adb capture workflow.
+Legacy release handoff tokens: Goal: Promote Android image preprocessing to release handoff evidence. Round focus: Promote real HTTP server smoke into backend config and release handoff gates.
+Release handoff compatibility: scoring evidence map; preliminary deck landing evidence package; `docs/delivery-boundary-and-scoring.md`; `materials/preliminary-deck.md`; `/mnt/c/Users/Xing/Desktop/SHIKE_ANDROID16_REAL_IMPLEMENTATION_GUIDE (1).md`; `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md`; `materials/evidence/requirement-matrix.md`.
+No cloud recordings, report values, credentials, or personal data were fabricated.
+
+Current handoff summary:
+- Current local release metrics remain `LANDING_RELEASE_CANDIDATE_METRIC	61/61`, `CLOUD_DEVICE_PACKAGE_METRIC	29/29`, `RELEASE_HANDOFF_CHECKS_METRIC	19/19`, `BACKEND_CONFIG_METRIC	18/18`, `RELEASE_EVIDENCE_INDEX_METRIC	10/10`, `REQUIREMENT_MATRIX_METRIC	9/9`, `DEMO_ACCEPTANCE_METRIC	18/18`, `APK_SECRET_HYGIENE_METRIC	8/8`, `VIVO_MULTIMODAL_CONTRACT_METRIC	25/25`, `NO_DEFAULT_IMAGE_UPLOAD_METRIC	12/12`, `ANDROID16_REAL_IMPLEMENTATION_GUIDE_METRIC	12/12`, `SCREENSHOT_ASSIST_METRIC	15/15`, `ANDROID_IMAGE_PREPROCESS_METRIC	15/15`, and expected strict blocker `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`.
+- Real HTTP server smoke is now part of the unified handoff runner; current evidence remains `http_server_smoke_metric=1/1` with `http_smoke_actions_disabled=True` and `http_smoke_ignored_regions_allowed=True`. The no-cloud-image boundary remains `allow_cloud_image=false` with `cloud_image_disabled` risk evidence.
+- `/v2/analyze-image` keeps the ignored-region metadata allowlist, final server-side user-confirmation action gate, and model-claimed executable actions overwrite evidence. The Android 16 aggregate still maps SHIKE-P0-001 through SHIKE-P1-012.
+- Added `scripts/collect_cloud_device_evidence.py` to list the 9 required recordings, run `adb screenrecord`, pull MP4s into `materials/evidence/cloud-device/`, export redacted `cloud-device-logcat.txt`, and write a report draft from device metadata.
+- Added `scripts/test_collect_cloud_device_evidence.py` to guard the 9 strict video filenames, adb command construction, and logcat redaction for `sk-*`, Bearer auth, AppKEY labels, phone numbers, emails, long identifiers, and image data URLs.
+- Updated `scripts/prepare_cloud_device_evidence.py`, `cloud-device-capture-todo.md`, `materials/evidence/cloud-device/README.md`, and `validate_cloud_device_package.py` so the collection helper is part of the existing `CLOUD_DEVICE_PACKAGE_METRIC	29/29` gate without weakening strict proof.
+
+Validation:
+- PASS `python3 scripts/test_collect_cloud_device_evidence.py`
+  - Evidence: 3 tests passed.
+- PASS `python3 scripts/collect_cloud_device_evidence.py --list`
+  - Evidence: all 9 strict MP4 scenarios listed with operator prompts.
+- PASS `python3 scripts/collect_cloud_device_evidence.py --record 1 --duration-seconds 1 --dry-run`
+  - Evidence: printed `adb shell screenrecord`, `adb pull`, and remote cleanup commands without creating fake MP4s.
+- PASS `python3 scripts/prepare_cloud_device_evidence.py`
+  - Evidence: `CLOUD_DEVICE_PREP_METRIC	5/5`; expected `CLOUD_DEVICE_PREP_MISSING_VIDEOS	9/9` remains until real recordings are captured.
+- PASS `python3 validation/validate_cloud_device_package.py`
+  - Evidence: `CLOUD_DEVICE_PACKAGE_METRIC	29/29`.
+- PASS `python3 validation/validate_release_evidence_index.py`
+  - Evidence: `RELEASE_EVIDENCE_INDEX_METRIC	10/10`.
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS secret_hygiene`.
+
+## 2026-06-08 / Round 263
+
+Goal: Verify the user-provided vivo/BlueLM test credential path through backend runtime config without committing AppKEY.
+Legacy release handoff tokens: Goal: Promote Android image preprocessing to release handoff evidence. Round focus: Promote real HTTP server smoke into backend config and release handoff gates.
+Release handoff compatibility: Android 16 capture/share boundaries; backend-only AppKEY handling; private env file loading; vivo OCR and `/v2/analyze-image`; APK secret hygiene; cloud-device strict blocker honesty.
+No cloud recordings, report values, credentials, or personal data were fabricated.
+
+Current handoff summary:
+- Current local release metrics remain `LANDING_RELEASE_CANDIDATE_METRIC	61/61`, `CLOUD_DEVICE_PACKAGE_METRIC	29/29`, `RELEASE_HANDOFF_CHECKS_METRIC	19/19`, `BACKEND_CONFIG_METRIC	18/18`, `RELEASE_EVIDENCE_INDEX_METRIC	10/10`, `REQUIREMENT_MATRIX_METRIC	9/9`, `DEMO_ACCEPTANCE_METRIC	18/18`, `APK_SECRET_HYGIENE_METRIC	8/8`, `VIVO_MULTIMODAL_CONTRACT_METRIC	25/25`, `NO_DEFAULT_IMAGE_UPLOAD_METRIC	12/12`, `ANDROID16_REAL_IMPLEMENTATION_GUIDE_METRIC	12/12`, `SCREENSHOT_ASSIST_METRIC	15/15`, `ANDROID_IMAGE_PREPROCESS_METRIC	15/15`, and expected strict blocker `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`.
+- Release evidence anchors remain: scoring evidence map; preliminary deck landing evidence package; `docs/delivery-boundary-and-scoring.md`; `materials/preliminary-deck.md`; `/mnt/c/Users/Xing/Desktop/SHIKE_ANDROID16_REAL_IMPLEMENTATION_GUIDE (1).md`; `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md`; `materials/evidence/requirement-matrix.md`.
+- Real HTTP server smoke is now part of the unified handoff runner; current evidence remains `http_server_smoke_metric=1/1` with `http_smoke_actions_disabled=True` and `http_smoke_ignored_regions_allowed=True`. The no-cloud-image boundary remains `allow_cloud_image=false` with `cloud_image_disabled` risk evidence.
+- `/v2/analyze-image` keeps the ignored-region metadata allowlist, final server-side user-confirmation action gate, and model-claimed executable actions overwrite evidence. The Android 16 aggregate still maps SHIKE-P0-001 through SHIKE-P1-012.
+- The backend loads runtime credentials from the private env file `~/.config/shike/bluelm.env` by default, with process env taking priority through `SHIKE_BACKEND_ENV_FILE`; this keeps the direct provider call server-side while Android continues to call only Shike backend routes.
+- The local private env file exists with mode `600` and contains the expected backend-only keys for BlueLM, vivo OCR, and vivo multimodal aliases; no secret values were printed.
+- A fresh secret-safe live smoke using `/tmp/shike-live-course-notice.png` passed BlueLM text parsing, vivo General OCR, and FastAPI `POST /v2/analyze-image`.
+- Updated `materials/evidence/cloud-device/backend-redacted-access-log.txt` with only redacted provider/status/schema/action-gate/latency evidence.
+
+Validation:
+- PASS `PYTHONPATH=backend python3 -m unittest backend.tests.test_settings_env_file`
+  - Evidence: 3 tests passed; private env file loading and process-env priority remain covered.
+- PASS runtime config inspection from `Settings.from_env()`
+  - Evidence: `provider=bluelm`, `bluelm_configured=true`, `ocr_configured=true`, `multimodal_configured=true`, `bluelm_model=Volc-DeepSeek-V3.2`, and configured multimodal candidate chain.
+- PASS `PYTHONPATH=backend python3 -m shike_backend.eval.live_smoke --ocr-image /tmp/shike-live-course-notice.png --route-v2 --route-v2-image /tmp/shike-live-course-notice.png --timeout-seconds 35`
+  - Evidence: `bluelm_status=pass`, `result_schema_valid=true`, `ocr_status=pass`, `route_v2_status=pass`, `route_v2_schema_valid=true`, `route_v2_actions_disabled=true`, `route_v2_ignored_regions_allowed=true`, `route_v2_scene_type=course_notice`, and `live_smoke_metric=3/3`.
+  - Boundary: output was redacted; no AppKEY, Authorization header, base64 image payload, full OCR text, phone number, email, or student ID was written into repo evidence.
+
+## 2026-06-08 / Round 262
+
+Goal: Continue `SHIKE_ANDROID16_REAL_IMPLEMENTATION_GUIDE (1).md` by locking the cloud-device handoff checklist to the Android 16 guide source.
+Legacy release handoff tokens: Goal: Promote Android image preprocessing to release handoff evidence. Round focus: Promote real HTTP server smoke into backend config and release handoff gates.
+Release handoff compatibility: scoring evidence map; preliminary deck landing evidence package; `docs/delivery-boundary-and-scoring.md`; `materials/preliminary-deck.md`; Android 16 capture/share boundaries; no default image upload; APK secret hygiene; `/mnt/c/Users/Xing/Desktop/SHIKE_ANDROID16_REAL_IMPLEMENTATION_GUIDE (1).md`; `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md`; `materials/evidence/requirement-matrix.md`; cloud-device strict blocker honesty.
+No cloud recordings, report values, credentials, or personal data were fabricated.
+
+Current handoff summary:
+- Current local release metrics remain `LANDING_RELEASE_CANDIDATE_METRIC	61/61`, `CLOUD_DEVICE_PACKAGE_METRIC	29/29`, `RELEASE_HANDOFF_CHECKS_METRIC	19/19`, `BACKEND_CONFIG_METRIC	18/18`, `RELEASE_EVIDENCE_INDEX_METRIC	10/10`, `REQUIREMENT_MATRIX_METRIC	9/9`, `DEMO_ACCEPTANCE_METRIC	18/18`, `APK_SECRET_HYGIENE_METRIC	8/8`, `VIVO_MULTIMODAL_CONTRACT_METRIC	25/25`, `NO_DEFAULT_IMAGE_UPLOAD_METRIC	12/12`, `ANDROID16_REAL_IMPLEMENTATION_GUIDE_METRIC	12/12`, `SCREENSHOT_ASSIST_METRIC	15/15`, `ANDROID_IMAGE_PREPROCESS_METRIC	15/15`, and expected strict blocker `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`.
+- Real HTTP server smoke is now part of the unified handoff runner; current evidence remains `http_server_smoke_metric=1/1` with `http_smoke_actions_disabled=True` and `http_smoke_ignored_regions_allowed=True`. The no-cloud-image boundary remains `allow_cloud_image=false` with `cloud_image_disabled` risk evidence.
+- `/v2/analyze-image` keeps the ignored-region metadata allowlist, final server-side user-confirmation action gate, and model-claimed executable actions overwrite evidence from the current `VIVO_MULTIMODAL_CONTRACT_METRIC	25/25` gate.
+- `scripts/prepare_cloud_device_evidence.py` now regenerates `cloud-device-capture-todo.md` with the Android 16 guide source path, `ANDROID16_REAL_IMPLEMENTATION_GUIDE_METRIC 12/12`, and SHIKE-P0-001 through SHIKE-P1-012 as explicit pre-capture checks.
+- `validation/validate_cloud_device_package.py` and `validation/validate_release_evidence_index.py` now guard that generated checklist and evidence index cannot drift back to the older cloud-device-only handoff wording.
+
+Validation:
+- PASS `python3 scripts/prepare_cloud_device_evidence.py`
+  - Evidence: `CLOUD_DEVICE_PREP_METRIC	5/5`, expected `CLOUD_DEVICE_PREP_MISSING_VIDEOS	9/9`, and expected `CLOUD_DEVICE_PREP_REPORT_VIDEO_TBD_FIELDS	9/9`.
+- PASS `python3 validation/validate_android16_real_implementation_guide.py`
+  - Evidence: `ANDROID16_REAL_IMPLEMENTATION_GUIDE_METRIC	12/12`.
+- PASS `python3 validation/validate_cloud_device_package.py`
+  - Evidence: `CLOUD_DEVICE_PACKAGE_METRIC	29/29`.
+- PASS `python3 validation/validate_release_evidence_index.py`
+  - Evidence: `RELEASE_EVIDENCE_INDEX_METRIC	10/10`.
+- PASS `python3 validation/validate_requirement_matrix.py`
+  - Evidence: `REQUIREMENT_MATRIX_METRIC	9/9`.
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS secret_hygiene`.
+- PASS `python3 scripts/run_release_handoff_checks.py --strict`
+  - Evidence: `RELEASE_HANDOFF_CHECKS_METRIC	19/19`; strict mode still reports expected blockers for missing real MP4s, placeholder report fields, and placeholder logcat, with `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`.
+- APK hash parity checked: local debug APK and `/mnt/c/Users/Xing/Desktop/Shike-app-debug.apk` both hash to `62a57e5e865f77a4ce56dd95f6488588e1916e9f7720f69f148b1e0277206ff0`.
+
+## 2026-06-08 / Round 261
+
+Goal: Continue `SHIKE_ANDROID16_REAL_IMPLEMENTATION_GUIDE (1).md` by adding a single aggregate gate for the guide's P0/P1 task list.
+Legacy release handoff tokens: Goal: Promote Android image preprocessing to release handoff evidence. Round focus: Promote real HTTP server smoke into backend config and release handoff gates.
+Release handoff compatibility: scoring evidence map; preliminary deck landing evidence package; `docs/delivery-boundary-and-scoring.md`; `materials/preliminary-deck.md`; Android 16 capture/share boundaries; no default image upload; APK secret hygiene; `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md`; `materials/evidence/requirement-matrix.md`; cloud-device strict blocker honesty.
+
+Current handoff summary:
+- Current local release metrics remain `LANDING_RELEASE_CANDIDATE_METRIC	61/61`, `CLOUD_DEVICE_PACKAGE_METRIC	29/29`, `RELEASE_HANDOFF_CHECKS_METRIC	19/19`, `BACKEND_CONFIG_METRIC	18/18`, `RELEASE_EVIDENCE_INDEX_METRIC	10/10`, `REQUIREMENT_MATRIX_METRIC	9/9`, `DEMO_ACCEPTANCE_METRIC	18/18`, `APK_SECRET_HYGIENE_METRIC	8/8`, `VIVO_MULTIMODAL_CONTRACT_METRIC	25/25`, `NO_DEFAULT_IMAGE_UPLOAD_METRIC	12/12`, `ANDROID16_REAL_IMPLEMENTATION_GUIDE_METRIC	12/12`, `SCREENSHOT_ASSIST_METRIC	15/15`, `ANDROID_IMAGE_PREPROCESS_METRIC	15/15`, and expected strict blocker `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`.
+- Real HTTP server smoke is now part of the unified handoff runner; current evidence remains `http_server_smoke_metric=1/1` with `http_smoke_actions_disabled=True` and `http_smoke_ignored_regions_allowed=True`. The no-cloud-image boundary remains `allow_cloud_image=false` with `cloud_image_disabled` risk evidence.
+- `/v2/analyze-image` keeps the ignored-region metadata allowlist, final server-side user-confirmation action gate, and model-claimed executable actions overwrite evidence from the current `VIVO_MULTIMODAL_CONTRACT_METRIC	25/25` gate.
+- Added `validation/validate_android16_real_implementation_guide.py`, mapping SHIKE-P0-001 through SHIKE-P1-012 to existing executable validators and source-level evidence instead of relying on scattered checks.
+- Integrated the aggregate guide gate into `scripts/run_release_handoff_checks.py`, raising the strict handoff runner from `18/18` to `19/19` while keeping strict cloud-device evidence as an expected blocker.
+- No cloud recordings, report values, credentials, or personal data were fabricated.
+
+Validation:
+- RED confirmed through `python3 scripts/run_release_handoff_checks.py`: the runner failed at the missing `validate_android16_real_implementation_guide.py` command and ended at `RELEASE_HANDOFF_CHECKS_METRIC	16/17`.
+- PASS `python3 validation/validate_android16_real_implementation_guide.py`
+  - Evidence: `ANDROID16_REAL_IMPLEMENTATION_GUIDE_METRIC	12/12`.
+
+## 2026-06-08 / Round 260
+
+Goal: Continue `SHIKE_ANDROID16_REAL_IMPLEMENTATION_GUIDE (1).md` by tightening `/v2/analyze-image` response metadata redaction.
+Legacy release handoff tokens: Goal: Promote Android image preprocessing to release handoff evidence. Round focus: Promote real HTTP server smoke into backend config and release handoff gates.
+Release handoff compatibility: scoring evidence map; preliminary deck landing evidence package; `docs/delivery-boundary-and-scoring.md`; `materials/preliminary-deck.md`; Android 16 capture/share boundaries; no default image upload; APK secret hygiene; `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md`; `materials/evidence/requirement-matrix.md`; cloud-device strict blocker honesty.
+
+Current handoff summary:
+- Current local release metrics remain `LANDING_RELEASE_CANDIDATE_METRIC	61/61`, `CLOUD_DEVICE_PACKAGE_METRIC	29/29`, `RELEASE_HANDOFF_CHECKS_METRIC	18/18`, `BACKEND_CONFIG_METRIC	18/18`, `RELEASE_EVIDENCE_INDEX_METRIC	10/10`, `REQUIREMENT_MATRIX_METRIC	9/9`, `DEMO_ACCEPTANCE_METRIC	18/18`, `APK_SECRET_HYGIENE_METRIC	8/8`, `VIVO_MULTIMODAL_CONTRACT_METRIC	25/25`, `NO_DEFAULT_IMAGE_UPLOAD_METRIC	12/12`, `SCREENSHOT_ASSIST_METRIC	15/15`, `ANDROID_IMAGE_PREPROCESS_METRIC	15/15`, and expected strict blocker `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`.
+- Real HTTP server smoke is now part of the unified handoff runner; current evidence remains `http_server_smoke_metric=1/1` with `http_smoke_actions_disabled=True` and `http_smoke_ignored_regions_allowed=True`. The no-cloud-image boundary remains `allow_cloud_image=false` with `cloud_image_disabled` risk evidence.
+- Added an ignored-region metadata allowlist so model/OCR text cannot leak through `ignored_regions`; only backend-approved labels such as `top_status_bar`, `bottom_navigation_bar`, and `screenshot_toolbar_or_overlay` can leave `/v2/analyze-image`.
+- The final server-side user-confirmation action gate remains in place for model-claimed executable actions.
+- No cloud recordings, report values, credentials, or personal data were fabricated.
+
+Behavior:
+- RED confirmed in `AnalyzeImageTextFallbackTest.test_analyze_image_tries_next_multimodal_candidate_before_text_fallback`: a successful image-model card returning `Top synthetic screenshot fixture text` in `ignored_regions` was previously echoed by the route.
+- Added `_ALLOWED_IGNORED_REGIONS` and `_sanitized_ignored_regions(...)` in `backend/shike_backend/main.py`.
+- Final route metadata merge now calls `_sanitized_ignored_regions([*card.ignored_regions, *ignored_regions])`, preserving known UI-chrome labels while dropping model-generated text.
+- `validate_vivo_multimodal_contract.py`, `materials/evidence/release-evidence-index.md`, and `docs/current-validation-status.md` now guard the metadata allowlist; the contract gate is now `VIVO_MULTIMODAL_CONTRACT_METRIC	25/25`.
+
+Validation:
+- PASS `PYTHONPATH=backend python3 -m unittest backend.tests.test_analyze_image_text_fallback`
+  - Evidence: 3 tests passed, including the ignored-region metadata sanitization fixture.
+- PASS `python3 validation/validate_vivo_multimodal_contract.py`
+  - Evidence: `VIVO_MULTIMODAL_CONTRACT_METRIC	25/25`.
+- PASS live synthetic smoke after the metadata allowlist fix:
+  - Evidence: `bluelm_status=pass`, `ocr_status=pass`, `route_v2_status=pass`, `route_v2_schema_valid=true`, `route_v2_actions_disabled=true`, `route_v2_ignored_regions_allowed=true`, `route_v2_ignored_regions=top_status_bar,bottom_navigation_bar`, and `live_smoke_metric=3/3`.
+- PASS temporary HTTP server smoke after promoting the metadata allowlist evidence:
+  - Evidence: `http_smoke_route_status=pass`, `http_smoke_actions_disabled=True`, `http_smoke_ignored_regions_allowed=True`, `http_smoke_ignored_regions=top_status_bar,bottom_navigation_bar`, `http_smoke_log_secret_scan=pass`, and `http_server_smoke_metric=1/1`.
+
+## 2026-06-08 / Round 259
+
+Goal: Continue `SHIKE_ANDROID16_REAL_IMPLEMENTATION_GUIDE (1).md` by closing the `/v2/analyze-image` action-gate regression found during live vivo smoke.
+Legacy release handoff tokens: Goal: Promote Android image preprocessing to release handoff evidence. Round focus: Promote real HTTP server smoke into backend config and release handoff gates.
+Release handoff compatibility: scoring evidence map; preliminary deck landing evidence package; `docs/delivery-boundary-and-scoring.md`; `materials/preliminary-deck.md`; Android 16 capture/share boundaries; no default image upload; APK secret hygiene; `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md`; `materials/evidence/requirement-matrix.md`; cloud-device strict blocker honesty.
+
+Current handoff summary:
+- Current local release metrics remain `LANDING_RELEASE_CANDIDATE_METRIC	61/61`, `CLOUD_DEVICE_PACKAGE_METRIC	29/29`, `RELEASE_HANDOFF_CHECKS_METRIC	18/18`, `BACKEND_CONFIG_METRIC	18/18`, `RELEASE_EVIDENCE_INDEX_METRIC	10/10`, `REQUIREMENT_MATRIX_METRIC	9/9`, `DEMO_ACCEPTANCE_METRIC	18/18`, `APK_SECRET_HYGIENE_METRIC	8/8`, `VIVO_MULTIMODAL_CONTRACT_METRIC	24/24`, `NO_DEFAULT_IMAGE_UPLOAD_METRIC	12/12`, `SCREENSHOT_ASSIST_METRIC	15/15`, `ANDROID_IMAGE_PREPROCESS_METRIC	15/15`, and expected strict blocker `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`.
+- Real HTTP server smoke is now part of the unified handoff runner; current evidence remains `http_server_smoke_metric=1/1` with `http_smoke_actions_disabled=True`. The no-cloud-image boundary remains `allow_cloud_image=false` with `cloud_image_disabled` risk evidence.
+- Added validator and evidence coverage for the final server-side user-confirmation action gate; successful image-model cards with model-claimed executable actions are overwritten to `disabled_reason=用户确认前不可执行` before leaving `/v2/analyze-image`.
+- No cloud recordings, report values, credentials, or personal data were fabricated.
+
+Behavior:
+- Live backend smoke had exposed a real `/v2/analyze-image` gap: BlueLM and OCR passed, but the route could return `route_v2_actions_disabled=false` when a successful multimodal card carried model-authored executable action state.
+- The route now runs `_require_user_confirmation_for_card(card)` on the final card before merging route metadata into the response.
+- `SuccessfulMultimodalAdapter` in `backend/tests/test_analyze_image_text_fallback.py` intentionally returns one action without `disabled_reason` and one with `disabled_reason=模型声称可直接执行`; the route test asserts both become `用户确认前不可执行`.
+- `validate_vivo_multimodal_contract.py`, `materials/evidence/release-evidence-index.md`, and `docs/current-validation-status.md` now guard and describe this final backend action gate.
+
+Validation:
+- RED confirmed before the backend fix: targeted route test failed on missing/incorrect `disabled_reason` for successful multimodal actions.
+- PASS `PYTHONPATH=backend python3 -m unittest backend.tests.test_analyze_image_text_fallback`
+  - Evidence: 3 tests passed; successful multimodal, image-unsupported text fallback, and `allow_cloud_image=false` branches all keep actions disabled.
+- PASS `python3 validation/validate_vivo_multimodal_contract.py`
+  - Evidence: `VIVO_MULTIMODAL_CONTRACT_METRIC	24/24`.
+- PASS live synthetic smoke after fix:
+  - Evidence: `bluelm_status=pass`, `ocr_status=pass`, `route_v2_status=pass`, `route_v2_schema_valid=true`, `route_v2_actions_disabled=true`, and `live_smoke_metric=3/3`.
+- PASS native multimodal smoke with the current runtime-only test key:
+  - Evidence: `Volc-DeepSeek-V3.2` reported `provider_model_does_not_support_image`; `Doubao-Seed-2.0-mini` returned `multimodal_status=pass`, `multimodal_scene_type=meeting_notice`, `multimodal_schema_valid=True`, and `live_smoke_metric=1/1`.
+
+## 2026-06-08 / Round 258
+
+Goal: Continue `SHIKE_ANDROID16_REAL_IMPLEMENTATION_GUIDE (1).md` with a stronger recent-screenshot notification import path.
+Round focus: Preserve recent screenshot candidate metadata across notification tap import and align the MediaStore lookback window with the Android 16 guide.
+Legacy release handoff tokens: Goal: Promote Android image preprocessing to release handoff evidence. Round focus: Promote real HTTP server smoke into backend config and release handoff gates.
+Release handoff compatibility: scoring evidence map; preliminary deck landing evidence package; `docs/delivery-boundary-and-scoring.md`; `materials/preliminary-deck.md`; Android 16 capture/share boundaries; no default image upload; APK secret hygiene; `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md`; `materials/evidence/requirement-matrix.md`; cloud-device strict blocker honesty.
+
+Current handoff summary:
+- Current local release metrics remain `LANDING_RELEASE_CANDIDATE_METRIC	61/61`, `REAL_WORLD_READY_METRIC	22/22`, `CLOUD_DEVICE_PACKAGE_METRIC	29/29`, `RELEASE_HANDOFF_CHECKS_METRIC	18/18`, `BACKEND_CONFIG_METRIC	18/18`, `RELEASE_EVIDENCE_INDEX_METRIC	10/10`, `REQUIREMENT_MATRIX_METRIC	9/9`, `DEMO_ACCEPTANCE_METRIC	18/18`, `APK_SECRET_HYGIENE_METRIC	8/8`, `VIVO_MULTIMODAL_CONTRACT_METRIC	24/24`, `NO_DEFAULT_IMAGE_UPLOAD_METRIC	12/12`, `SCREENSHOT_ASSIST_METRIC	15/15`, `ANDROID_IMAGE_PREPROCESS_METRIC	15/15`, `ANDROID_UNIT_TEST_METRIC	86/86`, and expected strict blocker `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`.
+- Real HTTP server smoke is now part of the unified handoff runner; current evidence remains `http_server_smoke_metric=1/1` with `http_smoke_actions_disabled=True`. The no-cloud-image boundary remains `allow_cloud_image=false` with `cloud_image_disabled` risk evidence.
+- The vivo test credentials remain runtime-only inputs and were not written into Android, docs, tests, logs, APK assets, or GitHub-ready evidence.
+- No cloud recordings, report values, credentials, or personal data were fabricated.
+- Strict cloud-device release proof remains blocked until nine real cloud-device MP4 recordings, filled report fields, and real logcat evidence are collected.
+
+Behavior:
+- Added a 30-second `SCREENSHOT_ASSIST_LOOKBACK_SECONDS` constant and made `ScreenshotObserver` use it for the recent MediaStore screenshot query.
+- Added `screenshotCandidateFromNotificationImport(...)` so notification taps preserve created time, width, height, and display-name digest instead of recreating a zero-dimension candidate.
+- `ScreenshotNotification` now writes candidate metadata into the pending intent, and `MainActivity` reads it back into the same pending draft flow.
+- Strengthened `validate_screenshot_assist.py` and `validate_android_unit_tests.py` so this metadata handoff remains guarded.
+- Fixed the release handoff runner HTTP smoke command to use `--disable-cloud-image`, keeping the local handoff route deterministic even when this machine has real vivo credentials in a private env file.
+
+Files changed:
+- Android: `android-mvp/app/src/main/java/cn/shike/app/data/ScreenshotCandidateStore.kt`, `android-mvp/app/src/main/java/cn/shike/app/system/ScreenshotObserver.kt`, `android-mvp/app/src/main/java/cn/shike/app/system/ScreenshotNotification.kt`, `android-mvp/app/src/main/java/cn/shike/app/MainActivity.kt`.
+- Tests/validation: `android-mvp/app/src/test/java/cn/shike/app/data/ScreenshotCandidateStoreTest.kt`, `validation/validate_screenshot_assist.py`, `validation/validate_android_unit_tests.py`, `validation/validate_release_evidence_index.py`.
+- Handoff: `scripts/run_release_handoff_checks.py`, `validation/validate_cloud_device_package.py`.
+- Evidence: `docs/current-validation-status.md`, `materials/evidence/release-evidence-index.md`, `materials/evidence/cloud-device/apk-sha256.txt`, `materials/evidence/cloud-device/cloud-device-capture-todo.md`, `/mnt/c/Users/Xing/Desktop/Shike-app-debug.apk`.
+
+Validation:
+- Target GREEN: `gradle --no-daemon :app:testDebugUnitTest --tests "cn.shike.app.data.ScreenshotCandidateStoreTest"` -> `BUILD SUCCESSFUL`.
+- PASS `gradle --no-daemon :app:testDebugUnitTest`
+  - Evidence: `BUILD SUCCESSFUL`; XML summary reports 38 suites, 144 tests, 0 failures, and 0 errors.
+- PASS `python3 validation/validate_android_unit_tests.py`
+  - Evidence: `ANDROID_UNIT_TEST_METRIC	86/86`.
+- PASS `python3 validation/validate_screenshot_assist.py`
+  - Evidence: `SCREENSHOT_ASSIST_METRIC	15/15`.
+- PASS `python3 validation/validate_android16_screenshot_flow.py`
+  - Evidence: `ANDROID16_SCREENSHOT_FLOW_METRIC	18/18`.
+- PASS `python3 validation/validate_no_default_image_upload.py`
+  - Evidence: `NO_DEFAULT_IMAGE_UPLOAD_METRIC	12/12`.
+- PASS `python3 backend/shike_backend/eval/http_server_smoke.py --timeout-seconds 35 --disable-cloud-image`
+  - Evidence: `http_server_smoke_metric=1/1`, `http_smoke_actions_disabled=True`, and `http_smoke_risk_kinds=text_fallback`.
+- PASS `bash android-mvp/build_apk.sh`
+  - Evidence: local APK rebuilt at `android-mvp/app/build/outputs/apk/debug/app-debug.apk`.
+- PASS desktop APK sync
+  - Evidence: local and `/mnt/c/Users/Xing/Desktop/Shike-app-debug.apk` SHA-256 both `62a57e5e865f77a4ce56dd95f6488588e1916e9f7720f69f148b1e0277206ff0`.
+- PASS `python3 scripts/prepare_cloud_device_evidence.py`
+  - Evidence: `CLOUD_DEVICE_PREP_METRIC	5/5`; expected pre-recording gaps remain `CLOUD_DEVICE_PREP_MISSING_VIDEOS	9/9`, `CLOUD_DEVICE_PREP_REPORT_TBD_FIELDS	14/14`, and `CLOUD_DEVICE_PREP_REPORT_VIDEO_TBD_FIELDS	9/9`.
+- PASS `python3 validation/validate_apk_secret_hygiene.py`
+  - Evidence: `APK_SECRET_HYGIENE_METRIC	8/8`.
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS	secret_hygiene`.
+- PASS `python3 scripts/run_release_handoff_checks.py --strict`
+  - Evidence: `RELEASE_HANDOFF_CHECKS_METRIC	18/18`; strict gates are expected blockers, not fabricated pass states.
+- BLOCKED `python3 validation/validate_landing_release_candidate.py --strict`
+  - Evidence from handoff runner: `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`.
+  - Missing external evidence remains: nine real cloud-device MP4 recordings, non-placeholder `cloud-device-test-report.md`, and real redacted `cloud-device-logcat.txt`.
+
+## 2026-06-08 / Round 257
+
+Goal: Continue `SHIKE_ANDROID16_REAL_IMPLEMENTATION_GUIDE (1).md` with the shared-input landing path.
+Round focus: Make `text/plain` share intents received while Shike is already open enter the same ready review draft path as cold-start text share.
+Legacy release handoff tokens: Goal: Promote Android image preprocessing to release handoff evidence. Round focus: Promote real HTTP server smoke into backend config and release handoff gates.
+Release handoff compatibility: scoring evidence map; preliminary deck landing evidence package; `docs/delivery-boundary-and-scoring.md`; `materials/preliminary-deck.md`; Android 16 capture/share boundaries; no default image upload; APK secret hygiene; `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md`; `materials/evidence/requirement-matrix.md`; cloud-device strict blocker honesty.
+
+Current handoff summary:
+- Current local release metrics remain `LANDING_RELEASE_CANDIDATE_METRIC	61/61`, `REAL_WORLD_READY_METRIC	22/22`, `CLOUD_DEVICE_PACKAGE_METRIC	29/29`, `RELEASE_HANDOFF_CHECKS_METRIC	18/18`, `BACKEND_CONFIG_METRIC	18/18`, `RELEASE_EVIDENCE_INDEX_METRIC	10/10`, `REQUIREMENT_MATRIX_METRIC	9/9`, `DEMO_ACCEPTANCE_METRIC	18/18`, `APK_SECRET_HYGIENE_METRIC	8/8`, `VIVO_MULTIMODAL_CONTRACT_METRIC	24/24`, `NO_DEFAULT_IMAGE_UPLOAD_METRIC	12/12`, `SCREENSHOT_ASSIST_METRIC	15/15`, `ANDROID_IMAGE_PREPROCESS_METRIC	15/15`, `ANDROID_UNIT_TEST_METRIC	86/86`, and expected strict blocker `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`.
+- Real HTTP server smoke is now part of the unified handoff runner; current evidence remains `http_server_smoke_metric=1/1` with `http_smoke_actions_disabled=True`. The no-cloud-image boundary remains `allow_cloud_image=false` with `cloud_image_disabled` risk evidence.
+- The vivo test credentials remain runtime-only inputs and were not written into Android, docs, tests, logs, APK assets, or GitHub-ready evidence.
+- No cloud recordings, report values, credentials, or personal data were fabricated.
+- Strict cloud-device release proof remains blocked until nine real cloud-device MP4 recordings, filled report fields, and real logcat evidence are collected.
+
+Behavior:
+- Added `buildRuntimeSharedTextSelection(...)` as the shared owner for runtime text-share review drafts.
+- `MainActivity.onNewIntent(...)` now consumes new `Intent.ACTION_SEND` text intents, stores a Compose state handoff, and clears it after `ShikeApp` imports the draft.
+- `ShikeApp` now applies runtime shared text as a pending review card, clears any previous image URI/bitmap context, and keeps original-image deletion unsupported for text-only input.
+- `validate_android16_screenshot_flow.py` now guards that runtime text share remains wired through Activity and Compose instead of only working on cold start.
+
+Files changed:
+- Android: `android-mvp/app/src/main/java/cn/shike/app/data/InitialSelectionMapper.kt`, `android-mvp/app/src/main/java/cn/shike/app/MainActivity.kt`, `android-mvp/app/src/main/java/cn/shike/app/ShikeApp.kt`.
+- Tests/validation: `android-mvp/app/src/test/java/cn/shike/app/data/InitialSelectionMapperTest.kt`, `validation/validate_android16_screenshot_flow.py`, `validation/validate_android_unit_tests.py`.
+- Evidence: `android-mvp/build-report.md`, `materials/evidence/cloud-device/apk-sha256.txt`, `materials/evidence/cloud-device/cloud-device-capture-todo.md`, `/mnt/c/Users/Xing/Desktop/Shike-app-debug.apk`.
+
+Validation:
+- RED confirmed first: `gradle --no-daemon :app:testDebugUnitTest --tests "cn.shike.app.data.InitialSelectionMapperTest"` initially failed before `buildRuntimeSharedTextSelection(...)` existed; the first environment rerun also exposed missing Android SDK/JDK path and was repaired with the project-local SDK/JDK.
+- Target GREEN: `JAVA_HOME=~/.local/share/shike-android-tools/jdk-local/usr/lib/jvm/java-21-openjdk-amd64 ANDROID_HOME=~/.local/share/shike-android-tools/android-sdk gradle --no-daemon :app:testDebugUnitTest --tests "cn.shike.app.data.InitialSelectionMapperTest"` -> `BUILD SUCCESSFUL`.
+- PASS `gradle --no-daemon :app:testDebugUnitTest`
+  - Evidence: `BUILD SUCCESSFUL`; XML summary reports 38 suites, 142 tests, 0 failures, and 0 errors.
+- PASS `python3 validation/validate_android_unit_tests.py`
+  - Evidence: `ANDROID_UNIT_TEST_METRIC	86/86`.
+- PASS `python3 validation/validate_android16_screenshot_flow.py`
+  - Evidence: `ANDROID16_SCREENSHOT_FLOW_METRIC	18/18`.
+- PASS `python3 validation/validate_no_default_image_upload.py`
+  - Evidence: `NO_DEFAULT_IMAGE_UPLOAD_METRIC	12/12`.
+- PASS `python3 validation/validate_screenshot_assist.py`
+  - Evidence: `SCREENSHOT_ASSIST_METRIC	15/15`.
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS	secret_hygiene`.
+- PASS `bash android-mvp/build_apk.sh`
+  - Evidence: local APK rebuilt at `android-mvp/app/build/outputs/apk/debug/app-debug.apk`.
+- PASS desktop APK sync
+  - Evidence: local and `/mnt/c/Users/Xing/Desktop/Shike-app-debug.apk` SHA-256 both `38449528d4066422161580730dd3d0c82eb79b34811e1568c7b549c7a3ff18e0`.
+- PASS `python3 scripts/prepare_cloud_device_evidence.py`
+  - Evidence: `CLOUD_DEVICE_PREP_METRIC	5/5`; expected pre-recording gaps remain `CLOUD_DEVICE_PREP_MISSING_VIDEOS	9/9`, `CLOUD_DEVICE_PREP_REPORT_TBD_FIELDS	14/14`, and `CLOUD_DEVICE_PREP_REPORT_VIDEO_TBD_FIELDS	9/9`.
+- PASS `python3 validation/validate_apk_secret_hygiene.py`
+  - Evidence: `APK_SECRET_HYGIENE_METRIC	8/8`.
+- PASS `python3 validation/validate_cloud_device_package.py`
+  - Evidence: `CLOUD_DEVICE_PACKAGE_METRIC	29/29`.
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	61/61`.
+- PASS `python3 scripts/run_release_handoff_checks.py --strict`
+  - Evidence: `RELEASE_HANDOFF_CHECKS_METRIC	18/18`; strict gates are expected blockers, not fabricated pass states.
+- BLOCKED `python3 validation/validate_landing_release_candidate.py --strict`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`.
+  - Missing external evidence remains: nine real cloud-device MP4 recordings, non-placeholder `cloud-device-test-report.md`, and real redacted `cloud-device-logcat.txt`.
+
+## 2026-06-08 / Round 256
+
+Goal: Continue `SHIKE_ANDROID16_REAL_IMPLEMENTATION_GUIDE (1).md` with a more landable recent screenshot helper.
+Round focus: Persist the opt-in screenshot-assist switch across app restarts and clear it when the user clears Shike local cache.
+Legacy release handoff tokens: Goal: Promote Android image preprocessing to release handoff evidence. Round focus: Promote real HTTP server smoke into backend config and release handoff gates.
+Release handoff compatibility: scoring evidence map; preliminary deck landing evidence package; `docs/delivery-boundary-and-scoring.md`; `materials/preliminary-deck.md`; `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md`; `materials/evidence/requirement-matrix.md`.
+
+Current handoff summary:
+- Current local release metrics remain `LANDING_RELEASE_CANDIDATE_METRIC	61/61`, `REAL_WORLD_READY_METRIC	22/22`, `CLOUD_DEVICE_PACKAGE_METRIC	29/29`, `RELEASE_HANDOFF_CHECKS_METRIC	18/18`, `BACKEND_CONFIG_METRIC	18/18`, `RELEASE_EVIDENCE_INDEX_METRIC	10/10`, `REQUIREMENT_MATRIX_METRIC	9/9`, `DEMO_ACCEPTANCE_METRIC	18/18`, `APK_SECRET_HYGIENE_METRIC	8/8`, `VIVO_MULTIMODAL_CONTRACT_METRIC	24/24`, `NO_DEFAULT_IMAGE_UPLOAD_METRIC	12/12`, `SCREENSHOT_ASSIST_METRIC	15/15`, `ANDROID_IMAGE_PREPROCESS_METRIC	15/15`, `ANDROID_UNIT_TEST_METRIC	86/86`, and expected strict blocker `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`.
+- Real HTTP server smoke is now part of the unified handoff runner; current evidence remains `http_server_smoke_metric=1/1` with `http_smoke_actions_disabled=True`. The no-cloud-image boundary remains `allow_cloud_image=false` with `cloud_image_disabled` risk evidence.
+- The vivo test credentials remain local/runtime-only inputs and were not written into Android, docs, tests, logs, APK assets, or GitHub-ready evidence.
+- No cloud recordings, report values, credentials, or personal data were fabricated.
+- Strict cloud-device release proof remains blocked until nine real cloud-device MP4 recordings, filled report fields, and real logcat evidence are collected.
+- Historical optimization-log entries keep their original evidence values.
+
+Behavior:
+- Added `SharedPreferences` persistence for the opt-in recent screenshot helper switch.
+- `MainActivity` now loads the saved screenshot-assist state on startup and registers the MediaStore observer only when the saved setting and media permission allow it.
+- Toggling the setting saves the new state; denying media permission or clearing Shike local cache resets the setting and unregisters the observer.
+- This keeps the Android 16 guide boundary intact: no default image upload, no global overlay, no silent gallery deletion, and no provider secret inside Android.
+
+Files changed:
+- Android: `android-mvp/app/src/main/java/cn/shike/app/data/ScreenshotCandidateStore.kt`, `android-mvp/app/src/main/java/cn/shike/app/MainActivity.kt`.
+- Tests/validation: `android-mvp/app/src/test/java/cn/shike/app/data/ScreenshotCandidateStoreTest.kt`, `validation/validate_android_unit_tests.py`, `validation/validate_screenshot_assist.py`, `validation/validate_android16_screenshot_flow.py`.
+- Docs/materials: `README.md`, `docs/current-validation-status.md`, `docs/optimization-log.md`, `materials/evidence/release-evidence-index.md`.
+
+Validation:
+- RED confirmed first: `gradle --no-daemon :app:testDebugUnitTest --tests "cn.shike.app.data.ScreenshotCandidateStoreTest"` failed with unresolved `loadScreenshotAssistEnabledFromPreferences`, `saveScreenshotAssistEnabledToPreferences`, `clearScreenshotAssistPreferenceFromPreferences`, and `KEY_SCREENSHOT_ASSIST_ENABLED`.
+- Target GREEN: `gradle --no-daemon :app:testDebugUnitTest --tests "cn.shike.app.data.ScreenshotCandidateStoreTest"` -> `BUILD SUCCESSFUL`.
+- PASS `gradle --no-daemon :app:testDebugUnitTest`
+  - Evidence: `BUILD SUCCESSFUL`; XML summary reports 38 suites, 140 tests, 0 failures, and 0 errors.
+- PASS `python3 validation/validate_android_unit_tests.py`
+  - Evidence: `ANDROID_UNIT_TEST_METRIC	86/86`.
+- PASS `python3 validation/validate_screenshot_assist.py`
+  - Evidence: `SCREENSHOT_ASSIST_METRIC	15/15`.
+- PASS `python3 validation/validate_android16_screenshot_flow.py`
+  - Evidence: `ANDROID16_SCREENSHOT_FLOW_METRIC	17/17`.
+- PASS `python3 validation/validate_release_evidence_index.py`
+  - Evidence: `RELEASE_EVIDENCE_INDEX_METRIC	10/10`.
+- PASS `bash android-mvp/build_apk.sh`
+  - Evidence: local APK rebuilt at `android-mvp/app/build/outputs/apk/debug/app-debug.apk`.
+- PASS desktop APK sync
+  - Evidence: local and `/mnt/c/Users/Xing/Desktop/Shike-app-debug.apk` SHA-256 both `f18a70e7d2f3d1fec25dec2a564926ea184771c7d7bf426349dc614c92f13db9`.
+- PASS `python3 scripts/prepare_cloud_device_evidence.py`
+  - Evidence: `CLOUD_DEVICE_PREP_METRIC	5/5`; refreshed `materials/evidence/cloud-device/apk-sha256.txt`, with expected pre-recording gaps `CLOUD_DEVICE_PREP_MISSING_VIDEOS	9/9`, `CLOUD_DEVICE_PREP_REPORT_TBD_FIELDS	14/14`, and `CLOUD_DEVICE_PREP_REPORT_VIDEO_TBD_FIELDS	9/9`.
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS	secret_hygiene`.
+- PASS `python3 validation/validate_apk_secret_hygiene.py`
+  - Evidence: `APK_SECRET_HYGIENE_METRIC	8/8`; scans local and desktop APKs and confirms private env values are not embedded.
+- PASS `python3 validation/validate_cloud_device_package.py`
+  - Evidence: `CLOUD_DEVICE_PACKAGE_METRIC	29/29`.
+- PASS `python3 validation/validate_release_blocking_report.py`
+  - Evidence: `RELEASE_BLOCKING_REPORT_METRIC	8/8`.
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	61/61`.
+- BLOCKED `python3 validation/validate_landing_release_candidate.py --strict`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`.
+  - Missing external evidence remains: nine real cloud-device MP4 recordings, non-placeholder `cloud-device-test-report.md`, and real redacted `cloud-device-logcat.txt`.
+
+## 2026-06-08 / Round 255
+
+Goal: Continue `SHIKE_ANDROID16_REAL_IMPLEMENTATION_GUIDE (1).md` with real vivo cloud image-model landing evidence.
+Round focus: Make the vivo multimodal default candidate chain land without requiring operators to hand-configure every model.
+Legacy handoff token: Goal: Continue the Android 16 real-implementation guide with the optional端侧 3B runtime contract.
+Legacy release handoff tokens: Goal: Promote Android image preprocessing to release handoff evidence. Round focus: Promote real HTTP server smoke into backend config and release handoff gates.
+Release handoff compatibility: default multimodal candidates; `provider_model_does_not_support_image`; selected `Doubao-Seed-2.0-mini`; no AppKEY in repo evidence.
+
+Current handoff summary:
+- Current release evidence anchors remain: scoring evidence map, preliminary deck landing evidence package, `docs/delivery-boundary-and-scoring.md`, `materials/preliminary-deck.md`, `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md`, and `materials/evidence/requirement-matrix.md`.
+- Current local release metrics remain `LANDING_RELEASE_CANDIDATE_METRIC	61/61`, `REAL_WORLD_READY_METRIC	22/22`, `CLOUD_DEVICE_PACKAGE_METRIC	29/29`, `RELEASE_HANDOFF_CHECKS_METRIC	18/18`, `BACKEND_CONFIG_METRIC	18/18`, `RELEASE_EVIDENCE_INDEX_METRIC	10/10`, `REQUIREMENT_MATRIX_METRIC	9/9`, `DEMO_ACCEPTANCE_METRIC	18/18`, `APK_SECRET_HYGIENE_METRIC	8/8`, `VIVO_MULTIMODAL_CONTRACT_METRIC	24/24`, `VIVO_OCR_ADAPTER_METRIC	11/11`, `NO_DEFAULT_IMAGE_UPLOAD_METRIC	12/12`, `SCREENSHOT_ASSIST_METRIC	15/15`, `ANDROID_IMAGE_PREPROCESS_METRIC	15/15`, `ANDROID_UNIT_TEST_METRIC	86/86`, and expected strict blocker `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`.
+- Real HTTP server smoke is now part of the unified handoff runner; current evidence remains `http_server_smoke_metric=1/1` with `http_smoke_actions_disabled=True`. The no-cloud-image boundary remains `allow_cloud_image=false` with `cloud_image_disabled` risk evidence.
+- The vivo test credentials remain local/runtime-only inputs loaded from the private backend env file or process environment. They were not written into Android, docs, tests, logs, APK assets, or GitHub-ready evidence.
+- No cloud recordings, report values, credentials, or personal data were fabricated.
+- Strict cloud-device release proof remains blocked until nine real cloud-device MP4 recordings, filled report fields, and real logcat evidence are collected.
+- Historical optimization-log entries keep their original evidence values.
+
+Behavior:
+- Kept `VIVO_MULTIMODAL_MODELS` as the explicit operator override.
+- Added the default route when `VIVO_MULTIMODAL_MODELS` is omitted: `VIVO_MULTIMODAL_MODEL`, `Volc-DeepSeek-V3.2`, `Doubao-Seed-2.0-mini`, `Doubao-Seed-2.0-lite`, `Doubao-Seed-2.0-pro`, and `qwen3.5-plus`, de-duplicated in priority order.
+- Updated live evidence from "all candidates failed" to the current secret-safe result: `Volc-DeepSeek-V3.2` fails with `provider_model_does_not_support_image`, then `Doubao-Seed-2.0-mini` returns a schema-valid `meeting_notice` card.
+- Preserved OCR+BlueLM text fallback for future image-provider failures and kept all downstream actions disabled until user confirmation.
+
+Files changed:
+- Backend settings/tests/validation: `backend/shike_backend/settings.py`, `backend/tests/test_settings_env_file.py`, `validation/validate_vivo_multimodal_contract.py`.
+- Docs/materials: `docs/current-validation-status.md`, `docs/server-deployment-runbook.md`, `docs/bluelm-integration-runbook.md`, `docs/optimization-log.md`, `materials/evidence/release-evidence-index.md`, `materials/evidence/cloud-device/backend-redacted-access-log.txt`.
+
+Validation:
+- PASS `PYTHONPATH=backend python3 -m unittest backend.tests.test_settings_env_file backend.tests.test_analyze_image_text_fallback`
+  - Evidence: 6 tests passed; covers private env loading, process-env priority, default multimodal candidate chain, image-candidate retry, and text fallback boundaries.
+- PASS `python3 validation/validate_vivo_multimodal_contract.py`
+  - Evidence: `VIVO_MULTIMODAL_CONTRACT_METRIC	24/24`.
+- PASS `python3 validation/validate_backend_config.py`
+  - Evidence: `BACKEND_CONFIG_METRIC	18/18`.
+- PASS `python3 validation/validate_release_evidence_index.py`
+  - Evidence: `RELEASE_EVIDENCE_INDEX_METRIC	10/10`.
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS	secret_hygiene`.
+- PASS `python3 validation/validate_apk_secret_hygiene.py`
+  - Evidence: `APK_SECRET_HYGIENE_METRIC	8/8`; scans local and desktop APKs without printing private env values.
+- PASS `PYTHONPATH=backend python3 -m shike_backend.eval.live_smoke --skip-bluelm --skip-ocr --multimodal --multimodal-image "/tmp/shike-live-smoke-synthetic.png" --timeout-seconds 25`
+  - Evidence: `multimodal_key_present=True`, `Volc-DeepSeek-V3.2` -> `provider_model_does_not_support_image`, `Doubao-Seed-2.0-mini` -> `multimodal_status=pass`, `multimodal_scene_type=meeting_notice`, `multimodal_schema_valid=True`, and `live_smoke_metric=1/1`.
+  - Boundary: output was redacted; no AppKEY, Authorization header, base64 image payload, full OCR text, or personal data was written into repo evidence.
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	61/61`.
+- BLOCKED `python3 validation/validate_landing_release_candidate.py --strict`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`.
+  - Missing external evidence remains: nine real cloud-device MP4 recordings, non-placeholder `cloud-device-test-report.md`, and real redacted `cloud-device-logcat.txt`.
+
+## 2026-06-08 / Round 254
+
+Goal: Continue the Android 16 real-implementation guide with the optional端侧 3B runtime contract.
+Round focus: Add a safe local multimodal runtime boundary without bundling vivo SDK credentials or claiming the model is installed.
+Legacy handoff token: Goal: Align the Android 16 confirmation and execution action copy with the real implementation guide.
+Release handoff baseline token: Goal: Promote Android image preprocessing to release handoff evidence.
+Release handoff smoke token: Round focus: Promote real HTTP server smoke into backend config and release handoff gates.
+Release handoff compatibility: allow_cloud_image=false; cloud_image_disabled; Real HTTP server smoke is now part of the unified handoff runner; http_smoke_actions_disabled=True; http_server_smoke_metric=1/1.
+
+Current handoff summary:
+- Current release evidence anchors remain: scoring evidence map, preliminary deck landing evidence package, `docs/delivery-boundary-and-scoring.md`, `materials/preliminary-deck.md`, `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md`, and `materials/evidence/requirement-matrix.md`.
+- Current local release metrics remain `LANDING_RELEASE_CANDIDATE_METRIC	61/61`, `REAL_WORLD_READY_METRIC	22/22`, `CLOUD_DEVICE_PACKAGE_METRIC	29/29`, `RELEASE_HANDOFF_CHECKS_METRIC	18/18`, `BACKEND_CONFIG_METRIC	18/18`, `RELEASE_EVIDENCE_INDEX_METRIC	10/10`, `REQUIREMENT_MATRIX_METRIC	9/9`, `DEMO_ACCEPTANCE_METRIC	18/18`, `APK_SECRET_HYGIENE_METRIC	8/8`, `VIVO_MULTIMODAL_CONTRACT_METRIC	24/24`, `NO_DEFAULT_IMAGE_UPLOAD_METRIC	12/12`, `ANDROID16_SCREENSHOT_FLOW_METRIC	17/17`, `SCREENSHOT_ASSIST_METRIC	15/15`, `NO_FAKE_DEVICE_CHROME_METRIC	1/1`, `HOME_ONE_SCREEN_METRIC	9/9`, `SCREENSHOT_CLEANUP_METRIC	14/14`, `ANDROID_UNIT_TEST_METRIC	86/86`, `ACTION_EXECUTION_METRIC	18/18`, `ANDROID_IMAGE_PREPROCESS_METRIC	15/15`, and expected strict blocker `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`.
+- The vivo test credentials remain local/runtime-only inputs and were not written into Android, docs, tests, logs, or APK assets.
+- No cloud recordings, report values, credentials, or personal data were fabricated.
+- Strict cloud-device release proof remains blocked until nine real cloud-device MP4 recordings, filled report fields, and real logcat evidence are collected.
+
+Behavior:
+- Added `LocalMultimodalRuntime` and `LocalMultimodalEngine` as a pure Kotlin adapter boundary for future端侧 3B SDK integration.
+- Locked the runtime order to `init(multimodal=true) -> callVit -> generate`, with `release()` called after each non-missing-engine run.
+- Local output now has a code-level schema gate: valid output becomes a `待确认` action card; missing required fields become `local_schema_rejected` without injecting training sample fields.
+- Missing SDK returns `local_multimodal_sdk_missing` rather than pretending the端侧 model is available.
+- Raised the Android unit-test guard from `84/84` to `86/86`.
+
+Files changed:
+- Android: `android-mvp/app/src/main/java/cn/shike/app/data/LocalMultimodalRuntime.kt`.
+- Tests/validation: `android-mvp/app/src/test/java/cn/shike/app/data/LocalMultimodalRuntimeTest.kt`, `validation/validate_android_unit_tests.py`, `validation/validate_real_world_ready.py`, `validation/validate_requirement_matrix.py`.
+- Docs/materials: `README.md`, `docs/android-mvp-implementation.md`, `docs/current-validation-status.md`, `docs/optimization-log.md`, `materials/device-demo-checklist.md`, `materials/evidence/requirement-matrix.md`.
+
+Validation:
+- RED confirmed for端侧 runtime contract: `gradle --no-daemon :app:testDebugUnitTest --tests "cn.shike.app.data.LocalMultimodalRuntimeTest"` failed with unresolved runtime symbols before production code existed.
+- Target GREEN after runtime implementation: `gradle --no-daemon :app:testDebugUnitTest --tests "cn.shike.app.data.LocalMultimodalRuntimeTest"` -> `BUILD SUCCESSFUL`.
+
+## 2026-06-08 / Round 253
+
+Goal: Align the Android 16 confirmation and execution action copy with the real implementation guide.
+Round focus: Centralize confirmed action button labels, disable reminder when time is missing, and sync validation/docs to the guide copy.
+Legacy handoff token: Goal: Promote Android image preprocessing to release handoff evidence.
+Legacy round focus token: Round focus: Promote real HTTP server smoke into backend config and release handoff gates.
+
+Current handoff summary:
+- Current release evidence anchors remain: scoring evidence map, preliminary deck landing evidence package, `docs/delivery-boundary-and-scoring.md`, `materials/preliminary-deck.md`, `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md`, and `materials/evidence/requirement-matrix.md`.
+- Current local release metrics remain `LANDING_RELEASE_CANDIDATE_METRIC	61/61`, `REAL_WORLD_READY_METRIC	22/22`, `CLOUD_DEVICE_PACKAGE_METRIC	29/29`, `RELEASE_HANDOFF_CHECKS_METRIC	18/18`, `BACKEND_CONFIG_METRIC	18/18`, `RELEASE_EVIDENCE_INDEX_METRIC	10/10`, `REQUIREMENT_MATRIX_METRIC	9/9`, `DEMO_ACCEPTANCE_METRIC	18/18`, `APK_SECRET_HYGIENE_METRIC	8/8`, `VIVO_MULTIMODAL_CONTRACT_METRIC	24/24`, `NO_DEFAULT_IMAGE_UPLOAD_METRIC	12/12`, `ANDROID16_SCREENSHOT_FLOW_METRIC	17/17`, `SCREENSHOT_ASSIST_METRIC	15/15`, `NO_FAKE_DEVICE_CHROME_METRIC	1/1`, `HOME_ONE_SCREEN_METRIC	9/9`, `SCREENSHOT_CLEANUP_METRIC	14/14`, `ANDROID_UNIT_TEST_METRIC	84/84`, `ACTION_EXECUTION_METRIC	18/18`, `ANDROID_IMAGE_PREPROCESS_METRIC	15/15`, and expected strict blocker `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`.
+- Real HTTP server smoke is now part of the unified handoff runner; current evidence remains `http_server_smoke_metric=1/1` with `http_smoke_actions_disabled=True`. The no-cloud-image boundary remains `allow_cloud_image=false` with `cloud_image_disabled` risk evidence when the user selects the端侧优先 path.
+- No cloud recordings, report values, credentials, or personal data were fabricated.
+- The vivo test credentials remain local/runtime-only inputs and were not written into Android, docs, tests, logs, or APK assets.
+- Strict cloud-device release proof remains blocked until nine real cloud-device MP4 recordings, filled report fields, and real logcat evidence are collected.
+- Historical optimization-log entries keep their original evidence values.
+
+Behavior:
+- Added the notification-permission recovery label required by the Android 16 guide: after reminder permission denial records `permission_blocked`, the reminder button changes to "去开启通知".
+- Threaded execution results into the confirmation banner and action planner button label helper so permission-denial recovery is visible from the same shared action-copy path.
+- Raised the Android unit-test guard from `83/83` to `84/84`.
+- Replaced the review CTA copy with "确认并安排" and aligned execution buttons to "打开日历", "设置提醒", and "查看路线".
+- Added `ExecutionActionButtonLabels` and `executionActionButtonLabelsFor(...)` so the confirmation banner and action planner share the same guide-driven button copy.
+- Tightened `executionActionGateFor(...)` so missing time disables both calendar and reminder actions; missing location still disables route lookup.
+- Updated validators and current demo materials so missing time shows "补充时间后可用" and missing location shows "补充地点后可用".
+- Raised the Android unit-test guard from `82/82` to `83/83` and the action-execution guard from `17/17` to `18/18`.
+- Replaced the privacy-panel direct clear button with "清除拾刻缓存" plus App-internal second confirmation.
+- Added `LocalDataClearConfirmationState` and pure confirmation helpers so first tap only arms the prompt, cancel keeps data, and confirm clears only after the prompt is visible.
+- Updated the cache-clear copy to state it deletes App-private cache/OCR/inbox/backend/reminders but does not delete the system album original screenshot.
+- Strengthened `validate_screenshot_cleanup.py` so screenshot cleanup now guards the separation between cache clearing and MediaStore original-screenshot deletion.
+- Raised the Android unit-test guard from `81/81` to `82/82` and the screenshot-cleanup guard from `13/13` to `14/14`.
+- Replaced the calendar Intent description copy that implied "confirm then write" with copy that states Shike opens Android's system calendar insert page and the user saves inside Calendar.
+- Added `calendarInsertDescriptionFor(...)` so the calendar copy is covered by JVM unit tests instead of only by source-string validation.
+- Added `SystemActionsTest` to guard that calendar copy contains "打开系统日历新增页" and "由用户在日历中保存", and does not contain "确认后写入" or "已保存".
+- Strengthened `validate_action_execution.py` so the action-execution gate fails if `SystemActions.kt` reintroduces "确认后写入" or omits the system-calendar insert-page wording.
+- Updated prototype/demo copy to stop saying "写入日历" before the user saves in Calendar.
+- Raised the Android unit-test guard from `77/77` to `78/78` and synced the current README, device checklist, runbook, requirement matrix, current validation status, and guard scripts.
+- Added the Android 16 screenshot flow, no-fake-device-chrome, one-screen-home, and screenshot-cleanup P0 gates to the release evidence index and unified release handoff runner, raising the current strict handoff metric from `16/16` to `18/18`.
+- Tightened recent screenshot helper detection so it only accepts filename/path screenshot signals and no longer treats screen-sized ordinary images as screenshot candidates.
+- Added `ScreenshotCandidateStoreTest` coverage for accepted screenshot names/paths, screen-sized ordinary-image rejection, and stable display-name digesting; raised the Android unit-test guard from `78/78` to `79/79`.
+- Added repeated-candidate notification dedupe so duplicate MediaStore callbacks for the same screenshot URI do not repeatedly alert the user.
+- Added `SCREENSHOT_ASSIST_METRIC	15/15` to the release evidence index as current proof for the opt-in screenshot helper boundary.
+- Replaced the Android 14+ `Activity.ScreenCaptureCallback` Toast path with a page-level Compose prompt that opens Photo Picker and states the callback does not provide image bytes.
+- Added `ScreenCapturePromptTest` and raised the Android unit-test guard from `79/79` to `80/80`; raised the Android 16 screenshot-flow guard from `15/15` to `17/17`.
+- Extracted DateStrip formatting/copy helpers so the home date uses the current system date only as a sorting hint and explicitly does not become a task time.
+- Added `DateStripTest`, raising the Android unit-test guard from `80/80` to `81/81`.
+
+Files changed:
+- Android current recovery round: `android-mvp/app/src/main/java/cn/shike/app/ui/ExecutionActionGate.kt`, `android-mvp/app/src/main/java/cn/shike/app/ui/ConfirmBannerActions.kt`, `android-mvp/app/src/main/java/cn/shike/app/ui/ConfirmBanner.kt`, `android-mvp/app/src/main/java/cn/shike/app/ui/ActionPlannerExecutionControls.kt`, `android-mvp/app/src/main/java/cn/shike/app/ui/ActionPlannerPanel.kt`, `android-mvp/app/src/main/java/cn/shike/app/ui/MainFlowScreens.kt`, `android-mvp/app/src/main/java/cn/shike/app/ui/ShikeMainScreen.kt`.
+- Tests/validation current recovery round: `android-mvp/app/src/test/java/cn/shike/app/ExecutionActionGateTest.kt`, `validation/validate_android_unit_tests.py`, `validation/validate_action_execution.py`, `validation/validate_advanced_product_beta.py`, `validation/validate_real_world_ready.py`, `validation/validate_requirement_matrix.py`.
+- Docs/materials current recovery round: `README.md`, `docs/current-validation-status.md`, `docs/device-runbook.md`, `docs/optimization-log.md`, `materials/device-demo-checklist.md`, `materials/evidence/requirement-matrix.md`.
+- Android current round: `android-mvp/app/src/main/java/cn/shike/app/ui/ExecutionActionGate.kt`, `android-mvp/app/src/main/java/cn/shike/app/ui/ConfirmBannerActions.kt`, `android-mvp/app/src/main/java/cn/shike/app/ui/ActionPlannerExecutionControls.kt`, `android-mvp/app/src/main/java/cn/shike/app/ui/ReviewDecisionActions.kt`, `android-mvp/app/src/main/java/cn/shike/app/ui/ConfirmBanner.kt`, `android-mvp/app/src/main/java/cn/shike/app/ui/ParseConfirmPanel.kt`, `android-mvp/app/src/main/java/cn/shike/app/ui/SummarySections.kt`.
+- Tests/validation current round: `android-mvp/app/src/test/java/cn/shike/app/ExecutionActionGateTest.kt`, `validation/validate_android_unit_tests.py`, `validation/validate_action_execution.py`, `validation/validate_android_structure.py`, `validation/validate_manual_review.py`, `validation/validate_demo_acceptance.py`, `validation/validate_advanced_product_beta.py`, `validation/validate_real_world_ready.py`, `validation/validate_requirement_matrix.py`.
+- Docs/materials current round: `README.md`, `docs/current-validation-status.md`, `docs/device-runbook.md`, `docs/android-mvp-implementation.md`, `docs/optimization-log.md`, `materials/device-demo-checklist.md`, `materials/demo-script.md`, `materials/evidence/requirement-matrix.md`, `materials/preliminary-deck.md`.
+- Android: `android-mvp/app/src/main/java/cn/shike/app/system/SystemActions.kt`, `android-mvp/app/src/main/java/cn/shike/app/data/ScreenshotCandidateStore.kt`, `android-mvp/app/src/main/java/cn/shike/app/system/ScreenshotObserver.kt`, `android-mvp/app/src/main/java/cn/shike/app/system/ScreenCaptureCallbackHelper.kt`, `android-mvp/app/src/main/java/cn/shike/app/system/VisibleScreenCapturePrompt.kt`, `android-mvp/app/src/main/java/cn/shike/app/ui/VisibleScreenCapturePromptCard.kt`, `android-mvp/app/src/main/java/cn/shike/app/ui/DateStrip.kt`, `android-mvp/app/src/main/java/cn/shike/app/MainActivity.kt`, `android-mvp/app/src/main/java/cn/shike/app/ShikeApp.kt`, `android-mvp/app/src/main/java/cn/shike/app/ui/ShikeMainScreen.kt`, `android-mvp/app/src/main/java/cn/shike/app/ui/MainFlowScreens.kt`.
+- Tests/validation/scripts: `android-mvp/app/src/test/java/cn/shike/app/SystemActionsTest.kt`, `android-mvp/app/src/test/java/cn/shike/app/ScreenCapturePromptTest.kt`, `android-mvp/app/src/test/java/cn/shike/app/DateStripTest.kt`, `android-mvp/app/src/test/java/cn/shike/app/data/ScreenshotCandidateStoreTest.kt`, `validation/validate_action_execution.py`, `validation/validate_android16_screenshot_flow.py`, `validation/validate_no_fake_device_chrome.py`, `validation/validate_android_unit_tests.py`, `validation/validate_screenshot_assist.py`, `validation/validate_real_world_ready.py`, `validation/validate_requirement_matrix.py`, `validation/validate_release_evidence_index.py`, `scripts/run_release_handoff_checks.py`, `scripts/verify_core20_package.py`.
+- Prototype/docs/materials: `prototype/index.html`, `prototype/demo.html`, `README.md`, `docs/current-validation-status.md`, `docs/device-runbook.md`, `docs/delivery-boundary-and-scoring.md`, `docs/SHIKE_LANDING_APP_OPTIMIZATION_GUIDE.md`, `docs/optimization-log.md`, `materials/device-demo-checklist.md`, `materials/evidence/cloud-device/README.md`, `materials/evidence/release-evidence-index.md`, `materials/evidence/requirement-matrix.md`, `materials/preliminary-deck.md`, `materials/submission-checklist.md`, `validation/traceability.md`.
+
+Validation:
+- RED confirmed for notification-permission recovery copy: `gradle --no-daemon :app:testDebugUnitTest --tests "cn.shike.app.ExecutionActionGateTest"` failed with unresolved `executionResults` parameter before the button-label helper consumed execution results.
+- Target GREEN after permission-recovery label implementation: `gradle --no-daemon :app:testDebugUnitTest --tests "cn.shike.app.ExecutionActionGateTest"` -> `BUILD SUCCESSFUL`.
+- Full Android unit tests: `gradle --no-daemon :app:testDebugUnitTest` -> `BUILD SUCCESSFUL`.
+- PASS `python3 validation/validate_android_unit_tests.py`
+  - Evidence: `ANDROID_UNIT_TEST_METRIC	84/84`.
+- PASS `python3 validation/validate_action_execution.py`
+  - Evidence: `ACTION_EXECUTION_METRIC	18/18`.
+- PASS `python3 validation/validate_advanced_product_beta.py --strict`
+  - Evidence: `PRODUCT_BETA_METRIC	30/30`.
+- RED confirmed for guide action copy: `gradle --no-daemon :app:testDebugUnitTest --tests "cn.shike.app.ExecutionActionGateTest"` failed with unresolved `executionActionButtonLabelsFor` before the shared label helper existed.
+- Target GREEN after guide-copy helper implementation: `gradle --no-daemon :app:testDebugUnitTest --tests "cn.shike.app.ExecutionActionGateTest"` -> `BUILD SUCCESSFUL`.
+- Full Android unit tests: `gradle --no-daemon :app:testDebugUnitTest` -> `BUILD SUCCESSFUL`.
+- PASS `python3 validation/validate_android_unit_tests.py`
+  - Evidence: `ANDROID_UNIT_TEST_METRIC	84/84`.
+- PASS `python3 validation/validate_action_execution.py`
+  - Evidence: `ACTION_EXECUTION_METRIC	18/18`.
+- PASS `python3 validation/validate_manual_review.py`
+  - Evidence: `MANUAL_REVIEW_METRIC	12/12`.
+- PASS `python3 validation/validate_demo_acceptance.py`
+  - Evidence: `DEMO_ACCEPTANCE_METRIC	18/18`.
+- PASS `python3 validation/validate_advanced_product_beta.py --strict`
+  - Evidence: `PRODUCT_BETA_METRIC	30/30`.
+- PASS `bash android-mvp/build_apk.sh`
+  - Evidence: local APK built at `android-mvp/app/build/outputs/apk/debug/app-debug.apk`; local and desktop SHA-256 both `948de4483b9e22937136b64335813d8e1670ec2a205bded0bdc1efbea521b9c3`.
+- PASS `python3 scripts/prepare_cloud_device_evidence.py`
+  - Evidence: `CLOUD_DEVICE_PREP_METRIC	5/5`; refreshed `materials/evidence/cloud-device/apk-sha256.txt`, with expected pre-recording gaps `CLOUD_DEVICE_PREP_MISSING_VIDEOS	9/9`, `CLOUD_DEVICE_PREP_REPORT_TBD_FIELDS	14/14`, and `CLOUD_DEVICE_PREP_REPORT_VIDEO_TBD_FIELDS	9/9`.
+- PASS `python3 validation/validate_apk_secret_hygiene.py`
+  - Evidence: `APK_SECRET_HYGIENE_METRIC	8/8`.
+- PASS exact sensitive value scan over repository text files
+  - Evidence: `sensitive_exact_scan values=2 checked_files=358 matched_files=0`.
+- PASS `python3 validation/validate_release_evidence_index.py`
+  - Evidence: `RELEASE_EVIDENCE_INDEX_METRIC	10/10`.
+- PASS `python3 validation/validate_real_world_ready.py`
+  - Evidence: `REAL_WORLD_READY_METRIC	22/22`.
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	61/61`.
+- RED confirmed for release evidence synchronization: `python3 validation/validate_release_evidence_index.py` failed at `RELEASE_EVIDENCE_INDEX_METRIC	8/10` while the validator still required the old `RELEASE_HANDOFF_CHECKS_METRIC 14/14` / `RELEASE_HANDOFF_CHECKS_METRIC	14/14` tokens.
+- RED confirmed for unified strict handoff before the evidence fix: `python3 scripts/run_release_handoff_checks.py --strict` stopped at `RELEASE_HANDOFF_CHECKS_METRIC	16/18` because `release_evidence_index` and the dependent local landing release candidate check inherited the old evidence token.
+- GREEN after evidence synchronization: `python3 validation/validate_release_evidence_index.py`
+  - Evidence: `RELEASE_EVIDENCE_INDEX_METRIC	10/10`.
+- GREEN after evidence synchronization: `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	61/61`.
+- RED confirmed for screenshot candidate precision: `gradle --no-daemon :app:testDebugUnitTest --tests "cn.shike.app.data.ScreenshotCandidateStoreTest"` failed while screen-sized ordinary images could still match screenshot detection.
+- Target GREEN: `gradle --no-daemon :app:testDebugUnitTest --tests "cn.shike.app.data.ScreenshotCandidateStoreTest"` -> `BUILD SUCCESSFUL`.
+- RED confirmed for notification dedupe: `gradle --no-daemon :app:testDebugUnitTest --tests "cn.shike.app.data.ScreenshotCandidateStoreTest"` failed with unresolved `shouldNotifyScreenshotCandidate` before the pure dedupe helper existed.
+- Target GREEN after notification dedupe: `gradle --no-daemon :app:testDebugUnitTest --tests "cn.shike.app.data.ScreenshotCandidateStoreTest"` -> `BUILD SUCCESSFUL`.
+- RED confirmed first: `python3 validation/validate_action_execution.py` failed at `calendar_requires_time_and_does_not_claim_saved` with `ACTION_EXECUTION_METRIC	16/17` after the stricter source check was added and before the Kotlin copy changed.
+- GREEN: `python3 validation/validate_action_execution.py`
+  - Evidence: `ACTION_EXECUTION_METRIC	17/17`.
+- RED confirmed for JVM coverage: `gradle --no-daemon :app:testDebugUnitTest --tests "cn.shike.app.SystemActionsTest"` failed with unresolved `calendarInsertDescriptionFor` before the helper existed.
+- Target GREEN: `gradle --no-daemon :app:testDebugUnitTest --tests "cn.shike.app.SystemActionsTest"` -> `BUILD SUCCESSFUL`.
+- RED confirmed for visible screenshot prompt coverage: `gradle --no-daemon :app:testDebugUnitTest --tests "cn.shike.app.ScreenCapturePromptTest"` failed with unresolved `visibleScreenCapturePrompt` before the prompt model existed.
+- Target GREEN after page-level prompt implementation: `gradle --no-daemon :app:testDebugUnitTest --tests "cn.shike.app.ScreenCapturePromptTest"` -> `BUILD SUCCESSFUL`.
+- RED confirmed for home date boundary coverage: `gradle --no-daemon :app:testDebugUnitTest --tests "cn.shike.app.DateStripTest"` failed with unresolved `formatTodayForHome` / `dateStripSubtitle` before the helpers existed.
+- Target GREEN after DateStrip helper extraction: `gradle --no-daemon :app:testDebugUnitTest --tests "cn.shike.app.DateStripTest"` -> `BUILD SUCCESSFUL`.
+- Full Android unit tests: `gradle --no-daemon :app:testDebugUnitTest` -> `BUILD SUCCESSFUL`; local unit suites report 132 tests, 0 failures, 0 errors.
+- PASS `python3 validation/validate_android_unit_tests.py`
+  - Evidence: `ANDROID_UNIT_TEST_METRIC	82/82`.
+- PASS `python3 validation/validate_no_fake_device_chrome.py`
+  - Evidence: `NO_FAKE_DEVICE_CHROME_METRIC	1/1`.
+- PASS `python3 validation/validate_home_one_screen.py`
+  - Evidence: `HOME_ONE_SCREEN_METRIC	9/9`.
+- PASS `python3 validation/validate_android16_screenshot_flow.py`
+  - Evidence: `ANDROID16_SCREENSHOT_FLOW_METRIC	17/17`.
+- PASS `python3 validation/validate_no_default_image_upload.py`
+  - Evidence: `NO_DEFAULT_IMAGE_UPLOAD_METRIC	12/12`.
+- PASS `python3 validation/validate_screenshot_assist.py`
+  - Evidence: `SCREENSHOT_ASSIST_METRIC	15/15`.
+- PASS `python3 validation/validate_screenshot_cleanup.py`
+  - Evidence: `SCREENSHOT_CLEANUP_METRIC	14/14`.
+- PASS `bash android-mvp/build_apk.sh`
+  - Evidence: local APK and `/mnt/c/Users/Xing/Desktop/Shike-app-debug.apk` SHA-256 both `914967d8a78657e69bd6ac43697cf9ad714d60b290c3ce171a6a233d7542052d`.
+- PASS `python3 scripts/prepare_cloud_device_evidence.py`
+  - Evidence: `CLOUD_DEVICE_PREP_METRIC	5/5`; expected pre-recording gaps remain `CLOUD_DEVICE_PREP_MISSING_VIDEOS	9/9`, `CLOUD_DEVICE_PREP_REPORT_TBD_FIELDS	14/14`, and `CLOUD_DEVICE_PREP_REPORT_VIDEO_TBD_FIELDS	9/9`.
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	61/61`.
+- PASS `python3 validation/validate_real_world_ready.py`
+  - Evidence: `REAL_WORLD_READY_METRIC	22/22`.
+- PASS `python3 validation/validate_requirement_matrix.py`
+  - Evidence: `REQUIREMENT_MATRIX_METRIC	9/9`.
+- EXPECTED BLOCK `python3 validation/validate_landing_release_candidate.py --strict`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`; missing real cloud-device MP4s, filled report fields, and real logcat remain the strict release blockers.
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS	secret_hygiene`.
+- PASS `python3 validation/validate_apk_secret_hygiene.py`
+  - Evidence: `APK_SECRET_HYGIENE_METRIC	8/8`.
+- PASS exact private env repository scan
+  - Evidence: `EXACT_PRIVATE_ENV_SCAN	checked_values=8	checked_files=301	matched_files=0`; configured local test values were checked without printing secrets.
+- PASS `git diff --check`
+  - Evidence: no whitespace errors.
+- PASS `python3 validation/validate_release_evidence_index.py`
+  - Evidence: `RELEASE_EVIDENCE_INDEX_METRIC	10/10`.
+- PASS `python3 validation/validate_cloud_device_package.py`
+  - Evidence: `CLOUD_DEVICE_PACKAGE_METRIC	29/29`.
+
+## 2026-06-07 / Round 251
+
+Goal: Promote Android image preprocessing to release handoff evidence.
+Round focus: Promote real HTTP server smoke into backend config and release handoff gates.
+Legacy handoff token: Goal: Close the Android 16 real implementation backend verification gap.
+
+Current handoff summary:
+- Current release evidence anchors remain: scoring evidence map, preliminary deck landing evidence package, `docs/delivery-boundary-and-scoring.md`, `materials/preliminary-deck.md`, `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md`, and `materials/evidence/requirement-matrix.md`.
+- Current local release metrics remain `LANDING_RELEASE_CANDIDATE_METRIC	61/61`, `REAL_WORLD_READY_METRIC	22/22`, `CLOUD_DEVICE_PACKAGE_METRIC	29/29`, `RELEASE_HANDOFF_CHECKS_METRIC	14/14`, `BACKEND_CONFIG_METRIC	18/18`, `RELEASE_EVIDENCE_INDEX_METRIC	10/10`, `REQUIREMENT_MATRIX_METRIC	9/9`, `DEMO_ACCEPTANCE_METRIC	18/18`, `APK_SECRET_HYGIENE_METRIC	8/8`, `VIVO_MULTIMODAL_CONTRACT_METRIC	24/24`, `NO_DEFAULT_IMAGE_UPLOAD_METRIC	12/12`, `ANDROID_UNIT_TEST_METRIC	77/77`, `ANDROID_IMAGE_PREPROCESS_METRIC	15/15`, and expected strict blocker `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`.
+- Real HTTP server smoke is now part of the unified handoff runner: the runner starts temporary uvicorn, calls `/health`, `/v2/schema`, and `POST /v2/analyze-image`, checks `http_smoke_actions_disabled=True`, and scans server output for secret markers.
+- Current HTTP server smoke evidence is `http_server_smoke_metric=1/1`; the no-cloud-image boundary remains `allow_cloud_image=false` with `cloud_image_disabled` risk evidence when the user selects the端侧优先 path.
+- `validate_backend_config.py` now guards `http_server_smoke.py`, `/v2/analyze-image` route coverage, server log secret scanning, and backend-only `VIVO_AIGC_*` / `VIVO_OCR_*` / `VIVO_MULTIMODAL_*` placeholder documentation.
+- No cloud recordings, report values, credentials, or personal data were fabricated.
+- The vivo test credentials remain local/runtime-only inputs and were not written into Android, docs, tests, logs, or APK assets.
+- Historical optimization-log entries keep their original evidence values.
+
+Behavior:
+- Fixed `backend/shike_backend/eval/http_server_smoke.py` so it resolves the backend root from `__file__`; the smoke runner now works both from `shike/` and from the workspace root used by `scripts/run_release_handoff_checks.py`.
+- Added `http_server_smoke` to `scripts/run_release_handoff_checks.py`, raising the current strict handoff runner from `13/13` to `14/14`.
+- Expanded `validation/validate_backend_config.py` from `15/15` to `18/18` so backend URL readiness also covers real HTTP server smoke and vivo backend-only env alias documentation.
+- Updated the current release evidence index, requirement matrix, device checklist, cloud-device README, submission checklist, scoring map, traceability row, current validation status, and landing optimization guide to the `RELEASE_HANDOFF_CHECKS_METRIC 14/14` handoff gate.
+
+Files changed:
+- Backend/model: `backend/shike_backend/eval/http_server_smoke.py`.
+- Tests/validation/scripts: `scripts/run_release_handoff_checks.py`, `validation/validate_backend_config.py`, `validation/validate_release_evidence_index.py`.
+- Docs/materials: `docs/current-validation-status.md`, `docs/device-runbook.md`, `docs/delivery-boundary-and-scoring.md`, `docs/SHIKE_LANDING_APP_OPTIMIZATION_GUIDE.md`, `docs/optimization-log.md`, `materials/device-demo-checklist.md`, `materials/preliminary-deck.md`, `materials/submission-checklist.md`, `materials/evidence/cloud-device/README.md`, `materials/evidence/release-evidence-index.md`, `materials/evidence/requirement-matrix.md`, `validation/traceability.md`.
+
+Validation:
+- RED confirmed first: `python3 - <<'PY' ...` failed because `validate_backend_config.py` did not yet contain `http_server_smoke_script_present`, `http_server_smoke_exercises_v2_image_route`, or `vivo_private_env_aliases_documented`.
+- RED confirmed for unified runner pathing: `python3 shike/backend/shike_backend/eval/http_server_smoke.py --timeout-seconds 3` from the workspace root failed with `server_start_timeout` before `BACKEND_ROOT` path resolution existed.
+- PASS `python3 validation/validate_backend_config.py`
+  - Evidence: `BACKEND_CONFIG_METRIC	18/18`.
+- PASS `python3 shike/backend/shike_backend/eval/http_server_smoke.py --timeout-seconds 35`
+  - Evidence: temporary uvicorn returned `http_smoke_health_status=ok`, `http_smoke_route_status=pass`, `http_smoke_actions_disabled=True`, `http_smoke_log_secret_scan=pass`, and `http_server_smoke_metric=1/1`.
+- PASS `python3 scripts/run_release_handoff_checks.py --strict`
+  - Evidence: `RELEASE_HANDOFF_CHECKS_METRIC	14/14`; strict cloud-device proof remains an expected blocker at `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`.
+  - Evidence: the new `http_server_smoke` handoff step started temporary uvicorn, called `/health`, `/v2/schema`, and `POST /v2/analyze-image`, and returned `http_server_smoke_metric=1/1`.
+- PASS `python3 validation/validate_release_evidence_index.py`
+  - Evidence: `RELEASE_EVIDENCE_INDEX_METRIC	10/10`.
+- PASS `python3 validation/validate_requirement_matrix.py`
+  - Evidence: `REQUIREMENT_MATRIX_METRIC	9/9`.
+- PASS `python3 validation/validate_cloud_backend_ready.py`
+  - Evidence: `CLOUD_BACKEND_READY_METRIC	9/9`.
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS	secret_hygiene`.
+- PASS `python3 validation/validate_apk_secret_hygiene.py`
+  - Evidence: `APK_SECRET_HYGIENE_METRIC	8/8`; checked 8 configured private env values against local and desktop APK artifacts without printing secrets.
+- PASS exact test-credential repository scan
+  - Evidence: an environment-variable-driven exact-value scan checked the configured private AppID/AppKEY values against repository text, excluding generated Android build and Gradle folders, and returned no files.
+- PASS Android local unit tests with the project-local toolchain
+  - Evidence: `gradle --no-daemon :app:testDebugUnitTest` returned `BUILD SUCCESSFUL in 14s` after exporting `~/.local/share/shike-android-tools/gradle-8.10.2/bin`, the local Android SDK, and local JDK into `PATH`.
+  - Boundary: the first bare `gradle --no-daemon :app:testDebugUnitTest` attempt failed with `gradle: command not found` because the current shell did not have the project-local Gradle in `PATH`; the project-local Gradle rerun passed.
+- PASS `git diff --check`
+  - Evidence: no whitespace errors.
+
+## 2026-06-07 / Round 250
+
+Goal: Promote Android image preprocessing to release handoff evidence.
+Round focus: Close the Android 16 `CaptureDraft` deletion-state gap so original screenshot cleanup can be represented separately from private thumbnails and app cache cleanup.
+Legacy handoff token: Goal: Add real Android private thumbnail cache for the Android 16 image-preprocess path.
+
+Current handoff summary:
+- Current release evidence anchors remain: scoring evidence map, preliminary deck landing evidence package, `docs/delivery-boundary-and-scoring.md`, `materials/preliminary-deck.md`, `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md`, and `materials/evidence/requirement-matrix.md`.
+- Current local release metrics remain `LANDING_RELEASE_CANDIDATE_METRIC	61/61`, `REAL_WORLD_READY_METRIC	22/22`, `CLOUD_DEVICE_PACKAGE_METRIC	29/29`, `RELEASE_HANDOFF_CHECKS_METRIC	13/13`, `RELEASE_EVIDENCE_INDEX_METRIC	10/10`, `REQUIREMENT_MATRIX_METRIC	9/9`, `DEMO_ACCEPTANCE_METRIC	18/18`, `APK_SECRET_HYGIENE_METRIC	8/8`, `VIVO_MULTIMODAL_CONTRACT_METRIC	24/24`, `NO_DEFAULT_IMAGE_UPLOAD_METRIC	12/12`, `ANDROID_UNIT_TEST_METRIC	77/77`, `ANDROID_IMAGE_PREPROCESS_METRIC	15/15`, and expected strict blocker `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`.
+- No-cloud-image backend evidence is now part of the current handoff: Android can pass `allow_cloud_image=false` when the user selects the端侧优先 boundary; the backend then skips server OCR and vivo image-model calls, records `cloud_image_disabled`, and uses OCR hint text fallback.
+- Route-v2 smoke evidence remains redacted: `route_v2_http_status=200`, `route_v2_schema_valid=true`, `route_v2_actions_disabled=true`, `route_v2_ignored_regions=top_status_bar,bottom_navigation_bar`, and `live_smoke_metric=1/1`.
+- No cloud recordings, report values, credentials, or personal data were fabricated.
+- The vivo test credentials remain local/runtime-only inputs and were not written into Android, docs, tests, logs, or APK assets.
+- Historical optimization-log entries keep their original evidence values.
+
+Behavior:
+- Added `ScreenshotDeleteState` as the UI-facing state for original screenshot cleanup: `NotAvailable`, `NotRequested`, `RequestingSystemConfirmation`, `Deleted`, `Denied`, and `Failed`.
+- Added `CaptureDraft.canDeleteOriginal` and `CaptureDraft.deleteState`, derived from `sourceMediaStoreUri` and `ImageCleanupStatus`.
+- Kept deletion eligibility tied to the original user-selected/shared media URI only. Private `thumbnailUri` remains app-cache evidence and never makes a camera draft look deletable.
+- Added `cleanupStatusLabel` so the original screenshot cleanup prompt shows user-facing Chinese status copy instead of raw `ImageCleanupStatus` enum names.
+- Expanded `CaptureImportMapperTest`, `ScreenshotCleanupPromptTest`, `validate_android_unit_tests.py`, and `validate_screenshot_cleanup.py` so deletion-state and prompt-copy regressions are covered by gates.
+- Added backend `VIVO_MULTIMODAL_MODELS` candidate-chain support for `/v2/analyze-image`: image model candidates are tried in order, and OCR+BlueLM text fallback is used after image candidates return the provider image-support boundary.
+- Added prompt location/action gate rules and server-side Shike UI chrome copy filtering so screenshots of the Shike app itself do not contaminate extracted action cards.
+- Added the server-side `allow_cloud_image=false` boundary: even if an image payload is present, `/v2/analyze-image` skips server OCR and vivo multimodal image calls, uses the existing OCR hint for text fallback, and records `cloud_image_disabled` risk evidence.
+- Added the Android-side `allowCloudImage` path from `LocalMultimodalPreference` through `BackendAnalysisInput`, `runBackendAnalysis`, `callAnalyzeImageApi`, and `buildAnalyzeImageRequestPayload`, so端侧优先 no longer hard-codes cloud image analysis to true.
+- Updated the server deployment runbook and `validate_cloud_backend_ready.py` so deployers configure `VIVO_AIGC_*`, `VIVO_OCR_*`, and `VIVO_MULTIMODAL_*` as backend-only placeholders; the local private env file now carries those aliases with mode `600`.
+
+Files changed:
+- Android: `android-mvp/app/src/main/java/cn/shike/app/ShikeApp.kt`, `android-mvp/app/src/main/java/cn/shike/app/data/CaptureImportMapper.kt`, `android-mvp/app/src/main/java/cn/shike/app/data/BackendAnalysisRunner.kt`, `android-mvp/app/src/main/java/cn/shike/app/data/ModelApiClient.kt`, `android-mvp/app/src/main/java/cn/shike/app/ui/LocalMultimodalStatus.kt`, `android-mvp/app/src/main/java/cn/shike/app/ui/ScreenshotCleanupPrompt.kt`.
+- Backend/model: `backend/shike_backend/settings.py`, `backend/shike_backend/main.py`, `backend/shike_backend/image_preprocess.py`, `backend/shike_backend/eval/live_smoke.py`, `backend/shike_backend/prompts/analyze_image_system_prompt.txt`, `backend/verify_backend.py`.
+- Tests/validation/scripts: `backend/tests/test_settings_env_file.py`, `backend/tests/test_analyze_image_text_fallback.py`, `backend/tests/test_image_preprocess.py`, `android-mvp/app/src/test/java/cn/shike/app/data/CaptureImportMapperTest.kt`, `android-mvp/app/src/test/java/cn/shike/app/data/AnalyzeImageApiClientTest.kt`, `android-mvp/app/src/test/java/cn/shike/app/LocalMultimodalStatusTest.kt`, `android-mvp/app/src/test/java/cn/shike/app/ScreenshotCleanupPromptTest.kt`, `validation/validate_vivo_multimodal_contract.py`, `validation/validate_no_default_image_upload.py`, `validation/validate_android_unit_tests.py`, `validation/validate_screenshot_cleanup.py`, `validation/validate_real_world_ready.py`, `validation/validate_requirement_matrix.py`, `scripts/verify_core20_package.py`.
+- Docs/materials: `README.md`, `docs/current-validation-status.md`, `docs/android-mvp-implementation.md`, `docs/device-runbook.md`, `docs/bluelm-integration-runbook.md`, `docs/optimization-log.md`, `materials/device-demo-checklist.md`, `materials/evidence/release-evidence-index.md`, `materials/evidence/requirement-matrix.md`.
+
+Validation:
+- RED confirmed first: `gradle --no-daemon :app:testDebugUnitTest --tests "cn.shike.app.data.CaptureImportMapperTest"` failed before `ScreenshotDeleteState`, `canDeleteOriginal`, and `deleteState` existed.
+- RED confirmed next: `gradle --no-daemon :app:testDebugUnitTest --tests "cn.shike.app.ScreenshotCleanupPromptTest"` failed before `cleanupStatusLabel` existed.
+- RED confirmed for backend candidate chaining: `PYTHONPATH=backend python3 -m unittest backend.tests.test_settings_env_file backend.tests.test_analyze_image_text_fallback` failed before `vivo_multimodal_models` and route candidate iteration existed.
+- RED confirmed for the no-cloud-image backend gate: `PYTHONPATH=backend python3 -m unittest backend.tests.test_analyze_image_text_fallback.AnalyzeImageTextFallbackTest.test_analyze_image_uses_ocr_hint_only_when_cloud_image_disabled` failed because the route still attempted server OCR when `allow_cloud_image=false`.
+- RED confirmed for Android cloud-image control: `gradle --no-daemon :app:testDebugUnitTest --tests "cn.shike.app.data.AnalyzeImageApiClientTest"` failed before `buildAnalyzeImageRequestPayload(... allowCloudImage = false)` existed, and `LocalMultimodalStatusTest.allowCloudImageForPreference_disablesImageUploadWhenLocalPreferred` failed before the preference helper existed.
+- Target GREEN: `gradle --no-daemon :app:testDebugUnitTest --tests "cn.shike.app.data.CaptureImportMapperTest"` -> `BUILD SUCCESSFUL`.
+- Target GREEN: `gradle --no-daemon :app:testDebugUnitTest --tests "cn.shike.app.ScreenshotCleanupPromptTest"` -> `BUILD SUCCESSFUL`.
+- Full Android unit tests: `gradle --no-daemon :app:testDebugUnitTest` -> `BUILD SUCCESSFUL`; local unit suites report 121 tests, 0 failures, 0 errors.
+- PASS `python3 validation/validate_android_unit_tests.py`
+  - Evidence: `ANDROID_UNIT_TEST_METRIC	77/77`.
+- PASS `python3 validation/validate_screenshot_cleanup.py`
+  - Evidence: `SCREENSHOT_CLEANUP_METRIC	13/13`.
+- PASS `python3 validation/validate_real_world_ready.py`
+  - Evidence: `REAL_WORLD_READY_METRIC	22/22`.
+- PASS `python3 validation/validate_requirement_matrix.py`
+  - Evidence: `REQUIREMENT_MATRIX_METRIC	9/9`.
+- PASS `python3 validation/validate_vivo_multimodal_contract.py`
+  - Evidence: `VIVO_MULTIMODAL_CONTRACT_METRIC	24/24`.
+- PASS `PYTHONPATH=backend python3 backend/verify_backend.py`
+  - Evidence: `backend_passed`; covers route-v2 server OCR enrichment, candidate chaining, text fallback, and the `allow_cloud_image=false` no-cloud-image branch.
+- PASS `PYTHONPATH=backend python3 backend/shike_backend/eval/live_smoke.py --ocr-image /tmp/shike-live-ocr-course.png --route-v2 --route-v2-image /tmp/shike-live-ocr-course.png --timeout-seconds 35`
+  - Evidence: `bluelm_status=pass`, `ocr_status=pass`, `route_v2_status=pass`, `route_v2_schema_valid=true`, `route_v2_actions_disabled=true`, `route_v2_ignored_regions=top_status_bar,bottom_navigation_bar`, and `live_smoke_metric=3/3`.
+  - Boundary: output was redacted; no AppKEY, Authorization header, base64 image payload, full OCR text, or personal data was written into repo evidence.
+- PASS private backend env alias check
+  - Evidence: `BLUELM_APP_ID_matches_requested=yes`; `VIVO_AIGC_APP_ID`, `VIVO_AIGC_APP_KEY`, `VIVO_MULTIMODAL_APP_ID`, `VIVO_MULTIMODAL_APP_KEY`, `VIVO_OCR_APP_ID`, and `VIVO_OCR_APP_KEY` are set in the local private env file with permission `600`.
+- PASS `PYTHONPATH=backend python3 backend/shike_backend/eval/http_server_smoke.py --timeout-seconds 35`
+  - Evidence: temporary uvicorn returned `http_smoke_health_status=ok`, `http_smoke_route_status=pass`, `http_smoke_actions_disabled=True`, `http_smoke_log_secret_scan=pass`, and `http_server_smoke_metric=1/1`.
+- PARTIAL `PYTHONPATH=backend python3 backend/shike_backend/eval/live_smoke.py --skip-bluelm --skip-ocr --multimodal --timeout-seconds 25 --multimodal-models "Volc-DeepSeek-V3.2,Doubao-Seed-2.0-mini,Doubao-Seed-2.0-lite,Doubao-Seed-2.0-pro,qwen3.5-plus"`
+  - Evidence: all five tested candidates returned `provider_model_does_not_support_image`.
+  - Boundary: native image-input proof remains blocked by the current provider model/permission set; the practical `/v2/analyze-image` path still lands through server OCR enrichment plus BlueLM text fallback and keeps actions user-confirmation-gated.
+- PASS `python3 validation/validate_release_evidence_index.py`
+  - Evidence: `RELEASE_EVIDENCE_INDEX_METRIC	10/10`.
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	61/61`.
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS	secret_hygiene`.
+- Rebuilt APK with `bash android-mvp/build_apk.sh`, copied it to `/mnt/c/Users/Xing/Desktop/Shike-app-debug.apk`, and refreshed the cloud-device evidence package with `python3 scripts/prepare_cloud_device_evidence.py`.
+  - Evidence: local and desktop APK SHA-256 `cef73c446435023bcf5093643d81f3143c6f8b1e0c86159b09b7da47d6e078eb`.
+  - Evidence: `CLOUD_DEVICE_PREP_METRIC	5/5`; expected `CLOUD_DEVICE_PREP_MISSING_VIDEOS	9/9` remains until real cloud-device recordings are collected.
+- PASS `python3 validation/validate_apk_secret_hygiene.py`
+  - Evidence: `APK_SECRET_HYGIENE_METRIC	8/8`.
+- PASS `python3 scripts/run_release_handoff_checks.py --strict`
+  - Evidence: `RELEASE_HANDOFF_CHECKS_METRIC	13/13`; strict cloud-device proof remains an expected blocker at `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`.
+- PASS `git diff --check`
+  - Evidence: no whitespace errors.
+
+## 2026-06-07 / Round 249
+
+Goal: Promote Android image preprocessing to release handoff evidence.
+Round focus: Carry private image thumbnails through the Android 16 `CaptureDraft` model without confusing them with deletable original media.
+Legacy handoff token: Goal: Add real Android private thumbnail cache for the Android 16 image-preprocess path.
+
+Current handoff summary:
+- Current release evidence anchors remain: scoring evidence map, preliminary deck landing evidence package, `docs/delivery-boundary-and-scoring.md`, `materials/preliminary-deck.md`, `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md`, and `materials/evidence/requirement-matrix.md`.
+- Current local release metrics remain `LANDING_RELEASE_CANDIDATE_METRIC	61/61`, `REAL_WORLD_READY_METRIC	22/22`, `CLOUD_DEVICE_PACKAGE_METRIC	29/29`, `RELEASE_HANDOFF_CHECKS_METRIC	13/13`, `RELEASE_EVIDENCE_INDEX_METRIC	10/10`, `REQUIREMENT_MATRIX_METRIC	9/9`, `DEMO_ACCEPTANCE_METRIC	18/18`, `APK_SECRET_HYGIENE_METRIC	8/8`, `VIVO_MULTIMODAL_CONTRACT_METRIC	20/20`, `NO_DEFAULT_IMAGE_UPLOAD_METRIC	11/11`, `ANDROID_UNIT_TEST_METRIC	74/74`, `ANDROID_IMAGE_PREPROCESS_METRIC	15/15`, and expected strict blocker `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`.
+- Route-v2 smoke evidence remains redacted: `route_v2_http_status=200`, `route_v2_schema_valid=true`, `route_v2_actions_disabled=true`, `route_v2_ignored_regions=top_status_bar,bottom_navigation_bar`, and `live_smoke_metric=1/1`.
+- No cloud recordings, report values, credentials, or personal data were fabricated.
+- The vivo test credentials remain local/runtime-only inputs and were not written into Android, docs, tests, logs, or APK assets.
+- Historical optimization-log entries keep their original evidence values.
+
+Behavior:
+- Added `thumbnailUri` to `CaptureInput`, `CaptureDraft`, and `CaptureDraftEntity`.
+- `captureDraftFromInput` now carries the private thumbnail URI while keeping `sourceMediaStoreUri` tied only to the original user-selected/shared media URI.
+- Camera drafts can keep a private thumbnail without gaining a fake original media URI, so screenshot deletion remains system-confirmed and source-scoped.
+- `validate_android_unit_tests.py` now guards the thumbnail URI contract and the updated Gradle XML counts.
+
+Files changed:
+- Android: `android-mvp/app/src/main/java/cn/shike/app/data/OcrEngine.kt`, `android-mvp/app/src/main/java/cn/shike/app/data/CaptureImportMapper.kt`, `android-mvp/app/src/main/java/cn/shike/app/data/InboxEntities.kt`.
+- Tests/validation/scripts: `android-mvp/app/src/test/java/cn/shike/app/data/CaptureImportMapperTest.kt`, `android-mvp/app/src/test/java/cn/shike/app/data/InboxEntitiesTest.kt`, `validation/validate_android_unit_tests.py`, `validation/validate_real_world_ready.py`, `validation/validate_requirement_matrix.py`, `scripts/verify_core20_package.py`.
+- Docs/materials: `README.md`, `docs/current-validation-status.md`, `docs/android-mvp-implementation.md`, `docs/device-runbook.md`, `docs/optimization-log.md`, `materials/device-demo-checklist.md`, `materials/evidence/requirement-matrix.md`.
+
+Validation:
+- RED confirmed first: target unit tests failed on missing `thumbnailUri` in `CaptureInput`, `CaptureDraft`, and `CaptureDraftEntity`.
+- Target GREEN: `gradle --no-daemon :app:testDebugUnitTest --tests "cn.shike.app.data.CaptureImportMapperTest" --tests "cn.shike.app.data.InboxEntitiesTest"` -> `BUILD SUCCESSFUL`; `CaptureImportMapperTest` reports 7 tests and `InboxEntitiesTest` reports 4 tests.
+- Full Android unit tests: `gradle --no-daemon :app:testDebugUnitTest` -> `BUILD SUCCESSFUL`; local unit suites report 106 tests, 0 failures, 0 errors.
+- PASS `python3 validation/validate_android_unit_tests.py`
+  - Evidence: `ANDROID_UNIT_TEST_METRIC	74/74`.
+- PASS `python3 validation/validate_android_image_preprocess.py`
+  - Evidence: `ANDROID_IMAGE_PREPROCESS_METRIC	15/15`.
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS secret_hygiene`.
+- PASS `python3 validation/validate_requirement_matrix.py`
+  - Evidence: `REQUIREMENT_MATRIX_METRIC	9/9`.
+- Rebuilt APK and copied it to `/mnt/c/Users/Xing/Desktop/Shike-app-debug.apk`.
+  - Evidence: local and desktop APK SHA-256 `1b8c95c4802c42ff7c8fcca183ac55fb72142baf777a4cb9855e7b7fd033c14f`.
+- PASS `python3 validation/validate_release_evidence_index.py`
+  - Evidence: `RELEASE_EVIDENCE_INDEX_METRIC	10/10`.
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	61/61`.
+- PASS `python3 scripts/run_release_handoff_checks.py --strict`
+  - Evidence: `RELEASE_HANDOFF_CHECKS_METRIC	13/13`; strict cloud-device proof remains an expected blocker at `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`.
+
+## 2026-06-07 / Round 248
+
+Goal: Add real Android private thumbnail cache for the Android 16 image-preprocess path.
+Legacy handoff token: Goal: Promote Android image preprocessing to release handoff evidence.
+
+Current handoff summary:
+- Current release evidence anchors remain: scoring evidence map, preliminary deck landing evidence package, `docs/delivery-boundary-and-scoring.md`, `materials/preliminary-deck.md`, `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md`, and `materials/evidence/requirement-matrix.md`.
+- Current local release metrics remain `LANDING_RELEASE_CANDIDATE_METRIC	61/61`, `REAL_WORLD_READY_METRIC	22/22`, `CLOUD_DEVICE_PACKAGE_METRIC	29/29`, `RELEASE_HANDOFF_CHECKS_METRIC	13/13`, `RELEASE_EVIDENCE_INDEX_METRIC	10/10`, `REQUIREMENT_MATRIX_METRIC	9/9`, `DEMO_ACCEPTANCE_METRIC	18/18`, `APK_SECRET_HYGIENE_METRIC	8/8`, `VIVO_MULTIMODAL_CONTRACT_METRIC	20/20`, `NO_DEFAULT_IMAGE_UPLOAD_METRIC	11/11`, `ANDROID_UNIT_TEST_METRIC	72/72`, `ANDROID_IMAGE_PREPROCESS_METRIC	15/15`, and expected strict blocker `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`.
+- Route-v2 smoke evidence remains redacted: `route_v2_http_status=200`, `route_v2_schema_valid=true`, `route_v2_actions_disabled=true`, `route_v2_ignored_regions=top_status_bar,bottom_navigation_bar`, and `live_smoke_metric=1/1`.
+- No cloud recordings, report values, credentials, or personal data were fabricated.
+- Historical optimization-log entries keep their original evidence values.
+
+Behavior:
+- Added `ImageThumbnailCache` so processed image thumbnails are written to App-private `shike-image-thumbnails` cache files named from the normalized image SHA-256.
+- Added `ImagePreprocessPolicy.thumbnailDimensionsFor` and `thumbnailFileNameFor`; thumbnails cap the long edge at 360px without upscaling smaller images.
+- Added `ImagePayloadPreprocessor.fromBytesWithThumbnail` and `fromBitmapWithThumbnail`; URI image imports and camera bitmap imports both write private thumbnails only when the user triggers image analysis.
+- Kept backend upload semantics unchanged: Android still sends only the existing `/v2/analyze-image` payload after user action, and Android still never stores provider credentials.
+
+Files changed:
+- Android: `android-mvp/app/src/main/java/cn/shike/app/data/ImagePreprocessPolicy.kt`, `android-mvp/app/src/main/java/cn/shike/app/data/ImagePayloadPreprocessor.kt`, `android-mvp/app/src/main/java/cn/shike/app/data/ImageThumbnailCache.kt`, `android-mvp/app/src/main/java/cn/shike/app/MainActivity.kt`.
+- Tests/validation/scripts: `android-mvp/app/src/test/java/cn/shike/app/data/ImagePreprocessPolicyTest.kt`, `android-mvp/app/src/test/java/cn/shike/app/data/ImageThumbnailCacheTest.kt`, `validation/validate_android_image_preprocess.py`, `validation/validate_android_unit_tests.py`, `validation/validate_landing_release_candidate.py`, `validation/validate_release_evidence_index.py`, `scripts/verify_core20_package.py`.
+- Docs/materials: `README.md`, `docs/current-validation-status.md`, `docs/android-mvp-implementation.md`, `docs/SHIKE_LANDING_APP_OPTIMIZATION_GUIDE.md`, `docs/device-runbook.md`, `docs/optimization-log.md`, `materials/device-demo-checklist.md`, `materials/evidence/release-evidence-index.md`, plus release handoff metric references.
+
+Validation:
+- RED confirmed first: target unit tests failed on missing `thumbnailDimensionsFor`, `thumbnailFileNameFor`, and `ImageThumbnailCache`.
+- Target GREEN: `gradle --no-daemon :app:testDebugUnitTest --tests "cn.shike.app.data.ImagePreprocessPolicyTest" --tests "cn.shike.app.data.ImageThumbnailCacheTest"` -> `BUILD SUCCESSFUL`; 11 tests passed across the two target suites.
+- Full Android unit tests: `gradle --no-daemon :app:testDebugUnitTest` -> `BUILD SUCCESSFUL`.
+- PASS `python3 validation/validate_android_unit_tests.py`
+  - Evidence: `ANDROID_UNIT_TEST_METRIC	72/72`.
+- PASS `python3 validation/validate_android_image_preprocess.py`
+  - Evidence: `ANDROID_IMAGE_PREPROCESS_METRIC	15/15`.
+- Rebuilt APK and copied it to `/mnt/c/Users/Xing/Desktop/Shike-app-debug.apk`.
+  - Evidence: local and desktop APK SHA-256 `fb1e0ea092f55db6dff98f13abc7475c7cc63c5f0e5270c93b24fc5434561cdb`.
+
+## 2026-06-07 / Round 247
+
+Goal: Promote Android image preprocessing to release handoff evidence.
+
+Current handoff summary:
+- Current release evidence anchors remain: scoring evidence map, preliminary deck landing evidence package, `docs/delivery-boundary-and-scoring.md`, `materials/preliminary-deck.md`, `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md`, and `materials/evidence/requirement-matrix.md`.
+- Current local release metrics remain `LANDING_RELEASE_CANDIDATE_METRIC	61/61`, `REAL_WORLD_READY_METRIC	22/22`, `CLOUD_DEVICE_PACKAGE_METRIC	29/29`, `RELEASE_HANDOFF_CHECKS_METRIC	13/13`, `RELEASE_EVIDENCE_INDEX_METRIC	10/10`, `REQUIREMENT_MATRIX_METRIC	9/9`, `DEMO_ACCEPTANCE_METRIC	18/18`, `APK_SECRET_HYGIENE_METRIC	8/8`, `VIVO_MULTIMODAL_CONTRACT_METRIC	20/20`, `NO_DEFAULT_IMAGE_UPLOAD_METRIC	11/11`, `ANDROID_IMAGE_PREPROCESS_METRIC	15/15`, and expected strict blocker `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`.
+- Route-v2 smoke evidence remains redacted: `route_v2_http_status=200`, `route_v2_schema_valid=true`, `route_v2_actions_disabled=true`, `route_v2_ignored_regions=top_status_bar,bottom_navigation_bar`, and `live_smoke_metric=1/1`.
+- No cloud recordings, report values, credentials, or personal data were fabricated.
+- Historical optimization-log entries keep their original evidence values.
+
+Behavior:
+- Added `ImagePreprocessPolicy` and `ImagePayloadPreprocessor` so Android image payload construction is centralized around input MIME magic-byte detection, non-image byte rejection, 1600px long-edge sampling, EXIF rotation, screenshot UI chrome crop, JPEG 82 compression, Base64 NO_WRAP data URLs, dimensions, and SHA-256.
+- Moved `MainActivity` image payload construction to the preprocessor instead of hand-rolled decode/Base64/digest logic; screenshot share and recent screenshot assist use source-aware crop, while camera/photo-picker paths do not.
+- Added `validate_android_image_preprocess.py` and promoted it into the local release-candidate and release-handoff runners.
+- Updated current public handoff docs from `LANDING_RELEASE_CANDIDATE_METRIC 60/60` to `61/61`, `RELEASE_HANDOFF_CHECKS_METRIC 12/12` to `13/13`, and `ANDROID_UNIT_TEST_METRIC 68/68` to `70/70`.
+
+Files changed:
+- Android: `android-mvp/app/src/main/java/cn/shike/app/data/ImagePreprocessPolicy.kt`, `android-mvp/app/src/main/java/cn/shike/app/data/ImagePayloadPreprocessor.kt`, `android-mvp/app/src/main/java/cn/shike/app/MainActivity.kt`.
+- Tests/validation/scripts: `android-mvp/app/src/test/java/cn/shike/app/data/ImagePreprocessPolicyTest.kt`, `validation/validate_android_image_preprocess.py`, `validation/validate_android_unit_tests.py`, `validation/validate_landing_release_candidate.py`, `validation/validate_release_evidence_index.py`, `scripts/run_release_handoff_checks.py`.
+- Docs/materials: `README.md`, `docs/current-validation-status.md`, `docs/android-mvp-implementation.md`, `docs/SHIKE_LANDING_APP_OPTIMIZATION_GUIDE.md`, `docs/optimization-log.md`, `materials/device-demo-checklist.md`, `materials/evidence/release-evidence-index.md`, plus release handoff metric references.
+
+Validation:
+- RED confirmed first: `gradle --no-daemon :app:testDebugUnitTest --tests cn.shike.app.data.ImagePreprocessPolicyTest` failed before `ImagePreprocessPolicy` existed.
+- Target GREEN: `gradle --no-daemon :app:testDebugUnitTest --tests cn.shike.app.data.ImagePreprocessPolicyTest` -> `BUILD SUCCESSFUL`; 8 tests passed.
+- PASS `python3 validation/validate_android_image_preprocess.py`
+  - Evidence: `ANDROID_IMAGE_PREPROCESS_METRIC	15/15`.
+
+## 2026-06-07 / Round 246
+
+Goal: Close the Android 16 guide safety DoD gap for no-default image upload.
+
+Current handoff summary:
+- Current release evidence anchors remain: scoring evidence map, preliminary deck landing evidence package, `docs/delivery-boundary-and-scoring.md`, `materials/preliminary-deck.md`, `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md`, and `materials/evidence/requirement-matrix.md`.
+- Current local release metrics remain `LANDING_RELEASE_CANDIDATE_METRIC	59/59`, `REAL_WORLD_READY_METRIC	22/22`, `CLOUD_DEVICE_PACKAGE_METRIC	29/29`, `RELEASE_HANDOFF_CHECKS_METRIC	11/11`, `RELEASE_EVIDENCE_INDEX_METRIC	10/10`, `REQUIREMENT_MATRIX_METRIC	9/9`, `DEMO_ACCEPTANCE_METRIC	18/18`, `APK_SECRET_HYGIENE_METRIC	8/8`, `NO_DEFAULT_IMAGE_UPLOAD_METRIC	11/11`, and expected strict blocker `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`.
+- No cloud recordings, report values, credentials, or personal data were fabricated.
+- Historical optimization-log entries keep their original evidence values.
+
+Behavior:
+- Added `validation/validate_no_default_image_upload.py` to prove Android import, share, screenshot-assist, and manual-entry paths do not upload images by default.
+- Fixed `ShikeApp.kt` manual-input switching so it clears the previous image URI, image-cleanup state, and camera preview before text-mode backend parsing.
+- Integrated the new gate into `validate_landing_release_candidate.py`, `scripts/run_release_handoff_checks.py --strict`, README, current status, and the release evidence index.
+- Updated current release handoff evidence from `RELEASE_HANDOFF_CHECKS_METRIC 10/10` to `RELEASE_HANDOFF_CHECKS_METRIC 11/11`, and the local release candidate from `58/58` to `59/59`.
+
+Files changed:
+- Android: `android-mvp/app/src/main/java/cn/shike/app/ShikeApp.kt`.
+- Validation/scripts: `validation/validate_no_default_image_upload.py`, `validation/validate_landing_release_candidate.py`, `validation/validate_release_evidence_index.py`, `scripts/run_release_handoff_checks.py`.
+- Docs/materials: `README.md`, `docs/android-mvp-implementation.md`, `docs/current-validation-status.md`, `docs/SHIKE_LANDING_APP_OPTIMIZATION_GUIDE.md`, `docs/optimization-log.md`, `materials/evidence/release-evidence-index.md`, plus release handoff metric references.
+
+Validation:
+- RED confirmed first: `python3 validation/validate_no_default_image_upload.py` failed because the validator did not exist, then failed on manual-entry old image state and docs coverage.
+- PASS `python3 validation/validate_no_default_image_upload.py`
+  - Evidence: `NO_DEFAULT_IMAGE_UPLOAD_METRIC	11/11`.
+
+## 2026-06-07 / Round 245
+
+Goal: Bring the public validation status up to the current materials evidence package.
+
+Current handoff summary:
+- Current release evidence anchors remain: scoring evidence map, preliminary deck landing evidence package, `docs/delivery-boundary-and-scoring.md`, `materials/preliminary-deck.md`, `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md`, and `materials/evidence/requirement-matrix.md`.
+- Current local release metrics remain `LANDING_RELEASE_CANDIDATE_METRIC	58/58`, `REAL_WORLD_READY_METRIC	22/22`, `CLOUD_DEVICE_PACKAGE_METRIC	29/29`, `RELEASE_HANDOFF_CHECKS_METRIC	10/10`, `RELEASE_EVIDENCE_INDEX_METRIC	10/10`, `REQUIREMENT_MATRIX_METRIC	9/9`, `DEMO_ACCEPTANCE_METRIC	18/18`, `APK_SECRET_HYGIENE_METRIC	8/8`, and expected strict blocker `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`.
+- No cloud recordings, report values, credentials, or personal data were fabricated.
+- Historical optimization-log entries keep their original evidence values.
+
+Goal: Close the Android 16 guide safety DoD gap for “APK 中无 AppKey” with a reproducible APK artifact gate.
+
+Behavior:
+- Added `validation/validate_apk_secret_hygiene.py` to scan local and desktop debug APK zip entries for `sk-*` tokens, provider secret env names, vivo direct endpoints, and exact private env values.
+- Integrated the APK gate into `validate_secret_hygiene.py`, `scripts/run_release_handoff_checks.py --strict`, README, current status, and the release evidence index.
+- Updated current release handoff evidence from `RELEASE_HANDOFF_CHECKS_METRIC 9/9` to `RELEASE_HANDOFF_CHECKS_METRIC 10/10`.
+- The validator may read backend private env files for exact byte matching, but it never prints secret values.
+
+Files changed:
+- Validation/scripts: `validation/validate_apk_secret_hygiene.py`, `validation/validate_secret_hygiene.py`, `scripts/run_release_handoff_checks.py`, `validation/validate_release_evidence_index.py`.
+- Docs/materials: `README.md`, `docs/current-validation-status.md`, `docs/optimization-log.md`, `materials/evidence/release-evidence-index.md`, plus release handoff metric references.
+
+Validation:
+- RED confirmed first: `python3 validation/validate_apk_secret_hygiene.py` failed because the validator did not exist.
+- PASS `python3 validation/validate_apk_secret_hygiene.py`
+  - Evidence: `APK_SECRET_HYGIENE_METRIC	8/8`; two APK artifacts scanned.
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS	secret_hygiene`.
+- PASS `python3 validation/validate_release_evidence_index.py`
+  - Evidence: `RELEASE_EVIDENCE_INDEX_METRIC	10/10`.
+- PASS `python3 validation/validate_requirement_matrix.py`
+  - Evidence: `REQUIREMENT_MATRIX_METRIC	9/9`.
+- PASS `python3 validation/validate_deliverables.py`
+  - Evidence: `METRIC	10/10`.
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	58/58`.
+- PASS `python3 scripts/run_release_handoff_checks.py --strict`
+  - Evidence: `RELEASE_HANDOFF_CHECKS_METRIC	10/10`; strict gates remain expected blockers with `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`.
+- PASS `git diff --check`
+  - Evidence: no whitespace errors.
+- PASS exact test-key text scan
+  - Evidence: no repository text matches for the provided test AppID/AppKEY fragments outside ignored build caches.
+
+Strict cloud-device release remains blocked until real MP4/report/logcat evidence exists.
+
+## 2026-06-06 / Round 244
+
+Goal: Bring the public validation status up to the current materials evidence package.
+
+Current handoff summary:
+- Current release evidence anchors remain: scoring evidence map, preliminary deck landing evidence package, `docs/delivery-boundary-and-scoring.md`, `materials/preliminary-deck.md`, `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md`, and `materials/evidence/requirement-matrix.md`.
+- Current local release metrics remain `LANDING_RELEASE_CANDIDATE_METRIC	58/58`, `REAL_WORLD_READY_METRIC	22/22`, `CLOUD_DEVICE_PACKAGE_METRIC	29/29`, `RELEASE_EVIDENCE_INDEX_METRIC	10/10`, `REQUIREMENT_MATRIX_METRIC	9/9`, `DEMO_ACCEPTANCE_METRIC	18/18`, and expected strict blocker `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`.
+- No cloud recordings, report values, credentials, or personal data were fabricated.
+- Historical optimization-log entries keep their original evidence values.
+
+Goal: Align docs and handoff evidence with the `/v2/analyze-image` OCR+BlueLM text fallback implemented after live vivo candidate models returned `provider_model_does_not_support_image`.
+
+Behavior:
+- Updated public model-contract copy from `VIVO_MULTIMODAL_CONTRACT_METRIC 17/17` to `VIVO_MULTIMODAL_CONTRACT_METRIC 19/19`.
+- Documented that native image-input live proof remains externally blocked by the tested vivo model/permission set, while the practical route now uses server OCR enrichment plus BlueLM text fallback when the image provider reports `provider_model_does_not_support_image`.
+- Kept the user confirmation gate explicit: every calendar, reminder, map, or screenshot-delete action remains disabled until the user confirms parsed fields.
+- Kept the no-sample-contamination boundary explicit: the fallback must never inject fixed course/activity training samples.
+
+Files changed:
+- Docs: `README.md`, `docs/current-validation-status.md`, `docs/bluelm-integration-runbook.md`, `docs/optimization-log.md`.
+
+Validation:
+- PASS `PYTHONPATH=backend python3 -m unittest backend.tests.test_analyze_image_text_fallback`
+  - Evidence: 1 test, OK.
+- PASS `PYTHONPATH=backend python3 backend/verify_backend.py`
+  - Evidence: `backend_passed`.
+- PASS `python3 validation/validate_vivo_multimodal_contract.py`
+  - Evidence: `VIVO_MULTIMODAL_CONTRACT_METRIC	19/19`.
+- PASS `python3 validation/validate_backend_audit_log.py`
+  - Evidence: `BACKEND_AUDIT_LOG_METRIC	7/7`.
+- PASS `python3 validation/validate_backend_config.py`
+  - Evidence: `BACKEND_CONFIG_METRIC	15/15`.
+- PASS `python3 validation/validate_cloud_backend_ready.py`
+  - Evidence: `CLOUD_BACKEND_READY_METRIC	9/9`.
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	58/58`.
+- PASS `python3 validation/validate_release_evidence_index.py`
+  - Evidence: `RELEASE_EVIDENCE_INDEX_METRIC	10/10`.
+- PASS `python3 scripts/run_release_handoff_checks.py --strict`
+  - Evidence: `RELEASE_HANDOFF_CHECKS_METRIC	9/9`; strict gates remain expected blockers with `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`.
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS	secret_hygiene`.
+
+Strict cloud-device release remains blocked until real MP4/report/logcat evidence exists.
+
+## 2026-06-06 / Round 243
+
+Goal: Bring the public validation status up to the current materials evidence package.
+
+Current handoff summary:
+- Current release evidence anchors remain: scoring evidence map, preliminary deck landing evidence package, `docs/delivery-boundary-and-scoring.md`, `materials/preliminary-deck.md`, `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md`, and `materials/evidence/requirement-matrix.md`.
+- Current local release metrics remain `LANDING_RELEASE_CANDIDATE_METRIC	58/58`, `REAL_WORLD_READY_METRIC	22/22`, `CLOUD_DEVICE_PACKAGE_METRIC	29/29`, `RELEASE_EVIDENCE_INDEX_METRIC	10/10`, `REQUIREMENT_MATRIX_METRIC	9/9`, `DEMO_ACCEPTANCE_METRIC	18/18`, and expected strict blocker `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`.
+- No cloud recordings, report values, credentials, or personal data were fabricated.
+- Historical optimization-log entries keep their original evidence values.
+
+Goal: Fold the 40-case screenshot/photo semantic fixture into the current release evidence chain and align the hidden Debug entry with `SHIKE_ANDROID16_REAL_IMPLEMENTATION_GUIDE (1).md`.
+
+Behavior:
+- Added `validation/fixtures/image_cases.json` to the release evidence index as a required model-evidence artifact.
+- Updated public model-eval copy from `MODEL_EVAL_CASES_METRIC 8/8` to `MODEL_EVAL_CASES_METRIC 9/9`.
+- Listed `IMAGE_SEMANTIC_CASES_METRIC 9/9` and the rebuild command before the release-candidate gate.
+- Changed the settings version-row hidden Debug unlock from 7 taps to 5 taps, matching the Android 16 guide.
+- Updated `DeveloperModeUnlockTest`, user-facing copy validators, home one-screen validator, README, and Android MVP docs to use the 5-tap contract.
+- Kept historical optimization-log entries unchanged because they describe earlier rounds.
+
+Files changed:
+- Docs/materials: `README.md`, `docs/current-validation-status.md`, `materials/evidence/release-evidence-index.md`, `docs/optimization-log.md`.
+- Android: `android-mvp/app/src/main/java/cn/shike/app/ui/DeveloperModeUnlock.kt`, `android-mvp/app/src/main/java/cn/shike/app/ui/MainFlowScreens.kt`.
+- Tests/validation: `android-mvp/app/src/test/java/cn/shike/app/DeveloperModeUnlockTest.kt`, `validation/validate_release_evidence_index.py`, `validation/validate_user_facing_copy.py`, `validation/validate_home_one_screen.py`, `validation/validate_android_unit_tests.py`.
+
+Validation:
+- RED confirmed first: `gradle --no-daemon :app:testDebugUnitTest --tests cn.shike.app.DeveloperModeUnlockTest` failed because production code still used 7 taps.
+- PASS `gradle --no-daemon :app:testDebugUnitTest --tests cn.shike.app.DeveloperModeUnlockTest`
+  - Evidence: `BUILD SUCCESSFUL`; 3 tests passed.
+- PASS `python3 validation/validate_image_semantic_cases.py`
+  - Evidence: `IMAGE_SEMANTIC_CASES_METRIC	9/9`.
+- PASS `python3 validation/validate_model_eval_cases.py`
+  - Evidence: `MODEL_EVAL_CASES_METRIC	9/9`.
+- PASS `python3 validation/validate_release_evidence_index.py`
+  - Evidence: `RELEASE_EVIDENCE_INDEX_METRIC	10/10`.
+- PASS `python3 validation/validate_user_facing_copy.py`
+  - Evidence: `USER_FACING_COPY_METRIC	12/12`.
+- PASS `python3 validation/validate_home_one_screen.py`
+  - Evidence: `HOME_ONE_SCREEN_METRIC	9/9`.
+- PASS `gradle --no-daemon :app:testDebugUnitTest`
+  - Evidence: `BUILD SUCCESSFUL`; Android local unit-test guard later confirmed `ANDROID_UNIT_TEST_METRIC	68/68`.
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	58/58`.
+- PASS `python3 scripts/run_release_handoff_checks.py --strict`
+  - Evidence: `RELEASE_HANDOFF_CHECKS_METRIC	9/9`; strict gates remain expected blockers.
+- PASS `gradle --no-daemon :app:assembleDebug`
+  - Evidence: local APK and `/mnt/c/Users/Xing/Desktop/Shike-app-debug.apk` SHA-256 both `363d9cc9229545236de7bc727596f703a9da42ed901c7f94d182d794747c0f04`.
+
+Strict cloud-device release remains blocked until real MP4/report/logcat evidence exists.
+
+## 2026-06-06 / Round 242
+
+Goal: Bring the public validation status up to the current materials evidence package.
+
+Current handoff summary:
+- Current release evidence anchors remain: scoring evidence map, preliminary deck landing evidence package, `docs/delivery-boundary-and-scoring.md`, `materials/preliminary-deck.md`, `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md`, and `materials/evidence/requirement-matrix.md`.
+- Current local release metrics remain `LANDING_RELEASE_CANDIDATE_METRIC	58/58`, `REAL_WORLD_READY_METRIC	22/22`, `CLOUD_DEVICE_PACKAGE_METRIC	29/29`, `RELEASE_EVIDENCE_INDEX_METRIC	10/10`, `REQUIREMENT_MATRIX_METRIC	9/9`, `DEMO_ACCEPTANCE_METRIC	18/18`, and expected strict blocker `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`.
+- No cloud recordings, report values, credentials, or personal data were fabricated.
+- Historical optimization-log entries keep their original evidence values.
+
+Goal: Continue `SHIKE_ANDROID16_REAL_IMPLEMENTATION_GUIDE (1).md` with backend `/v2/analyze-image` audit-log redaction.
+
+Behavior:
+- Added metadata-only backend audit evidence for `/v2/analyze-image`.
+- The audit event records provider, source type, image presence, SHA-256 prefix, OCR block count, key-present boolean, duration, status, and OCR hint length.
+- The audit event does not copy provider credentials, Authorization headers, image data URLs, base64 payloads, full OCR text, phone numbers, student IDs, emails, or names.
+- `/v2/analyze-image` still returns a schema-validated action card or `manual_review`, and user confirmation remains required before calendar, reminder, map, or screenshot deletion actions.
+
+Files changed:
+- Backend: `backend/shike_backend/audit_log.py`, `backend/shike_backend/main.py`.
+- Tests/validation: `backend/tests/test_audit_log_redaction.py`, `validation/validate_backend_audit_log.py`.
+- Docs: `README.md`, `docs/current-validation-status.md`, `docs/optimization-log.md`.
+
+Validation:
+- RED confirmed first: `PYTHONPATH=backend python3 -m unittest backend.tests.test_audit_log_redaction` failed because `shike_backend.audit_log` did not exist.
+- PASS `PYTHONPATH=backend python3 -m unittest backend.tests.test_audit_log_redaction`
+  - Evidence: 1 test, OK.
+- PASS `python3 validation/validate_backend_audit_log.py`
+  - Evidence: `BACKEND_AUDIT_LOG_METRIC	7/7`.
+- PASS `PYTHONPATH=backend python3 backend/verify_backend.py`
+  - Evidence: `backend_passed`.
+- PASS `python3 validation/validate_vivo_multimodal_contract.py`
+  - Evidence: `VIVO_MULTIMODAL_CONTRACT_METRIC	17/17`.
+- PASS `python3 validation/validate_backend_config.py`
+  - Evidence: `BACKEND_CONFIG_METRIC	15/15`.
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS	secret_hygiene`.
+
+Strict cloud-device release remains blocked until real MP4/report/logcat evidence exists.
+
+## 2026-06-06 / Round 240
+
+Goal: Continue `SHIKE_ANDROID16_REAL_IMPLEMENTATION_GUIDE (1).md` with the optional端侧 3B multimodal boundary.
+
+Current handoff summary:
+- Goal: Bring the public validation status up to the current materials evidence package.
+- Current release evidence anchors remain: scoring evidence map, preliminary deck landing evidence package, `docs/delivery-boundary-and-scoring.md`, `materials/preliminary-deck.md`, `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md`, and `materials/evidence/requirement-matrix.md`.
+- Current local release metrics remain `LANDING_RELEASE_CANDIDATE_METRIC	58/58`, `REAL_WORLD_READY_METRIC	22/22`, `CLOUD_DEVICE_PACKAGE_METRIC	29/29`, `RELEASE_EVIDENCE_INDEX_METRIC	10/10`, `REQUIREMENT_MATRIX_METRIC	9/9`, `DEMO_ACCEPTANCE_METRIC	18/18`, and expected strict blocker `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`.
+- No cloud recordings, report values, credentials, or personal data were fabricated.
+- Historical optimization-log entries keep their original evidence values.
+
+Behavior:
+- Added `LocalMultimodalStatus` with `NotInstalled` / `Available` / `InitFailed` states.
+- Settings now shows the端侧模型状态 and端云路由 without claiming the APK bundles a usable local model.
+- Debug mode now exposes a dedicated端侧 3B diagnostics panel after the existing version-tap unlock.
+-端侧 output remains bounded by the same JSON Schema and user confirmation gate.
+
+Files changed:
+- Android: `ShikeApp.kt`, `ui/LocalMultimodalStatus.kt`, `ui/ReadinessSections.kt`, `ui/MainFlowScreens.kt`, `ui/ShikeMainScreen.kt`, `ui/DebugDemoScreen.kt`.
+- Tests/validation: `LocalMultimodalStatusTest.kt`, `validate_android_unit_tests.py`, `validate_user_facing_copy.py`, `validate_real_world_ready.py`, `validate_requirement_matrix.py`.
+- Docs/materials: `README.md`, `docs/current-validation-status.md`, `docs/android-mvp-implementation.md`, `docs/device-runbook.md`, `materials/device-demo-checklist.md`, `materials/evidence/requirement-matrix.md`, `prototype/demo.html`.
+
+Validation:
+- RED confirmed first: `LocalMultimodalStatusTest` failed to compile before production symbols existed.
+- Target GREEN: `gradle --no-daemon :app:testDebugUnitTest --tests cn.shike.app.LocalMultimodalStatusTest` -> `BUILD SUCCESSFUL`.
+- PASS `gradle --no-daemon :app:compileDebugKotlin :app:testDebugUnitTest :app:assembleDebug`
+  - Evidence: `BUILD SUCCESSFUL`; local unit XML totals report 103 tests, 0 failures, 0 errors; non-blocking AGP 8.6.1 compileSdk 36 warning remains.
+- PASS `python3 validation/validate_android_unit_tests.py`
+  - Evidence: `ANDROID_UNIT_TEST_METRIC	68/68`
+- PASS `python3 validation/validate_user_facing_copy.py`
+  - Evidence: `USER_FACING_COPY_METRIC	12/12`
+- PASS `python3 validation/validate_real_world_ready.py`
+  - Evidence: `REAL_WORLD_READY_METRIC	22/22`
+- PASS `python3 validation/validate_requirement_matrix.py`
+  - Evidence: `REQUIREMENT_MATRIX_METRIC	9/9`
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	58/58`
+- PASS `python3 scripts/run_release_handoff_checks.py`
+  - Evidence: `RELEASE_HANDOFF_CHECKS_METRIC	7/7`
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS	secret_hygiene`
+
+Release artifact:
+- Desktop APK: `/mnt/c/Users/Xing/Desktop/Shike-app-debug.apk`
+- APK SHA-256: `a0410b0aceb405aca768e80d59ef6af05cb5d50646eec6102cffaceeb8fe83c3`.
+- Strict cloud-device release remains blocked until real MP4/report/logcat evidence exists.
+
+## 2026-06-06 / Round 241
+
+Goal: Make backend real-credential calls more deployable while keeping secrets outside the repo.
+
+Behavior:
+- `Settings.from_env()` now loads a private env file from `~/.config/shike/bluelm.env` by default or `SHIKE_BACKEND_ENV_FILE` when set.
+- Process environment variables keep higher priority than file values for one-off smoke runs.
+- `verify_backend.py` is isolated to mock mode with `SHIKE_BACKEND_ENV_FILE=/dev/null`, so local backend smoke stays deterministic even when real credentials exist on the machine.
+- Real provider proof remains in `live_smoke.py`, which prints only redacted evidence fields.
+
+Validation:
+- RED confirmed first: `PYTHONPATH=backend python3 -m unittest backend.tests.test_settings_env_file` failed before env-file loading existed.
+- PASS `PYTHONPATH=backend python3 -m unittest backend.tests.test_settings_env_file`
+  - Evidence: 2 tests, OK.
+- PASS `PYTHONPATH=backend python3 backend/verify_backend.py`
+  - Evidence: `backend_passed`.
+- PASS `python3 validation/validate_bluelm_adapter.py`
+  - Evidence: `BLUELM_ADAPTER_METRIC	8/8`.
+- PASS `python3 validation/validate_vivo_ocr_adapter.py`
+  - Evidence: `VIVO_OCR_ADAPTER_METRIC	11/11`.
+- PASS `PYTHONPATH=backend python3 -m shike_backend.eval.live_smoke --ocr-image /tmp/shike-live-ocr-course.png --timeout-seconds 35`
+  - Evidence: `bluelm_status=pass`, `result_schema_valid=true`, `ocr_status=pass`, `live_smoke_metric=2/2`.
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS	secret_hygiene`.
+
+## 2026-06-06 / Round 239
+
+Goal: Continue Android 16 real-implementation guide with a real hidden Debug entry.
+
+Current handoff summary:
+- Goal: Bring the public validation status up to the current materials evidence package.
+- Current release evidence anchors remain: scoring evidence map, preliminary deck landing evidence package, `docs/delivery-boundary-and-scoring.md`, `materials/preliminary-deck.md`, `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md`, and `materials/evidence/requirement-matrix.md`.
+- Current local release metrics remain `LANDING_RELEASE_CANDIDATE_METRIC	58/58`, `REAL_WORLD_READY_METRIC	22/22`, `CLOUD_DEVICE_PACKAGE_METRIC	29/29`, `RELEASE_EVIDENCE_INDEX_METRIC	10/10`, `REQUIREMENT_MATRIX_METRIC	9/9`, `DEMO_ACCEPTANCE_METRIC	18/18`, and expected strict blocker `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`.
+- No cloud recordings, report values, credentials, or personal data were fabricated.
+- AppKEY, Authorization headers, base64 image payloads, and full OCR text were not committed.
+
+Files changed:
+- Android: `android-mvp/app/src/main/java/cn/shike/app/ui/DeveloperModeUnlock.kt`, `MainFlowScreens.kt`, `ShikeMainScreen.kt`, `UiPrimitives.kt`.
+- Tests/validation: `android-mvp/app/src/test/java/cn/shike/app/DeveloperModeUnlockTest.kt`, `validation/validate_android_unit_tests.py`, `validation/validate_user_facing_copy.py`.
+- Docs/evidence: `README.md`, `docs/current-validation-status.md`, `docs/android-mvp-implementation.md`, `docs/optimization-log.md`, `materials/device-demo-checklist.md`, `materials/evidence/requirement-matrix.md`, `prototype/demo.html`, `scripts/verify_core20_package.py`, `validation/validate_real_world_ready.py`, `validation/validate_requirement_matrix.py`.
+
+Behavior:
+- Settings now has a real version-row tap target: 7 taps unlock developer mode and route to `DebugDemoScreen`.
+- Bottom navigation still hides Debug from ordinary user tabs; backend URL, samples, and delivery self-check remain Debug-owned.
+- The state machine is pure Kotlin and covered by `DeveloperModeUnlockTest`.
+
+Validation:
+- RED confirmed first: `DeveloperModeUnlockTest` failed to compile before production symbols existed.
+- PASS `PATH="$HOME/.local/share/shike-android-tools/gradle-8.10.2/bin:$PATH" ANDROID_HOME="$HOME/.local/share/shike-android-tools/android-sdk" ANDROID_SDK_ROOT="$HOME/.local/share/shike-android-tools/android-sdk" JAVA_HOME="$HOME/.local/share/shike-android-tools/jdk-local/usr/lib/jvm/java-21-openjdk-amd64" gradle --no-daemon :app:compileDebugKotlin :app:testDebugUnitTest :app:assembleDebug`
+  - Evidence: `BUILD SUCCESSFUL`; non-blocking AGP 8.6.1 compileSdk 36 warning remains.
+- PASS `python3 validation/validate_android_unit_tests.py`
+  - Evidence: `ANDROID_UNIT_TEST_METRIC	66/66`
+- PASS `python3 validation/validate_frontend_polish.py`
+  - Evidence: `FRONTEND_POLISH_METRIC	12/12`
+- PASS `python3 validation/validate_home_one_screen.py`
+  - Evidence: `HOME_ONE_SCREEN_METRIC	9/9`
+- PASS `python3 validation/validate_user_facing_copy.py`
+  - Evidence: `USER_FACING_COPY_METRIC	11/11`
+- PASS `python3 validation/validate_real_world_ready.py`
+  - Evidence: `REAL_WORLD_READY_METRIC	22/22`
+- PASS `PYTHONPATH=backend python3 backend/verify_backend.py`
+  - Evidence: `backend_passed`
+- PASS `python3 validation/validate_vivo_ocr_adapter.py`
+  - Evidence: `VIVO_OCR_ADAPTER_METRIC	11/11`
+- PASS `python3 validation/validate_vivo_multimodal_contract.py`
+  - Evidence: `VIVO_MULTIMODAL_CONTRACT_METRIC	17/17`
+- PASS `python3 scripts/run_release_handoff_checks.py`
+  - Evidence: `RELEASE_HANDOFF_CHECKS_METRIC	7/7`
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	58/58`
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS	secret_hygiene`
+
+Release artifact:
+- APK SHA-256: `60bd3492fc56bfe8e352b163508bad25e0ac4ad912c92ccb0207bba51da8adc2`.
+- Strict cloud-device release remains blocked until real MP4/report/logcat evidence exists.
+
+## 2026-06-06 / Round 238
+
+Goal: Bring the public validation status up to the current materials evidence package.
+
+Current handoff summary:
+- Goal: Bring the public validation status up to the current materials evidence package.
+- Current release evidence anchors remain: scoring evidence map, preliminary deck landing evidence package, `docs/delivery-boundary-and-scoring.md`, `materials/preliminary-deck.md`, `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md`, and `materials/evidence/requirement-matrix.md`.
+- Current local release metrics remain `LANDING_RELEASE_CANDIDATE_METRIC	58/58`, `REAL_WORLD_READY_METRIC	22/22`, `CLOUD_DEVICE_PACKAGE_METRIC	29/29`, `RELEASE_EVIDENCE_INDEX_METRIC	10/10`, `REQUIREMENT_MATRIX_METRIC	9/9`, `DEMO_ACCEPTANCE_METRIC	18/18`, and expected strict blocker `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`.
+- No cloud recordings, report values, credentials, or personal data were fabricated.
+- AppKEY, Authorization headers, base64 image payloads, and full OCR text were not committed.
+
+Files changed:
+- Backend: `backend/shike_backend/adapters/vivo_ocr_adapter.py`, `backend/shike_backend/main.py`, `backend/verify_backend.py`.
+- Validation: `validation/validate_vivo_multimodal_contract.py`.
+- Docs: `README.md`, `docs/android-mvp-implementation.md`, `docs/bluelm-integration-runbook.md`, `docs/current-validation-status.md`, `docs/optimization-log.md`.
+
+Behavior:
+- `VivoOcrAdapter` now exposes `recognize_detail(...)` for backend-internal v2 use while keeping `/v1/ocr` response compatibility through `recognize(...)`.
+- `/v2/analyze-image` now merges server-side OCR coordinate blocks into `ocr_blocks`, then filters device status-bar and bottom-navigation blocks before the multimodal prompt is built.
+- The backend smoke uses a fake OCR detail result to prove `09:50` is filtered out while `服务端OCR块：今晚20:00 自习室C301` reaches the captured multimodal request.
+
+Validation:
+- PASS `python3 validation/validate_vivo_multimodal_contract.py`
+  - Evidence: `VIVO_MULTIMODAL_CONTRACT_METRIC	17/17`
+- PASS `PYTHONPATH="backend" python3 backend/verify_backend.py`
+  - Evidence: `backend_passed`
+- PASS `python3 validation/validate_vivo_ocr_adapter.py`
+  - Evidence: `VIVO_OCR_ADAPTER_METRIC	11/11`
+
+Next:
+- Run the broader local release gate chain, rebuild the APK, refresh the desktop APK copy, and keep strict cloud-device release blocked until real MP4/report/logcat evidence exists.
+
+## 2026-06-06 / Round 237
+
+Goal: Bring the public validation status up to the current materials evidence package.
+
+Current handoff summary:
+- Goal: Bring the public validation status up to the current materials evidence package.
+- Current release evidence anchors remain: scoring evidence map, preliminary deck landing evidence package, `docs/delivery-boundary-and-scoring.md`, `materials/preliminary-deck.md`, `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md`, and `materials/evidence/requirement-matrix.md`.
+- Current local release metrics remain `LANDING_RELEASE_CANDIDATE_METRIC	58/58`, `REAL_WORLD_READY_METRIC	22/22`, `CLOUD_DEVICE_PACKAGE_METRIC	29/29`, `RELEASE_EVIDENCE_INDEX_METRIC	10/10`, `REQUIREMENT_MATRIX_METRIC	9/9`, `DEMO_ACCEPTANCE_METRIC	18/18`, and expected strict blocker `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`.
+- No cloud recordings, report values, credentials, or personal data were fabricated.
+- AppKEY, Authorization headers, base64 image payloads, and full OCR text were not committed.
+
+Files changed:
+- Backend: `backend/shike_backend/main.py`, `backend/verify_backend.py`.
+- Validation: `validation/validate_vivo_multimodal_contract.py`.
+- Docs: `README.md`, `docs/android-mvp-implementation.md`, `docs/bluelm-integration-runbook.md`, `docs/current-validation-status.md`, `docs/optimization-log.md`.
+
+Behavior:
+- `/v2/analyze-image` now extracts base64 content from inline image data URLs, calls backend-only `VivoOcrAdapter`, merges server OCR text with Android `ocr_text_hint`, and sends the enriched request to `VivoCloudMultimodalAdapter`.
+- Server-side OCR failure remains non-blocking and records a non-secret `server_ocr_unavailable:*` risk marker; it never enables calendar, reminder, or map actions before user confirmation.
+- Android still calls only the Shike backend and does not hold vivo AppKEY values.
+
+Validation:
+- PASS `python3 validation/validate_vivo_multimodal_contract.py`
+  - Evidence: `VIVO_MULTIMODAL_CONTRACT_METRIC	16/16`
+- PASS `PYTHONPATH="backend" python3 backend/verify_backend.py`
+  - Evidence: `backend_passed`
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS	secret_hygiene`
+- PASS `PATH="$HOME/.local/share/shike-android-tools/gradle-8.10.2/bin:$PATH" ANDROID_HOME="$HOME/.local/share/shike-android-tools/android-sdk" ANDROID_SDK_ROOT="$HOME/.local/share/shike-android-tools/android-sdk" JAVA_HOME="$HOME/.local/share/shike-android-tools/jdk-local/usr/lib/jvm/java-21-openjdk-amd64" gradle --no-daemon :app:testDebugUnitTest :app:assembleDebug`
+  - Evidence: `BUILD SUCCESSFUL`
+  - Non-blocking warning: AGP 8.6.1 recommends a newer plugin for `compileSdk = 36`.
+- PASS `python3 validation/validate_real_world_ready.py`
+  - Evidence: `REAL_WORLD_READY_METRIC	22/22`
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	58/58`
+- PASS `python3 scripts/run_release_handoff_checks.py`
+  - Evidence: `RELEASE_HANDOFF_CHECKS_METRIC	7/7`
+- PARTIAL `PYTHONPATH="backend" python3 -m shike_backend.eval.live_smoke --ocr-image /tmp/shike-live-ocr-course.png --timeout-seconds 35 --multimodal --multimodal-models "Volc-DeepSeek-V3.2,Doubao-Seed-2.0-mini,Doubao-Seed-2.0-lite,Doubao-Seed-2.0-pro,qwen3.5-plus"`
+  - Evidence: `bluelm_status=pass`
+  - Evidence: `ocr_status=pass`
+  - Evidence: `live_smoke_metric=2/3`
+  - Boundary: all tested multimodal candidate models still return `provider_model_does_not_support_image`; this remains an external model/permission limit, while backend-only credentials, BlueLM text extraction, vivo OCR, and local v2 enrichment pass.
+- PASS desktop APK copy
+  - Evidence: `/mnt/c/Users/Xing/Desktop/Shike-app-debug.apk`
+  - Evidence: desktop hash matches local APK hash `d39493d9df6e5ae84114113197f2fd6a8004a52db5c2cecdf41e014d17fa1183`.
+
+Next:
+- Keep strict cloud-device release blocked until real MP4/report/logcat evidence exists.
+
+## 2026-06-06 / Round 236
+
+Goal: Continue from `/mnt/c/Users/Xing/Desktop/SHIKE_ANDROID16_REAL_IMPLEMENTATION_GUIDE (1).md` and make Android 16 / image-analysis paths more real.
+
+Current handoff summary:
+- Goal: Bring the public validation status up to the current materials evidence package.
+- Current release evidence anchors remain: scoring evidence map, preliminary deck landing evidence package, `docs/delivery-boundary-and-scoring.md`, `materials/preliminary-deck.md`, `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md`, and `materials/evidence/requirement-matrix.md`.
+- Current local release metrics remain `LANDING_RELEASE_CANDIDATE_METRIC	58/58`, `REAL_WORLD_READY_METRIC	22/22`, `CLOUD_DEVICE_PACKAGE_METRIC	29/29`, `RELEASE_EVIDENCE_INDEX_METRIC	10/10`, `REQUIREMENT_MATRIX_METRIC	9/9`, `DEMO_ACCEPTANCE_METRIC	18/18`, and expected strict blocker `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`.
+- No cloud recordings, report values, credentials, or personal data were fabricated.
+- AppKEY, Authorization headers, base64 image payloads, and full OCR text were not committed.
+- Android now targets `compileSdk = 36` and `targetSdk = 36`; Gradle build succeeds with the existing AGP 8.6.1 warning that the plugin was tested up to compileSdk 35.
+- Removed production/demo fake device chrome: no page-level `10:28`, `100%`, fixed `5月24日`, or fixed lunar-date copy remains in Android runtime or active prototype surfaces.
+- Android uses `enableEdgeToEdge()` and `WindowInsets.safeDrawing`; the Home tab no longer draws its own fake status bar.
+- App image import now supports `ACTION_SEND image/*`; shared image URIs produce a pending screenshot draft and route the user to the Import tab for confirmation.
+- App gallery import now uses Android Photo Picker (`PickVisualMedia.ImageOnly`) as the primary image selection path.
+- Added Android 14+ visible-page screenshot callback helper; it only tells the user the current Activity was screenshotted and does not claim to obtain screenshot pixels.
+- Added backend `/v2/schema` and `/v2/analyze-image` contracts for image data URL, OCR hint, OCR blocks, ignored regions, evidence spans, and manual-review fallback.
+- Added `VivoCloudMultimodalAdapter`, image/OCR preprocessing, and prompt files for vivo OpenAI-style multimodal requests; all provider credentials remain backend environment variables only.
+- Android now routes real image drafts to `/v2/analyze-image`: Photo Picker, system image share, recent screenshot assist, and camera preview are converted into backend image payloads with `data:image/jpeg;base64,...`, dimensions, SHA-256, OCR text hint, current date, locale, and timezone. Manual/text-only drafts continue to use `/v1/analyze`.
+- Android image upload failures are explicit: if the content URI or camera preview cannot be read, the app records a local `待确认` fallback instead of injecting training samples or pretending the cloud succeeded.
+- Updated validation to lock the Android 16 screenshot/share flow, no fake device chrome, and vivo multimodal contract while keeping older local release gates green.
+- Verified vivo official doc-center `docId=1745`: image understanding uses `/v1/chat/completions` with `messages[].content` entries of type `text` and `image_url`.
+- Extended `backend/shike_backend/eval/live_smoke.py` with a secret-safe `--multimodal` path and candidate model testing.
+- Live smoke with the current backend-only test credentials reached vivo and confirmed configuration, but all official candidate models returned `provider_model_does_not_support_image`; this remains an external model/ability permission gap, not an Android or backend secret-loading failure.
+
+Files changed:
+- Android: `android-mvp/app/build.gradle.kts`, `AndroidManifest.xml`, `MainActivity.kt`, `CaptureLaunchers.kt`, `ShikeApp.kt`, `BackendAnalysisActions.kt`, `BackendAnalysisRunner.kt`, `ModelApiClient.kt`, `CaptureImportMapper.kt`, `ScreenshotCandidateStore.kt`, `ShikeMainScreen.kt`, `MainFlowScreens.kt`, `HomeAgendaList.kt`, `SystemStatusRow.kt`, `DateStrip.kt`, `ReadinessSections.kt`, `ScreenCaptureCallbackHelper.kt`.
+- Backend: `backend/shike_backend/main.py`, `settings.py`, `schemas_v2.py`, `image_preprocess.py`, `adapters/vivo_cloud_multimodal_adapter.py`, `prompts/analyze_image_system_prompt.txt`, `prompts/analyze_image_user_template.txt`, `backend/verify_backend.py`.
+- Validation/prototype: `AnalyzeImageApiClientTest.kt`, `validate_no_fake_device_chrome.py`, `validate_android16_screenshot_flow.py`, `validate_vivo_multimodal_contract.py`, `validate_ocr_input.py`, `validate_backend_source_type_contract.py`, `validate_device_demo.py`, `validate_home_one_screen.py`, `validate_frontend_polish.py`, `validate_real_world_ready.py`, `prototype/demo.html`, `prototype/index.html`.
+
+Validation:
+- PASS `python3 validation/validate_no_fake_device_chrome.py`
+  - Evidence: `NO_FAKE_DEVICE_CHROME_METRIC	1/1`
+- PASS `python3 validation/validate_android16_screenshot_flow.py`
+  - Evidence: `ANDROID16_SCREENSHOT_FLOW_METRIC	15/15`
+- PASS `python3 validation/validate_vivo_multimodal_contract.py`
+  - Evidence: `VIVO_MULTIMODAL_CONTRACT_METRIC	15/15`
+- PASS `PATH="$HOME/.local/share/shike-android-tools/gradle-8.10.2/bin:$PATH" ANDROID_HOME="$HOME/.local/share/shike-android-tools/android-sdk" ANDROID_SDK_ROOT="$HOME/.local/share/shike-android-tools/android-sdk" JAVA_HOME="$HOME/.local/share/shike-android-tools/jdk-local/usr/lib/jvm/java-21-openjdk-amd64" gradle --no-daemon :app:testDebugUnitTest --tests "cn.shike.app.data.AnalyzeImageApiClientTest"`
+  - Evidence: `BUILD SUCCESSFUL`; locks Android `/v2/analyze-image` payload construction and image-vs-text endpoint selection.
+- PASS `PATH="$HOME/.local/share/shike-android-tools/gradle-8.10.2/bin:$PATH" ANDROID_HOME="$HOME/.local/share/shike-android-tools/android-sdk" ANDROID_SDK_ROOT="$HOME/.local/share/shike-android-tools/android-sdk" JAVA_HOME="$HOME/.local/share/shike-android-tools/jdk-local/usr/lib/jvm/java-21-openjdk-amd64" gradle --no-daemon :app:testDebugUnitTest`
+  - Evidence: `BUILD SUCCESSFUL`
+- PASS `python3 validation/validate_ocr_input.py`
+  - Evidence: `OCR_INPUT_METRIC	12/12`
+- PASS `python3 validation/validate_model_contract_strict.py`
+  - Evidence: `MODEL_CONTRACT_STRICT_METRIC	10/10`
+- PASS `python3 backend/verify_backend.py`
+  - Evidence: `backend_passed`
+- PARTIAL `PYTHONPATH="/home/xing-12_26/projects/codex-workspace/shike/backend" python3 -m shike_backend.eval.live_smoke --skip-bluelm --skip-ocr --multimodal --timeout-seconds 25 --multimodal-models "Volc-DeepSeek-V3.2,Doubao-Seed-2.0-mini,Doubao-Seed-2.0-lite,Doubao-Seed-2.0-pro,qwen3.5-plus"`
+  - Evidence: `multimodal_configured=True`
+  - Evidence: `multimodal_error=provider_model_does_not_support_image` for all tested candidate models.
+  - Boundary: backend credentials load and request routing work; the current test key/model set does not have usable image-input ability.
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS	secret_hygiene`
+- PASS `PATH="$HOME/.local/share/shike-android-tools/gradle-8.10.2/bin:$PATH" ANDROID_HOME="$HOME/.local/share/shike-android-tools/android-sdk" ANDROID_SDK_ROOT="$HOME/.local/share/shike-android-tools/android-sdk" JAVA_HOME="$HOME/.local/share/shike-android-tools/jdk-local/usr/lib/jvm/java-21-openjdk-amd64" gradle --no-daemon :app:testDebugUnitTest :app:assembleDebug`
+  - Evidence: `BUILD SUCCESSFUL`
+  - Non-blocking warning: AGP 8.6.1 recommends a newer plugin for `compileSdk = 36`.
+- PASS `python3 validation/validate_real_world_ready.py`
+  - Evidence: `REAL_WORLD_READY_METRIC	22/22`
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	58/58`
+- PASS desktop APK copy
+  - Evidence: `/mnt/c/Users/Xing/Desktop/Shike-app-debug.apk`
+  - Evidence: desktop hash matches local APK hash `d39493d9df6e5ae84114113197f2fd6a8004a52db5c2cecdf41e014d17fa1183`.
+- Strict cloud-device release remains blocked until real Android 16 cloud-device MP4/report/logcat evidence is collected.
+
+## 2026-06-05 / Round 235
+
+Goal: Implement the cloud-device product-fix guide's screenshot assist and original-screenshot cleanup paths as reachable runtime flows.
+
+Current handoff summary:
+- Goal: Bring the public validation status up to the current materials evidence package.
+- Current release evidence anchors: scoring evidence map, preliminary deck landing evidence package, `docs/delivery-boundary-and-scoring.md`, `materials/preliminary-deck.md`, `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md`, and `materials/evidence/requirement-matrix.md`.
+- Current release metrics remain `LANDING_RELEASE_CANDIDATE_METRIC	58/58`, `CLOUD_DEVICE_PACKAGE_METRIC	29/29`, `RELEASE_EVIDENCE_INDEX_METRIC	10/10`, `REQUIREMENT_MATRIX_METRIC	9/9`, `DEMO_ACCEPTANCE_METRIC	18/18`, and expected strict blocker `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`.
+- No cloud recordings, report values, credentials, or personal data were fabricated.
+- Continued from `docs/SHIKE_CLOUD_DEVICE_PRODUCT_FIX_GUIDE.md`, derived from `/mnt/c/Users/Xing/Desktop/SHIKE_CLOUD_DEVICE_PRODUCT_FIX_GUIDE (1).md`.
+- Connected screenshot assist from Settings into `MainActivity`: requests screenshot media permission, requests notification permission when needed, registers `ScreenshotObserver`, sends the screenshot notification, and handles `ACTION_IMPORT_SCREENSHOT`.
+- Connected notification/foreground screenshot candidates into the Import page with `ScreenshotDetectedSheet`; user must tap `交给拾刻` before a screenshot candidate becomes a pending action card.
+- Added a sample-free screenshot assistant draft path: `待解析截图` / `截图导入` / `待确认`, without injecting B203, 18:30, 22:00, or 第5章 sample fields.
+- Connected original screenshot cleanup into the confirmed Action Plan path: after user confirmation, `ScreenshotCleanupPrompt` can request `MediaStore.createDeleteRequest`; the app records requested, deleted, kept, or failed states and never silently deletes media.
+- Strict cloud-device release is still externally blocked until real MP4/report/logcat evidence is collected; no recordings, report values, credentials, raw OCR, or personal data were fabricated.
+
+Files changed:
+- Android runtime path: `MainActivity.kt`, `ShikeApp.kt`, `ShikeMainScreen.kt`, `MainFlowScreens.kt`, `ActionPlannerPanel.kt`, `CaptureResultActions.kt`, `CaptureImportMapper.kt`, `ExecutionResult.kt`.
+- Android system helpers: `PermissionDecisions.kt`, `ScreenshotObserver.kt`, `AndroidManifest.xml`.
+- Tests and validators: `CaptureResultActionsTest.kt`, `CaptureImportMapperTest.kt`, `ExecutionResultStateTest.kt`, `validate_screenshot_assist.py`, `validate_screenshot_cleanup.py`, `validate_android_unit_tests.py`.
+
+Validation:
+- PASS `PATH="$HOME/.local/share/shike-android-tools/gradle-8.10.2/bin:$PATH" ANDROID_HOME="$HOME/.local/share/shike-android-tools/android-sdk" ANDROID_SDK_ROOT="$HOME/.local/share/shike-android-tools/android-sdk" JAVA_HOME="$HOME/.local/share/shike-android-tools/jdk-local/usr/lib/jvm/java-21-openjdk-amd64" gradle --no-daemon :app:testDebugUnitTest`
+  - Evidence: `BUILD SUCCESSFUL`.
+- PASS `python3 validation/validate_screenshot_assist.py`
+  - Evidence: `SCREENSHOT_ASSIST_METRIC	13/13`
+- PASS `python3 validation/validate_screenshot_cleanup.py`
+  - Evidence: `SCREENSHOT_CLEANUP_METRIC	12/12`
+- PASS `python3 validation/validate_android_unit_tests.py`
+  - Evidence: `ANDROID_UNIT_TEST_METRIC	66/66`
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS	secret_hygiene`
+- PASS `python3 validation/validate_real_world_ready.py`
+  - Evidence: `REAL_WORLD_READY_METRIC	22/22`
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	58/58`
+- PASS `PATH="$HOME/.local/share/shike-android-tools/gradle-8.10.2/bin:$PATH" ANDROID_HOME="$HOME/.local/share/shike-android-tools/android-sdk" ANDROID_SDK_ROOT="$HOME/.local/share/shike-android-tools/android-sdk" JAVA_HOME="$HOME/.local/share/shike-android-tools/jdk-local/usr/lib/jvm/java-21-openjdk-amd64" gradle --no-daemon :app:assembleDebug`
+  - Evidence: `BUILD SUCCESSFUL`.
+- PASS desktop APK copy
+  - Evidence: `/mnt/c/Users/Xing/Desktop/Shike-app-debug.apk`
+  - Evidence: desktop hash matches local APK hash `1f742d8d81e2b9ba6b4ec6546bee8605ec3017aee3921d8d710fc091d24bdd11`.
+- PASS `python3 scripts/prepare_cloud_device_evidence.py`
+  - Evidence: `CLOUD_DEVICE_PREP_METRIC	5/5`
+  - Expected pre-recording gaps remain: `CLOUD_DEVICE_PREP_MISSING_VIDEOS	9/9`, `CLOUD_DEVICE_PREP_REPORT_TBD_FIELDS	14/14`, `CLOUD_DEVICE_PREP_REPORT_VIDEO_TBD_FIELDS	9/9`.
+
+## 2026-06-05 / Round 234
+
+Goal: Bring the public validation status up to the current materials evidence package.
+
+Current handoff summary:
+- Applied `/mnt/c/Users/Xing/Desktop/SHIKE_CLOUD_DEVICE_PRODUCT_FIX_GUIDE (1).md` into the current cloud-device product fix round.
+- Existing evidence package surfaces remain current: scoring evidence map, preliminary deck landing evidence package, `docs/delivery-boundary-and-scoring.md`, and `materials/preliminary-deck.md`.
+- Raised the local release gate to `LANDING_RELEASE_CANDIDATE_METRIC	58/58` by adding no-sample-contamination, screenshot assist, screenshot cleanup, user-facing copy, and one-screen home checks.
+- Handoff metrics remain tied to `CLOUD_DEVICE_PACKAGE_METRIC	29/29`, `RELEASE_EVIDENCE_INDEX_METRIC	10/10`, `REQUIREMENT_MATRIX_METRIC	9/9`, and `DEMO_ACCEPTANCE_METRIC	18/18`.
+- Strict release remains expected at `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7` until real external evidence exists.
+- Desktop guidance and matrix anchors remain `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md` and `materials/evidence/requirement-matrix.md`.
+- No cloud recordings, report values, credentials, or personal data were fabricated.
+
+Files changed:
+- Added/validated the no-sample-contamination backend regression for `今天晚上需要上高数 A`.
+- Added screenshot-assist and screenshot-cleanup Android surfaces with dedicated validators.
+- Updated release-candidate, cloud-device, evidence-index, deliverable, demo, and requirement-matrix gates to the current `58/58` local release metric.
+
+Validation:
+- PASS `PATH="$HOME/.local/share/shike-android-tools/gradle-8.10.2/bin:$PATH" gradle --no-daemon :app:testDebugUnitTest`
+  - Evidence: `BUILD SUCCESSFUL`; local unit suites report 91 tests, 0 failures, 0 errors.
+- PASS `python3 validation/validate_android_unit_tests.py`
+  - Evidence: `ANDROID_UNIT_TEST_METRIC	66/66`
+- PASS `python3 validation/validate_real_world_ready.py`
+  - Evidence: `REAL_WORLD_READY_METRIC	22/22`
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	58/58`
+- PASS `bash android-mvp/build_apk.sh`
+  - Evidence: `android-mvp/app/build/outputs/apk/debug/app-debug.apk`
+  - Evidence: `APK_SHA256	12aec053297ec0eaf77e2d7edc175a46a51c96e90f7c1e100c84aaba75037c91`
+- PASS desktop APK copy
+  - Evidence: `/mnt/c/Users/Xing/Desktop/Shike-app-debug.apk`
+  - Evidence: desktop hash matches local APK hash `12aec053297ec0eaf77e2d7edc175a46a51c96e90f7c1e100c84aaba75037c91`
+- PASS public HTTPS backend deployment
+  - Evidence: deployed release `/opt/shike/releases/20260605203552` on `118.89.119.107`.
+  - Evidence: `https://roky.chat/health` returned `{"status":"ok"}`.
+  - Evidence: `https://roky.chat/v1/analyze` for `今天晚上需要上高数A` returned `title=上高数 A`, `normalized_start=null`, `location=null`, `missing_fields=["exact_start_time","location"]`, and only a reminder action.
+- PASS `python3 scripts/prepare_cloud_device_evidence.py`
+  - Evidence: `CLOUD_DEVICE_PREP_METRIC	5/5`
+- PASS `python3 validation/validate_cloud_device_package.py`
+  - Evidence: `CLOUD_DEVICE_PACKAGE_METRIC	29/29`
+- PASS `python3 validation/validate_release_evidence_index.py`
+  - Evidence: `RELEASE_EVIDENCE_INDEX_METRIC	10/10`
+- Strict cloud-device release remains blocked until real MP4/report/logcat evidence is collected.
+
+## 2026-06-03 / Round 233
+
+Goal: Apply the product-manager deep review guide and add vivo OCR import API support without committing test credentials.
+
+Current handoff summary:
+- Goal: Bring the public validation status up to the current materials evidence package.
+- No cloud recordings, report values, credentials, or personal data were fabricated.
+- Desktop source used for this round: `/mnt/c/Users/Xing/Desktop/SHIKE_PRODUCT_MANAGER_DEEP_REVIEW_GUIDE.md`.
+- Existing evidence package surfaces remain current: scoring evidence map, preliminary deck landing evidence package, `docs/delivery-boundary-and-scoring.md`, and `materials/preliminary-deck.md`.
+- Added the application-value evidence package: `docs/user-research-plan.md`, `docs/user-interview-summary.md`, `materials/evidence/scoring-evidence-map.md`, and `USER_RESEARCH_EVIDENCE_METRIC	8/8`, while keeping real interviews and survey metrics marked as `待采集`.
+- Official vivo docs checked through the doc-center API: `id=1746` usage guide, `id=1677` Bearer AppKey auth, `id=1745` `/v1/chat/completions`, and `id=1737` `/ocr/general_recognition`.
+- The backend now exposes `/v1/ocr` for server-side screenshot/camera OCR imports; Android still calls Shike backend only and must not hold BlueLM/OCR AppKEY values.
+- Current local release gate is raised to `LANDING_RELEASE_CANDIDATE_METRIC	53/53` by adding `VIVO_OCR_ADAPTER_METRIC	11/11`.
+- Secret-safe live smoke with temporary environment credentials passed for both BlueLM structured extraction and vivo General OCR: `live_smoke_metric	2/2`.
+- Redacted live evidence now includes `provider=bluelm`, `result_schema_valid=true`, `provider=vivo_general_ocr`, `ocr_status=pass`, and `image_persisted=false` without AppKEY, Authorization, base64 image payloads, or full OCR text.
+- Handoff metrics remain tied to `CLOUD_BACKEND_READY_METRIC	9/9`, `CLOUD_DEVICE_PACKAGE_METRIC	29/29`, `RELEASE_EVIDENCE_INDEX_METRIC	10/10`, `REQUIREMENT_MATRIX_METRIC	9/9`, and `DEMO_ACCEPTANCE_METRIC	18/18`.
+- Strict release is still expected at `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7` until real external evidence exists.
+- Desktop guidance and matrix anchors remain `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md` and `materials/evidence/requirement-matrix.md`.
+- Strict external evidence remains blocked until real cloud-device MP4 files, filled report, and non-placeholder logcat are collected.
+- No cloud recordings, report values, credentials, base64 image payloads, or personal data were fabricated.
+
+Files changed:
+- Added `backend/shike_backend/adapters/vivo_ocr_adapter.py` for vivo General OCR form-body calls.
+- Added `OcrRequest` / `OcrResponse` and `POST /v1/ocr` with manual fallback when credentials or network are unavailable.
+- Added `validation/validate_vivo_ocr_adapter.py`.
+- Added `docs/user-research-plan.md`, `docs/user-interview-summary.md`, `materials/evidence/scoring-evidence-map.md`, and `validation/validate_user_research_evidence.py` to lock the user-research evidence boundary without fabricating interview data.
+- Added `docs/SHIKE_PRODUCT_MANAGER_DEEP_REVIEW_GUIDE.md` as a secret-safe project copy of the desktop review guidance.
+- Updated `docs/bluelm-integration-runbook.md`, `README.md`, `docs/current-validation-status.md`, and `materials/evidence/release-evidence-index.md`.
+- Updated `scripts/prepare_cloud_device_evidence.py` so generated cloud-device TODO output stays aligned with the 53/53 release gate and the pre-recording evidence tokens.
+
+Validation:
+- PASS `PYTHONPATH=/home/xing-12_26/projects/codex-workspace/shike/backend python3 -m shike_backend.eval.live_smoke --ocr-image /tmp/shike-live-ocr-course.png --timeout-seconds 35`
+  - Evidence: `bluelm_status=pass`
+  - Evidence: `result_schema_valid=true`
+  - Evidence: `ocr_status=pass`
+  - Evidence: `image_persisted=false`
+  - Evidence: `live_smoke_metric=2/2`
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS	secret_hygiene`
+- PASS `python3 validation/validate_vivo_ocr_adapter.py`
+  - Evidence: `VIVO_OCR_ADAPTER_METRIC	11/11`
+- PASS `python3 scripts/prepare_cloud_device_evidence.py`
+  - Evidence: `CLOUD_DEVICE_PREP_METRIC	5/5`
+  - Evidence: `CLOUD_DEVICE_PREP_MISSING_VIDEOS	9/9`
+  - Evidence: `CLOUD_DEVICE_PREP_REPORT_TBD_FIELDS	14/14`
+  - Evidence: `CLOUD_DEVICE_PREP_REPORT_VIDEO_TBD_FIELDS	9/9`
+- PASS `python3 validation/validate_cloud_device_package.py`
+  - Evidence: `CLOUD_DEVICE_PACKAGE_METRIC	29/29`
+- PASS `python3 validation/validate_release_evidence_index.py`
+  - Evidence: `RELEASE_EVIDENCE_INDEX_METRIC	10/10`
+- PASS `python3 validation/validate_user_research_evidence.py`
+  - Evidence: `USER_RESEARCH_EVIDENCE_METRIC	8/8`
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	53/53`
+- PASS `python3 scripts/run_release_handoff_checks.py --strict`
+  - Evidence: `RELEASE_HANDOFF_CHECKS_METRIC	9/9`
+  - Expected blocks: strict cloud-device package and strict landing release still require real MP4/report/logcat evidence.
+- EXPECTED BLOCK `python3 validation/validate_landing_release_candidate.py --strict`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`
+  - Passed strict item: redacted BlueLM online log is present.
+  - Blocking items: missing nine real cloud-device MP4 files, report placeholders, and placeholder cloud-device logcat.
+
+## 2026-06-02 / Round 232
+
+Goal: Add a dependency-safe release handoff runner for the post-capture evidence pass without fabricating strict cloud-device proof.
+
+Current handoff summary:
+- This continuation preserves the same release handoff boundary as the previous public-status update: `Goal: Bring the public validation status up to the current materials evidence package.`
+- Evidence package surfaces remain current: scoring evidence map, preliminary deck landing evidence package, `docs/delivery-boundary-and-scoring.md`, and `materials/preliminary-deck.md`.
+- Current release handoff metrics remain:
+  - `CLOUD_DEVICE_PACKAGE_METRIC	29/29`
+  - `RELEASE_HANDOFF_CHECKS_METRIC	9/9`
+  - `RELEASE_EVIDENCE_INDEX_METRIC	10/10`
+  - `REQUIREMENT_MATRIX_METRIC	9/9`
+  - `DEMO_ACCEPTANCE_METRIC	18/18`
+  - `LANDING_RELEASE_CANDIDATE_METRIC	52/52`
+  - `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`
+- Desktop guidance and matrix anchors remain `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md` and `materials/evidence/requirement-matrix.md`.
+- No cloud recordings, report values, credentials, or personal data were fabricated.
+
+Files changed:
+- Added `scripts/run_release_handoff_checks.py`, which runs release handoff checks in dependency-safe order.
+- The new runner defaults to local handoff gates; `--strict` confirms strict gates are still expected blockers before real cloud-device evidence, while `--strict-ready` requires strict gates to pass after the real MP4/report/logcat set is complete.
+- Updated `scripts/prepare_cloud_device_evidence.py` so generated `cloud-device-capture-todo.md` points operators to the new runner before final handoff.
+- Updated `validation/validate_cloud_device_package.py` to guard the runner's existence and command coverage, raising the non-strict cloud-device package gate to `CLOUD_DEVICE_PACKAGE_METRIC	29/29`.
+- Updated current release handoff docs and validators so README, current status, release evidence index, requirement matrix, traceability, device runbook, cloud evidence README, demo checklist, submission checklist, scoring map, deck, and landing optimization guide all reference the new `29/29` gate and `RELEASE_HANDOFF_CHECKS_METRIC	9/9`.
+
+Validation:
+- PASS `python3 -m py_compile scripts/run_release_handoff_checks.py scripts/prepare_cloud_device_evidence.py validation/validate_cloud_device_package.py validation/validate_release_evidence_index.py validation/validate_requirement_matrix.py validation/validate_release_blocking_report.py validation/validate_landing_release_candidate.py validation/validate_deliverables.py validation/validate_demo_acceptance.py`
+- PASS `python3 scripts/prepare_cloud_device_evidence.py`
+  - Evidence: `CLOUD_DEVICE_PREP_METRIC	5/5`
+  - Evidence: `CLOUD_DEVICE_PREP_MISSING_VIDEOS	9/9`
+  - Evidence: `CLOUD_DEVICE_PREP_REPORT_TBD_FIELDS	14/14`
+  - Evidence: `CLOUD_DEVICE_PREP_REPORT_VIDEO_TBD_FIELDS	9/9`
+- PASS `python3 validation/validate_cloud_device_package.py`
+  - Evidence: `CLOUD_DEVICE_PACKAGE_METRIC	29/29`
+- PASS `python3 scripts/run_release_handoff_checks.py --strict`
+  - Evidence: `RELEASE_HANDOFF_CHECKS_METRIC	9/9`
+  - Expected blocks: `validate_cloud_device_package.py --strict` and `validate_landing_release_candidate.py --strict` remain blocked until real external evidence exists.
+- PASS `python3 validation/validate_requirement_matrix.py`
+  - Evidence: `REQUIREMENT_MATRIX_METRIC	9/9`
+- PASS `python3 validation/validate_deliverables.py`
+  - Evidence: `METRIC	10/10`
+- PASS `python3 validation/validate_release_evidence_index.py`
+  - Evidence: `RELEASE_EVIDENCE_INDEX_METRIC	10/10`
+- PASS `python3 validation/validate_release_blocking_report.py`
+  - Evidence: `RELEASE_BLOCKING_REPORT_METRIC	8/8`
+- PASS `python3 validation/validate_demo_acceptance.py`
+  - Evidence: `DEMO_ACCEPTANCE_METRIC	18/18`
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC	52/52`
+- EXPECTED BLOCK `python3 validation/validate_landing_release_candidate.py --strict`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`
+  - Blocking items: missing nine real cloud-device MP4 files, report placeholders, and placeholder cloud-device logcat.
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS	secret_hygiene`
+
+Behavior preserved:
+- Local release-candidate readiness remains reproducible at 52/52.
+- The new handoff runner reduces post-capture operator error but does not weaken strict gates.
+- Strict release remains blocked until the real cloud-device recordings, filled redacted report, and redacted non-placeholder logcat exist.
+
+Next:
+- After collecting the external evidence set, run `python3 shike/scripts/run_release_handoff_checks.py --strict-ready`, then rerun strict cloud-device and landing release gates.
+
 ## 2026-05-31 / Round 231
 
 Goal: Make the cloud-device preparation handoff count report-level video evidence placeholders explicitly.
@@ -1591,7 +3415,7 @@ Validation:
   - Evidence: `ModelApiClientTest` reports 8 tests, 0 failures, 0 errors
   - Evidence: local unit suites report 89 tests, 0 failures, 0 errors
 - PASS `python3 validation/validate_android_unit_tests.py`
-  - Evidence: `ANDROID_UNIT_TEST_METRIC 64/64`
+  - Evidence: `ANDROID_UNIT_TEST_METRIC 66/66`
 - PASS `python3 validation/validate_model_bridge.py`
   - Evidence: `MODEL_BRIDGE_METRIC 14/14`
 - PASS `python3 validation/validate_real_world_ready.py`
@@ -1632,7 +3456,7 @@ Validation:
 - PASS `python3 validation/validate_model_contract_strict.py`
   - Evidence: `MODEL_CONTRACT_STRICT_METRIC 5/5`
 - PASS `python3 validation/validate_android_unit_tests.py`
-  - Evidence: `ANDROID_UNIT_TEST_METRIC 64/64`
+  - Evidence: `ANDROID_UNIT_TEST_METRIC 66/66`
 - PASS `python3 validation/validate_model_bridge.py`
   - Evidence: `MODEL_BRIDGE_METRIC 14/14`
 - PASS `python3 validation/validate_demo_acceptance.py`
@@ -4993,6 +6817,46 @@ Code shape:
 Next:
 - Continue P0.2 with another low-risk UI or validation boundary improvement.
 - Keep the next round focused and require the full guard-chain verification before recording.
+
+## 2026-06-04 / Public backend and APK closeout
+
+Goal: make the real-device APK use the public HTTPS Shike backend and remove the remaining relative-date ambiguity in BlueLM analysis.
+
+Files changed:
+- Updated Android backend defaults and migration so old `http://10.0.2.2:8000` installs move to `https://roky.chat`.
+- Increased Android backend request timeouts to tolerate live BlueLM latency.
+- Added `current_date` prompt context in `BlueLMModelAdapter` so relative dates are normalized from the user's timezone instead of the model's own date.
+- Updated BlueLM adapter validation and current evidence documents from `BLUELM_ADAPTER_METRIC 7/7` to `8/8`.
+- Regenerated `materials/evidence/cloud-device/apk-sha256.txt` and `cloud-device-capture-todo.md`.
+
+Deployment:
+- Deployed Shike backend release `/opt/shike/releases/20260604183427` on `118.89.119.107`.
+- Kept `https://roky.chat/health`, `https://roky.chat/v1/schema`, and `https://roky.chat/v1/analyze` behind the existing HTTPS gateway.
+- Did not change `api.roky.chat`.
+
+Validation:
+- PASS `python3 validation/validate_bluelm_adapter.py`
+  - Evidence: `BLUELM_ADAPTER_METRIC 8/8`
+- PASS `python3 validation/validate_android_unit_tests.py`
+  - Evidence: `ANDROID_UNIT_TEST_METRIC 66/66`
+- PASS `python3 validation/validate_real_world_ready.py`
+  - Evidence: `REAL_WORLD_READY_METRIC 22/22`
+- PASS public HTTPS backend smoke
+  - Evidence: `/health` returned `{"status":"ok"}`
+  - Evidence: `/v1/analyze` normalized `明天上午十点` to `2026-06-05T10:00:00+08:00`
+- PASS `bash android-mvp/build_apk.sh`
+  - Evidence: `android-mvp/app/build/outputs/apk/debug/app-debug.apk`
+- PASS desktop copy hash match
+  - Evidence: `d107e2c8dc3c9221b17a295b327fcda94392c74fa39ceb396c8392d39b98de01`
+
+Behavior preserved:
+- Android still calls only the Shike backend and does not contain BlueLM or OCR credentials.
+- All suggested calendar, reminder, and map actions remain user-confirmed.
+- Strict cloud-device release evidence remains blocked until real recordings, report values, and redacted logcat are collected.
+
+Next:
+- Install `/mnt/c/Users/Xing/Desktop/Shike-app-debug.apk` on a real phone and run the cloud-device recording checklist.
+- If an old install keeps a saved backend URL, clear app data or save `https://roky.chat` in the app backend field.
 
 ## 2026-05-24 / Round 069
 

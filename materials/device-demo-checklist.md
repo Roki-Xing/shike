@@ -8,8 +8,9 @@
 |---|---|---|
 | 构建 APK | `bash shike/android-mvp/build_apk.sh` | 产出 `shike/android-mvp/app/build/outputs/apk/debug/app-debug.apk` |
 | Android 结构守卫 | `python3 shike/validation/validate_android_structure.py` | 输出 `ANDROID_STRUCTURE_METRIC 31/31` |
-| Android 单元测试守卫 | `python3 shike/validation/validate_android_unit_tests.py` | 输出 `ANDROID_UNIT_TEST_METRIC 64/64`；最近一次 `gradle --no-daemon :app:testDebugUnitTest` 已通过 |
-| 执行层守卫 | `python3 shike/validation/validate_action_execution.py` | 输出 `ACTION_EXECUTION_METRIC 17/17` |
+| Android 单元测试守卫 | `python3 shike/validation/validate_android_unit_tests.py` | 输出 `ANDROID_UNIT_TEST_METRIC 86/86`；最近一次 `gradle --no-daemon :app:testDebugUnitTest` 已通过 |
+| Android 图片预处理守卫 | `python3 shike/validation/validate_android_image_preprocess.py` | 输出 `ANDROID_IMAGE_PREPROCESS_METRIC 15/15`；覆盖 `ImagePayloadPreprocessor` 的输入 MIME 魔数识别、非图片拒绝、EXIF 旋转、1600 长边压缩、截图 UI chrome 裁剪、`ImageThumbnailCache` 私有缩略图缓存、JPEG data URL 和 SHA-256 合同 |
+| 执行层守卫 | `python3 shike/validation/validate_action_execution.py` | 输出 `ACTION_EXECUTION_METRIC 18/18` |
 | 总体验收 | `python3 shike/validation/validate_real_world_ready.py` | 输出 `REAL_WORLD_READY_METRIC 22/22` |
 | 后端 smoke | `python3 shike/backend/verify_backend.py` | 输出 `backend_passed` |
 | 启动后端 | `cd shike/backend && python3 -m uvicorn shike_backend.main:app --host 0.0.0.0 --port 8000` | `/health` 返回 `{"status":"ok"}` |
@@ -24,7 +25,7 @@
 | 文件 | 内容 | 必须覆盖 |
 |---|---|---|
 | `01-install-and-open.mp4` | 安装后首次打开 | 今日行动台、导入入口、收件箱状态 |
-| `02-course-gallery-backend.mp4` | 课程通知链路 | 选择截图、OCR 文本草稿、解析当前草稿、确认修正 |
+| `02-course-gallery-backend.mp4` | 课程通知链路 | 选择截图、OCR 文本草稿、解析当前草稿、确认并安排 |
 | `03-event-camera-actions.mp4` | 活动海报链路 | 拍照导入、活动样例解析、提醒、地图 |
 | `04-fallback-offline.mp4` | 失败降级链路 | 停掉后端、后端失败、回退本地 MockModelAdapter |
 | `05-restart-restore.mp4` | 重启恢复链路 | 杀掉应用后重开，行动卡、待触发提醒和后端地址仍保留 |
@@ -39,18 +40,25 @@
 
 ## 云真机 strict 证据包
 
-上面的六段主线录屏用于本地/USB 真机演示验收，不等同于云真机 strict 发布证据。云真机证据包统一放在 `materials/evidence/cloud-device/`，入口文件为 `materials/evidence/cloud-device/README.md`，总索引为 `materials/evidence/release-evidence-index.md`，当前索引门禁是 `RELEASE_EVIDENCE_INDEX_METRIC 10/10`，并已覆盖 `docs/optimization-log.md` 当前交接摘要、README 公开入口、`validation/traceability.md` SHIKE-070 交付追踪和 `DELIVERABLES_METRIC 10/10`。云真机录制前先运行 `python3 shike/scripts/prepare_cloud_device_evidence.py`，当前准备门禁是 `CLOUD_DEVICE_PREP_METRIC 5/5`，在未收齐真实录屏前 `CLOUD_DEVICE_PREP_MISSING_VIDEOS 9/9` 是预期状态；随后保持 `validate_cloud_device_package.py` 非 strict 门禁为 `CLOUD_DEVICE_PACKAGE_METRIC 27/27`。桌面指导源必须仍是 `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md`，桌面指导逐项证据见 `materials/evidence/requirement-matrix.md`，录制前确认其仍通过 `REQUIREMENT_MATRIX_METRIC 9/9`；当前外部阻断项见 `materials/evidence/blocking-report.md`。录制前还必须在 `cloud-device-test-report.md` 填写 `Pre-recording Evidence Gate`，确认 all 9 real cloud-device MP4 files 已进入证据包，并确认 no placeholder fields remain after capture。
+上面的六段主线录屏用于本地/USB 真机演示验收，不等同于云真机 strict 发布证据。云真机证据包统一放在 `materials/evidence/cloud-device/`，入口文件为 `materials/evidence/cloud-device/README.md`，总索引为 `materials/evidence/release-evidence-index.md`，当前索引门禁是 `RELEASE_EVIDENCE_INDEX_METRIC 10/10`，并已覆盖 `docs/optimization-log.md` 当前交接摘要、README 公开入口、`validation/traceability.md` SHIKE-070 交付追踪和 `DELIVERABLES_METRIC 10/10`。云真机录制前先运行 `python3 shike/scripts/prepare_cloud_device_evidence.py`，当前准备门禁是 `CLOUD_DEVICE_PREP_METRIC 5/5`，在未收齐真实录屏前 `CLOUD_DEVICE_PREP_MISSING_VIDEOS 9/9` 是预期状态；随后运行 `python3 shike/scripts/test_collect_cloud_device_evidence.py` 守住 adb 采集 helper，运行 `python3 shike/scripts/test_preflight_cloud_backend.py` 和 `python3 shike/scripts/preflight_cloud_backend.py --base-url https://roky.chat` 确认 `CLOUD_BACKEND_PREFLIGHT_METRIC`，再运行 `python3 shike/scripts/collect_cloud_device_evidence.py --preflight-backend --backend-url https://roky.chat` 统一验证 no-cloud-image 与 `--allow-cloud-image` 两条公网后端分支，并用 `python3 shike/scripts/collect_cloud_device_evidence.py --list` 复核 9 段录屏场景。录制时逐条执行 `python3 shike/scripts/collect_cloud_device_evidence.py --record <1-9> --duration-seconds 180`。录制完成后执行 `python3 shike/scripts/collect_cloud_device_evidence.py --capture-logcat --write-report-draft --backend-url https://roky.chat`，再人工复核生成的脱敏 logcat、报告草稿和 `Pre-recording Evidence Gate` 字段。录制前后都要保持 `validate_cloud_device_package.py` 非 strict 门禁为 `CLOUD_DEVICE_PACKAGE_METRIC 30/30`，用 `python3 shike/validation/validate_android16_real_implementation_guide.py` 确认 `ANDROID16_REAL_IMPLEMENTATION_GUIDE_METRIC 12/12`，用 `python3 shike/validation/validate_android16_definition_of_done.py` 确认 `ANDROID16_DOD_COVERAGE_METRIC 28/28`，用 `python3 shike/validation/validate_image_semantic_cases.py` 确认 `IMAGE_SEMANTIC_CASES_METRIC 9/9`，用 `python3 shike/validation/validate_live_smoke_evidence.py` 确认 `LIVE_SMOKE_EVIDENCE_METRIC 7/7`，并用 `python3 shike/scripts/run_release_handoff_checks.py --strict` 确认 `RELEASE_HANDOFF_CHECKS_METRIC 24/24`。桌面指导源必须仍是 `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md`，桌面指导逐项证据见 `materials/evidence/requirement-matrix.md`，录制前确认其仍通过 `REQUIREMENT_MATRIX_METRIC 9/9`；当前外部阻断项见 `materials/evidence/blocking-report.md`。只有在真实 MP4、脱敏 logcat 和已填报告全部齐备后，才允许使用 `python3 shike/scripts/run_release_handoff_checks.py --strict-ready` 做最终核验，并在 `cloud-device-test-report.md` 中确认 all 9 real cloud-device MP4 files 和 no placeholder fields remain after capture。
 
 当前本地发布候选门禁应保持：
 
 ```bash
 python3 shike/validation/validate_requirement_matrix.py
 python3 shike/scripts/prepare_cloud_device_evidence.py
+python3 shike/scripts/test_collect_cloud_device_evidence.py
+python3 shike/scripts/collect_cloud_device_evidence.py --list
 python3 shike/validation/validate_cloud_device_package.py
+python3 shike/scripts/run_release_handoff_checks.py --strict
 python3 shike/validation/validate_landing_release_candidate.py
 # CLOUD_DEVICE_PREP_METRIC 5/5
-# CLOUD_DEVICE_PACKAGE_METRIC 27/27
-# LANDING_RELEASE_CANDIDATE_METRIC 52/52
+# CLOUD_DEVICE_PACKAGE_METRIC 30/30
+# ANDROID16_REAL_IMPLEMENTATION_GUIDE_METRIC 12/12
+# IMAGE_SEMANTIC_CASES_METRIC 9/9
+# LIVE_SMOKE_EVIDENCE_METRIC 7/7
+# RELEASE_HANDOFF_CHECKS_METRIC 24/24
+# LANDING_RELEASE_CANDIDATE_METRIC 63/63
 ```
 
 在真实云真机录屏和填写后的报告尚未收齐前，strict 发布候选预期保持阻断：
@@ -62,16 +70,18 @@ python3 shike/validation/validate_landing_release_candidate.py --strict
 
 云真机补录必须使用 HTTPS 后端地址，收齐 `01-cloud-install-open.mp4` 到 `09-cloud-final-route.mp4` 九段真实云真机视频，并填写 `cloud-device-test-report.md`。录屏、日志、文件名和报告不得包含 AppKEY、backend tokens、完整 OCR 原文、手机号、邮箱、学号或个人通知。
 
+这 9 段 strict 视频同时承接 `/mnt/c/Users/Xing/Desktop/SHIKE_ANDROID16_REAL_IMPLEMENTATION_GUIDE (1).md` 第 14 章手工真机验收脚本：`14.1 无假信息` 对应 `01-cloud-install-open.mp4`，`14.2 截图分享导入` 对应 `04-cloud-share-text.mp4` 且必须从系统截图浮层分享合成图片到拾刻，`14.3 确认后打开日历`、`14.5 地图`、`14.6 删除原截图` 对应 `09-cloud-final-route.mp4`，`14.4 通知权限与提醒` 对应 `05-cloud-permission-fallback.mp4`，`14.7 最近截图助手` 对应 `08-cloud-ui-polish.mp4`。
+
 ## 课程通知链路
 
 | 步骤 | 操作 | 预期 |
 |---|---|---|
 | 1 | 点“选择截图” | 采集来源显示相册图片，OCR 文本草稿填入课程通知 |
 | 2 | 必要时编辑“OCR 文本草稿” | 文本可编辑，后端解析会使用编辑后的 `ocr_text` |
-| 3 | 后端地址保持 `http://10.0.2.2:8000` 或真机局域网地址 | 模型状态可显示请求后端 |
+| 3 | 后端地址保持默认 `https://roky.chat`；本地调试才改为 `http://10.0.2.2:8000` 或真机局域网地址 | 模型状态可显示请求后端 |
 | 4 | 点“解析当前草稿” | 返回课程通知结构化字段 |
-| 5 | 编辑标题、时间、地点或状态并点“确认修正” | 今日行动台和收件箱同步更新 |
-| 6 | 点“加日历” | 仅在确认修正后可点；打开系统日历新增页，标题和地点预填 |
+| 5 | 编辑标题、时间、地点或状态并点“确认并安排” | 今日行动台和收件箱同步更新 |
+| 6 | 点“打开日历” | 仅在确认并安排后可点；打开系统日历新增页，标题和地点预填 |
 
 录屏时同时扫过“风险与缺失字段”，确认相对时间和系统写入权限不是黑盒执行。
 
@@ -81,9 +91,9 @@ python3 shike/validation/validate_landing_release_candidate.py --strict
 |---|---|---|
 | 1 | 点“拍照导入”并授权相机 | 显示拍照预览和活动 OCR 草稿 |
 | 2 | 点“活动样例解析” | 返回活动海报结构化字段 |
-| 3 | 点“确认修正” | 当前行动卡持久化，提醒和地图按钮变为可用 |
-| 4 | 点“提醒” | Android 13+ 申请通知权限，授权后调度本地定时提醒；exact-alarm 不可用时降级为普通定时 |
-| 5 | 点“地图” | 打开 `geo:` deeplink |
+| 3 | 点“确认并安排” | 当前行动卡持久化，设置提醒和查看路线按钮变为可用 |
+| 4 | 点“设置提醒” | Android 13+ 申请通知权限，授权后调度本地定时提醒；拒绝通知权限时保留行动卡并把提醒按钮改成“去开启通知”；exact-alarm 不可用时降级为普通定时 |
+| 5 | 点“查看路线” | 打开 `geo:` deeplink |
 
 ## 扩展场景抽查
 
@@ -103,8 +113,8 @@ python3 shike/validation/validate_landing_release_candidate.py --strict
 | 字段不可信 | 点“忽略” | 当前卡片状态变为“已忽略” |
 | 应用重启 | 关闭应用后重新打开 | `SharedPreferences` 恢复当前行动卡、采集来源和后端地址；未过期提醒通过 `restoreScheduledReminder` 重新调度 |
 | 设备重启 | 重启设备后重新打开拾刻 | `BootReminderReceiver` 接收 `BOOT_COMPLETED` 并恢复未过期待触发提醒 |
-| 清除本地数据 | 点“隐私与端云设置”里的“一键清除本地数据” | `cancelScheduledReminder` 取消系统待触发提醒并清空本地提醒记录 |
-| 精确闹钟策略 | 运行执行层守卫 | `setExactAndAllowWhileIdle`、`canScheduleExactAlarms` 和普通定时 fallback 均被 `ACTION_EXECUTION_METRIC 17/17` 覆盖 |
+| 清除拾刻缓存 | 点“隐私与端云设置”里的“清除拾刻缓存”，再点“确认清除” | App 内二次确认后 `cancelScheduledReminder` 取消系统待触发提醒并清空本地提醒记录；不会删除系统相册原截图 |
+| 精确闹钟策略 | 运行执行层守卫 | `setExactAndAllowWhileIdle`、`canScheduleExactAlarms` 和普通定时 fallback 均被 `ACTION_EXECUTION_METRIC 18/18` 覆盖 |
 
 ## 最终验收命令
 
@@ -112,6 +122,7 @@ python3 shike/validation/validate_landing_release_candidate.py --strict
 bash shike/android-mvp/build_apk.sh
 python3 shike/validation/validate_android_structure.py
 python3 shike/validation/validate_android_unit_tests.py
+python3 shike/validation/validate_android_image_preprocess.py
 python3 shike/validation/validate_action_execution.py
 python3 shike/validation/validate_demo_acceptance.py
 python3 shike/validation/validate_real_world_ready.py

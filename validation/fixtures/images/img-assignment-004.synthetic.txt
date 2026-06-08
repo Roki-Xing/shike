@@ -1,0 +1,14 @@
+id: img-assignment-004
+scene: assignment_deadline
+source_type: photo_picker
+fixture_type: synthetic_descriptor
+
+ocr_text_hint:
+作业截图主体：小组展示材料周四18:00前发到课程群，附三页PPT。
+
+expected:
+must_not_extract_status_bar_time: True
+title_contains: 小组展示, 材料
+time_required: True
+location_required: False
+actions: reminder

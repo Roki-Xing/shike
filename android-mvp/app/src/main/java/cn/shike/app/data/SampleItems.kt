@@ -2,7 +2,7 @@ package cn.shike.app.data
 
 import cn.shike.app.domain.ShikeItem
 
-const val DEFAULT_BACKEND_BASE_URL = "http://10.0.2.2:8000"
+const val DEFAULT_BACKEND_BASE_URL = "https://roky.chat"
 
 fun sampleCourse() = ShikeItem(
     title = "高数A班教室变更",
@@ -25,4 +25,3 @@ fun sampleEvent() = ShikeItem(
     startEpochMillis = 1777039800000L,
     rawText = "AI应用分享会 4月24日19:30 图书馆报告厅 报名截止今晚22:00",
 )
-

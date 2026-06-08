@@ -55,10 +55,10 @@ def main() -> int:
     checks = [
         (
             "action_buttons_require_confirmation",
-            "canUseReminder = isConfirmed" in execution_action_gate
+            "canUseReminder = isConfirmed && !missingTime" in execution_action_gate
             and "enabled = gate.canUseReminder" in planner_controls
             and "enabled = gate.canUseReminder" in banner_actions
-            and "先确认字段" in banner_actions,
+            and "先确认字段" in execution_action_gate,
         ),
         (
             "calendar_requires_time_and_does_not_claim_saved",
@@ -66,7 +66,17 @@ def main() -> int:
             and "enabled = gate.canUseCalendar" in planner_controls
             and "enabled = gate.canUseCalendar" in banner_actions
             and "已打开系统新增页" in execution_result
+            and "确认后写入" not in system_actions
+            and "打开系统日历新增页" in system_actions
+            and "由用户在日历中保存" in system_actions
             and "不得假装" not in execution_result,
+        ),
+        (
+            "reminder_requires_time_before_scheduling",
+            "canUseReminder = isConfirmed && !missingTime" in execution_action_gate
+            and "补充时间后可用" in execution_action_gate
+            and "enabled = gate.canUseReminder" in planner_controls
+            and "enabled = gate.canUseReminder" in banner_actions,
         ),
         (
             "map_requires_location_and_has_copy_fallback",
@@ -140,6 +150,7 @@ def main() -> int:
             "notification_permission_denial_preserves_card",
             "permission_blocked" in reminder_permission_fallback
             and "reminderPermissionFallbackCopyFor" in main_activity
+            and "去开启通知" in execution_action_gate
             and "已保留" in reminder_permission_fallback
             and "saveReminderPermissionFallback" in main_activity
             and "saveSnapshot" in main_activity,
@@ -162,7 +173,7 @@ def main() -> int:
         ),
         (
             "docs_describe_reminder_recovery_guard",
-            "ACTION_EXECUTION_METRIC 17/17" in docs
+            "ACTION_EXECUTION_METRIC 18/18" in docs
             and "应用启动" in docs
             and "设备重启" in docs
             and "restoreScheduledReminder" in docs,

@@ -55,15 +55,24 @@ def main() -> int:
         ("ocr_draft_state_present", "var ocrDraft by remember" in android_source),
         ("ocr_draft_label_visible", "OCR 文本草稿" in android_source),
         ("ocr_draft_edit_handler_present", "onOcrDraftChange" in android_source),
-        ("backend_uses_ocr_draft", "textForAnalyze = backendAnalyzeText(ocrDraft, fallback)" in android_source and "fun backendAnalyzeText(" in android_source),
-        ("call_analyze_uses_text_for_analyze", "callAnalyzeApi(endpoint, sourceType, textForAnalyze" in android_source),
+        (
+            "backend_uses_ocr_draft",
+            "textForAnalyze = backendAnalyzeText(ocrDraft, input.fallback)" in android_source
+            and "fun backendAnalyzeText(" in android_source,
+        ),
+        (
+            "call_analyze_uses_text_for_analyze",
+            "callAnalyzeApi(endpoint, input.sourceType, textForAnalyze" in android_source
+            and "ocrTextHint = textForAnalyze" in android_source
+            and "/v2/analyze-image" in android_source,
+        ),
         ("gallery_populates_ocr_draft", "相册 OCR 草稿" in android_source),
         ("camera_populates_ocr_draft", "相机 OCR 草稿" in android_source),
         (
             "fallback_preserves_edited_text",
             "fun backendFailureOutcome(" in android_source
             and "redactSensitiveLogText(textForAnalyze)" in android_source
-            and "后端不可用，已回退本地 MockModelAdapter" in android_source,
+            and "云侧暂不可用，已切换为本地确认" in android_source,
         ),
         ("persist_selection_updates_draft", "ocrDraft = item.rawText" in android_source),
         ("ocr_input_documented", "OCR 文本草稿" in docs and "编辑" in docs and "/v1/analyze" in docs),

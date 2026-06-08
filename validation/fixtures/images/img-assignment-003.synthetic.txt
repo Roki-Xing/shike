@@ -1,0 +1,14 @@
+id: img-assignment-003
+scene: assignment_deadline
+source_type: screenshot_share
+fixture_type: synthetic_descriptor
+
+ocr_text_hint:
+群公告主体：论文选题明天中午12点前在问卷内提交，未提交视为放弃。
+
+expected:
+must_not_extract_status_bar_time: True
+title_contains: 论文选题, 提交
+time_required: True
+location_required: False
+actions: reminder

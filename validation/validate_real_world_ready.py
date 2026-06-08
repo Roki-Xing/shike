@@ -62,11 +62,17 @@ def main() -> int:
         ("spike_passes", command_passes(["python3", "shike/spike/run_spike.py", "--all"])),
         ("apk_exists", (ROOT / "android-mvp/app/build/outputs/apk/debug/app-debug.apk").is_file()),
         ("runbook_has_device_install", "adb install -r" in runbook and "真机验证路径" in runbook),
-        ("runbook_has_backend_and_fallback", "10.0.2.2:8000" in runbook and "回退本地 MockModelAdapter" in runbook),
+        ("runbook_has_backend_and_fallback", "https://roky.chat" in runbook and "10.0.2.2:8000" in runbook and "回退本地 MockModelAdapter" in runbook),
         ("runbook_has_real_device_backend_config", "保存后端地址" in runbook and "192.168.1.10:8000" in runbook),
         ("demo_checklist_has_recording_evidence", "device-demo-checklist.md" in readme and (ROOT / "materials/device-demo-checklist.md").is_file()),
         ("android_has_confirm_before_execute", "先确认字段；未确认前不会打开外部日历、通知或地图。" in android_source),
-        ("android_has_real_inputs_and_actions", all(token in android_source for token in ["GetContent", "TakePicturePreview", "CalendarContract", "NotificationCompat", "geo:"])),
+        (
+            "android_has_real_inputs_and_actions",
+            all(
+                token in android_source
+                for token in ["PickVisualMedia", "TakePicturePreview", "CalendarContract", "NotificationCompat", "geo:"]
+            ),
+        ),
         (
             "readme_has_real_world_commands",
             all(
@@ -77,7 +83,7 @@ def main() -> int:
                     "validate_android_structure.py",
                     "validate_android_unit_tests.py",
                     "ANDROID_STRUCTURE_METRIC 31/31",
-                    "ANDROID_UNIT_TEST_METRIC 64/64",
+                    "ANDROID_UNIT_TEST_METRIC 86/86",
                 ]
             ),
         ),

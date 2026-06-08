@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="cn.shike.app.BackendTriggerActionsTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-05-29T04:53:43" hostname="LAPTOP-B84BKQGP" time="0.002">
+<testsuite name="cn.shike.app.BackendTriggerActionsTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-06-08T13:34:59" hostname="LAPTOP-B84BKQGP" time="0.002">
   <properties/>
   <testcase name="analyzeEventWithBackendAction_dispatchesEventCameraInput" classname="cn.shike.app.BackendTriggerActionsTest" time="0.001"/>
   <testcase name="analyzeCourseWithBackendAction_dispatchesCourseScreenshotInput" classname="cn.shike.app.BackendTriggerActionsTest" time="0.001"/>

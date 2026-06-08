@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="cn.shike.app.ExecutionResultActionsTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-05-29T04:53:43" hostname="LAPTOP-B84BKQGP" time="0.008">
+<testsuite name="cn.shike.app.ExecutionResultActionsTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-06-08T13:34:59" hostname="LAPTOP-B84BKQGP" time="0.008">
   <properties/>
   <testcase name="runMapExecution_preservesExistingCalendarResult" classname="cn.shike.app.ExecutionResultActionsTest" time="0.002"/>
-  <testcase name="runReminderExecution_recordsPermissionAwareReminderResult" classname="cn.shike.app.ExecutionResultActionsTest" time="0.004"/>
+  <testcase name="runReminderExecution_recordsPermissionAwareReminderResult" classname="cn.shike.app.ExecutionResultActionsTest" time="0.003"/>
   <testcase name="runCalendarExecution_recordsResultBeforeSystemAction" classname="cn.shike.app.ExecutionResultActionsTest" time="0.002"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>

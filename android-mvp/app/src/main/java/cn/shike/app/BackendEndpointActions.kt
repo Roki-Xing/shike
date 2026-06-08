@@ -13,5 +13,5 @@ fun saveBackendEndpointAction(
 ): BackendEndpointResult =
     BackendEndpointResult(
         endpoint = saveBackendUrlFromInput(backendUrl, onSaveBackendUrl),
-        statusMessage = "模型编排：后端地址已保存",
+        statusMessage = "云侧连接已保存",
     )

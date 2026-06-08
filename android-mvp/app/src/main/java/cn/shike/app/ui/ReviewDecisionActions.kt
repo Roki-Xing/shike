@@ -37,7 +37,7 @@ fun ReviewDecisionActions(
             modifier = Modifier.weight(1f),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0F766E)),
         ) {
-            Text("确认修正")
+            Text("确认并安排")
         }
         OutlinedButton(
             onClick = {

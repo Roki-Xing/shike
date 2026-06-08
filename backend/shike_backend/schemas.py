@@ -34,6 +34,32 @@ class AnalyzeRequest(BaseModel):
     user_timezone: str = "Asia/Shanghai"
 
 
+class OcrRequest(BaseModel):
+    """Server-side OCR import request."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    input_id: str
+    source_type: Literal["screenshot", "camera"]
+    image_base64: str = Field(min_length=16)
+    locale: str = "zh-CN"
+    pos: int = Field(default=2, ge=0, le=2)
+
+
+class OcrResponse(BaseModel):
+    """OCR result returned to Android or cloud-device smoke tests."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    text: str
+    confidence: float = Field(ge=0, le=1)
+    engine: str
+    is_redacted: bool
+    image_cleared: bool
+    failure_hint: str | None
+    request_id: str
+
+
 class Action(BaseModel):
     """Suggested action returned by the model adapter."""
 

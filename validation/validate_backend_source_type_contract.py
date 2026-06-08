@@ -105,7 +105,11 @@ def main() -> int:
         ),
         (
             "android_backend_uses_current_draft_source",
-            "backendAnalysisInputForCurrentDraft(captureSource, selected)" in shike_app
+            "backendAnalysisInputForCurrentDraft(" in shike_app
+            and "captureSource = captureSource" in shike_app
+            and "fallback = selected" in shike_app
+            and "imageUri = imageUri" in shike_app
+            and "allowCloudImage = allowCloudImageForPreference(localMultimodalPreference)" in shike_app
             and "fun backendAnalysisInputForCurrentDraft" in backend_runner
             and "backendSourceTypeFromCaptureSource(captureSource)" in backend_runner,
         ),

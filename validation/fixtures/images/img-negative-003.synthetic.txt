@@ -1,0 +1,19 @@
+id: img-negative-003
+scene: negative_fragment
+source_type: camera
+fixture_type: synthetic_descriptor
+
+ocr_text_hint:
+随手拍白板涂鸦，没有可识别的课程、会议、截止或地点。
+
+expected:
+must_not_extract_status_bar_time: True
+title_contains: 无行动
+time_required: False
+location_required: False
+actions: none
+output_scene: unknown
+missing_fields: task, time, location
+forbidden_title_terms: 白板涂鸦
+forbidden_location_terms: 无
+forbidden_evidence_regions: top_status_bar, bottom_navigation_bar

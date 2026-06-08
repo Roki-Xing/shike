@@ -1,0 +1,14 @@
+id: img-event-002
+scene: event_poster
+source_type: photo_picker
+fixture_type: synthetic_descriptor
+
+ocr_text_hint:
+活动海报主体：社团招新宣讲，明晚18:30，教学楼A101，扫码报名。
+
+expected:
+must_not_extract_status_bar_time: True
+title_contains: 社团招新, 宣讲
+time_required: True
+location_required: True
+actions: calendar, reminder, map

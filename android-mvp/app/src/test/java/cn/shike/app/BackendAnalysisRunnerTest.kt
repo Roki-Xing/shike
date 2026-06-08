@@ -41,14 +41,45 @@ class BackendAnalysisRunnerTest {
         )
 
         assertEquals("待确认", outcome.item.status)
-        assertEquals("后端失败，回退本地 MockModelAdapter", outcome.source)
-        assertEquals("模型编排：后端失败，已回退本地 mock", outcome.statusMessage)
+        assertEquals("云侧解析失败，本地待确认", outcome.source)
+        assertEquals("云侧暂不可用，已切换为本地确认", outcome.statusMessage)
         assertTrue(outcome.item.rawText.contains("[手机号已脱敏]"))
         assertTrue(outcome.item.rawText.contains("学号：[学号已脱敏]"))
         assertTrue(outcome.item.rawText.contains("[局域网地址已脱敏]"))
-        assertTrue(outcome.item.rawText.contains("后端不可用，已回退本地 MockModelAdapter"))
+        assertTrue(outcome.item.rawText.contains("云侧暂不可用，已切换为本地确认"))
         assertFalse(outcome.item.rawText.contains("13812345678"))
         assertFalse(outcome.item.rawText.contains("192.168.1.10"))
+    }
+
+    @Test
+    fun backendFailureOutcomeForRealMathDraft_doesNotInjectCourseSampleFields() {
+        val outcome = backendFailureOutcome(
+            fallback = sampleCourse(),
+            textForAnalyze = "今天晚上需要上高数A",
+        )
+        val combined = listOf(
+            outcome.item.title,
+            outcome.item.time,
+            outcome.item.location,
+            outcome.item.rawText,
+            outcome.source,
+            outcome.statusMessage,
+        ).joinToString("\n")
+
+        assertEquals("上高数 A", outcome.item.title)
+        assertEquals("课程通知", outcome.item.scene)
+        assertEquals("今天晚上（需确认具体时间）", outcome.item.time)
+        assertEquals("待补充", outcome.item.location)
+        assertEquals("待确认", outcome.item.status)
+        assertEquals(listOf("先存入待确认"), outcome.item.actions)
+        assertEquals("云侧解析失败，本地待确认", outcome.source)
+        assertEquals("云侧暂不可用，已切换为本地确认", outcome.statusMessage)
+        assertTrue(outcome.item.rawText.contains("今天晚上需要上高数A"))
+        assertFalse(combined.contains("B203"))
+        assertFalse(combined.contains("18:30"))
+        assertFalse(combined.contains("22:00"))
+        assertFalse(combined.contains("第5章"))
+        assertFalse(combined.contains("MockModelAdapter"))
     }
 
     @Test
@@ -57,8 +88,8 @@ class BackendAnalysisRunnerTest {
             "活动报名 联系 13900001111 邮箱 demo@example.com 地址 192.168.0.2:8000",
         )
 
-        assertEquals("后端失败，回退本地 MockModelAdapter", copy.source)
-        assertEquals("模型编排：后端失败，已回退本地 mock", copy.statusMessage)
+        assertEquals("云侧解析失败，本地待确认", copy.source)
+        assertEquals("云侧暂不可用，已切换为本地确认", copy.statusMessage)
         assertTrue(copy.rawText.contains("[手机号已脱敏]"))
         assertTrue(copy.rawText.contains("[邮箱已脱敏]"))
         assertTrue(copy.rawText.contains("[局域网地址已脱敏]"))

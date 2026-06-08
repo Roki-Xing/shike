@@ -21,6 +21,7 @@ data class CaptureDraftEntity(
     val id: String,
     val sourceType: String,
     val localImageUri: String?,
+    val thumbnailUri: String?,
     val ocrText: String,
     val createdEpochMillis: Long,
     val privacyLevel: String,

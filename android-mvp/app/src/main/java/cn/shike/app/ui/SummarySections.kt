@@ -31,7 +31,7 @@ fun TodaySummaryPanel() {
 @Composable
 fun DemoRoutePanel() {
     SectionCard("3分钟演示路线") {
-        DemoRouteStep("1", "课程截图", "选择截图 -> 课程样例 -> 确认修正")
+        DemoRouteStep("1", "课程截图", "选择截图 -> 课程样例 -> 确认并安排")
         DemoRouteStep("2", "活动拍照", "拍照导入 -> 活动样例 -> 即将截止")
         DemoRouteStep("3", "后端回退", "后端解析失败时保留 MockModelAdapter")
         DemoRouteStep("4", "重启恢复", "返回今日行动台查看收件箱缓存")

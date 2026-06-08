@@ -1,0 +1,14 @@
+id: img-travel-004
+scene: travel_ticket
+source_type: recent_screenshot_assist
+fixture_type: synthetic_descriptor
+
+ocr_text_hint:
+打车行程主体：预约明早7点到校门口集合，目的地机场。
+
+expected:
+must_not_extract_status_bar_time: True
+title_contains: 预约, 机场
+time_required: True
+location_required: True
+actions: calendar, reminder, map

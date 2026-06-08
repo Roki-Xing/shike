@@ -1,0 +1,577 @@
+[
+  {
+    "id": "img-course-001",
+    "scene": "course_notice",
+    "source_type": "screenshot_share",
+    "image_fixture": "validation/fixtures/images/img-course-001.synthetic.txt",
+    "ocr_text_hint": "群公告主体：高等数学调课，今晚18:30，教学楼B203，课前完成预习。",
+    "expected": {
+      "must_not_extract_status_bar_time": true,
+      "title_contains": ["高等数学", "调课"],
+      "time_required": true,
+      "location_required": true,
+      "actions": ["calendar", "reminder", "map"]
+    }
+  },
+  {
+    "id": "img-course-002",
+    "scene": "course_notice",
+    "source_type": "photo_picker",
+    "image_fixture": "validation/fixtures/images/img-course-002.synthetic.txt",
+    "ocr_text_hint": "课程通知主体：线性代数明天上午8点半改到综合楼C301，上课前签到。",
+    "expected": {
+      "must_not_extract_status_bar_time": true,
+      "title_contains": ["线性代数", "改到"],
+      "time_required": true,
+      "location_required": true,
+      "actions": ["calendar", "reminder", "map"]
+    }
+  },
+  {
+    "id": "img-course-003",
+    "scene": "course_notice",
+    "source_type": "recent_screenshot_assist",
+    "image_fixture": "validation/fixtures/images/img-course-003.synthetic.txt",
+    "ocr_text_hint": "课程平台截图主体：物理实验本周六14:00，实验楼一区105，带实验记录本。",
+    "expected": {
+      "must_not_extract_status_bar_time": true,
+      "title_contains": ["物理实验"],
+      "time_required": true,
+      "location_required": true,
+      "actions": ["calendar", "reminder", "map"]
+    }
+  },
+  {
+    "id": "img-course-004",
+    "scene": "course_notice",
+    "source_type": "screenshot_share",
+    "image_fixture": "validation/fixtures/images/img-course-004.synthetic.txt",
+    "ocr_text_hint": "教务通知主体：数据结构补课，周三晚上，地点待定，请关注后续通知。",
+    "expected": {
+      "must_not_extract_status_bar_time": true,
+      "title_contains": ["数据结构", "补课"],
+      "time_required": true,
+      "location_required": false,
+      "actions": ["calendar", "reminder"]
+    }
+  },
+  {
+    "id": "img-course-005",
+    "scene": "course_notice",
+    "source_type": "photo_picker",
+    "image_fixture": "validation/fixtures/images/img-course-005.synthetic.txt",
+    "ocr_text_hint": "群通知主体：英语听力课暂停一次，下周一恢复，地点仍为语音室2。",
+    "expected": {
+      "must_not_extract_status_bar_time": true,
+      "title_contains": ["英语听力", "暂停"],
+      "time_required": true,
+      "location_required": true,
+      "actions": ["calendar", "reminder", "map"]
+    }
+  },
+  {
+    "id": "img-course-006",
+    "scene": "course_notice",
+    "source_type": "camera",
+    "image_fixture": "validation/fixtures/images/img-course-006.synthetic.txt",
+    "ocr_text_hint": "黑板拍照主体：概率论习题课，今天16:30，图书馆研讨室2。",
+    "expected": {
+      "must_not_extract_status_bar_time": true,
+      "title_contains": ["概率论", "习题课"],
+      "time_required": true,
+      "location_required": true,
+      "actions": ["calendar", "reminder", "map"]
+    }
+  },
+  {
+    "id": "img-course-007",
+    "scene": "course_notice",
+    "source_type": "screenshot_share",
+    "image_fixture": "validation/fixtures/images/img-course-007.synthetic.txt",
+    "ocr_text_hint": "课程群截图主体：思政讨论课改为线上腾讯会议，周五19:00，会议号见群公告。",
+    "expected": {
+      "must_not_extract_status_bar_time": true,
+      "title_contains": ["思政讨论", "线上"],
+      "time_required": true,
+      "location_required": false,
+      "actions": ["calendar", "reminder"]
+    }
+  },
+  {
+    "id": "img-course-008",
+    "scene": "course_notice",
+    "source_type": "photo_picker",
+    "image_fixture": "validation/fixtures/images/img-course-008.synthetic.txt",
+    "ocr_text_hint": "导员通知主体：机器学习实验验收，明晚20:00前到信远楼机房完成登记。",
+    "expected": {
+      "must_not_extract_status_bar_time": true,
+      "title_contains": ["机器学习", "验收"],
+      "time_required": true,
+      "location_required": true,
+      "actions": ["calendar", "reminder", "map"]
+    }
+  },
+  {
+    "id": "img-assignment-001",
+    "scene": "assignment_deadline",
+    "source_type": "screenshot_share",
+    "image_fixture": "validation/fixtures/images/img-assignment-001.synthetic.txt",
+    "ocr_text_hint": "学习通截图主体：第5章作业今晚22:00前提交，逾期不可补交。",
+    "expected": {
+      "must_not_extract_status_bar_time": true,
+      "title_contains": ["第5章作业", "提交"],
+      "time_required": true,
+      "location_required": false,
+      "actions": ["reminder"]
+    }
+  },
+  {
+    "id": "img-assignment-002",
+    "scene": "assignment_deadline",
+    "source_type": "photo_picker",
+    "image_fixture": "validation/fixtures/images/img-assignment-002.synthetic.txt",
+    "ocr_text_hint": "课程平台主体：实验报告周日23:59截止，需上传PDF和数据表。",
+    "expected": {
+      "must_not_extract_status_bar_time": true,
+      "title_contains": ["实验报告", "截止"],
+      "time_required": true,
+      "location_required": false,
+      "actions": ["reminder"]
+    }
+  },
+  {
+    "id": "img-assignment-003",
+    "scene": "assignment_deadline",
+    "source_type": "screenshot_share",
+    "image_fixture": "validation/fixtures/images/img-assignment-003.synthetic.txt",
+    "ocr_text_hint": "群公告主体：论文选题明天中午12点前在问卷内提交，未提交视为放弃。",
+    "expected": {
+      "must_not_extract_status_bar_time": true,
+      "title_contains": ["论文选题", "提交"],
+      "time_required": true,
+      "location_required": false,
+      "actions": ["reminder"]
+    }
+  },
+  {
+    "id": "img-assignment-004",
+    "scene": "assignment_deadline",
+    "source_type": "photo_picker",
+    "image_fixture": "validation/fixtures/images/img-assignment-004.synthetic.txt",
+    "ocr_text_hint": "作业截图主体：小组展示材料周四18:00前发到课程群，附三页PPT。",
+    "expected": {
+      "must_not_extract_status_bar_time": true,
+      "title_contains": ["小组展示", "材料"],
+      "time_required": true,
+      "location_required": false,
+      "actions": ["reminder"]
+    }
+  },
+  {
+    "id": "img-assignment-005",
+    "scene": "assignment_deadline",
+    "source_type": "recent_screenshot_assist",
+    "image_fixture": "validation/fixtures/images/img-assignment-005.synthetic.txt",
+    "ocr_text_hint": "平台弹窗主体：补交窗口今天下午关闭，请尽快提交实验截图。",
+    "expected": {
+      "must_not_extract_status_bar_time": true,
+      "title_contains": ["补交窗口", "实验截图"],
+      "time_required": true,
+      "location_required": false,
+      "actions": ["reminder"]
+    }
+  },
+  {
+    "id": "img-assignment-006",
+    "scene": "assignment_deadline",
+    "source_type": "screenshot_share",
+    "image_fixture": "validation/fixtures/images/img-assignment-006.synthetic.txt",
+    "ocr_text_hint": "课程系统主体：阅读打卡本周五前完成，需连续三天有效记录。",
+    "expected": {
+      "must_not_extract_status_bar_time": true,
+      "title_contains": ["阅读打卡", "完成"],
+      "time_required": true,
+      "location_required": false,
+      "actions": ["reminder"]
+    }
+  },
+  {
+    "id": "img-event-001",
+    "scene": "event_poster",
+    "source_type": "camera",
+    "image_fixture": "validation/fixtures/images/img-event-001.synthetic.txt",
+    "ocr_text_hint": "海报主体：AI应用分享会，6月18日19:00，大学生活动中心报告厅。",
+    "expected": {
+      "must_not_extract_status_bar_time": true,
+      "title_contains": ["AI应用分享会"],
+      "time_required": true,
+      "location_required": true,
+      "actions": ["calendar", "reminder", "map"]
+    }
+  },
+  {
+    "id": "img-event-002",
+    "scene": "event_poster",
+    "source_type": "photo_picker",
+    "image_fixture": "validation/fixtures/images/img-event-002.synthetic.txt",
+    "ocr_text_hint": "活动海报主体：社团招新宣讲，明晚18:30，教学楼A101，扫码报名。",
+    "expected": {
+      "must_not_extract_status_bar_time": true,
+      "title_contains": ["社团招新", "宣讲"],
+      "time_required": true,
+      "location_required": true,
+      "actions": ["calendar", "reminder", "map"]
+    }
+  },
+  {
+    "id": "img-event-003",
+    "scene": "event_poster",
+    "source_type": "camera",
+    "image_fixture": "validation/fixtures/images/img-event-003.synthetic.txt",
+    "ocr_text_hint": "路演海报主体：创新创业比赛报名截止本周日，线下说明会地点为双创中心。",
+    "expected": {
+      "must_not_extract_status_bar_time": true,
+      "title_contains": ["创新创业比赛", "报名"],
+      "time_required": true,
+      "location_required": true,
+      "actions": ["calendar", "reminder", "map"]
+    }
+  },
+  {
+    "id": "img-event-004",
+    "scene": "event_poster",
+    "source_type": "screenshot_share",
+    "image_fixture": "validation/fixtures/images/img-event-004.synthetic.txt",
+    "ocr_text_hint": "公众号海报主体：志愿服务培训，周六9:00，志愿者之家二楼会议室。",
+    "expected": {
+      "must_not_extract_status_bar_time": true,
+      "title_contains": ["志愿服务", "培训"],
+      "time_required": true,
+      "location_required": true,
+      "actions": ["calendar", "reminder", "map"]
+    }
+  },
+  {
+    "id": "img-event-005",
+    "scene": "event_poster",
+    "source_type": "photo_picker",
+    "image_fixture": "validation/fixtures/images/img-event-005.synthetic.txt",
+    "ocr_text_hint": "展览海报主体：摄影展今日开展，展期到月底，图书馆一层展厅。",
+    "expected": {
+      "must_not_extract_status_bar_time": true,
+      "title_contains": ["摄影展"],
+      "time_required": true,
+      "location_required": true,
+      "actions": ["calendar", "reminder", "map"]
+    }
+  },
+  {
+    "id": "img-event-006",
+    "scene": "event_poster",
+    "source_type": "camera",
+    "image_fixture": "validation/fixtures/images/img-event-006.synthetic.txt",
+    "ocr_text_hint": "讲座海报主体：职业规划讲座，时间待通知，地点为就业指导中心。",
+    "expected": {
+      "must_not_extract_status_bar_time": true,
+      "title_contains": ["职业规划", "讲座"],
+      "time_required": false,
+      "location_required": true,
+      "actions": ["map"]
+    }
+  },
+  {
+    "id": "img-meeting-001",
+    "scene": "meeting_notice",
+    "source_type": "screenshot_share",
+    "image_fixture": "validation/fixtures/images/img-meeting-001.synthetic.txt",
+    "ocr_text_hint": "组会通知主体：项目周会明天15:00，科研楼312，需带进展文档。",
+    "expected": {
+      "must_not_extract_status_bar_time": true,
+      "title_contains": ["项目周会"],
+      "time_required": true,
+      "location_required": true,
+      "actions": ["calendar", "reminder", "map"]
+    }
+  },
+  {
+    "id": "img-meeting-002",
+    "scene": "meeting_notice",
+    "source_type": "photo_picker",
+    "image_fixture": "validation/fixtures/images/img-meeting-002.synthetic.txt",
+    "ocr_text_hint": "会议截图主体：腾讯会议答辩预演，周三20:00，会议链接见通知主体。",
+    "expected": {
+      "must_not_extract_status_bar_time": true,
+      "title_contains": ["答辩预演"],
+      "time_required": true,
+      "location_required": false,
+      "actions": ["calendar", "reminder"]
+    }
+  },
+  {
+    "id": "img-meeting-003",
+    "scene": "meeting_notice",
+    "source_type": "screenshot_share",
+    "image_fixture": "validation/fixtures/images/img-meeting-003.synthetic.txt",
+    "ocr_text_hint": "部门通知主体：班委例会今晚21:00，线上，讨论期末安排。",
+    "expected": {
+      "must_not_extract_status_bar_time": true,
+      "title_contains": ["班委例会"],
+      "time_required": true,
+      "location_required": false,
+      "actions": ["calendar", "reminder"]
+    }
+  },
+  {
+    "id": "img-meeting-004",
+    "scene": "meeting_notice",
+    "source_type": "recent_screenshot_assist",
+    "image_fixture": "validation/fixtures/images/img-meeting-004.synthetic.txt",
+    "ocr_text_hint": "群通知主体：实验室安全培训会，周五10:00，主楼201。",
+    "expected": {
+      "must_not_extract_status_bar_time": true,
+      "title_contains": ["安全培训会"],
+      "time_required": true,
+      "location_required": true,
+      "actions": ["calendar", "reminder", "map"]
+    }
+  },
+  {
+    "id": "img-meeting-005",
+    "scene": "meeting_notice",
+    "source_type": "photo_picker",
+    "image_fixture": "validation/fixtures/images/img-meeting-005.synthetic.txt",
+    "ocr_text_hint": "通知主体：导师一对一沟通，时间另约，地点办公室A412。",
+    "expected": {
+      "must_not_extract_status_bar_time": true,
+      "title_contains": ["导师", "沟通"],
+      "time_required": false,
+      "location_required": true,
+      "actions": ["map"]
+    }
+  },
+  {
+    "id": "img-interview-001",
+    "scene": "interview_notice",
+    "source_type": "screenshot_share",
+    "image_fixture": "validation/fixtures/images/img-interview-001.synthetic.txt",
+    "ocr_text_hint": "校招通知主体：产品实习面试，明天10:30，线上会议，请提前10分钟进入。",
+    "expected": {
+      "must_not_extract_status_bar_time": true,
+      "title_contains": ["产品实习", "面试"],
+      "time_required": true,
+      "location_required": false,
+      "actions": ["calendar", "reminder"]
+    }
+  },
+  {
+    "id": "img-interview-002",
+    "scene": "interview_notice",
+    "source_type": "photo_picker",
+    "image_fixture": "validation/fixtures/images/img-interview-002.synthetic.txt",
+    "ocr_text_hint": "短信截图主体：宣讲会后现场面试，周四14:00，就业中心三楼。",
+    "expected": {
+      "must_not_extract_status_bar_time": true,
+      "title_contains": ["现场面试"],
+      "time_required": true,
+      "location_required": true,
+      "actions": ["calendar", "reminder", "map"]
+    }
+  },
+  {
+    "id": "img-interview-003",
+    "scene": "interview_notice",
+    "source_type": "screenshot_share",
+    "image_fixture": "validation/fixtures/images/img-interview-003.synthetic.txt",
+    "ocr_text_hint": "招聘平台主体：笔试提醒，今晚19:30开始，需提前下载客户端。",
+    "expected": {
+      "must_not_extract_status_bar_time": true,
+      "title_contains": ["笔试提醒"],
+      "time_required": true,
+      "location_required": false,
+      "actions": ["calendar", "reminder"]
+    }
+  },
+  {
+    "id": "img-interview-004",
+    "scene": "interview_notice",
+    "source_type": "recent_screenshot_assist",
+    "image_fixture": "validation/fixtures/images/img-interview-004.synthetic.txt",
+    "ocr_text_hint": "邮件截图主体：终面安排下周二16:00，公司会议室，地址见邮件底部。",
+    "expected": {
+      "must_not_extract_status_bar_time": true,
+      "title_contains": ["终面安排"],
+      "time_required": true,
+      "location_required": true,
+      "actions": ["calendar", "reminder", "map"]
+    }
+  },
+  {
+    "id": "img-travel-001",
+    "scene": "travel_ticket",
+    "source_type": "screenshot_share",
+    "image_fixture": "validation/fixtures/images/img-travel-001.synthetic.txt",
+    "ocr_text_hint": "车票截图主体：G1234，6月20日08:15出发，南京南站到上海虹桥。",
+    "expected": {
+      "must_not_extract_status_bar_time": true,
+      "title_contains": ["G1234", "出发"],
+      "time_required": true,
+      "location_required": true,
+      "actions": ["calendar", "reminder", "map"]
+    }
+  },
+  {
+    "id": "img-travel-002",
+    "scene": "travel_ticket",
+    "source_type": "photo_picker",
+    "image_fixture": "validation/fixtures/images/img-travel-002.synthetic.txt",
+    "ocr_text_hint": "机票截图主体：航班MU567，周六13:40起飞，浦东机场T1。",
+    "expected": {
+      "must_not_extract_status_bar_time": true,
+      "title_contains": ["MU567", "起飞"],
+      "time_required": true,
+      "location_required": true,
+      "actions": ["calendar", "reminder", "map"]
+    }
+  },
+  {
+    "id": "img-travel-003",
+    "scene": "travel_ticket",
+    "source_type": "screenshot_share",
+    "image_fixture": "validation/fixtures/images/img-travel-003.synthetic.txt",
+    "ocr_text_hint": "酒店订单主体：入住明天下午，地址为人民路88号，离店日期后天。",
+    "expected": {
+      "must_not_extract_status_bar_time": true,
+      "title_contains": ["酒店", "入住"],
+      "time_required": true,
+      "location_required": true,
+      "actions": ["calendar", "reminder", "map"]
+    }
+  },
+  {
+    "id": "img-travel-004",
+    "scene": "travel_ticket",
+    "source_type": "recent_screenshot_assist",
+    "image_fixture": "validation/fixtures/images/img-travel-004.synthetic.txt",
+    "ocr_text_hint": "打车行程主体：预约明早7点到校门口集合，目的地机场。",
+    "expected": {
+      "must_not_extract_status_bar_time": true,
+      "title_contains": ["预约", "机场"],
+      "time_required": true,
+      "location_required": true,
+      "actions": ["calendar", "reminder", "map"]
+    }
+  },
+  {
+    "id": "img-low-quality-001",
+    "scene": "low_quality_fragment",
+    "source_type": "camera",
+    "image_fixture": "validation/fixtures/images/img-low-quality-001.synthetic.txt",
+    "ocr_text_hint": "模糊海报主体只清晰看到讲座和报告厅，时间区域被遮挡。",
+    "expected": {
+      "must_not_extract_status_bar_time": true,
+      "title_contains": ["讲座"],
+      "time_required": false,
+      "location_required": true,
+      "actions": ["map"]
+    }
+  },
+  {
+    "id": "img-low-quality-002",
+    "scene": "low_quality_fragment",
+    "source_type": "photo_picker",
+    "image_fixture": "validation/fixtures/images/img-low-quality-002.synthetic.txt",
+    "ocr_text_hint": "长图截断主体只有作业提交字样和今天，缺少具体截止时刻。",
+    "expected": {
+      "must_not_extract_status_bar_time": true,
+      "title_contains": ["作业提交"],
+      "time_required": false,
+      "location_required": false,
+      "actions": ["reminder"]
+    }
+  },
+  {
+    "id": "img-low-quality-003",
+    "scene": "low_quality_fragment",
+    "source_type": "screenshot_share",
+    "image_fixture": "validation/fixtures/images/img-low-quality-003.synthetic.txt",
+    "ocr_text_hint": "旋转截图主体能看到活动名称，地点和时间需要人工确认。",
+    "expected": {
+      "must_not_extract_status_bar_time": true,
+      "title_contains": ["活动"],
+      "time_required": false,
+      "location_required": false,
+      "actions": []
+    }
+  },
+  {
+    "id": "img-low-quality-004",
+    "scene": "low_quality_fragment",
+    "source_type": "recent_screenshot_assist",
+    "image_fixture": "validation/fixtures/images/img-low-quality-004.synthetic.txt",
+    "ocr_text_hint": "聊天截图主体包含老师说今晚前完成，但任务对象和具体材料不完整。",
+    "expected": {
+      "must_not_extract_status_bar_time": true,
+      "title_contains": ["今晚前完成"],
+      "time_required": true,
+      "location_required": false,
+      "actions": ["reminder"]
+    }
+  },
+  {
+    "id": "img-negative-001",
+    "scene": "negative_fragment",
+    "source_type": "screenshot_share",
+    "image_fixture": "validation/fixtures/images/img-negative-001.synthetic.txt",
+    "ocr_text_hint": "纯网页截图主体是新闻列表，没有任务、时间或地点。",
+    "expected": {
+      "must_not_extract_status_bar_time": true,
+      "title_contains": ["无行动"],
+      "time_required": false,
+      "location_required": false,
+      "actions": [],
+      "output_scene": "unknown",
+      "missing_fields": ["task", "time", "location"],
+      "forbidden_title_terms": ["新闻列表", "推荐", "热搜"],
+      "forbidden_location_terms": ["首页", "评论"],
+      "forbidden_evidence_regions": ["top_status_bar", "bottom_navigation_bar"]
+    }
+  },
+  {
+    "id": "img-negative-002",
+    "scene": "negative_fragment",
+    "source_type": "photo_picker",
+    "image_fixture": "validation/fixtures/images/img-negative-002.synthetic.txt",
+    "ocr_text_hint": "纯拾刻首页截图主体只有今日行动台空状态和导入按钮，没有外部事件。",
+    "expected": {
+      "must_not_extract_status_bar_time": true,
+      "title_contains": ["无行动"],
+      "time_required": false,
+      "location_required": false,
+      "actions": [],
+      "output_scene": "unknown",
+      "missing_fields": ["task", "time", "location"],
+      "forbidden_title_terms": ["今日行动台", "还没有今日行动", "导入截图", "手动输入", "快捷导入"],
+      "forbidden_location_terms": ["首页", "导入", "收件箱", "设置"],
+      "forbidden_evidence_regions": ["top_status_bar", "bottom_navigation_bar", "shike_own_ui"]
+    }
+  },
+  {
+    "id": "img-negative-003",
+    "scene": "negative_fragment",
+    "source_type": "camera",
+    "image_fixture": "validation/fixtures/images/img-negative-003.synthetic.txt",
+    "ocr_text_hint": "随手拍白板涂鸦，没有可识别的课程、会议、截止或地点。",
+    "expected": {
+      "must_not_extract_status_bar_time": true,
+      "title_contains": ["无行动"],
+      "time_required": false,
+      "location_required": false,
+      "actions": [],
+      "output_scene": "unknown",
+      "missing_fields": ["task", "time", "location"],
+      "forbidden_title_terms": ["白板涂鸦"],
+      "forbidden_location_terms": ["无"],
+      "forbidden_evidence_regions": ["top_status_bar", "bottom_navigation_bar"]
+    }
+  }
+]
