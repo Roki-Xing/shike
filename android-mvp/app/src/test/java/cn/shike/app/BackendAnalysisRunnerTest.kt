@@ -25,11 +25,21 @@ class BackendAnalysisRunnerTest {
     }
 
     @Test
-    fun backendAnalyzeText_prefersEditedOcrDraftAndFallsBackToSampleRawText() {
+    fun backendAnalyzeText_prefersEditedOcrDraftAndDoesNotFallbackToImageSampleRawText() {
         val fallback = sampleCourse()
+        val pendingImage = fallback.copy(
+            title = "待解析截图",
+            scene = "图片导入",
+            time = "待确认",
+            location = "待确认",
+            status = "待确认",
+            actions = listOf("先存入待确认"),
+            rawText = "",
+        )
 
         assertEquals("用户改过的 OCR 文本", backendAnalyzeText("用户改过的 OCR 文本", fallback))
         assertEquals(fallback.rawText, backendAnalyzeText("   ", fallback))
+        assertEquals("", backendAnalyzeText("   ", pendingImage))
     }
 
     @Test

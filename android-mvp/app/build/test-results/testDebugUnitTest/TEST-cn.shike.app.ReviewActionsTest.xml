@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="cn.shike.app.ReviewActionsTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-06-09T01:39:40" hostname="LAPTOP-B84BKQGP" time="0.001">
+<testsuite name="cn.shike.app.ReviewActionsTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-06-09T10:02:26" hostname="LAPTOP-B84BKQGP" time="0.001">
   <properties/>
   <testcase name="applyReviewedItemSelection_persistsConfirmedItemAndSource" classname="cn.shike.app.ReviewActionsTest" time="0.001"/>
   <testcase name="applyReviewedItemSelection_persistsIgnoredItemAndSource" classname="cn.shike.app.ReviewActionsTest" time="0.0"/>

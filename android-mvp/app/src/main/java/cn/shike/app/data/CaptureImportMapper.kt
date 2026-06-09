@@ -77,7 +77,12 @@ fun cameraDraftFromPreview(width: Int, height: Int): CaptureDraft =
     )
 
 fun itemFromCameraDraft(draft: CaptureDraft): ShikeItem =
-    sampleEvent().copy(title = "拍照导入的活动海报", rawText = draft.rawText)
+    pendingImageItem(
+        title = "待解析照片",
+        scene = "拍照导入",
+        rawText = draft.rawText,
+        startEpochMillis = draft.createdEpochMillis,
+    )
 
 fun cameraSelectionFromPreview(width: Int, height: Int): CaptureSelection =
     selectionFromCaptureDraft(cameraDraftFromPreview(width, height))
@@ -95,7 +100,12 @@ fun galleryDraftFromImage(label: String): CaptureDraft =
     )
 
 fun itemFromGalleryDraft(draft: CaptureDraft): ShikeItem =
-    sampleCourse().copy(title = "相册导入的课程通知", rawText = draft.rawText)
+    pendingImageItem(
+        title = "待解析截图",
+        scene = "图片导入",
+        rawText = draft.rawText,
+        startEpochMillis = draft.createdEpochMillis,
+    )
 
 fun gallerySelectionFromImage(label: String): CaptureSelection =
     selectionFromCaptureDraft(galleryDraftFromImage(label))
@@ -104,13 +114,9 @@ fun screenshotCaptureSource(candidate: ScreenshotCandidate): String =
     candidate.sourceLabel.takeIf { it.isNotBlank() } ?: "截图助手导入 ${candidate.width}x${candidate.height}"
 
 fun itemFromScreenshotCandidate(candidate: ScreenshotCandidate): ShikeItem =
-    ShikeItem(
+    pendingImageItem(
         title = "待解析截图",
         scene = "截图导入",
-        time = "待确认",
-        location = "待确认",
-        status = "待确认",
-        actions = listOf("先存入待确认"),
         startEpochMillis = candidate.createdAtMillis,
         rawText = "截图助手导入：将自动请求云侧解析，可在 OCR 文本草稿中校对后重试。",
     )
@@ -122,9 +128,35 @@ fun screenshotSelectionFromCandidate(candidate: ScreenshotCandidate): CaptureSel
     )
 
 fun selectionFromCaptureDraft(draft: CaptureDraft): CaptureSelection {
-    val item = if (draft.channel == "camera") itemFromCameraDraft(draft) else itemFromGalleryDraft(draft)
+    val item = when (draft.channel) {
+        "camera" -> itemFromCameraDraft(draft)
+        "gallery" -> itemFromGalleryDraft(draft)
+        else -> pendingImageItem(
+            title = "待确认碎片",
+            scene = "待确认",
+            rawText = draft.rawText,
+            startEpochMillis = draft.createdEpochMillis,
+        )
+    }
     return CaptureSelection(item = item, source = draft.sourceLabel)
 }
+
+fun pendingImageItem(
+    title: String,
+    scene: String,
+    rawText: String,
+    startEpochMillis: Long,
+): ShikeItem =
+    ShikeItem(
+        title = title,
+        scene = scene,
+        time = "待确认",
+        location = "待确认",
+        status = "待确认",
+        actions = listOf("先存入待确认"),
+        startEpochMillis = startEpochMillis,
+        rawText = rawText,
+    )
 
 fun backendSourceTypeFromCaptureSource(captureSource: String): String =
     when {

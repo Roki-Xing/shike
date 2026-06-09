@@ -154,9 +154,11 @@ python3 shike/backend/verify_backend.py
 | 引擎 | 入口 | 行为 |
 |---|---|---|
 | `ManualOcrEngine` | 分享文本、手动输入、OCR 失败兜底 | 保留用户文本；空文本返回低置信度和“手动粘贴”提示，不阻断主链路 |
-| `MockOcrEngine` | 相册、相机演示入口 | 产出课程通知和活动海报两组合成 OCR 草稿，供无真 OCR 环境下演示与单测复现 |
+| `MockOcrEngine` | 相册、相机真实导入入口 | 不生成课程/活动样例；只返回 `image_pending` 空草稿，等待 `/v2/analyze-image` 和后端 OCR/多模态接管 |
 
 `CaptureDraft` 会记录 `sourceType`、`ocrText`、`ocrConfidence`、`ocrEngineName`、`privacyLevel`、`cloudAllowed`、`imageCleared`、`sourceMediaStoreUri`、`thumbnailUri` 和 `imageCleanupStatus`。分享文本默认使用 `ManualOcrEngine` 且 `allowCloudEnhancement = false`，避免把用户从其他应用分享来的原文自动送云；相册/相机当前使用 `MockOcrEngine`，后续可替换为端侧或云侧 OCR，但必须保留手动继续路径。
+
+真实相册、拍照和截图助手导入会先落成 `待解析截图` / `待解析照片` 的中性待确认卡片，不得在 Android 端注入 `高数A班 / B203 / 18:30 / 22:00 / 第5章` 等离线演示字段。图片 payload 构造成功时优先走 `/v2/analyze-image`；图片读取、压缩或云侧解析失败时进入本地待确认，失败说明可见，但不得回退到课程样例。课程/活动合成样例只允许通过离线样例或 Debug 演示入口触发。
 
 图片上传边界是用户主动导入后触发：被动截图检测仍只生成候选或通知，不自动上传图片；用户主动选择相册、拍照或确认导入截图后自动请求自有后端 `/v2/analyze-image`，同时保留“解析当前草稿”作为手动重试入口。手动输入会清空上一张图片 URI 和相机预览，避免从图片模式切到文本模式后误带旧图。Android 仍然只调用自有后端，不持有 vivo/DeepSeek/BlueLM 密钥；该边界由 `validate_no_default_image_upload.py` 的 `NO_DEFAULT_IMAGE_UPLOAD_METRIC 12/12` 守卫。
 

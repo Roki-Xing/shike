@@ -167,10 +167,10 @@ def main() -> int:
             "capture_import_unit_test_exists",
             "class CaptureImportMapperTest" in capture_test
             and capture_test.count("@Test") == 8
-            and "cameraSelectionFromPreview_mapsPreviewToEventDraft" in capture_test
-            and "gallerySelectionFromImage_mapsImageLabelToCourseDraft" in capture_test
+            and "cameraSelectionFromPreview_startsPendingImageDraftWithoutEventSample" in capture_test
+            and "gallerySelectionFromImage_startsPendingImageDraftWithoutCourseSample" in capture_test
             and "screenshotSelectionFromCandidate_keepsAssistantDraftPendingAndSampleFree" in capture_test
-            and "selectionFromCaptureDraft_routesOnlyCameraDraftToEventSample" in capture_test
+            and "selectionFromCaptureDraft_routesOnlyImageDraftsToPendingImageCards" in capture_test
             and "captureDraftFromInput_preservesOriginalAndThumbnailUrisSeparately" in capture_test
             and "captureDraftFromInput_keepsCameraThumbnailOutOfOriginalMediaUri" in capture_test
             and "captureDraftDeleteState_tracksSystemConfirmationStates" in capture_test
@@ -244,7 +244,7 @@ def main() -> int:
             and "class OcrEngineTest" in ocr_engine_test
             and ocr_engine_test.count("@Test") == 3
             and "manualOcrEngine_keepsUserTextAndReportsBlankFailure" in ocr_engine_test
-            and "mockOcrEngine_producesGalleryAndCameraDraftText" in ocr_engine_test
+            and "mockOcrEngine_keepsImageImportsNeutralUntilBackendAnalysis" in ocr_engine_test
             and "captureDraftFromInput_recordsOcrMetadataAndPrivacyChoice" in ocr_engine_test
             and "未识别到稳定文字" in ocr_engine_source,
         ),
@@ -451,7 +451,7 @@ def main() -> int:
             "class CaptureResultActionsTest" in capture_result_test
             and capture_result_test.count("@Test") == 3
             and "applyCameraPreviewSizeSelection_persistsCameraDraftAndSource" in capture_result_test
-            and "applyGalleryImageSelection_persistsGalleryDraftAndSource" in capture_result_test
+            and "applyGalleryImageSelection_persistsPendingImageDraftWithoutSampleFields" in capture_result_test
             and "applyScreenshotCandidateSelection_persistsPendingDraftWithoutSampleFields" in capture_result_test
             and "相机拍照预览 1080x1440" in capture_result_test
             and "相册图片 course-screenshot.png" in capture_result_test,
@@ -733,7 +733,7 @@ def main() -> int:
             and "class BackendAnalysisRunnerTest" in backend_analysis_runner_test
             and backend_analysis_runner_test.count("@Test") == 6
             and "backendAnalysisInputForCurrentDraft_usesCaptureSourceSpecificBackendType" in backend_analysis_runner_test
-            and "backendAnalyzeText_prefersEditedOcrDraftAndFallsBackToSampleRawText" in backend_analysis_runner_test
+            and "backendAnalyzeText_prefersEditedOcrDraftAndDoesNotFallbackToImageSampleRawText" in backend_analysis_runner_test
             and "backendFailureOutcome_redactsSensitiveTextAndKeepsFallbackReviewState" in backend_analysis_runner_test
             and "backendFailureOutcomeForRealMathDraft_doesNotInjectCourseSampleFields" in backend_analysis_runner_test
             and "backendFailureFallbackCopyFor_redactsEvidenceBeforeUiPersistence" in backend_analysis_runner_test

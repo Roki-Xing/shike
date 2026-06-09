@@ -141,7 +141,7 @@ All commands below were run from `/home/xing-12_26/projects/codex-workspace`.
 | `python3 shike/validation/validate_landing_release_candidate.py` | PASS | `LANDING_RELEASE_CANDIDATE_METRIC 63/63`; default local release-candidate now runs both `validate_backend_audit_log.py` and `validate_live_smoke_evidence.py` directly, so metadata-only backend logging and the redacted private-env live smoke are covered by the main gate as well as the release handoff runner |
 | `python3 shike/validation/validate_landing_release_candidate.py --strict` | BLOCKED | `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE 3/7`; still missing real cloud-device videos, filled report, and redacted logcat |
 | `python3 shike/scripts/verify_core20_package.py "$tmp_core20_package"` | PASS | `CORE20_FILE_COUNT 20/20`; structure/action/unit-test guard references pass |
-| `bash shike/android-mvp/build_apk.sh` | PASS | APK rebuilt with the project-local Gradle/JDK/SDK toolchain; local APK and `/mnt/c/Users/Xing/Desktop/Shike-app-debug.apk` SHA-256 both `62a57e5e865f77a4ce56dd95f6488588e1916e9f7720f69f148b1e0277206ff0` |
+| `bash shike/android-mvp/build_apk.sh` | PASS | APK rebuilt with the project-local Gradle/JDK/SDK toolchain; local APK and `/mnt/c/Users/Xing/Desktop/Shike-app-debug.apk` SHA-256 both `4627f918f7f17b6bb31d361f718c8afb307d8a77d54d4d1e674effb3564871c6` |
 | `gradle --no-daemon :app:testDebugUnitTest` from `shike/android-mvp/` | PASS | `BUILD SUCCESSFUL`; local unit suites report 144 tests, 0 failures, 0 errors |
 
 ## Current Strengths

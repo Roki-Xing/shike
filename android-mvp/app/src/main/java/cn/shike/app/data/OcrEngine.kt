@@ -52,23 +52,20 @@ class ManualOcrEngine : OcrEngine {
 class MockOcrEngine : OcrEngine {
     override fun recognize(input: CaptureInput): OcrResult =
         when (input.sourceType) {
-            CaptureSourceType.Camera -> OcrResult(
-                text = "相机 OCR 草稿：AI应用分享会 4月24日19:30 图书馆报告厅 报名截止今晚22:00",
-                confidence = 0.86f,
-                engineName = "mock",
-                isRedacted = false,
-                imageCleared = false,
-            )
-            CaptureSourceType.Gallery -> OcrResult(
-                text = "相册 OCR 草稿：高数A班今晚18:30改到B203，作业第5章今晚22:00前提交。",
-                confidence = 0.9f,
-                engineName = "mock",
-                isRedacted = false,
-                imageCleared = false,
-            )
+            CaptureSourceType.Camera, CaptureSourceType.Gallery -> pendingImageOcrResult()
             CaptureSourceType.ShareText, CaptureSourceType.Manual -> ManualOcrEngine().recognize(input)
         }
 }
+
+fun pendingImageOcrResult(): OcrResult =
+    OcrResult(
+        text = "",
+        confidence = 0f,
+        engineName = "image_pending",
+        isRedacted = false,
+        imageCleared = false,
+        failureHint = "等待云侧图片解析；若识别失败，可手动补充 OCR 文本草稿。",
+    )
 
 fun captureSourceTypeFromChannel(channel: String): CaptureSourceType =
     when (channel) {

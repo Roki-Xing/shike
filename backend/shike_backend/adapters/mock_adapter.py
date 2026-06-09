@@ -11,6 +11,13 @@ from shike_backend.schemas import AnalyzeRequest, AnalyzeResponse
 COURSE_TOPIC_TOKENS = ("高数", "课程", "上课", "课")
 SPECIFIC_TIME_TOKENS = ("18:30", "22:00", "10:00", "8:30", "12:30", "14:00", "16:30", "18:00")
 LOCATION_TOKENS = ("B203", "教室", "报告厅", "会议室", "教学楼", "综合楼", "研讨室", "信远楼")
+SPECIFIC_TIME_PATTERN = re.compile(
+    r"(今天晚上|晚上|今晚|明天晚上|明晚|明早|明天|本周[一二三四五六日天]|周[一二三四五六日天])\s*"
+    r"[一二三四五六七八九十0-9]{1,3}点(?:半|[0-9]{1,2}分)?"
+)
+LOCATION_EVIDENCE_PATTERN = re.compile(
+    r"(?:教室是|教室|地点|改到|调整到|在)\s*[A-Za-z一-龥]*[A-Z]?\d{2,4}[A-Za-z一-龥]*|[A-Z]\d{2,4}"
+)
 DEMO_COURSE_TITLE = "高数A班教室变更"
 DEMO_COURSE_TASK = "查看新教室路线并提交第5章作业"
 DEMO_COURSE_LOCATION = "B203"
@@ -30,8 +37,8 @@ def is_sparse_course_text(text: str, hint: str | None = None) -> bool:
     """
 
     has_course_topic = hint == "course_notice" or any(token in text for token in COURSE_TOPIC_TOKENS)
-    has_specific_time = any(token in text for token in SPECIFIC_TIME_TOKENS)
-    has_location = any(token in text for token in LOCATION_TOKENS)
+    has_specific_time = any(token in text for token in SPECIFIC_TIME_TOKENS) or SPECIFIC_TIME_PATTERN.search(text) is not None
+    has_location = any(token in text for token in LOCATION_TOKENS) or LOCATION_EVIDENCE_PATTERN.search(text) is not None
     return has_course_topic and not has_specific_time and not has_location
 
 
@@ -321,7 +328,7 @@ class MockModelAdapter:
     def _extract_start_text(text: str) -> str | None:
         for pattern in [
             r"(今天晚上|今晚|明天|明早|本周[一二三四五六日天]|周[一二三四五六日天])\s*[0-9]{1,2}[:：][0-9]{2}",
-            r"(今天晚上|今晚|明天晚上|明晚|明早|明天|本周[一二三四五六日天]|周[一二三四五六日天])\s*[一二三四五六七八九十0-9]{1,3}点(?:半|[0-9]{1,2}分)?",
+            r"(今天晚上|晚上|今晚|明天晚上|明晚|明早|明天|本周[一二三四五六日天]|周[一二三四五六日天])\s*[一二三四五六七八九十0-9]{1,3}点(?:半|[0-9]{1,2}分)?",
             r"[0-9]{1,2}[:：][0-9]{2}",
         ]:
             match = re.search(pattern, text)
@@ -344,6 +351,7 @@ class MockModelAdapter:
     @staticmethod
     def _extract_location_text(text: str) -> str | None:
         for pattern in [
+            r"([A-Za-z]地点在\d{2,4})",
             r"(?:教室是|教室|地点|改到|调整到|在)\s*([A-Za-z一-龥]*[A-Z]?\d{2,4}[A-Za-z一-龥]*)",
             r"(?:教室是|教室|地点|改到|调整到|在)\s*([A-Za-z一-龥]+(?:研讨室|报告厅|会议室)\d*)",
             r"([A-Z]\d{2,4})",

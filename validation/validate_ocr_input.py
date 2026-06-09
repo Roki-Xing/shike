@@ -66,8 +66,18 @@ def main() -> int:
             and "ocrTextHint = textForAnalyze" in android_source
             and "/v2/analyze-image" in android_source,
         ),
-        ("gallery_populates_ocr_draft", "相册 OCR 草稿" in android_source),
-        ("camera_populates_ocr_draft", "相机 OCR 草稿" in android_source),
+        (
+            "gallery_starts_pending_image_draft",
+            "待解析截图" in android_source
+            and "image_pending" in android_source
+            and "相册 OCR 草稿" not in android_source,
+        ),
+        (
+            "camera_starts_pending_image_draft",
+            "待解析照片" in android_source
+            and "拍照导入" in android_source
+            and "相机 OCR 草稿" not in android_source,
+        ),
         (
             "fallback_preserves_edited_text",
             "fun backendFailureOutcome(" in android_source

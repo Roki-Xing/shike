@@ -9782,3 +9782,31 @@ Code shape:
 Next:
 - Continue P0.2 with another low-risk UI or validation boundary improvement.
 - Keep the next round focused and require the full guard-chain verification before recording.
+## 2026-06-09 / Real Image Import Sample Contamination Fix
+
+Goal: Remove fixed course/event samples from the real Android gallery/camera import path and lock the user's reported screenshot case into validation.
+
+Files changed:
+- Android image import now starts with neutral `待解析截图` / `待解析照片` cards and `image_pending` OCR state; the fixed `高数A班 / B203 / 18:30 / 22:00 / 第5章` sample is no longer injected before `/v2/analyze-image`.
+- Backend evidence-only course extraction now recognizes Chinese relative time such as `晚上九点` and non-standard location evidence such as `B地点在303`.
+- Validation now includes `晚上九点上 高数 B地点在303` and guards Android gallery/camera import against sample contamination.
+
+Validation:
+- PASS `gradle --no-daemon :app:testDebugUnitTest`
+- PASS `python3 validation/validate_no_sample_contamination.py`
+  - Evidence: `NO_SAMPLE_CONTAMINATION_METRIC 14/14`
+- PASS `python3 validation/validate_android_unit_tests.py`
+  - Evidence: `ANDROID_UNIT_TEST_METRIC 86/86`
+- PASS `python3 validation/validate_ocr_input.py`
+  - Evidence: `OCR_INPUT_METRIC 12/12`
+- PASS `python3 validation/validate_ocr_engine_layer.py`
+  - Evidence: `OCR_ENGINE_LAYER_METRIC 9/9`
+- PASS `python3 validation/validate_real_world_ready.py`
+  - Evidence: `REAL_WORLD_READY_METRIC 22/22`
+- PASS `python3 validation/validate_apk_secret_hygiene.py`
+  - Evidence: `APK_SECRET_HYGIENE_METRIC 8/8`
+- PASS APK rebuild and desktop copy parity
+  - Evidence: `APK_SHA256 4627f918f7f17b6bb31d361f718c8afb307d8a77d54d4d1e674effb3564871c6`
+
+Next:
+- Install `/mnt/c/Users/Xing/Desktop/Shike-app-debug.apk` on the cloud device and verify the same screenshot now shows a neutral pending state first, then `/v2/analyze-image` output without B203/18:30/22:00/第5章 unless those fields are present in OCR evidence.

@@ -53,9 +53,13 @@ def main() -> int:
             "CaptureDraft metadata",
         ),
         (
-            "gallery_and_camera_use_mock_ocr",
-            "MockOcrEngine()" in capture_mapper and "captureDraftFromInput" in capture_mapper,
-            "gallery/camera",
+            "gallery_and_camera_start_pending_until_backend_image_analysis",
+            "MockOcrEngine()" in capture_mapper
+            and "pendingImageOcrResult" in ocr_engine
+            and "engineName = \"image_pending\"" in ocr_engine
+            and "pendingImageItem" in capture_mapper
+            and "相册导入的课程通知" not in capture_mapper,
+            "gallery/camera pending",
         ),
         (
             "share_uses_manual_ocr_without_cloud",
@@ -69,12 +73,15 @@ def main() -> int:
         ),
         (
             "unit_tests_cover_ocr_layer",
-            all(token in ocr_test for token in ["ManualOcrEngine", "MockOcrEngine", "captureDraftFromInput"]),
+            all(
+                token in ocr_test
+                for token in ["ManualOcrEngine", "MockOcrEngine", "captureDraftFromInput", "image_pending"]
+            ),
             "OcrEngineTest",
         ),
         (
             "docs_describe_ocr_layer",
-            "OCR 分层" in docs and "ManualOcrEngine" in docs and "MockOcrEngine" in docs,
+            "OCR 分层" in docs and "ManualOcrEngine" in docs and "image_pending" in docs,
             "docs",
         ),
         (

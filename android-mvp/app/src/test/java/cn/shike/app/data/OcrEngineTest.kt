@@ -28,15 +28,19 @@ class OcrEngineTest {
     }
 
     @Test
-    fun mockOcrEngine_producesGalleryAndCameraDraftText() {
+    fun mockOcrEngine_keepsImageImportsNeutralUntilBackendAnalysis() {
         val engine = MockOcrEngine()
         val camera = engine.recognize(CaptureInput(sourceType = CaptureSourceType.Camera, sourceLabel = "相机"))
         val gallery = engine.recognize(CaptureInput(sourceType = CaptureSourceType.Gallery, sourceLabel = "相册"))
 
-        assertEquals("mock", camera.engineName)
-        assertTrue(camera.text.contains("AI应用分享会"))
-        assertTrue(gallery.text.contains("高数A班"))
-        assertTrue(gallery.confidence > 0.8f)
+        assertEquals("image_pending", camera.engineName)
+        assertEquals("image_pending", gallery.engineName)
+        assertEquals("", camera.text)
+        assertEquals("", gallery.text)
+        assertEquals(0f, camera.confidence)
+        assertEquals(0f, gallery.confidence)
+        assertTrue(camera.failureHint.orEmpty().contains("等待云侧图片解析"))
+        assertFalse(gallery.failureHint.orEmpty().contains("高数A班"))
     }
 
     @Test

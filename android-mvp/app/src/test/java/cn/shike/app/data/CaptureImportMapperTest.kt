@@ -5,23 +5,44 @@ import org.junit.Test
 
 class CaptureImportMapperTest {
     @Test
-    fun cameraSelectionFromPreview_mapsPreviewToEventDraft() {
+    fun cameraSelectionFromPreview_startsPendingImageDraftWithoutEventSample() {
         val selection = cameraSelectionFromPreview(width = 1080, height = 1440)
 
         assertEquals("相机拍照预览 1080x1440", selection.source)
-        assertEquals("拍照导入的活动海报", selection.item.title)
-        assertEquals("活动海报", selection.item.scene)
-        assertEquals("相机 OCR 草稿：AI应用分享会 4月24日19:30 图书馆报告厅 报名截止今晚22:00", selection.item.rawText)
+        assertEquals("待解析照片", selection.item.title)
+        assertEquals("拍照导入", selection.item.scene)
+        assertEquals("待确认", selection.item.time)
+        assertEquals("待确认", selection.item.location)
+        assertEquals("待确认", selection.item.status)
+        assertEquals(listOf("先存入待确认"), selection.item.actions)
+        assertEquals("", selection.item.rawText)
     }
 
     @Test
-    fun gallerySelectionFromImage_mapsImageLabelToCourseDraft() {
+    fun gallerySelectionFromImage_startsPendingImageDraftWithoutCourseSample() {
         val selection = gallerySelectionFromImage("course-screenshot.png")
+        val combined = listOf(
+            selection.item.title,
+            selection.item.scene,
+            selection.item.time,
+            selection.item.location,
+            selection.item.status,
+            selection.item.actions.joinToString(),
+            selection.item.rawText,
+        ).joinToString("\n")
 
         assertEquals("相册图片 course-screenshot.png", selection.source)
-        assertEquals("相册导入的课程通知", selection.item.title)
-        assertEquals("课程通知", selection.item.scene)
-        assertEquals("相册 OCR 草稿：高数A班今晚18:30改到B203，作业第5章今晚22:00前提交。", selection.item.rawText)
+        assertEquals("待解析截图", selection.item.title)
+        assertEquals("图片导入", selection.item.scene)
+        assertEquals("待确认", selection.item.time)
+        assertEquals("待确认", selection.item.location)
+        assertEquals("待确认", selection.item.status)
+        assertEquals(listOf("先存入待确认"), selection.item.actions)
+        assertEquals("", selection.item.rawText)
+        assertEquals(false, combined.contains("B203"))
+        assertEquals(false, combined.contains("18:30"))
+        assertEquals(false, combined.contains("22:00"))
+        assertEquals(false, combined.contains("第5章"))
     }
 
     @Test
@@ -46,7 +67,7 @@ class CaptureImportMapperTest {
     }
 
     @Test
-    fun selectionFromCaptureDraft_routesOnlyCameraDraftToEventSample() {
+    fun selectionFromCaptureDraft_routesOnlyImageDraftsToPendingImageCards() {
         val customDraft = CaptureDraft(
             channel = "share",
             sourceLabel = "系统分享文本",
@@ -56,7 +77,8 @@ class CaptureImportMapperTest {
         val selection = selectionFromCaptureDraft(customDraft)
 
         assertEquals("系统分享文本", selection.source)
-        assertEquals("相册导入的课程通知", selection.item.title)
+        assertEquals("待确认碎片", selection.item.title)
+        assertEquals("待确认", selection.item.scene)
         assertEquals("高数A班今晚18:30改到B203", selection.item.rawText)
     }
 
