@@ -54,6 +54,9 @@ fun ShikeMainScreen(
     onLocalMultimodalPreferenceChange: (LocalMultimodalPreference) -> Unit,
     screenshotAssistEnabled: Boolean,
     onScreenshotAssistChange: (Boolean) -> Unit,
+    onboardingDismissed: Boolean,
+    onDismissOnboarding: () -> Unit,
+    onEnableScreenshotAssistFromOnboarding: () -> Unit,
     pendingScreenshotCandidate: ScreenshotCandidate?,
     onImportScreenshotCandidate: (ScreenshotCandidate) -> Unit,
     onIgnoreScreenshotCandidate: () -> Unit,
@@ -123,6 +126,9 @@ fun ShikeMainScreen(
                     onAddCalendar = onAddCalendar,
                     onReminder = onReminder,
                     onOpenMap = onOpenMap,
+                    onboardingDismissed = onboardingDismissed,
+                    onDismissOnboarding = onDismissOnboarding,
+                    onEnableScreenshotAssistFromOnboarding = onEnableScreenshotAssistFromOnboarding,
                 )
                 ShikeMainSection.Import -> {
                     CaptureHubScreen(

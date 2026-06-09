@@ -51,8 +51,8 @@ class ExecutionResultStateTest {
     fun imageCleanupResults_distinguishSystemConfirmationStates() {
         assertEquals("已请求", imageCleanupRequestedResult().status)
         assertTrue(imageCleanupRequestedResult().detail.contains("系统确认"))
-        assertEquals("已删除", imageCleanupDeletedResult().status)
-        assertTrue(imageCleanupDeletedResult().detail.contains("原截图已删除"))
+        assertEquals("已移入回收站", imageCleanupDeletedResult().status)
+        assertTrue(imageCleanupDeletedResult().detail.contains("移入系统回收站"))
         assertEquals("已保留", imageCleanupKeptResult().status)
         assertTrue(imageCleanupKeptResult().detail.contains("用户选择保留"))
         assertEquals("未完成", imageCleanupFailedResult().status)

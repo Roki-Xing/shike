@@ -65,15 +65,14 @@ fun PrivacyPanel(
     onScreenshotAssistChange: (Boolean) -> Unit = {},
     cleanupPreference: String = "每次询问（推荐）",
 ) {
-    val localState = localMultimodalUiState(localMultimodalStatus)
     var clearConfirmationState by remember { mutableStateOf(LocalDataClearConfirmationState()) }
-    SectionCard("隐私与端云设置") {
+    SectionCard("隐私与协同") {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = androidx.compose.foundation.layout.Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text("端侧优先", color = Color(0xFF667085), fontSize = 12.sp)
+            Text("本地优先处理", color = Color(0xFF667085), fontSize = 12.sp)
             Switch(
                 checked = localMultimodalStatus.preference == LocalMultimodalPreference.LocalPreferred,
                 onCheckedChange = { enabled ->
@@ -83,36 +82,35 @@ fun PrivacyPanel(
                 },
             )
         }
-        KeyValue("端侧模型", localState.statusLabel)
-        KeyValue("端云路由", localState.routeLabel)
-        Text(localState.detail, color = Color(0xFF667085), fontSize = 12.sp)
+        KeyValue("解析方式", if (localMultimodalStatus.preference == LocalMultimodalPreference.LocalPreferred) "优先本地待确认" else "AI 解析优先")
+        Text("主动导入后才解析；不默认上传原图。", color = Color(0xFF667085), fontSize = 12.sp)
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = androidx.compose.foundation.layout.Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text("云侧增强", color = Color(0xFF667085), fontSize = 12.sp)
+            Text("AI 解析", color = Color(0xFF667085), fontSize = 12.sp)
             Switch(
                 checked = cloudEnhancedEnabled,
                 onCheckedChange = onCloudEnhancedChange,
             )
         }
         KeyValue(
-            "云侧状态",
-            if (cloudEnhancedEnabled) "开启，主动导入或手动重试才请求后端" else "关闭云侧增强，不请求后端",
+            "解析状态",
+            if (cloudEnhancedEnabled) "开启，主动导入或手动重试才解析" else "关闭，不请求 AI 解析",
         )
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = androidx.compose.foundation.layout.Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text("截图助手模式", color = Color(0xFF667085), fontSize = 12.sp)
+            Text("截图助手", color = Color(0xFF667085), fontSize = 12.sp)
             Switch(
                 checked = screenshotAssistEnabled,
                 onCheckedChange = onScreenshotAssistChange,
             )
         }
-        KeyValue("最近截图助手", "检测到新截图后发通知，不会自动上传，不使用全局悬浮窗")
+        KeyValue("截图提醒", "检测到新截图后发通知，不会自动上传，不使用全局悬浮窗")
         KeyValue("导入后处理原截图", cleanupPreference)
         OutlinedButton(
             onClick = {
@@ -157,6 +155,6 @@ fun PrivacyPanel(
                 }
             }
         }
-        KeyValue("敏感动作", "日历和提醒写入前必须确认")
+        KeyValue("系统协同", "日历、提醒和地图都需要确认后执行")
     }
 }

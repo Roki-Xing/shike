@@ -59,7 +59,7 @@ def main() -> int:
         ),
         (
             "settings_mentions_hidden_developer_mode",
-            "开发者模式" in main_flow and "普通模式已隐藏工程配置" in main_flow,
+            "高级设置" in main_flow and "普通模式已隐藏高级配置" in main_flow,
         ),
         (
             "settings_version_tap_unlocks_developer_mode",
@@ -76,8 +76,8 @@ def main() -> int:
         ),
         (
             "settings_names_local_multimodal_boundary",
-            "端侧模型" in readiness_sections
-            and "端云路由" in readiness_sections
+            "解析方式" in readiness_sections
+            and "本地优先处理" in readiness_sections
             and "端侧模型：未安装" in local_multimodal
             and "不会假装可用" in local_multimodal
             and "同一 JSON Schema" in local_multimodal,

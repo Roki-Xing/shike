@@ -50,8 +50,8 @@ def main() -> int:
         ),
         (
             "cleanup_prompt_requires_user_choice",
-            "是否删除这张系统相册原截图" in prompt
-            and "删除原截图" in prompt
+            "是否把原图移入系统回收站" in prompt
+            and "移入回收站" in prompt
             and "保留原图" in prompt,
         ),
         (
@@ -61,11 +61,11 @@ def main() -> int:
             and all(
                 token in prompt
                 for token in [
-                    "当前来源不支持删除原图",
+                    "当前来源不支持直接移入回收站",
                     "等待你的选择",
                     "已选择保留原图",
-                    "正在等待系统确认删除",
-                    "已删除原截图",
+                    "正在等待系统确认",
+                    "已移入系统回收站",
                     "系统确认未完成",
                 ]
             ),
@@ -105,7 +105,7 @@ def main() -> int:
             and "ImageCleanupStatus.DELETED -> executionResults.recordExecutionResult" in app
             and "ImageCleanupStatus.FAILED -> executionResults.recordExecutionResult" in app
             and "handleImageCleanupStatusFromSystem(ImageCleanupStatus.FAILED)" in activity
-            and "原截图清理：已删除原截图" in activity
+            and "原截图清理：已移入系统回收站" in activity
             and "ImageCleanupStatus.DELETED" in activity
             and "ImageCleanupStatus.FAILED" in activity,
         ),

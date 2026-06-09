@@ -21,9 +21,18 @@ fun HomeActionScreen(
     onAddCalendar: (ShikeItem) -> Unit,
     onReminder: (ShikeItem) -> Unit,
     onOpenMap: (ShikeItem) -> Unit,
+    onboardingDismissed: Boolean,
+    onDismissOnboarding: () -> Unit,
+    onEnableScreenshotAssistFromOnboarding: () -> Unit,
 ) {
     DashboardHeader()
     DateStrip()
+    if (!onboardingDismissed) {
+        PermissionOnboarding(
+            onEnableScreenshotAssist = onEnableScreenshotAssistFromOnboarding,
+            onDismiss = onDismissOnboarding,
+        )
+    }
     HomeAgendaList(
         item = selected,
         state = todayAgendaState,
@@ -92,7 +101,7 @@ fun CaptureHubScreen(
         ShikeLoadingSkeleton("解析中", "正在解析 OCR 文本")
     }
     if ("失败" in modelStatus) {
-        ShikeErrorState("云侧增强暂不可用", "可继续手动确认，连接配置仅在开发者模式中显示。")
+        ShikeErrorState("AI 解析暂不可用", "可继续手动确认，连接配置已隐藏在高级设置中。")
     }
 }
 
@@ -174,12 +183,9 @@ fun PrivacySettingsScreen(
             onVersionTap = onVersionTap,
         )
         val remainingTaps = (DEVELOPER_MODE_UNLOCK_TAPS - developerModeState.tapCount).coerceAtLeast(0)
-        KeyValue(
-            "开发者模式",
-            if (developerModeState.enabled) "已开启，工程配置已转入调试页" else "连续点击版本号 5 次后显示",
-        )
+        KeyValue("高级设置", if (developerModeState.enabled) "已开启" else "连续点击版本号 5 次后显示")
         ShikeStatusPill(
-            if (developerModeState.enabled) "开发者模式已开启" else "普通模式已隐藏工程配置",
+            if (developerModeState.enabled) "高级设置已开启" else "普通模式已隐藏高级配置",
             ShikeColors.BrandSoft,
             ShikeColors.Brand,
         )
@@ -201,7 +207,7 @@ private fun VersionUnlockRow(
         modifier = Modifier.clickable(onClick = onVersionTap),
     )
     if (developerModeState.enabled) {
-        ShikeStatusPill("已进入 DebugDemoScreen", ShikeColors.BrandSoft, ShikeColors.Brand)
+        ShikeStatusPill("已进入高级设置页", ShikeColors.BrandSoft, ShikeColors.Brand)
     }
 }
 

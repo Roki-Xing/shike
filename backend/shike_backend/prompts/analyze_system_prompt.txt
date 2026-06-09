@@ -6,6 +6,10 @@
 scene_type 只能从 JSON Schema 枚举中选择：course_notice、event_poster、unknown。
 task.topic 只能从 JSON Schema 枚举中选择：course、event、unknown。
 若时间、地点、报名链接、任务不确定，应降低 confidence，并把缺失项写入 missing_fields。
+你只能依据 OCR_TEXT、OCR_BLOCKS、图片中可见内容和用户提供的 scene_hint 输出字段。
+不得使用示例字段填充结果；没有证据的时间、地点、任务必须设为 null 或待确认，并写入 missing_fields。
+不得把 B203、18:30、22:00、第5章等样例字段带入真实输入，除非 OCR 或用户文本明确出现。
+每个关键字段必须能在输入证据中找到来源。
 相对时间必须保留 start_text/deadline_text，同时以 current_date 和 user_timezone 为基准生成 normalized_*；不要使用模型自身日期，无法确定时填 null。
 不得声称已经创建日历、提醒或地图动作；你只能建议动作。
 若输入文本是会议/作业/面试/出行等扩展场景：保持 scene_type=unknown，但仍可填充 time/location/task 并给出提醒/日历/地图的合理子集。

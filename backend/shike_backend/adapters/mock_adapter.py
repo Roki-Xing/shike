@@ -3,13 +3,19 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
+import re
 
 from shike_backend.schemas import AnalyzeRequest, AnalyzeResponse
 
 
 COURSE_TOPIC_TOKENS = ("高数", "课程", "上课", "课")
-SPECIFIC_TIME_TOKENS = ("18:30", "22:00", "10:00", "8:30", "14:00", "16:30")
-LOCATION_TOKENS = ("B203", "教室", "报告厅", "会议室", "教学楼")
+SPECIFIC_TIME_TOKENS = ("18:30", "22:00", "10:00", "8:30", "12:30", "14:00", "16:30", "18:00")
+LOCATION_TOKENS = ("B203", "教室", "报告厅", "会议室", "教学楼", "综合楼", "研讨室", "信远楼")
+DEMO_COURSE_TITLE = "高数A班教室变更"
+DEMO_COURSE_TASK = "查看新教室路线并提交第5章作业"
+DEMO_COURSE_LOCATION = "B203"
+DEMO_COURSE_START = "今晚18:30"
+DEMO_COURSE_DEADLINE = "今晚22:00"
 
 
 def is_sparse_course_text(text: str, hint: str | None = None) -> bool:
@@ -54,6 +60,9 @@ def sparse_course_output(text: str) -> AnalyzeResponse:
 
 class MockModelAdapter:
     """A deterministic adapter that simulates model output for MVP scenes."""
+
+    def __init__(self, *, allow_demo_samples: bool = False) -> None:
+        self.allow_demo_samples = allow_demo_samples
 
     def analyze(self, request: AnalyzeRequest) -> AnalyzeResponse:
         text = request.ocr_text
@@ -219,21 +228,24 @@ class MockModelAdapter:
             explanation="内容没有明确时间、地点或后续动作，避免误创建行动。",
         )
 
-    @staticmethod
-    def _course_output(text: str) -> AnalyzeResponse:
+    def _course_output(self, text: str) -> AnalyzeResponse:
         if MockModelAdapter._is_sparse_course_text(text):
             return MockModelAdapter._sparse_course_output(text)
-        deadline = "今晚22:00" if "22:00" in text else "今晚22:00"
+
+        if not self.allow_demo_samples:
+            return MockModelAdapter._evidence_only_course_output(text)
+
+        deadline = DEMO_COURSE_DEADLINE if "22:00" in text else DEMO_COURSE_DEADLINE
         missing_fields = MockModelAdapter._missing_fields_for_text(text)
         return AnalyzeResponse(
             scene_type="course_notice",
             confidence=0.72 if missing_fields else 0.94,
-            title="高数A班教室变更",
+            title=DEMO_COURSE_TITLE,
             time=None if "time" in missing_fields else MockModelAdapter._time_for_text(
-                text, default_start="今晚18:30", default_deadline=deadline
+                text, default_start=DEMO_COURSE_START, default_deadline=deadline
             ),
-            location=MockModelAdapter._location_for_text(text, "B203"),
-            task={"summary": "查看新教室路线并提交第5章作业", "priority": "high", "topic": "course"},
+            location=MockModelAdapter._location_for_text(text, DEMO_COURSE_LOCATION),
+            task={"summary": DEMO_COURSE_TASK, "priority": "high", "topic": "course"},
             suggested_actions=MockModelAdapter._actions_for_missing(
                 missing_fields,
                 calendar="加入日历",
@@ -243,6 +255,121 @@ class MockModelAdapter:
             missing_fields=missing_fields,
             explanation="文本包含课程、时间、地点和截止事项，适合转成行动卡。",
         )
+
+    @staticmethod
+    def _evidence_only_course_output(text: str) -> AnalyzeResponse:
+        """Build a course card only from fields present in evidence text.
+
+        Args:
+            text: OCR or manually entered course text.
+
+        Returns:
+            Schema-valid course card with missing fields marked instead of
+            filling fixed demo sample values.
+        """
+
+        start_text = MockModelAdapter._extract_start_text(text)
+        deadline_text = MockModelAdapter._extract_deadline_text(text)
+        location_raw = MockModelAdapter._extract_location_text(text)
+        base_missing = MockModelAdapter._missing_fields_for_text(text)
+        if "time" in base_missing:
+            start_text = None
+            deadline_text = None
+        if "location" in base_missing:
+            location_raw = None
+        missing_fields: list[str] = []
+        if not start_text:
+            missing_fields.append("time" if "time" in base_missing else "exact_start_time")
+        if not location_raw:
+            missing_fields.append("location")
+        title = MockModelAdapter._course_title_from_text(text)
+        location = (
+            {"raw": location_raw, "map_query": location_raw, "confidence": 0.84}
+            if location_raw
+            else None
+        )
+        time = (
+            {
+                "start_text": start_text,
+                "deadline_text": deadline_text,
+                "normalized_start": None,
+                "normalized_deadline": None,
+            }
+            if start_text or deadline_text
+            else None
+        )
+        actions = MockModelAdapter._actions_for_missing(
+            ["time" if not start_text else "", *missing_fields],
+            calendar="加入日历",
+            reminder="设置提醒",
+            map_label="打开地点",
+        )
+        task_summary = MockModelAdapter._course_task_summary_from_text(text)
+        return AnalyzeResponse(
+            scene_type="course_notice",
+            confidence=0.91 if not missing_fields else 0.72,
+            title=title,
+            time=time,
+            location=location,
+            task={"summary": task_summary, "priority": "medium", "topic": "course"},
+            suggested_actions=actions,
+            missing_fields=list(dict.fromkeys(missing_fields)),
+            explanation="课程字段仅来自 OCR 或用户输入证据；缺失时间或地点时保持待确认，不使用固定演示样例。",
+        )
+
+    @staticmethod
+    def _extract_start_text(text: str) -> str | None:
+        for pattern in [
+            r"(今天晚上|今晚|明天|明早|本周[一二三四五六日天]|周[一二三四五六日天])\s*[0-9]{1,2}[:：][0-9]{2}",
+            r"(今天晚上|今晚|明天晚上|明晚|明早|明天|本周[一二三四五六日天]|周[一二三四五六日天])\s*[一二三四五六七八九十0-9]{1,3}点(?:半|[0-9]{1,2}分)?",
+            r"[0-9]{1,2}[:：][0-9]{2}",
+        ]:
+            match = re.search(pattern, text)
+            if match:
+                return match.group(0).replace("：", ":")
+        if "今天晚上" in text:
+            return "今天晚上"
+        if "今晚" in text:
+            return "今晚"
+        return None
+
+    @staticmethod
+    def _extract_deadline_text(text: str) -> str | None:
+        match = re.search(r"(今晚|明天|明早|本周[一二三四五六日天]|周[一二三四五六日天])?\s*[0-9]{1,2}[:：][0-9]{2}\s*前", text)
+        if match:
+            return match.group(0).strip().replace("：", ":")
+        match = re.search(r"(今晚|明天|明早|本周[一二三四五六日天]|周[一二三四五六日天])?\s*[一二三四五六七八九十0-9]{1,3}点(?:半|[0-9]{1,2}分)?\s*前", text)
+        return match.group(0).strip() if match else None
+
+    @staticmethod
+    def _extract_location_text(text: str) -> str | None:
+        for pattern in [
+            r"(?:教室是|教室|地点|改到|调整到|在)\s*([A-Za-z一-龥]*[A-Z]?\d{2,4}[A-Za-z一-龥]*)",
+            r"(?:教室是|教室|地点|改到|调整到|在)\s*([A-Za-z一-龥]+(?:研讨室|报告厅|会议室)\d*)",
+            r"([A-Z]\d{2,4})",
+            r"([\u4e00-\u9fa5]{1,8}(?:教室|报告厅|会议室|教学楼)[A-Z]?\d{0,4})",
+        ]:
+            match = re.search(pattern, text)
+            if match:
+                return match.group(1).strip(" ，,。")
+        return None
+
+    @staticmethod
+    def _course_title_from_text(text: str) -> str:
+        if "高数" in text:
+            suffix = " A" if "高数A" in text or "高数 A" in text else ""
+            return f"上高数{suffix}".strip()
+        match = re.search(r"([\u4e00-\u9fa5A-Za-z0-9]{1,12})(?:课|课程|上课)", text)
+        if match:
+            return f"{match.group(1)}课"
+        return "课程事项待确认"
+
+    @staticmethod
+    def _course_task_summary_from_text(text: str) -> str:
+        summary = text.strip()
+        if len(summary) > 48:
+            summary = summary[:48]
+        return summary or "课程事项待确认"
 
     @staticmethod
     def _sparse_course_output(text: str) -> AnalyzeResponse:

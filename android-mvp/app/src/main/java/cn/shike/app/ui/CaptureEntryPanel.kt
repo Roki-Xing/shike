@@ -19,7 +19,7 @@ fun CaptureEntryPanel(
     onBackendEvent: () -> Unit,
 ) {
     SectionCard("导入") {
-        Text("从相册选择通知截图、拍海报公告，或在没有 OCR / OCR 失败时直接粘贴文字继续。", style = ShikeTypography.Body)
+        Text("从相册选择截图、拍海报公告，或直接粘贴文字继续。", style = ShikeTypography.Body)
         ImportCaptureActions(
             onGallery = onGallery,
             onCamera = onCamera,
@@ -38,6 +38,6 @@ fun CaptureEntryPanel(
             onBackendCourse = onBackendCourse,
             onBackendEvent = onBackendEvent,
         )
-        Text("云侧不可用时可手动确认继续，样例和连接配置仅在开发者模式中显示。", style = ShikeTypography.Caption)
+        Text("AI 解析不可用时也会保留待确认行动卡。", style = ShikeTypography.Caption)
     }
 }

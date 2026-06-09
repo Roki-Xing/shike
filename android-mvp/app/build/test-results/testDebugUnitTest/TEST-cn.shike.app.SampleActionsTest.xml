@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="cn.shike.app.SampleActionsTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-06-08T13:34:59" hostname="LAPTOP-B84BKQGP" time="0.001">
+<testsuite name="cn.shike.app.SampleActionsTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-06-09T01:39:40" hostname="LAPTOP-B84BKQGP" time="0.002">
   <properties/>
-  <testcase name="applyEventSampleSelection_persistsEventSampleWithSource" classname="cn.shike.app.SampleActionsTest" time="0.0"/>
+  <testcase name="applyEventSampleSelection_persistsEventSampleWithSource" classname="cn.shike.app.SampleActionsTest" time="0.001"/>
   <testcase name="applyCourseSampleSelection_persistsCourseSampleWithSource" classname="cn.shike.app.SampleActionsTest" time="0.001"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>

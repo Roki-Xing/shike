@@ -98,7 +98,7 @@ def main() -> int:
             "captureLaunchers.launchGallery()" in app
             and "不会直接获得图片" in visible_prompt
             and "导入页选择这张截图" in visible_prompt
-            and "删除原截图" in visible_prompt
+            and "移入回收站" in visible_prompt
             and "自动读取" not in visible_prompt,
         ),
         (
@@ -107,7 +107,7 @@ def main() -> int:
         ),
         (
             "screenshot_assist_privacy_copy",
-            "最近截图助手" in settings
+            "截图提醒" in settings
             and "不会自动上传" in settings
             and "screenshotAssistEnabled" in app
             and "loadScreenshotAssistEnabled" in activity

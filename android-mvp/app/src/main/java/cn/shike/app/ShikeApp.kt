@@ -50,6 +50,9 @@ fun ShikeApp(
     onImportScreenshotCandidate: () -> Unit = {},
     screenshotAssistEnabled: Boolean = false,
     onScreenshotAssistEnabledChange: (Boolean) -> Unit = {},
+    onboardingDismissed: Boolean = true,
+    onDismissOnboarding: () -> Unit = {},
+    onEnableScreenshotAssistFromOnboarding: () -> Unit = {},
     onDeleteSourceImage: (String?) -> Unit = {},
     onBuildImagePayload: (String, String) -> BackendImagePayload? = { _, _ -> null },
     onBuildBitmapPayload: (Bitmap) -> BackendImagePayload? = { null },
@@ -288,6 +291,12 @@ fun ShikeApp(
         onLocalMultimodalPreferenceChange = { localMultimodalPreference = it },
         screenshotAssistEnabled = screenshotAssistSwitchEnabled,
         onScreenshotAssistChange = ::updateScreenshotAssist,
+        onboardingDismissed = onboardingDismissed,
+        onDismissOnboarding = onDismissOnboarding,
+        onEnableScreenshotAssistFromOnboarding = {
+            screenshotAssistSwitchEnabled = true
+            onEnableScreenshotAssistFromOnboarding()
+        },
         pendingScreenshotCandidate = pendingScreenshotCandidate,
         onImportScreenshotCandidate = ::applyScreenshotCandidate,
         onIgnoreScreenshotCandidate = onImportScreenshotCandidate,

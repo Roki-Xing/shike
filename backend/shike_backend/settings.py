@@ -21,6 +21,7 @@ DEFAULT_VIVO_MULTIMODAL_MODEL_CANDIDATES = (
     "Doubao-Seed-2.0-pro",
     "qwen3.5-plus",
 )
+VALID_RUNTIME_MODES = {"demo_mode", "cloud_device_test", "release_user"}
 
 
 def _unique_nonempty(values: tuple[str | None, ...]) -> tuple[str, ...]:
@@ -134,6 +135,7 @@ def _split_vivo_chat_base_url(value: str) -> tuple[str, str]:
 class Settings:
     """Runtime settings for the Shike backend."""
 
+    runtime_mode: str
     model_provider: str
     allow_mock_fallback: bool
 
@@ -175,8 +177,24 @@ class Settings:
     deepseek_response_format_enabled: bool
     recorded_dir: str
 
+    @property
+    def allows_demo_samples(self) -> bool:
+        """Return whether fixed demo sample fields may be used.
+
+        Args:
+            None.
+
+        Returns:
+            True only for explicit offline demo mode.
+        """
+
+        return self.runtime_mode == "demo_mode"
+
     @staticmethod
     def from_env() -> "Settings":
+        runtime_mode = (_env("SHIKE_RUNTIME_MODE", "release_user") or "release_user").lower()
+        if runtime_mode not in VALID_RUNTIME_MODES:
+            runtime_mode = "release_user"
         provider = (_env("SHIKE_MODEL_PROVIDER", "mock") or "mock").lower()
         allow_mock_fallback = _env_bool("SHIKE_ALLOW_MOCK_FALLBACK", True)
         allow_ocr_fallback = _env_bool("SHIKE_ALLOW_OCR_FALLBACK", True)
@@ -259,6 +277,7 @@ class Settings:
         recorded_dir = _env("SHIKE_RECORDED_DIR", default_recorded_dir) or default_recorded_dir
 
         return Settings(
+            runtime_mode=runtime_mode,
             model_provider=provider,
             allow_mock_fallback=allow_mock_fallback,
             bluelm_app_id=bluelm_app_id,

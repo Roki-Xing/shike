@@ -12,11 +12,11 @@ import cn.shike.app.data.ImageCleanupStatus
 
 fun cleanupStatusLabel(status: ImageCleanupStatus): String =
     when (status) {
-        ImageCleanupStatus.NOT_SUPPORTED -> "当前来源不支持删除原图"
+        ImageCleanupStatus.NOT_SUPPORTED -> "当前来源不支持直接移入回收站"
         ImageCleanupStatus.NOT_REQUESTED -> "等待你的选择"
         ImageCleanupStatus.USER_KEPT -> "已选择保留原图"
-        ImageCleanupStatus.DELETE_REQUESTED -> "正在等待系统确认删除"
-        ImageCleanupStatus.DELETED -> "已删除原截图"
+        ImageCleanupStatus.DELETE_REQUESTED -> "正在等待系统确认"
+        ImageCleanupStatus.DELETED -> "已移入系统回收站"
         ImageCleanupStatus.FAILED -> "系统确认未完成"
     }
 
@@ -27,11 +27,11 @@ fun ScreenshotCleanupPrompt(
     onKeep: () -> Unit,
 ) {
     SectionCard("处理原截图") {
-        Text("这张截图已经被拾刻处理。是否删除这张系统相册原截图？系统会弹出确认，拾刻不会静默删除。", style = ShikeTypography.Body)
+        Text("这张截图已经生成行动卡，是否把原图移入系统回收站？系统会弹出确认，拾刻不会静默删除。", style = ShikeTypography.Body)
         KeyValue("当前状态", cleanupStatusLabel(status))
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             OutlinedButton(onClick = onDelete, modifier = Modifier.weight(1f)) {
-                Text("删除原截图")
+                Text("移入回收站")
             }
             OutlinedButton(onClick = onKeep, modifier = Modifier.weight(1f)) {
                 Text("保留原图")

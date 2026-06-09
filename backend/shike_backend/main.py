@@ -484,7 +484,7 @@ def _get_adapter() -> object:
         _ADAPTER = recorded
         return recorded
 
-    _ADAPTER = MockModelAdapter()
+    _ADAPTER = MockModelAdapter(allow_demo_samples=settings.allows_demo_samples)
     return _ADAPTER
 
 
@@ -634,7 +634,7 @@ def analyze(request: AnalyzeRequest) -> AnalyzeResponse:
     except AdapterError:
         settings = get_settings()
         if settings.allow_mock_fallback:
-            return MockModelAdapter().analyze(request)
+            return MockModelAdapter(allow_demo_samples=settings.allows_demo_samples).analyze(request)
         return manual_review_response("model_unavailable")
 
 

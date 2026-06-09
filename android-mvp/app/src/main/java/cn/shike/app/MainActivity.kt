@@ -25,10 +25,12 @@ import cn.shike.app.data.ImagePayloadPreprocessor
 import cn.shike.app.data.ImagePreprocessSource
 import cn.shike.app.data.ScreenshotCandidate
 import cn.shike.app.data.clearScreenshotAssistPreference
+import cn.shike.app.data.loadPermissionOnboardingDismissed
 import cn.shike.app.data.loadBackendBaseUrl
 import cn.shike.app.data.loadSavedInboxHistory
 import cn.shike.app.data.loadInitialSelection
 import cn.shike.app.data.loadScreenshotAssistEnabled
+import cn.shike.app.data.savePermissionOnboardingDismissed
 import cn.shike.app.data.saveScreenshotAssistEnabled
 import cn.shike.app.data.shouldNotifyScreenshotCandidate
 import cn.shike.app.data.clearInboxSnapshot
@@ -75,6 +77,7 @@ class MainActivity : ComponentActivity() {
     private var pendingSharedText by mutableStateOf<String?>(null)
     private var screenshotAssistEnabled by mutableStateOf(false)
     private var imageCleanupStatusFromSystem by mutableStateOf<ImageCleanupStatus?>(null)
+    private var permissionOnboardingDismissed by mutableStateOf(false)
 
     private val notificationPermission = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -133,6 +136,7 @@ class MainActivity : ComponentActivity() {
         consumeSharedImageIntent(intent)
         val sharedText = sharedTextFrom(intent)
         screenshotAssistEnabled = loadScreenshotAssistEnabled(this)
+        permissionOnboardingDismissed = loadPermissionOnboardingDismissed(this)
         registerScreenshotObserverIfAllowed()
         setContent {
             MaterialTheme {
@@ -154,6 +158,9 @@ class MainActivity : ComponentActivity() {
                         onImportScreenshotCandidate = ::clearPendingScreenshotCandidate,
                         screenshotAssistEnabled = screenshotAssistEnabled,
                         onScreenshotAssistEnabledChange = ::updateScreenshotAssistEnabled,
+                        onboardingDismissed = permissionOnboardingDismissed,
+                        onDismissOnboarding = ::dismissPermissionOnboarding,
+                        onEnableScreenshotAssistFromOnboarding = ::enableScreenshotAssistFromOnboarding,
                         onDeleteSourceImage = ::requestDeleteSourceImage,
                         onBuildImagePayload = ::buildImagePayloadFromUri,
                         onBuildBitmapPayload = ::buildImagePayloadFromBitmap,
@@ -199,6 +206,16 @@ class MainActivity : ComponentActivity() {
         clearScreenshotAssistPreference(this)
         screenshotAssistEnabled = false
         unregisterScreenshotObserver()
+    }
+
+    private fun dismissPermissionOnboarding() {
+        permissionOnboardingDismissed = true
+        savePermissionOnboardingDismissed(this, true)
+    }
+
+    private fun enableScreenshotAssistFromOnboarding() {
+        dismissPermissionOnboarding()
+        updateScreenshotAssistEnabled(true)
     }
 
     private fun consumeScreenshotImportIntent(intent: Intent?) {
@@ -374,7 +391,7 @@ class MainActivity : ComponentActivity() {
     private fun handleImageCleanupStatusFromSystem(status: ImageCleanupStatus) {
         imageCleanupStatusFromSystem = status
         val source = when (status) {
-            ImageCleanupStatus.DELETED -> "原截图清理：已删除原截图"
+            ImageCleanupStatus.DELETED -> "原截图清理：已移入系统回收站"
             ImageCleanupStatus.FAILED -> "原截图清理：系统确认未完成"
             else -> return
         }
@@ -393,7 +410,7 @@ class MainActivity : ComponentActivity() {
             context = this,
             intent = buildCalendarInsertIntent(item),
             item = item,
-            fallbackSource = "系统日历不可用，已保留行动卡，稍后可手动添加日程。",
+            fallbackSource = "系统日历新增页不可用，已保留行动卡，稍后可手动添加日程。",
             onFallback = ::saveSystemActionFallback,
         )
     }

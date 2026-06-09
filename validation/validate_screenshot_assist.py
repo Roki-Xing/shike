@@ -35,7 +35,7 @@ def main() -> int:
         ("candidate_store_file_exists", file_exists("android-mvp/app/src/main/java/cn/shike/app/data/ScreenshotCandidateStore.kt")),
         (
             "settings_has_screenshot_assist_switch",
-            "截图助手模式" in settings
+            "截图助手" in settings
             and "screenshotAssistEnabled" in app
             and "loadScreenshotAssistEnabled" in activity
             and "saveScreenshotAssistEnabled" in activity

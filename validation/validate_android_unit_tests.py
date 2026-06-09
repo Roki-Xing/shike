@@ -354,7 +354,7 @@ def main() -> int:
             and "fun visibleScreenCapturePrompt(): VisibleScreenCapturePrompt" in screen_capture_prompt_source
             and "不会直接获得图片" in screen_capture_prompt_source
             and "导入页选择这张截图" in screen_capture_prompt_source
-            and "删除原截图" in screen_capture_prompt_source
+            and "移入回收站" in screen_capture_prompt_source
             and "后台监听" not in screen_capture_prompt_source
             and "全局监听" not in screen_capture_prompt_source
             and "自动读取" not in screen_capture_prompt_source
@@ -374,11 +374,11 @@ def main() -> int:
             and all(
                 token in screenshot_cleanup_prompt_source
                 for token in [
-                    "当前来源不支持删除原图",
+                    "当前来源不支持直接移入回收站",
                     "等待你的选择",
                     "已选择保留原图",
-                    "正在等待系统确认删除",
-                    "已删除原截图",
+                    "正在等待系统确认",
+                    "已移入系统回收站",
                     "系统确认未完成",
                 ]
             )
