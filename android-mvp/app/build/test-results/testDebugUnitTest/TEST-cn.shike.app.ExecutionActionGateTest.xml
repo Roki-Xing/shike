@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="cn.shike.app.ExecutionActionGateTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-06-09T13:06:56" hostname="LAPTOP-B84BKQGP" time="0.004">
+<testsuite name="cn.shike.app.ExecutionActionGateTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-06-09T13:47:44" hostname="LAPTOP-B84BKQGP" time="0.003">
   <properties/>
-  <testcase name="executionActionButtonLabelsFor_usesGuideActionCopyAfterConfirmation" classname="cn.shike.app.ExecutionActionGateTest" time="0.002"/>
+  <testcase name="executionActionButtonLabelsFor_usesGuideActionCopyAfterConfirmation" classname="cn.shike.app.ExecutionActionGateTest" time="0.001"/>
+  <testcase name="executionActionGateFor_timeTextWithoutEpochBlocksCalendarAndReminder" classname="cn.shike.app.ExecutionActionGateTest" time="0.001"/>
   <testcase name="executionActionButtonLabelsFor_namesMissingFieldRecovery" classname="cn.shike.app.ExecutionActionGateTest" time="0.0"/>
-  <testcase name="executionActionGateFor_missingFieldsBlockCalendarReminderAndMap" classname="cn.shike.app.ExecutionActionGateTest" time="0.001"/>
+  <testcase name="executionActionGateFor_missingFieldsBlockCalendarReminderAndMap" classname="cn.shike.app.ExecutionActionGateTest" time="0.0"/>
   <testcase name="executionActionGateFor_unconfirmedItemBlocksAllSensitiveActions" classname="cn.shike.app.ExecutionActionGateTest" time="0.0"/>
   <testcase name="executionActionButtonLabelsFor_blocksUnconfirmedActionsWithReviewCopy" classname="cn.shike.app.ExecutionActionGateTest" time="0.0"/>
-  <testcase name="executionActionButtonLabelsFor_namesNotificationRecoveryAfterPermissionBlocked" classname="cn.shike.app.ExecutionActionGateTest" time="0.0"/>
+  <testcase name="executionActionButtonLabelsFor_namesNotificationRecoveryAfterPermissionBlocked" classname="cn.shike.app.ExecutionActionGateTest" time="0.001"/>
   <testcase name="executionActionGateFor_confirmedItemAllowsCompleteFields" classname="cn.shike.app.ExecutionActionGateTest" time="0.0"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>

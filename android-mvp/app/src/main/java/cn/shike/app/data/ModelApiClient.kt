@@ -7,6 +7,7 @@ import java.io.OutputStreamWriter
 import java.net.HttpURLConnection
 import java.net.URI
 import java.net.URL
+import java.time.ZoneId
 
 fun callAnalyzeApi(backendBaseUrl: String, sourceType: String, ocrText: String, scene: String): ShikeItem {
     val connection = (URL("${normalizeBackendUrl(backendBaseUrl)}/v1/analyze").openConnection() as HttpURLConnection).apply {
@@ -41,7 +42,12 @@ fun buildAnalyzeRequestPayload(inputId: String, sourceType: String, ocrText: Str
         .put("locale", "zh-CN")
         .put("user_timezone", "Asia/Shanghai")
 
-fun itemFromAnalyzeJson(json: JSONObject, fallbackText: String): ShikeItem {
+fun itemFromAnalyzeJson(
+    json: JSONObject,
+    fallbackText: String,
+    referenceNowMillis: Long = System.currentTimeMillis(),
+    zoneId: ZoneId = ZoneId.of("Asia/Shanghai"),
+): ShikeItem {
     val sceneType = json.safeString("scene_type")
     val scene = when (sceneType) {
         "event_poster" -> "活动海报"
@@ -51,25 +57,25 @@ fun itemFromAnalyzeJson(json: JSONObject, fallbackText: String): ShikeItem {
     val time = json.optJSONObject("time")
     val location = json.optJSONObject("location")
     val explanation = json.safeString("explanation").ifBlank { fallbackText }
+    val timeText = displayTimeFrom(time)
     return ShikeItem(
         title = json.safeString("title").ifBlank { "待确认碎片" },
         scene = scene,
-        time = listOfNotNull(
-            time?.safeString("start_text")?.takeIf { it.isNotBlank() },
-            time?.safeString("deadline_text")?.takeIf { it.isNotBlank() },
-        ).joinToString(" / ").ifBlank { "待确认" },
+        time = timeText,
         location = location?.safeString("raw")?.takeIf { it.isNotBlank() } ?: "待确认",
         status = "待确认",
         actions = actionsFromJson(json.optJSONArray("suggested_actions")),
-        startEpochMillis = when (sceneType) {
-            "event_poster" -> sampleEvent().startEpochMillis
-            else -> sampleCourse().startEpochMillis
-        },
+        startEpochMillis = startEpochMillisFromTime(time, fallbackText, referenceNowMillis, zoneId),
         rawText = "云端 AI 解析：$explanation",
     )
 }
 
-fun itemFromAnalyzeImageJson(json: JSONObject, fallbackText: String): ShikeItem {
+fun itemFromAnalyzeImageJson(
+    json: JSONObject,
+    fallbackText: String,
+    referenceNowMillis: Long = System.currentTimeMillis(),
+    zoneId: ZoneId = ZoneId.of("Asia/Shanghai"),
+): ShikeItem {
     val sceneType = json.safeString("scene_type")
     val scene = when (sceneType) {
         "event_poster" -> "活动海报"
@@ -87,6 +93,7 @@ fun itemFromAnalyzeImageJson(json: JSONObject, fallbackText: String): ShikeItem 
     val taskSummary = task?.safeString("summary").orEmpty()
     val risks = stringsFromJson(json.optJSONArray("risks")).joinToString("；")
     val missingFields = stringsFromJson(json.optJSONArray("missing_fields")).joinToString("、")
+    val timeText = displayTimeFrom(time)
     val reviewTail = listOfNotNull(
         taskSummary.takeIf { it.isNotBlank() }?.let { "任务：$it" },
         risks.takeIf { it.isNotBlank() }?.let { "风险：$it" },
@@ -95,17 +102,11 @@ fun itemFromAnalyzeImageJson(json: JSONObject, fallbackText: String): ShikeItem 
     return ShikeItem(
         title = json.safeString("title").ifBlank { "待确认碎片" },
         scene = scene,
-        time = listOfNotNull(
-            time?.safeString("start_text")?.takeIf { it.isNotBlank() },
-            time?.safeString("deadline_text")?.takeIf { it.isNotBlank() },
-        ).joinToString(" / ").ifBlank { "待确认" },
+        time = timeText,
         location = location?.safeString("raw")?.takeIf { it.isNotBlank() } ?: "待确认",
         status = "待确认",
         actions = actionsFromJson(json.optJSONArray("suggested_actions")),
-        startEpochMillis = when (sceneType) {
-            "event_poster" -> sampleEvent().startEpochMillis
-            else -> sampleCourse().startEpochMillis
-        },
+        startEpochMillis = startEpochMillisFromTime(time, fallbackText, referenceNowMillis, zoneId),
         rawText = listOf("云端 AI 解析：$explanation", reviewTail)
             .filter { it.isNotBlank() }
             .joinToString("\n"),
@@ -129,6 +130,12 @@ fun stringsFromJson(values: JSONArray?): List<String> {
         values.safeArrayString(index).takeIf { it.isNotBlank() }
     }
 }
+
+fun displayTimeFrom(time: JSONObject?): String =
+    listOfNotNull(
+        time?.safeString("start_text")?.takeIf { it.isNotBlank() },
+        time?.safeString("deadline_text")?.takeIf { it.isNotBlank() },
+    ).joinToString(" / ").ifBlank { "待确认" }
 
 private fun JSONObject.safeString(key: String): String {
     if (!has(key) || isNull(key)) {

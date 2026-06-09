@@ -107,12 +107,12 @@ fun ShikeMainScreen(
         ) {
             when (selectedSection) {
                 ShikeMainSection.Home -> HomeRouteContent(
-                    selected, todayAgendaState, executionResults, isConfirmed, modelStatus,
+                    selected, todayAgendaState, modelStatus,
                     pendingScreenshotCandidate, visibleScreenCapturePrompt, onboardingDismissed,
-                    onGallery, onManualInput, onAddCalendar, onReminder, onOpenMap,
+                    onGallery, onManualInput,
                     onDismissOnboarding, onEnableScreenshotAssistFromOnboarding,
                     onImportScreenshotCandidate, onIgnoreScreenshotCandidate,
-                    onImportVisibleScreenCapture, onDismissVisibleScreenCapture, onReviewed,
+                    onImportVisibleScreenCapture, onDismissVisibleScreenCapture,
                 )
                 ShikeMainSection.Import -> ImportRouteContent(
                     selected, executionResults, isConfirmed, captureSource, capturedBitmap,

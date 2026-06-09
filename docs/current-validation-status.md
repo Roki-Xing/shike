@@ -3,12 +3,15 @@
 Date: 2026-06-09
 Guide: `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md`  
 Deep review guide applied this round: `/mnt/c/Users/Xing/Desktop/SHIKE_PRODUCT_MANAGER_DEEP_REVIEW_GUIDE.md`
+Calendar/UI guide applied this round: `/mnt/c/Users/Xing/Desktop/SHIKE_CALENDAR_AND_UI_PRODUCT_FIX_GUIDE.md`
 Guide source availability: the expected desktop source file was restored from the Windows recycle bin and is currently readable in this closeout audit; see `materials/evidence/desktop-guidance-source-status.md`. The local matrix remains useful for repository evidence traceability, while strict external cloud-device evidence remains blocked.
 Scope: Desktop guidance stages A-E: BlueLM credible evidence, cloud-device and HTTPS backend evidence, frontend productization, long-lived inbox workbench, and materials upgraded to a release evidence package. Historical S2/S3 hardening remains part of the evidence base, but the current public status is anchored to `materials/evidence/requirement-matrix.md` and `REQUIREMENT_MATRIX_METRIC 9/9`.
 
 ## 2026-06-09 Closeout Evidence
 
 This closeout pass focused on the real screenshot-to-action product loop: no real gallery/screenshot path may fall back to fixed `MockOcrEngine` / `sampleCourse` values, the home import path now stays on the home screen with staged AI parsing progress, the Android UI displays structured action-card fields without `"null"` copy, screenshot assist uses opt-in MediaStore observation plus a high-priority notification, and ordinary user screens hide backend endpoint, Mock, validation, self-check, and demo tooling copy.
+
+This calendar/UI pass additionally fixed Android calendar prefill ownership: `/v1/analyze` and `/v2/analyze-image` results now derive `startEpochMillis` from `time.normalized_start` or common Chinese relative time such as "明天早上九点" using `Asia/Shanghai`; missing concrete time leaves the calendar/reminder actions disabled instead of falling back to sample epochs. The home route no longer mounts the full confirmation form or action planner; those remain in the import/confirm flow so the first screen stays focused on today action, pending review, import entry, and staged parsing progress.
 
 Fresh local evidence from this pass:
 
@@ -26,7 +29,9 @@ Fresh local evidence from this pass:
 | `python3 validation/validate_structured_action_card_ui.py` | PASS | `STRUCTURED_ACTION_CARD_UI_METRIC 8/8` |
 | `python3 validation/validate_screenshot_assist.py` | PASS | `SCREENSHOT_ASSIST_METRIC 17/17` |
 | `python3 validation/validate_user_facing_copy.py` | PASS | `USER_FACING_COPY_METRIC 13/13` |
-| `python3 validation/validate_home_one_screen.py` | PASS | `HOME_ONE_SCREEN_METRIC 10/10` |
+| `python3 validation/validate_calendar_prefill_accuracy.py` | PASS | `CALENDAR_PREFILL_ACCURACY_METRIC 9/9` |
+| `python3 validation/validate_home_flow_simplification.py` | PASS | `HOME_FLOW_SIMPLIFICATION_METRIC 8/8` |
+| `python3 validation/validate_home_one_screen.py` | PASS | `HOME_ONE_SCREEN_METRIC 11/11` |
 | `python3 validation/validate_frontend_polish.py` | PASS | `FRONTEND_POLISH_METRIC 13/13` |
 | `python3 validation/validate_screenshot_cleanup.py` | PASS | `SCREENSHOT_CLEANUP_METRIC 15/15` |
 | `python3 validation/validate_android_unit_tests.py` | PASS | `ANDROID_UNIT_TEST_METRIC 88/88` |
@@ -35,7 +40,7 @@ Fresh local evidence from this pass:
 | `python3 validation/validate_secret_hygiene.py` | PASS | `PASS secret_hygiene` |
 | `python3 validation/validate_apk_secret_hygiene.py` | PASS | `APK_SECRET_HYGIENE_METRIC 8/8` |
 | `gradle --no-daemon :app:testDebugUnitTest` from `shike/android-mvp/` | PASS | `BUILD SUCCESSFUL`; local unit suites report 149 tests, 0 failures, 0 errors |
-| `bash android-mvp/build_apk.sh` | PASS | APK copied to `/mnt/c/Users/Xing/Desktop/Shike-app-debug.apk`; local and Desktop SHA-256 both `733fd972ac7a1d2a0454acb9a37dd48449b48d2475a49e93156e51288dbcca93` |
+| `bash android-mvp/build_apk.sh` | PASS | APK copied to `/mnt/c/Users/Xing/Desktop/Shike-app-debug.apk`; local and Desktop SHA-256 both `82c91686512ab0c9347a3837980ca9261eff95b293d7060325f41bd265e868e7` |
 
 Strict external cloud-device evidence remains a separate manual recording gate: the local repository and APK gates pass, but final release proof still requires real cloud-device MP4s, filled report fields, and redacted logcat evidence before strict release status can be claimed.
 

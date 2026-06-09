@@ -44,6 +44,19 @@ class ExecutionActionGateTest {
     }
 
     @Test
+    fun executionActionGateFor_timeTextWithoutEpochBlocksCalendarAndReminder() {
+        val item = sampleCourse().copy(time = "明天早上九点", location = "E520", startEpochMillis = 0L)
+
+        val gate = executionActionGateFor(item, isConfirmed = true)
+
+        assertTrue(gate.missingTime)
+        assertFalse(gate.missingLocation)
+        assertFalse(gate.canUseCalendar)
+        assertFalse(gate.canUseReminder)
+        assertTrue(gate.canUseMap)
+    }
+
+    @Test
     fun executionActionButtonLabelsFor_usesGuideActionCopyAfterConfirmation() {
         val labels = executionActionButtonLabelsFor(sampleCourse(), isConfirmed = true)
 

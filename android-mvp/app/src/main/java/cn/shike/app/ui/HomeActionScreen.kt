@@ -9,13 +9,8 @@ import cn.shike.app.system.VisibleScreenCapturePrompt
 fun HomeActionScreen(
     selected: ShikeItem,
     todayAgendaState: TodayAgendaState,
-    executionResults: List<ExecutionResult>,
-    isConfirmed: Boolean,
     onGallery: () -> Unit,
     onManualInput: () -> Unit,
-    onAddCalendar: (ShikeItem) -> Unit,
-    onReminder: (ShikeItem) -> Unit,
-    onOpenMap: (ShikeItem) -> Unit,
     onboardingDismissed: Boolean,
     onDismissOnboarding: () -> Unit,
     onEnableScreenshotAssistFromOnboarding: () -> Unit,
@@ -26,7 +21,6 @@ fun HomeActionScreen(
     visibleScreenCapturePrompt: VisibleScreenCapturePrompt?,
     onImportVisibleScreenCapture: () -> Unit,
     onDismissVisibleScreenCapture: () -> Unit,
-    onReviewed: (ShikeItem) -> Unit,
 ) {
     DashboardHeader()
     DateStrip()
@@ -58,15 +52,6 @@ fun HomeActionScreen(
         ),
     )
     HomePendingReviewPanel(selected)
-    ParseConfirmPanel(selected, onReviewed = onReviewed)
-    ConfirmBanner(
-        selected = selected,
-        isConfirmed = isConfirmed,
-        executionResults = executionResults,
-        onAddCalendar = onAddCalendar,
-        onReminder = onReminder,
-        onOpenMap = onOpenMap,
-    )
 }
 
 @Composable

@@ -17,6 +17,15 @@ import cn.shike.app.domain.ShikeItem
 
 internal const val REMINDER_CHANNEL_ID = "shike_reminders"
 
+data class CalendarDraft(
+    val title: String,
+    val startAtMillis: Long?,
+    val endAtMillis: Long?,
+    val location: String?,
+    val description: String,
+    val disabledReason: String?,
+)
+
 /**
  * Builds the user-visible description for Android's calendar insert page.
  *
@@ -28,6 +37,19 @@ internal const val REMINDER_CHANNEL_ID = "shike_reminders"
  */
 fun calendarInsertDescriptionFor(item: ShikeItem): String =
     "由拾刻从${item.scene}解析，用户确认后打开系统日历新增页，由用户在日历中保存。"
+
+fun calendarDraftFrom(item: ShikeItem): CalendarDraft {
+    val hasConcreteTime = item.startEpochMillis > 0L && item.time.isNotBlank() && item.time != "待确认"
+    val startAtMillis = item.startEpochMillis.takeIf { hasConcreteTime }
+    return CalendarDraft(
+        title = item.title,
+        startAtMillis = startAtMillis,
+        endAtMillis = startAtMillis?.plus(60 * 60 * 1000L),
+        location = item.location.takeIf { it.isNotBlank() && it != "待确认" },
+        description = calendarInsertDescriptionFor(item),
+        disabledReason = if (startAtMillis == null) "补充具体时间后可加入日历" else null,
+    )
+}
 
 /**
  * Creates the Android notification channel used by local reminders.
@@ -53,14 +75,15 @@ fun createReminderNotificationChannel(context: Context) {
  *     Intent that opens Android's calendar insertion flow.
  */
 fun buildCalendarInsertIntent(item: ShikeItem): Intent {
-    val startMillis = item.startEpochMillis
+    val draft = calendarDraftFrom(item)
+    val startMillis = requireNotNull(draft.startAtMillis) { draft.disabledReason ?: "缺少日历开始时间" }
     return Intent(Intent.ACTION_INSERT).apply {
         data = CalendarContract.Events.CONTENT_URI
-        putExtra(CalendarContract.Events.TITLE, item.title)
-        putExtra(CalendarContract.Events.EVENT_LOCATION, item.location)
+        putExtra(CalendarContract.Events.TITLE, draft.title)
+        draft.location?.let { putExtra(CalendarContract.Events.EVENT_LOCATION, it) }
         putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, startMillis)
-        putExtra(CalendarContract.EXTRA_EVENT_END_TIME, startMillis + 60 * 60 * 1000)
-        putExtra(CalendarContract.Events.DESCRIPTION, calendarInsertDescriptionFor(item))
+        putExtra(CalendarContract.EXTRA_EVENT_END_TIME, draft.endAtMillis ?: startMillis + 60 * 60 * 1000L)
+        putExtra(CalendarContract.Events.DESCRIPTION, draft.description)
     }
 }
 

@@ -9928,3 +9928,50 @@ Validation:
 
 Next:
 - Reinstall `/mnt/c/Users/Xing/Desktop/Shike-app-debug.apk`, import a screenshot, wait for AI parsing, tap "确认并安排", then check the action planner area for "是否把原图移入系统回收站".
+
+## 2026-06-09 / Calendar Prefill And Home Layout Product Pass
+
+Goal: Apply `/mnt/c/Users/Xing/Desktop/SHIKE_CALENDAR_AND_UI_PRODUCT_FIX_GUIDE.md` so calendar prefill uses real parsed time and ordinary home layout no longer duplicates confirmation/action-planning panels.
+
+Root cause:
+- Android model-result mapping used fixed sample epochs when backend output lacked a direct Android epoch, so system calendar could prefill an unrelated demo time.
+- `ExecutionActionGate` treated non-empty time text as executable even when no concrete epoch existed.
+- `HomeActionScreen` mounted `ParseConfirmPanel` and `ConfirmBanner` directly on the home route, making the first screen feel like a duplicated workflow/debug surface instead of a compact action dashboard.
+
+Files changed:
+- `docs/SHIKE_CALENDAR_AND_UI_PRODUCT_FIX_GUIDE.md`: added the desktop guidance as the repo copy for this pass.
+- `ModelApiClient.kt` + `ModelTimeParser.kt`: added normalized-start and Chinese relative-time parsing for `Asia/Shanghai`; missing parse now returns `0L` instead of sample epoch.
+- `SystemActions.kt`: introduced `CalendarDraft` and made calendar insert intents consume `draft.startAtMillis`.
+- `ExecutionActionGate.kt`: disables calendar/reminder when `startEpochMillis <= 0`.
+- `HomeActionScreen.kt`, `MainScreenRoutes.kt`, `ShikeMainScreen.kt`: home route now keeps overview/import/progress/pending review only; confirmation and action planning stay in the import/confirm flow.
+- `ModelApiClientTest.kt`, `SystemActionsTest.kt`, `ExecutionActionGateTest.kt`: added regression coverage for `normalized_start`, "明天早上九点", calendar draft disablement, and epoch-gated actions.
+- `validate_calendar_prefill_accuracy.py`, `validate_home_flow_simplification.py`, `validate_home_one_screen.py`, `validate_frontend_polish.py`, `validate_android_unit_tests.py`: added and updated guards for the new product rules.
+
+Validation:
+- PASS `gradle --no-daemon :app:testDebugUnitTest`
+  - Evidence: `BUILD SUCCESSFUL`
+- PASS `python3 validation/validate_calendar_prefill_accuracy.py`
+  - Evidence: `CALENDAR_PREFILL_ACCURACY_METRIC 9/9`
+- PASS `python3 validation/validate_home_flow_simplification.py`
+  - Evidence: `HOME_FLOW_SIMPLIFICATION_METRIC 8/8`
+- PASS `python3 validation/validate_home_one_screen.py`
+  - Evidence: `HOME_ONE_SCREEN_METRIC 11/11`
+- PASS `python3 validation/validate_frontend_polish.py`
+  - Evidence: `FRONTEND_POLISH_METRIC 13/13`
+- PASS `python3 validation/validate_user_facing_copy.py`
+  - Evidence: `USER_FACING_COPY_METRIC 13/13`
+- PASS `python3 validation/validate_android_structure.py`
+  - Evidence: `ANDROID_STRUCTURE_METRIC 31/31`
+- PASS `python3 validation/validate_android_unit_tests.py`
+  - Evidence: `ANDROID_UNIT_TEST_METRIC 88/88`
+- PASS `python3 validation/validate_action_execution.py`
+  - Evidence: `ACTION_EXECUTION_METRIC 18/18`
+- PASS `python3 validation/validate_real_world_ready.py`
+  - Evidence: `REAL_WORLD_READY_METRIC 22/22`
+- PASS APK rebuild and Desktop copy parity
+  - Evidence: `APK_SHA256 82c91686512ab0c9347a3837980ca9261eff95b293d7060325f41bd265e868e7`
+- PASS `python3 validation/validate_apk_secret_hygiene.py`
+  - Evidence: `APK_SECRET_HYGIENE_METRIC 8/8`
+
+Next:
+- Install `/mnt/c/Users/Xing/Desktop/Shike-app-debug.apk` on the cloud device and verify that "明天早上九点上英语口语教室 E520" opens a system calendar insert page at the next-day 09:00 slot and the home page no longer shows the full confirmation/action-planning stack.

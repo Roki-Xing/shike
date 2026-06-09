@@ -116,7 +116,8 @@ def main() -> int:
             "QuickImportPanel" not in home_body
             and "HomeAgendaList(" in home_body
             and "AnalyzeProgressPanel(" in home_body
-            and "ParseConfirmPanel(" in home_body
+            and "ParseConfirmPanel(" not in home_body
+            and "ConfirmBanner(" not in home_body
             and "导入截图" in read("HomeAgendaList.kt")
             and "ImportCaptureActions" in capture_entry,
             "home import cta",

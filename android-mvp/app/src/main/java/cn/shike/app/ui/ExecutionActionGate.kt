@@ -28,7 +28,7 @@ data class ExecutionActionButtonLabels(
  *     Gate flags shared by the confirmation banner and action planner.
  */
 fun executionActionGateFor(item: ShikeItem, isConfirmed: Boolean): ExecutionActionGate {
-    val missingTime = item.time.isBlank() || item.time == "待确认"
+    val missingTime = item.time.isBlank() || item.time == "待确认" || item.startEpochMillis <= 0L
     val missingLocation = item.location.isBlank() || item.location == "待确认"
     return ExecutionActionGate(
         missingTime = missingTime,

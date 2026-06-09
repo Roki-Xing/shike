@@ -2,6 +2,7 @@ package cn.shike.app
 
 import cn.shike.app.data.actionsFromJson
 import cn.shike.app.data.buildAnalyzeRequestPayload
+import cn.shike.app.data.itemFromAnalyzeImageJson
 import cn.shike.app.data.itemFromAnalyzeJson
 import cn.shike.app.data.normalizeBackendUrl
 import cn.shike.app.data.sampleCourse
@@ -9,8 +10,11 @@ import cn.shike.app.data.sampleEvent
 import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import java.time.Instant
+import java.time.ZoneId
 
 class ModelApiClientTest {
     @Test
@@ -107,12 +111,57 @@ class ModelApiClientTest {
         assertEquals("B203", item.location)
         assertEquals("待确认", item.status)
         assertEquals(listOf("加入日历", "课前提醒"), item.actions)
-        assertEquals(sampleCourse().startEpochMillis, item.startEpochMillis)
+        assertTrue(item.startEpochMillis > 0L)
+        assertNotEquals(sampleCourse().startEpochMillis, item.startEpochMillis)
         assertEquals("云端 AI 解析：识别为课程通知，时间和地点完整", item.rawText)
     }
 
     @Test
-    fun itemFromAnalyzeJson_eventPosterUsesFallbacksForBlankFields() {
+    fun itemFromAnalyzeJson_usesNormalizedStartInsteadOfSampleEpoch() {
+        val item = itemFromAnalyzeJson(
+            JSONObject()
+                .put("scene_type", "course_notice")
+                .put("title", "英语口语课")
+                .put(
+                    "time",
+                    JSONObject()
+                        .put("start_text", "明天早上九点")
+                        .put("normalized_start", "2026-06-10T09:00:00+08:00")
+                        .put("deadline_text", JSONObject.NULL),
+                )
+                .put("location", JSONObject().put("raw", "E520"))
+                .put("suggested_actions", JSONArray().put(JSONObject().put("label", "加入日历"))),
+            fallbackText = "明天早上九点上英语口语教室 E520",
+        )
+
+        assertEquals("明天早上九点", item.time)
+        assertFalseContainsNull(item.time)
+        assertEquals(Instant.parse("2026-06-10T01:00:00Z").toEpochMilli(), item.startEpochMillis)
+        assertNotEquals(sampleCourse().startEpochMillis, item.startEpochMillis)
+    }
+
+    @Test
+    fun itemFromAnalyzeImageJson_normalizesChineseRelativeStartTextWhenNormalizedStartMissing() {
+        val item = itemFromAnalyzeImageJson(
+            JSONObject()
+                .put("scene_type", "course_notice")
+                .put("title", "英语口语课")
+                .put("time", JSONObject().put("start_text", "明天早上九点").put("deadline_text", JSONObject.NULL))
+                .put("location", JSONObject().put("raw", "E520"))
+                .put("suggested_actions", JSONArray().put(JSONObject().put("label", "加入日历")))
+                .put("explanation", "识别到课程、时间和地点"),
+            fallbackText = "明天早上九点上英语口语教室 E520",
+            referenceNowMillis = Instant.parse("2026-06-09T04:00:00Z").toEpochMilli(),
+            zoneId = ZoneId.of("Asia/Shanghai"),
+        )
+
+        assertEquals("明天早上九点", item.time)
+        assertEquals(Instant.parse("2026-06-10T01:00:00Z").toEpochMilli(), item.startEpochMillis)
+        assertNotEquals(sampleCourse().startEpochMillis, item.startEpochMillis)
+    }
+
+    @Test
+    fun itemFromAnalyzeJson_eventPosterUsesPendingEpochForBlankFields() {
         val json = JSONObject()
             .put("scene_type", "event_poster")
             .put("title", "")
@@ -127,7 +176,7 @@ class ModelApiClientTest {
         assertEquals("待确认", item.time)
         assertEquals("待确认", item.location)
         assertEquals(listOf("稍后确认"), item.actions)
-        assertEquals(sampleEvent().startEpochMillis, item.startEpochMillis)
+        assertEquals(0L, item.startEpochMillis)
         assertEquals("云端 AI 解析：OCR 原文兜底", item.rawText)
     }
 
@@ -147,7 +196,7 @@ class ModelApiClientTest {
         assertEquals("待确认", item.scene)
         assertEquals("今晚10:00", item.time)
         assertEquals(listOf("加入会议日历"), item.actions)
-        assertEquals(sampleCourse().startEpochMillis, item.startEpochMillis)
+        assertTrue(item.startEpochMillis > 0L)
     }
 
     @Test
@@ -167,5 +216,9 @@ class ModelApiClientTest {
         assertEquals("http://192.168.1.10:8000", normalizeBackendUrl("192.168.1.10:8000/v1/analyze"))
         assertEquals("http://192.168.1.10:8000", normalizeBackendUrl("http://192.168.1.10:8000/v1/analyze?x=1#frag"))
         assertEquals("https://example.test:8443", normalizeBackendUrl("https://example.test:8443/api/v1/analyze/"))
+    }
+
+    private fun assertFalseContainsNull(value: String) {
+        assertTrue(!value.contains("null", ignoreCase = true))
     }
 }

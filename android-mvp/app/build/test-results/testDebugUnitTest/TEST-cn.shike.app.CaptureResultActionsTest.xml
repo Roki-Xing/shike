@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="cn.shike.app.CaptureResultActionsTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-06-09T13:06:56" hostname="LAPTOP-B84BKQGP" time="0.023">
+<testsuite name="cn.shike.app.CaptureResultActionsTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-06-09T13:47:44" hostname="LAPTOP-B84BKQGP" time="0.017">
   <properties/>
-  <testcase name="applyGalleryImageSelection_persistsPendingImageDraftWithoutSampleFields" classname="cn.shike.app.CaptureResultActionsTest" time="0.015"/>
-  <testcase name="applyScreenshotCandidateSelection_persistsPendingDraftWithoutSampleFields" classname="cn.shike.app.CaptureResultActionsTest" time="0.006"/>
+  <testcase name="applyGalleryImageSelection_persistsPendingImageDraftWithoutSampleFields" classname="cn.shike.app.CaptureResultActionsTest" time="0.012"/>
+  <testcase name="applyScreenshotCandidateSelection_persistsPendingDraftWithoutSampleFields" classname="cn.shike.app.CaptureResultActionsTest" time="0.004"/>
   <testcase name="applyCameraPreviewSizeSelection_persistsCameraDraftAndSource" classname="cn.shike.app.CaptureResultActionsTest" time="0.001"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>

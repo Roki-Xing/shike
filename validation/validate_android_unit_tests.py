@@ -338,18 +338,21 @@ def main() -> int:
         (
             "calendar_system_action_copy_unit_tested",
             "fun calendarInsertDescriptionFor(item: ShikeItem): String" in system_actions_source
+            and "data class CalendarDraft" in system_actions_source
+            and "fun calendarDraftFrom(item: ShikeItem)" in system_actions_source
             and "calendarInsertDescriptionFor(item)" in system_actions_source
             and "确认后写入" not in system_actions_source
             and "打开系统日历新增页" in system_actions_source
             and "由用户在日历中保存" in system_actions_source
             and "class SystemActionsTest" in system_actions_test
-            and system_actions_test.count("@Test") == 1
+            and system_actions_test.count("@Test") == 2
             and "calendarInsertDescriptionFor_onlyDescribesSystemInsertPage" in system_actions_test
+            and "calendarDraftFrom_usesParsedEpochAndDisablesWhenTimeIsMissing" in system_actions_test
             and 'assertFalse(description.contains("确认后写入"))' in system_actions_test
             and test_result_passed(
                 "android-mvp/app/build/test-results/testDebugUnitTest/TEST-cn.shike.app.SystemActionsTest.xml",
                 "cn.shike.app.SystemActionsTest",
-                1,
+                2,
             ),
         ),
         (
@@ -518,12 +521,14 @@ def main() -> int:
             and "interview_notice" in model_api_client_source
             and "travel_ticket" in model_api_client_source
             and "class ModelApiClientTest" in model_api_client_test
-            and model_api_client_test.count("@Test") == 8
+            and model_api_client_test.count("@Test") == 10
             and "buildAnalyzeRequestPayload_keepsBackendContractFields" in model_api_client_test
             and "buildAnalyzeRequestPayload_acceptsShareTextAndManualSourceTypes" in model_api_client_test
             and "buildAnalyzeRequestPayload_mapsExtendedSceneHints" in model_api_client_test
             and "itemFromAnalyzeJson_courseNoticeCombinesTimeLocationAndActions" in model_api_client_test
-            and "itemFromAnalyzeJson_eventPosterUsesFallbacksForBlankFields" in model_api_client_test
+            and "itemFromAnalyzeJson_usesNormalizedStartInsteadOfSampleEpoch" in model_api_client_test
+            and "itemFromAnalyzeImageJson_normalizesChineseRelativeStartTextWhenNormalizedStartMissing" in model_api_client_test
+            and "itemFromAnalyzeJson_eventPosterUsesPendingEpochForBlankFields" in model_api_client_test
             and "itemFromAnalyzeJson_unknownSceneFallsBackToPendingLabel" in model_api_client_test
             and "actionsFromJson_ignoresBlankAndMalformedActions" in model_api_client_test
             and "normalizeBackendUrl_stripsPathQueryAndFragment" in model_api_client_test
@@ -581,7 +586,7 @@ def main() -> int:
             test_result_passed(
                 "android-mvp/app/build/test-results/testDebugUnitTest/TEST-cn.shike.app.ModelApiClientTest.xml",
                 "cn.shike.app.ModelApiClientTest",
-                8,
+                10,
             ),
         ),
         (
@@ -630,11 +635,13 @@ def main() -> int:
             and "canUseCalendar = isConfirmed && !missingTime" in execution_action_gate_source
             and "canUseReminder = isConfirmed && !missingTime" in execution_action_gate_source
             and "canUseMap = isConfirmed && !missingLocation" in execution_action_gate_source
+            and "item.startEpochMillis <= 0L" in execution_action_gate_source
             and "class ExecutionActionGateTest" in execution_action_gate_test
-            and execution_action_gate_test.count("@Test") == 7
+            and execution_action_gate_test.count("@Test") == 8
             and "executionActionGateFor_unconfirmedItemBlocksAllSensitiveActions" in execution_action_gate_test
             and "executionActionGateFor_confirmedItemAllowsCompleteFields" in execution_action_gate_test
             and "executionActionGateFor_missingFieldsBlockCalendarReminderAndMap" in execution_action_gate_test
+            and "executionActionGateFor_timeTextWithoutEpochBlocksCalendarAndReminder" in execution_action_gate_test
             and "assertFalse(gate.canUseCalendar)" in execution_action_gate_test,
         ),
         (
@@ -665,7 +672,7 @@ def main() -> int:
             test_result_passed(
                 "android-mvp/app/build/test-results/testDebugUnitTest/TEST-cn.shike.app.ExecutionActionGateTest.xml",
                 "cn.shike.app.ExecutionActionGateTest",
-                7,
+                8,
             ),
         ),
         (

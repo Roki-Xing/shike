@@ -11,32 +11,26 @@ import cn.shike.app.system.VisibleScreenCapturePrompt
 fun HomeRouteContent(
     selected: ShikeItem,
     todayAgendaState: TodayAgendaState,
-    executionResults: List<ExecutionResult>,
-    isConfirmed: Boolean,
     modelStatus: String,
     pendingScreenshotCandidate: ScreenshotCandidate?,
     visibleScreenCapturePrompt: VisibleScreenCapturePrompt?,
     onboardingDismissed: Boolean,
     onGallery: () -> Unit,
     onManualInput: () -> Unit,
-    onAddCalendar: (ShikeItem) -> Unit,
-    onReminder: (ShikeItem) -> Unit,
-    onOpenMap: (ShikeItem) -> Unit,
     onDismissOnboarding: () -> Unit,
     onEnableScreenshotAssistFromOnboarding: () -> Unit,
     onImportScreenshotCandidate: (ScreenshotCandidate) -> Unit,
     onIgnoreScreenshotCandidate: () -> Unit,
     onImportVisibleScreenCapture: () -> Unit,
     onDismissVisibleScreenCapture: () -> Unit,
-    onReviewed: (ShikeItem) -> Unit,
 ) {
     HomeActionScreen(
-        selected, todayAgendaState, executionResults, isConfirmed,
-        onGallery, onManualInput, onAddCalendar, onReminder, onOpenMap,
+        selected, todayAgendaState,
+        onGallery, onManualInput,
         onboardingDismissed, onDismissOnboarding, onEnableScreenshotAssistFromOnboarding,
         modelStatus, pendingScreenshotCandidate, onImportScreenshotCandidate,
         onIgnoreScreenshotCandidate, visibleScreenCapturePrompt, onImportVisibleScreenCapture,
-        onDismissVisibleScreenCapture, onReviewed,
+        onDismissVisibleScreenCapture,
     )
 }
 

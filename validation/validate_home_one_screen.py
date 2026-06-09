@@ -39,8 +39,13 @@ def main() -> int:
             "home_contains_primary_action_and_import",
             "HomeAgendaList(" in home_body
             and "AnalyzeProgressPanel(" in home_body
-            and "ParseConfirmPanel(" in home_body
             and "HomePendingReviewPanel" in home_body,
+        ),
+        (
+            "home_excludes_full_confirm_and_action_plan",
+            "ParseConfirmPanel(" not in home_body
+            and "ConfirmBanner(" not in home_body
+            and "ActionPlannerPanel(" not in home_body,
         ),
         (
             "home_keeps_summary_compact",
