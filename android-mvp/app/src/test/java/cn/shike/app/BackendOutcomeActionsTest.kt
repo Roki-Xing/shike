@@ -16,16 +16,16 @@ class BackendOutcomeActionsTest {
         val item = sampleEvent().copy(title = "后端解析活动")
         val outcome = BackendAnalysisOutcome(
             item = item,
-            source = "后端 /v1/analyze：活动海报",
-            statusMessage = "模型编排：后端解析成功",
+            source = "云端 AI 解析：活动海报",
+            statusMessage = "云端 AI 解析完成",
         )
 
         val status = applyBackendOutcomeSelection(outcome) { savedItem, source ->
             persisted += savedItem to source
         }
 
-        assertEquals("模型编排：后端解析成功", status)
-        assertEquals(listOf(item to "后端 /v1/analyze：活动海报"), persisted)
+        assertEquals("云端 AI 解析完成", status)
+        assertEquals(listOf(item to "云端 AI 解析：活动海报"), persisted)
     }
 
     @Test

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="cn.shike.app.InboxWorkbenchTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-06-09T10:02:26" hostname="LAPTOP-B84BKQGP" time="0.008">
+<testsuite name="cn.shike.app.InboxWorkbenchTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-06-09T11:37:18" hostname="LAPTOP-B84BKQGP" time="0.006">
   <properties/>
-  <testcase name="inboxArchiveActionStateFor_separatesArchiveAndRestoreDecisions" classname="cn.shike.app.InboxWorkbenchTest" time="0.002"/>
+  <testcase name="inboxArchiveActionStateFor_separatesArchiveAndRestoreDecisions" classname="cn.shike.app.InboxWorkbenchTest" time="0.001"/>
   <testcase name="selectedInboxStatusFor_unsupportedStatusFallsBackToPendingReview" classname="cn.shike.app.InboxWorkbenchTest" time="0.0"/>
-  <testcase name="visibleInboxEntries_respectsArchiveStatusAndSearchQuery" classname="cn.shike.app.InboxWorkbenchTest" time="0.004"/>
-  <testcase name="visibleInboxEntries_allStatusPrioritizesUrgentReviewAndScheduleOrder" classname="cn.shike.app.InboxWorkbenchTest" time="0.001"/>
-  <testcase name="inboxWorkbenchEntryFrom_searchesRawTextExplanationAndExecutionSummary" classname="cn.shike.app.InboxWorkbenchTest" time="0.001"/>
+  <testcase name="visibleInboxEntries_respectsArchiveStatusAndSearchQuery" classname="cn.shike.app.InboxWorkbenchTest" time="0.003"/>
+  <testcase name="visibleInboxEntries_allStatusPrioritizesUrgentReviewAndScheduleOrder" classname="cn.shike.app.InboxWorkbenchTest" time="0.002"/>
+  <testcase name="inboxWorkbenchEntryFrom_searchesRawTextExplanationAndExecutionSummary" classname="cn.shike.app.InboxWorkbenchTest" time="0.0"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

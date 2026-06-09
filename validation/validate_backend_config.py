@@ -58,7 +58,7 @@ def main() -> int:
     checks = [
         ("manual_review_checks_pass", command_passes(["python3", "shike/validation/validate_manual_review.py"])),
         ("default_backend_url_present", "DEFAULT_BACKEND_BASE_URL = \"https://roky.chat\"" in android_source),
-        ("backend_url_state_present", "var backendUrl by remember" in android_source),
+        ("backend_url_state_present", "var backendUrl by mutableStateOf" in android_source),
         ("backend_url_field_visible", "label = { Text(\"后端地址\") }" in android_source),
         ("save_backend_button_present", "保存后端地址" in android_source),
         ("backend_url_preference_key_present", "KEY_BACKEND_BASE_URL" in android_source and "backend_base_url" in android_source),

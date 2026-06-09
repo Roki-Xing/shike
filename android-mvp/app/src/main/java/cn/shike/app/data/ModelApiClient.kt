@@ -7,15 +7,6 @@ import java.io.OutputStreamWriter
 import java.net.HttpURLConnection
 import java.net.URI
 import java.net.URL
-import java.time.LocalDate
-
-data class BackendImagePayload(
-    val dataUrl: String,
-    val mime: String,
-    val width: Int,
-    val height: Int,
-    val sha256: String,
-)
 
 fun callAnalyzeApi(backendBaseUrl: String, sourceType: String, ocrText: String, scene: String): ShikeItem {
     val connection = (URL("${normalizeBackendUrl(backendBaseUrl)}/v1/analyze").openConnection() as HttpURLConnection).apply {
@@ -50,87 +41,8 @@ fun buildAnalyzeRequestPayload(inputId: String, sourceType: String, ocrText: Str
         .put("locale", "zh-CN")
         .put("user_timezone", "Asia/Shanghai")
 
-fun callAnalyzeImageApi(
-    backendBaseUrl: String,
-    sourceType: String,
-    ocrTextHint: String,
-    scene: String,
-    image: BackendImagePayload,
-    allowCloudImage: Boolean = true,
-): BackendAnalysisOutcome {
-    val connection = (URL("${normalizeBackendUrl(backendBaseUrl)}${backendAnalysisPathForImage()}").openConnection() as HttpURLConnection).apply {
-        requestMethod = "POST"
-        connectTimeout = 8000
-        readTimeout = 60000
-        setRequestProperty("Content-Type", "application/json; charset=utf-8")
-        doOutput = true
-    }
-    val payload = buildAnalyzeImageRequestPayload(
-        inputId = "android-image-${System.currentTimeMillis()}",
-        sourceType = sourceType,
-        ocrTextHint = ocrTextHint,
-        scene = scene,
-        currentDate = LocalDate.now().toString(),
-        image = image,
-        allowCloudImage = allowCloudImage,
-    )
-    OutputStreamWriter(connection.outputStream, Charsets.UTF_8).use { writer ->
-        writer.write(payload.toString())
-    }
-    if (connection.responseCode !in 200..299) {
-        throw IllegalStateException("Analyze image failed: HTTP ${connection.responseCode}")
-    }
-    val body = connection.inputStream.bufferedReader(Charsets.UTF_8).use { it.readText() }
-    val item = itemFromAnalyzeImageJson(JSONObject(body), ocrTextHint)
-    return if (item.rawText.contains("manual_review", ignoreCase = true) || item.scene == "待确认") {
-        backendImageManualReviewOutcome(item)
-    } else {
-        backendImageSuccessOutcome(item)
-    }
-}
-
-fun buildAnalyzeImageRequestPayload(
-    inputId: String,
-    sourceType: String,
-    ocrTextHint: String,
-    scene: String,
-    currentDate: String,
-    image: BackendImagePayload,
-    allowCloudImage: Boolean = true,
-): JSONObject =
-    JSONObject()
-        .put("input_id", inputId)
-        .put("source_type", sourceType)
-        .put("image", JSONObject()
-            .put("data_url", image.dataUrl)
-            .put("mime", image.mime)
-            .put("width", image.width.coerceAtLeast(1))
-            .put("height", image.height.coerceAtLeast(1))
-            .put("sha256", image.sha256))
-        .put("ocr_text_hint", ocrTextHint)
-        .put("ocr_blocks", JSONArray())
-        .put("user_timezone", "Asia/Shanghai")
-        .put("current_date", currentDate)
-        .put("locale", "zh-CN")
-        .put("scene_hint", sceneHint(scene))
-        .put("allow_cloud_image", allowCloudImage)
-
-fun backendAnalysisPathFor(input: BackendAnalysisInput): String =
-    if (input.hasImageForCloudAnalysis) backendAnalysisPathForImage() else "/v1/analyze"
-
-fun backendAnalysisPathForImage(): String = "/v2/analyze-image"
-
-fun backendImageSourceTypeFromCaptureSource(captureSource: String): String =
-    when {
-        "相机" in captureSource || "拍照" in captureSource -> "camera"
-        "分享" in captureSource -> "screenshot_share"
-        "截图助手" in captureSource -> "recent_screenshot_assist"
-        "手动输入" in captureSource -> "manual"
-        else -> "photo_picker"
-    }
-
 fun itemFromAnalyzeJson(json: JSONObject, fallbackText: String): ShikeItem {
-    val sceneType = json.optString("scene_type")
+    val sceneType = json.safeString("scene_type")
     val scene = when (sceneType) {
         "event_poster" -> "活动海报"
         "course_notice" -> "课程通知"
@@ -138,26 +50,27 @@ fun itemFromAnalyzeJson(json: JSONObject, fallbackText: String): ShikeItem {
     }
     val time = json.optJSONObject("time")
     val location = json.optJSONObject("location")
+    val explanation = json.safeString("explanation").ifBlank { fallbackText }
     return ShikeItem(
-        title = json.optString("title", "待确认碎片"),
+        title = json.safeString("title").ifBlank { "待确认碎片" },
         scene = scene,
         time = listOfNotNull(
-            time?.optString("start_text")?.takeIf { it.isNotBlank() },
-            time?.optString("deadline_text")?.takeIf { it.isNotBlank() },
+            time?.safeString("start_text")?.takeIf { it.isNotBlank() },
+            time?.safeString("deadline_text")?.takeIf { it.isNotBlank() },
         ).joinToString(" / ").ifBlank { "待确认" },
-        location = location?.optString("raw")?.takeIf { it.isNotBlank() } ?: "待确认",
+        location = location?.safeString("raw")?.takeIf { it.isNotBlank() } ?: "待确认",
         status = "待确认",
         actions = actionsFromJson(json.optJSONArray("suggested_actions")),
         startEpochMillis = when (sceneType) {
             "event_poster" -> sampleEvent().startEpochMillis
             else -> sampleCourse().startEpochMillis
         },
-        rawText = "后端 /v1/analyze：${json.optString("explanation", fallbackText)}",
+        rawText = "云端 AI 解析：$explanation",
     )
 }
 
 fun itemFromAnalyzeImageJson(json: JSONObject, fallbackText: String): ShikeItem {
-    val sceneType = json.optString("scene_type")
+    val sceneType = json.safeString("scene_type")
     val scene = when (sceneType) {
         "event_poster" -> "活动海报"
         "course_notice" -> "课程通知"
@@ -169,28 +82,31 @@ fun itemFromAnalyzeImageJson(json: JSONObject, fallbackText: String): ShikeItem 
     }
     val time = json.optJSONObject("time")
     val location = json.optJSONObject("location")
-    val explanation = json.optString("explanation", fallbackText)
+    val task = json.optJSONObject("task")
+    val explanation = json.safeString("explanation").ifBlank { fallbackText }
+    val taskSummary = task?.safeString("summary").orEmpty()
     val risks = stringsFromJson(json.optJSONArray("risks")).joinToString("；")
     val missingFields = stringsFromJson(json.optJSONArray("missing_fields")).joinToString("、")
     val reviewTail = listOfNotNull(
+        taskSummary.takeIf { it.isNotBlank() }?.let { "任务：$it" },
         risks.takeIf { it.isNotBlank() }?.let { "风险：$it" },
         missingFields.takeIf { it.isNotBlank() }?.let { "待补：$it" },
     ).joinToString("\n")
     return ShikeItem(
-        title = json.optString("title", "待确认碎片"),
+        title = json.safeString("title").ifBlank { "待确认碎片" },
         scene = scene,
         time = listOfNotNull(
-            time?.optString("start_text")?.takeIf { it.isNotBlank() },
-            time?.optString("deadline_text")?.takeIf { it.isNotBlank() },
+            time?.safeString("start_text")?.takeIf { it.isNotBlank() },
+            time?.safeString("deadline_text")?.takeIf { it.isNotBlank() },
         ).joinToString(" / ").ifBlank { "待确认" },
-        location = location?.optString("raw")?.takeIf { it.isNotBlank() } ?: "待确认",
+        location = location?.safeString("raw")?.takeIf { it.isNotBlank() } ?: "待确认",
         status = "待确认",
         actions = actionsFromJson(json.optJSONArray("suggested_actions")),
         startEpochMillis = when (sceneType) {
             "event_poster" -> sampleEvent().startEpochMillis
             else -> sampleCourse().startEpochMillis
         },
-        rawText = listOf("后端 /v2/analyze-image：$explanation", reviewTail)
+        rawText = listOf("云端 AI 解析：$explanation", reviewTail)
             .filter { it.isNotBlank() }
             .joinToString("\n"),
     )
@@ -201,7 +117,7 @@ fun actionsFromJson(actions: JSONArray?): List<String> {
         return listOf("稍后确认")
     }
     return (0 until actions.length()).mapNotNull { index ->
-        actions.optJSONObject(index)?.optString("label")?.takeIf { it.isNotBlank() }
+        actions.optJSONObject(index)?.safeString("label")?.takeIf { it.isNotBlank() }
     }.ifEmpty { listOf("稍后确认") }
 }
 
@@ -210,8 +126,28 @@ fun stringsFromJson(values: JSONArray?): List<String> {
         return emptyList()
     }
     return (0 until values.length()).mapNotNull { index ->
-        values.optString(index).takeIf { it.isNotBlank() }
+        values.safeArrayString(index).takeIf { it.isNotBlank() }
     }
+}
+
+private fun JSONObject.safeString(key: String): String {
+    if (!has(key) || isNull(key)) {
+        return ""
+    }
+    return optString(key)
+        .trim()
+        .takeUnless { it.equals("null", ignoreCase = true) }
+        .orEmpty()
+}
+
+private fun JSONArray.safeArrayString(index: Int): String {
+    if (isNull(index)) {
+        return ""
+    }
+    return optString(index)
+        .trim()
+        .takeUnless { it.equals("null", ignoreCase = true) }
+        .orEmpty()
 }
 
 fun sceneHint(scene: String): String =

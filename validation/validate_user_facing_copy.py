@@ -13,14 +13,33 @@ APP_ROOT = ROOT / "android-mvp/app/src/main/java/cn/shike/app"
 USER_SCREEN_FILES = [
     "ShikeMainScreen.kt",
     "MainFlowScreens.kt",
+    "MainScreenRoutes.kt",
+    "HomeActionScreen.kt",
+    "HomePendingReviewPanel.kt",
+    "AnalyzeProgressPanel.kt",
+    "StructuredActionCard.kt",
     "BottomNavigation.kt",
     "CaptureEntryPanel.kt",
+    "OcrDraftEditor.kt",
     "HomeAgendaList.kt",
     "ParseConfirmPanel.kt",
     "ActionPlannerPanel.kt",
     "InboxPanel.kt",
 ]
-FORBIDDEN_USER_COPY = ["MockModelAdapter", "/v1/analyze", "validate_", "后端地址", "交付物自检中心", "3分钟演示路线"]
+FORBIDDEN_USER_COPY = [
+    "MockModelAdapter",
+    "/v1/analyze",
+    "/v2/analyze-image",
+    "后端模型编排",
+    "解析当前草稿",
+    "活动样例解析",
+    "OCR 文本草稿",
+    "模型状态",
+    "validate_",
+    "后端地址",
+    "交付物自检中心",
+    "3分钟演示路线",
+]
 
 
 def read(path: Path) -> str:
@@ -42,7 +61,7 @@ def main() -> int:
 
     checks = [
         ("ordinary_screens_hide_mock_copy", "MockModelAdapter" not in user_copy and "MockModelAdapter" not in backend_runner),
-        ("ordinary_screens_hide_endpoint_path", "/v1/analyze" not in user_copy and "/v1/analyze" not in backend_actions),
+        ("ordinary_screens_hide_endpoint_path", "/v1/analyze" not in user_copy and "/v2/analyze-image" not in user_copy),
         ("ordinary_screens_hide_validation_copy", "validate_" not in user_copy),
         ("ordinary_screens_hide_backend_address", "后端地址" not in user_copy),
         ("ordinary_screens_hide_delivery_self_check", "交付物自检中心" not in user_copy and "3分钟演示路线" not in user_copy),
@@ -51,7 +70,7 @@ def main() -> int:
             "product_copy_replaces_engineering_status",
             "云侧解析中" in backend_actions
             and "云侧连接已保存" in endpoint_actions
-            and "云侧暂不可用，已切换为本地确认" in backend_runner,
+            and "云侧暂不可用，已切换为本地确认" in read(APP_ROOT / "data/BackendAnalysisOutcomes.kt"),
         ),
         (
             "debug_screen_keeps_engineering_tools",
@@ -67,6 +86,13 @@ def main() -> int:
             and "Modifier.clickable(onClick = onVersionTap)" in main_flow
             and "DEVELOPER_MODE_UNLOCK_TAPS = 5" in developer_mode
             and "developerModeStateAfterVersionTap" in main_screen,
+        ),
+        (
+            "ordinary_flow_has_product_progress_and_structured_card",
+            "正在把截图变成行动卡" in user_copy
+            and "课程/事项" in user_copy
+            and "缺失项" in user_copy
+            and "识别到的文字" in user_copy,
         ),
         (
             "debug_entry_requires_unlock_state",

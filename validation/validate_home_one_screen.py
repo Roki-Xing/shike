@@ -23,10 +23,12 @@ def body_between(text: str, start: str, end: str) -> str:
 def main() -> int:
     main_screen = read("ShikeMainScreen.kt")
     main_flow = read("MainFlowScreens.kt")
+    home_screen = read("HomeActionScreen.kt")
+    progress_panel = read("AnalyzeProgressPanel.kt")
     bottom_nav = read("BottomNavigation.kt")
     home_agenda = read("HomeAgendaList.kt")
-    home_body = body_between(main_flow, "fun HomeActionScreen", "fun CaptureHubScreen")
-    settings_body = body_between(main_flow, "fun PrivacySettingsScreen", "private fun HomePendingReviewPanel")
+    home_body = body_between(home_screen, "fun HomeActionScreen", "private fun ScreenshotPromptEntry")
+    settings_body = body_between(main_flow, "fun PrivacySettingsScreen", "private fun VersionUnlockRow")
 
     checks = [
         ("main_screen_uses_scaffold", "Scaffold(" in main_screen and "bottomBar =" in main_screen),
@@ -35,7 +37,10 @@ def main() -> int:
         ("home_excludes_debug_screen", "DebugDemoScreen" not in home_body and "BackendEndpointControls" not in home_body),
         (
             "home_contains_primary_action_and_import",
-            "HomeAgendaList(" in home_body and "QuickImportPanel(" not in home_body and "HomePendingReviewPanel" in home_body,
+            "HomeAgendaList(" in home_body
+            and "AnalyzeProgressPanel(" in home_body
+            and "ParseConfirmPanel(" in home_body
+            and "HomePendingReviewPanel" in home_body,
         ),
         (
             "home_keeps_summary_compact",
@@ -45,6 +50,13 @@ def main() -> int:
             "home_agenda_has_quick_actions",
             all(token in home_agenda for token in ["onGallery", "onManualInput", "导入截图", "手动输入"])
             and "QuickImportPanel" not in main_flow,
+        ),
+        (
+            "home_keeps_screenshot_flow_on_home",
+            "mutableStateOf(ShikeMainSection.Home)" in main_screen
+            and "selectedSection = ShikeMainSection.Import" not in main_screen
+            and "ScreenshotDetectedSheet" in home_screen
+            and "正在把截图变成行动卡" in progress_panel,
         ),
         ("settings_hides_backend_connection", "BackendEndpointControls" not in settings_body and "后端连接" not in settings_body),
         ("settings_has_about_and_developer_hint", "关于拾刻" in settings_body and "连续点击版本号 5 次" in settings_body),

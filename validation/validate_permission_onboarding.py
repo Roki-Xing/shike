@@ -23,8 +23,11 @@ def main() -> int:
     onboarding = read(onboarding_path) if exists(onboarding_path) else ""
     store = read(store_path) if exists(store_path) else ""
     main_activity = read("android-mvp/app/src/main/java/cn/shike/app/MainActivity.kt")
+    lifecycle = read("android-mvp/app/src/main/java/cn/shike/app/MainActivityLifecycleActions.kt")
     shike_app = read("android-mvp/app/src/main/java/cn/shike/app/ShikeApp.kt")
+    content = read("android-mvp/app/src/main/java/cn/shike/app/MainActivityContent.kt")
     main_flow = read("android-mvp/app/src/main/java/cn/shike/app/ui/MainFlowScreens.kt")
+    home = read("android-mvp/app/src/main/java/cn/shike/app/ui/HomeActionScreen.kt")
     notification = read("android-mvp/app/src/main/java/cn/shike/app/system/ScreenshotNotification.kt")
 
     checks = [
@@ -44,15 +47,15 @@ def main() -> int:
         ),
         (
             "shike_app_wires_first_run_onboarding",
-            "onboardingDismissed" in shike_app and "PermissionOnboarding" in main_flow,
+            "onboardingDismissed" in shike_app + content and "PermissionOnboarding" in main_flow + home,
         ),
         (
             "main_activity_persists_onboarding_state",
-            "loadPermissionOnboardingDismissed" in main_activity and "savePermissionOnboardingDismissed" in main_activity,
+            "loadPermissionOnboardingDismissed" in main_activity and "savePermissionOnboardingDismissed" in lifecycle,
         ),
         (
             "screenshot_notification_prompts_handoff",
-            "是否交给拾刻" in notification and "生成行动卡" in notification,
+            "是否交给拾刻" in notification and "生成可确认的行动卡" in notification,
         ),
     ]
     passed = sum(1 for _, ok in checks if ok)

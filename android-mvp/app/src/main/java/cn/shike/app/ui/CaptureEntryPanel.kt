@@ -26,8 +26,8 @@ fun CaptureEntryPanel(
             onManualInput = onManualInput,
         )
         KeyValue("本地恢复", "已保存到收件箱缓存")
-        KeyValue("采集来源", captureSource)
-        KeyValue("模型状态", modelStatus)
+        KeyValue("来源", captureSource)
+        KeyValue("解析状态", modelStatus)
         OcrDraftEditor(
             ocrDraft = ocrDraft,
             onOcrDraftChange = onOcrDraftChange,

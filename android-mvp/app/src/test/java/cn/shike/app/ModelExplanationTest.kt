@@ -12,7 +12,7 @@ class ModelExplanationTest {
     fun modelExplanation_usesBackendExplanationWhenPresent() {
         val item = sampleEvent().copy(
             status = "待确认",
-            rawText = "后端 /v1/analyze：模型识别为活动海报，地点和报名截止时间完整。\n原始OCR：AI应用分享会",
+            rawText = "云端 AI 解析：模型识别为活动海报，地点和报名截止时间完整。\n原文：AI应用分享会",
         )
 
         assertEquals("模型识别为活动海报，地点和报名截止时间完整。", modelExplanation(item))
@@ -22,12 +22,12 @@ class ModelExplanationTest {
     fun modelExplanation_explainsBackendFallbackBeforeLocalConfirmation() {
         val item = sampleCourse().copy(
             status = "待确认",
-            rawText = "后端不可用，回退本地 MockModelAdapter。高数A班今晚18:30改到B203",
+            rawText = "云侧暂不可用，已切换为本地确认。高数A班今晚18:30改到B203",
         )
 
         val explanation = modelExplanation(item)
 
-        assertTrue(explanation.contains("后端不可用"))
+        assertTrue(explanation.contains("云端暂不可用"))
         assertTrue(explanation.contains("本地规则保留行动卡"))
         assertTrue(explanation.contains("置信度或字段完整性仍需用户确认"))
     }

@@ -25,6 +25,8 @@
 
 动作编排由 `ActionPlanner` 统一生成，避免 Android 页面、模型服务和本地执行层各自拼接动作。
 
+Android Compose 入口由 `ShikeApp` 作为 app coordinator 承接；`MainActivity` 只保留权限、Intent 和系统动作边界，`ShikeAppState` 统一持有可观察状态，`ShikeAppActions` 负责用户动作分发，`ShikeScreenHost` 负责把状态和事件映射到各个页面。
+
 ## 状态机
 
 ```text
@@ -140,7 +142,7 @@ python3 shike/backend/verify_backend.py
 | 后端文本解析 | `HttpURLConnection` -> `POST /v1/analyze` | 分享文本、手动输入和无图片草稿提交可编辑 OCR 文本，映射 JSON 响应到行动卡 |
 | 后端图片解析 | `HttpURLConnection` -> `POST /v2/analyze-image` | 相册截图、系统图片分享、最近截图助手和相机预览上传后端图片 payload，携带 OCR hint、日期、时区、尺寸和 SHA-256；后端会从图片 data URL 尝试服务端 vivo OCR enrichment，合并 OCR 文本和 blocks 后再交给多模态解析 |
 | 失败回退 | `runCatching` + 本地样例 | 后端超时、未启动或返回非 2xx 时回退本地 MockModelAdapter |
-| OCR 草稿 | `OutlinedTextField` + `ocrDraft` | 相册、相机、样例和分享导入后可编辑 OCR 文本草稿；文本路径提交到 `/v1/analyze`，图片路径作为 hint 提交到 `/v2/analyze-image` |
+| 识别文字 | `OutlinedTextField` + `ocrDraft` | 相册、相机、样例和分享导入后可编辑识别到的文字；文本路径提交到 `/v1/analyze`，图片路径作为 hint 提交到 `/v2/analyze-image` |
 | 后端地址配置 | `OutlinedTextField` + `SharedPreferences` | 默认 `https://roky.chat`；旧安装保存的 `http://10.0.2.2:8000` 自动迁移，模拟器/局域网调试仍可手动保存自定义地址 |
 | 手动修正 | `ParseConfirmPanel` + `onReviewed` | 用户可编辑标题、时间、地点和状态，点“确认并安排”后持久化 |
 | 忽略动作 | `status = "已忽略"` | 低置信度或字段不可信时保留记录但不推进执行 |
@@ -160,7 +162,7 @@ python3 shike/backend/verify_backend.py
 
 真实相册、拍照和截图助手导入会先落成 `待解析截图` / `待解析照片` 的中性待确认卡片，不得在 Android 端注入 `高数A班 / B203 / 18:30 / 22:00 / 第5章` 等离线演示字段。图片 payload 构造成功时优先走 `/v2/analyze-image`；图片读取、压缩或云侧解析失败时进入本地待确认，失败说明可见，但不得回退到课程样例。课程/活动合成样例只允许通过离线样例或 Debug 演示入口触发。
 
-图片上传边界是用户主动导入后触发：被动截图检测仍只生成候选或通知，不自动上传图片；用户主动选择相册、拍照或确认导入截图后自动请求自有后端 `/v2/analyze-image`，同时保留“解析当前草稿”作为手动重试入口。手动输入会清空上一张图片 URI 和相机预览，避免从图片模式切到文本模式后误带旧图。Android 仍然只调用自有后端，不持有 vivo/DeepSeek/BlueLM 密钥；该边界由 `validate_no_default_image_upload.py` 的 `NO_DEFAULT_IMAGE_UPLOAD_METRIC 12/12` 守卫。
+图片上传边界是用户主动导入后触发：被动截图检测仍只生成候选或通知，不自动上传图片；用户主动选择相册、拍照或确认导入截图后自动请求自有后端 `/v2/analyze-image`，同时保留“生成行动卡”作为手动重试入口。手动输入会清空上一张图片 URI 和相机预览，避免从图片模式切到文本模式后误带旧图。Android 仍然只调用自有后端，不持有 vivo/DeepSeek/BlueLM 密钥；该边界由 `validate_no_default_image_upload.py` 的 `NO_DEFAULT_IMAGE_UPLOAD_METRIC 12/12` 守卫。
 
 后端 v2 图片链路在收到 `image.data_url` 后会提取 base64 图片并调用服务端 `VivoOcrAdapter`，把后端 OCR 文本合并进 `ocr_text_hint`，把服务端 OCR blocks 合并进 `ocr_blocks`，并再次过滤顶部状态栏和底部导航块，再调用 `VivoCloudMultimodalAdapter`。这条 enrichment 只在后端发生，不把 vivo AppKEY 下发到 Android；OCR 缺凭据、网络失败或空结果不会自动执行动作，只会把请求继续送多模态或进入 `manual_review` 风险说明，用户确认前日历、提醒、地图仍不可执行。
 

@@ -3,9 +3,11 @@ package cn.shike.app.ui
 import android.graphics.Bitmap
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
@@ -13,7 +15,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -74,20 +75,9 @@ fun ShikeMainScreen(
     onOpenMap: (ShikeItem) -> Unit,
 ) {
     var selectedSection by remember {
-        mutableStateOf(if (pendingScreenshotCandidate != null) ShikeMainSection.Import else ShikeMainSection.Home)
+        mutableStateOf(ShikeMainSection.Home)
     }
     var developerModeState by remember { mutableStateOf(DeveloperModeState()) }
-
-    LaunchedEffect(pendingScreenshotCandidate) {
-        if (pendingScreenshotCandidate != null) {
-            selectedSection = ShikeMainSection.Import
-        }
-    }
-    LaunchedEffect(visibleScreenCapturePrompt) {
-        if (visibleScreenCapturePrompt != null) {
-            selectedSection = ShikeMainSection.Import
-        }
-    }
 
     Scaffold(
         modifier = Modifier
@@ -116,54 +106,23 @@ fun ShikeMainScreen(
             verticalArrangement = ShikeSpacing.Screen,
         ) {
             when (selectedSection) {
-                ShikeMainSection.Home -> HomeActionScreen(
-                    selected = selected,
-                    todayAgendaState = todayAgendaState,
-                    executionResults = executionResults,
-                    isConfirmed = isConfirmed,
-                    onGallery = onGallery,
-                    onManualInput = onManualInput,
-                    onAddCalendar = onAddCalendar,
-                    onReminder = onReminder,
-                    onOpenMap = onOpenMap,
-                    onboardingDismissed = onboardingDismissed,
-                    onDismissOnboarding = onDismissOnboarding,
-                    onEnableScreenshotAssistFromOnboarding = onEnableScreenshotAssistFromOnboarding,
+                ShikeMainSection.Home -> HomeRouteContent(
+                    selected, todayAgendaState, executionResults, isConfirmed, modelStatus,
+                    pendingScreenshotCandidate, visibleScreenCapturePrompt, onboardingDismissed,
+                    onGallery, onManualInput, onAddCalendar, onReminder, onOpenMap,
+                    onDismissOnboarding, onEnableScreenshotAssistFromOnboarding,
+                    onImportScreenshotCandidate, onIgnoreScreenshotCandidate,
+                    onImportVisibleScreenCapture, onDismissVisibleScreenCapture, onReviewed,
                 )
-                ShikeMainSection.Import -> {
-                    CaptureHubScreen(
-                        captureSource = captureSource,
-                        capturedBitmap = capturedBitmap,
-                        modelStatus = modelStatus,
-                        ocrDraft = ocrDraft,
-                        onOcrDraftChange = onOcrDraftChange,
-                        cloudEnhancedEnabled = cloudEnhancedEnabled,
-                        onGallery = onGallery,
-                        onCamera = onCamera,
-                        onManualInput = onManualInput,
-                        onBackendCourse = onBackendCourse,
-                        onBackendEvent = onBackendEvent,
-                        pendingScreenshotCandidate = pendingScreenshotCandidate,
-                        onImportScreenshotCandidate = onImportScreenshotCandidate,
-                        onIgnoreScreenshotCandidate = onIgnoreScreenshotCandidate,
-                        visibleScreenCapturePrompt = visibleScreenCapturePrompt,
-                        onImportVisibleScreenCapture = onImportVisibleScreenCapture,
-                        onDismissVisibleScreenCapture = onDismissVisibleScreenCapture,
-                    )
-                    ParseConfirmScreen(selected, onReviewed = onReviewed)
-                    ActionPlanScreen(
-                        selected = selected,
-                        isConfirmed = isConfirmed,
-                        executionResults = executionResults,
-                        sourceImageCleanupStatus = sourceImageCleanupStatus,
-                        selectedSourceMediaStoreUri = selectedSourceMediaStoreUri,
-                        onDeleteSourceImage = onDeleteSourceImage,
-                        onKeepSourceImage = onKeepSourceImage,
-                        onAddCalendar = onAddCalendar,
-                        onReminder = onReminder,
-                        onOpenMap = onOpenMap,
-                    )
-                }
+                ShikeMainSection.Import -> ImportRouteContent(
+                    selected, executionResults, isConfirmed, captureSource, capturedBitmap,
+                    modelStatus, ocrDraft, cloudEnhancedEnabled, pendingScreenshotCandidate,
+                    visibleScreenCapturePrompt, sourceImageCleanupStatus, selectedSourceMediaStoreUri,
+                    onOcrDraftChange, onGallery, onCamera, onManualInput, onBackendCourse,
+                    onBackendEvent, onImportScreenshotCandidate, onIgnoreScreenshotCandidate,
+                    onImportVisibleScreenCapture, onDismissVisibleScreenCapture, onReviewed,
+                    onDeleteSourceImage, onKeepSourceImage, onAddCalendar, onReminder, onOpenMap,
+                )
                 ShikeMainSection.Inbox -> InboxScreen(selected, captureSource, executionResults, inboxHistory)
                 ShikeMainSection.Settings -> PrivacySettingsScreen(
                     cloudEnhancedEnabled = cloudEnhancedEnabled,
@@ -189,6 +148,7 @@ fun ShikeMainScreen(
                     localMultimodalStatus = localMultimodalStatus,
                 )
             }
+            Spacer(Modifier.height(112.dp))
         }
     }
 }

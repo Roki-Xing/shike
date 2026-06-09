@@ -64,7 +64,7 @@ fun pendingImageOcrResult(): OcrResult =
         engineName = "image_pending",
         isRedacted = false,
         imageCleared = false,
-        failureHint = "等待云侧图片解析；若识别失败，可手动补充 OCR 文本草稿。",
+        failureHint = "等待云侧图片解析；若识别失败，可手动补充识别到的文字。",
     )
 
 fun captureSourceTypeFromChannel(channel: String): CaptureSourceType =

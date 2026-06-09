@@ -27,11 +27,17 @@ def main() -> int:
         "CaptureEntryPanel.kt",
         "DebugDemoScreen.kt",
         "FrontendStateComponents.kt",
+        "ActionCardUiModel.kt",
+        "AnalyzeProgressPanel.kt",
+        "HomeActionScreen.kt",
         "MainFlowScreens.kt",
+        "MainScreenRoutes.kt",
         "ShikeDesignTokens.kt",
         "ShikeMainScreen.kt",
+        "StructuredActionCard.kt",
     ]
     main_flow = read("MainFlowScreens.kt")
+    home_screen = read("HomeActionScreen.kt")
     main_screen = read("ShikeMainScreen.kt")
     debug_screen = read("DebugDemoScreen.kt")
     capture_entry = read("CaptureEntryPanel.kt")
@@ -39,7 +45,7 @@ def main() -> int:
     state_components = read("FrontendStateComponents.kt")
     bottom_nav = read("BottomNavigation.kt")
 
-    home_body = body_between(main_flow, "fun HomeActionScreen", "fun CaptureHubScreen")
+    home_body = body_between(home_screen, "fun HomeActionScreen", "private fun ScreenshotPromptEntry")
     capture_body = body_between(capture_entry, "fun CaptureEntryPanel", "}")
 
     screen_names = [
@@ -58,7 +64,18 @@ def main() -> int:
 
     checks = [
         ("required_frontend_files_present", all((UI_ROOT / path).is_file() for path in required_files), ",".join(required_files)),
-        ("screen_shells_present", all(f"fun {name}" in (debug_screen if name == "DebugDemoScreen" else main_flow) for name in screen_names), ",".join(screen_names)),
+        (
+            "screen_shells_present",
+            all(
+                f"fun {name}" in (
+                    debug_screen if name == "DebugDemoScreen"
+                    else home_screen if name == "HomeActionScreen"
+                    else main_flow
+                )
+                for name in screen_names
+            ),
+            ",".join(screen_names),
+        ),
         ("design_tokens_present", all(f"object {name}" in tokens for name in token_names), ",".join(token_names)),
         ("state_components_present", all(f"fun {name}" in state_components for name in state_names), ",".join(state_names)),
         ("root_uses_section_state", "var selectedSection" in main_screen and "when (selectedSection)" in main_screen, "selectedSection"),
@@ -80,7 +97,7 @@ def main() -> int:
         (
             "settings_hides_backend_endpoint",
             "fun PrivacySettingsScreen" in main_flow
-            and "BackendEndpointControls" not in body_between(main_flow, "fun PrivacySettingsScreen", "private fun HomePendingReviewPanel"),
+            and "BackendEndpointControls" not in body_between(main_flow, "fun PrivacySettingsScreen", "private fun VersionUnlockRow"),
             "settings",
         ),
         (
@@ -98,9 +115,19 @@ def main() -> int:
             "home_has_quick_import",
             "QuickImportPanel" not in home_body
             and "HomeAgendaList(" in home_body
+            and "AnalyzeProgressPanel(" in home_body
+            and "ParseConfirmPanel(" in home_body
             and "导入截图" in read("HomeAgendaList.kt")
             and "ImportCaptureActions" in capture_entry,
             "home import cta",
+        ),
+        (
+            "structured_action_card_ui_present",
+            "data class ActionCardUiModel" in read("ActionCardUiModel.kt")
+            and "fun StructuredActionCard" in read("StructuredActionCard.kt")
+            and "课程/事项" in read("StructuredActionCard.kt")
+            and "缺失项" in read("StructuredActionCard.kt"),
+            "structured action card",
         ),
     ]
 

@@ -73,7 +73,7 @@ def main() -> int:
     backend_smoke = read("backend/verify_backend.py")
     capture_mapper = read("android-mvp/app/src/main/java/cn/shike/app/data/CaptureImportMapper.kt")
     backend_runner = read("android-mvp/app/src/main/java/cn/shike/app/data/BackendAnalysisRunner.kt")
-    shike_app = read("android-mvp/app/src/main/java/cn/shike/app/ShikeApp.kt")
+    shike_state = read("android-mvp/app/src/main/java/cn/shike/app/ShikeAppState.kt")
     model_api_test = read("android-mvp/app/src/test/java/cn/shike/app/ModelApiClientTest.kt")
     capture_test = read("android-mvp/app/src/test/java/cn/shike/app/data/CaptureImportMapperTest.kt")
     backend_runner_test = read("android-mvp/app/src/test/java/cn/shike/app/BackendAnalysisRunnerTest.kt")
@@ -105,11 +105,11 @@ def main() -> int:
         ),
         (
             "android_backend_uses_current_draft_source",
-            "backendAnalysisInputForCurrentDraft(" in shike_app
-            and "captureSource = captureSource" in shike_app
-            and "fallback = selected" in shike_app
-            and "imageUri = imageUri" in shike_app
-            and "allowCloudImage = allowCloudImageForPreference(localMultimodalPreference)" in shike_app
+            "backendAnalysisInputForCurrentDraft(" in shike_state
+            and "captureSource = captureSource" in shike_state
+            and "fallback = selected" in shike_state
+            and "imageUri = imageUri" in shike_state
+            and "allowCloudImage = allowCloudImageForPreference(localMultimodalPreference)" in shike_state
             and "fun backendAnalysisInputForCurrentDraft" in backend_runner
             and "backendSourceTypeFromCaptureSource(captureSource)" in backend_runner,
         ),

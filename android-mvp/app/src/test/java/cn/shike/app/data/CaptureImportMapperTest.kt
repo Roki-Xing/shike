@@ -63,7 +63,7 @@ class CaptureImportMapperTest {
         assertEquals("待确认", selection.item.time)
         assertEquals("待确认", selection.item.location)
         assertEquals("待确认", selection.item.status)
-        assertEquals("截图助手导入：将自动请求云侧解析，可在 OCR 文本草稿中校对后重试。", selection.item.rawText)
+        assertEquals("截图助手导入：将生成行动卡，可在识别到的文字中校对后重试。", selection.item.rawText)
     }
 
     @Test
@@ -145,6 +145,6 @@ class CaptureImportMapperTest {
         assertEquals("screenshot", backendSourceTypeFromCaptureSource("截图助手导入 1260x2800"))
         assertEquals("camera", backendSourceTypeFromCaptureSource("相机拍照预览 1080x1440"))
         assertEquals("share_text", backendSourceTypeFromCaptureSource("文本分享入口（待确认，未落盘）"))
-        assertEquals("manual", backendSourceTypeFromCaptureSource("手动输入入口：请编辑 OCR 文本草稿后选择后端解析或离线样例。"))
+        assertEquals("manual", backendSourceTypeFromCaptureSource("手动输入：可编辑识别文字后生成行动卡。"))
     }
 }

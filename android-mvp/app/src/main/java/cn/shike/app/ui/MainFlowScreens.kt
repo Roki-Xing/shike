@@ -11,46 +11,6 @@ import cn.shike.app.domain.ShikeItem
 import cn.shike.app.system.VisibleScreenCapturePrompt
 
 @Composable
-fun HomeActionScreen(
-    selected: ShikeItem,
-    todayAgendaState: TodayAgendaState,
-    executionResults: List<ExecutionResult>,
-    isConfirmed: Boolean,
-    onGallery: () -> Unit,
-    onManualInput: () -> Unit,
-    onAddCalendar: (ShikeItem) -> Unit,
-    onReminder: (ShikeItem) -> Unit,
-    onOpenMap: (ShikeItem) -> Unit,
-    onboardingDismissed: Boolean,
-    onDismissOnboarding: () -> Unit,
-    onEnableScreenshotAssistFromOnboarding: () -> Unit,
-) {
-    DashboardHeader()
-    DateStrip()
-    if (!onboardingDismissed) {
-        PermissionOnboarding(
-            onEnableScreenshotAssist = onEnableScreenshotAssistFromOnboarding,
-            onDismiss = onDismissOnboarding,
-        )
-    }
-    HomeAgendaList(
-        item = selected,
-        state = todayAgendaState,
-        onGallery = onGallery,
-        onManualInput = onManualInput,
-    )
-    HomePendingReviewPanel(selected)
-    ConfirmBanner(
-        selected = selected,
-        isConfirmed = isConfirmed,
-        executionResults = executionResults,
-        onAddCalendar = onAddCalendar,
-        onReminder = onReminder,
-        onOpenMap = onOpenMap,
-    )
-}
-
-@Composable
 fun CaptureHubScreen(
     captureSource: String,
     capturedBitmap: Bitmap?,
@@ -208,20 +168,5 @@ private fun VersionUnlockRow(
     )
     if (developerModeState.enabled) {
         ShikeStatusPill("已进入高级设置页", ShikeColors.BrandSoft, ShikeColors.Brand)
-    }
-}
-
-@Composable
-private fun HomePendingReviewPanel(selected: ShikeItem) {
-    val hasMissingField = selected.time == "待确认" || selected.location == "待确认" || selected.status == "待确认"
-    SectionCard("待确认") {
-        if (hasMissingField) {
-            KeyValue("当前卡片", selected.title)
-            KeyValue("需要确认", listOf(selected.time, selected.location, selected.status).filter { it == "待确认" }.size.toString())
-            ShikeStatusPill("进入解析确认页补齐字段", ShikeColors.WarningSoft, ShikeColors.Warning)
-        } else {
-            KeyValue("当前状态", "暂无待确认")
-            KeyValue("下一步", "可在行动编排页继续处理")
-        }
     }
 }

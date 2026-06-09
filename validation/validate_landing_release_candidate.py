@@ -140,6 +140,7 @@ def build_local_checks() -> list[Check]:
     capture_mapper = read("android-mvp/app/src/main/java/cn/shike/app/data/CaptureImportMapper.kt")
     share_mapper = read("android-mvp/app/src/main/java/cn/shike/app/data/ShareImportMapper.kt")
     main_flow = read("android-mvp/app/src/main/java/cn/shike/app/ui/MainFlowScreens.kt")
+    home_action = read("android-mvp/app/src/main/java/cn/shike/app/ui/HomeActionScreen.kt")
     debug_screen = read("android-mvp/app/src/main/java/cn/shike/app/ui/DebugDemoScreen.kt")
     inbox_database = read("android-mvp/app/src/main/java/cn/shike/app/data/InboxDatabase.kt")
     inbox_entities = read("android-mvp/app/src/main/java/cn/shike/app/data/InboxEntities.kt")
@@ -274,7 +275,7 @@ def build_local_checks() -> list[Check]:
         Check("ocr_contracts_present", contains_all(ocr_engine, ("interface OcrEngine", "data class CaptureInput", "data class OcrResult")), "OcrEngine.kt"),
         Check("capture_draft_records_ocr_metadata", contains_all(capture_mapper, ("ocrText", "ocrConfidence", "ocrEngineName", "privacyLevel", "cloudAllowed", "imageCleared")), "CaptureDraft"),
         Check("share_text_disables_cloud_by_default", "ManualOcrEngine()" in share_mapper and "allowCloudEnhancement = false" in share_mapper, "ShareImportMapper.kt"),
-        Check("frontend_has_real_screen_shells", contains_all(main_flow + debug_screen, ("HomeActionScreen", "CaptureHubScreen", "ParseConfirmScreen", "ActionPlanScreen", "InboxScreen", "PrivacySettingsScreen", "DebugDemoScreen")), "screen shells"),
+        Check("frontend_has_real_screen_shells", contains_all(main_flow + home_action + debug_screen, ("HomeActionScreen", "CaptureHubScreen", "ParseConfirmScreen", "ActionPlanScreen", "InboxScreen", "PrivacySettingsScreen", "DebugDemoScreen")), "screen shells"),
         Check("debug_tools_not_on_home", "BackendEndpointControls" not in main_flow.split("fun CaptureHubScreen")[0] and "DebugDemoScreen" in debug_screen, "debug separation"),
         Check("inbox_sqlite_database_present", "SQLiteOpenHelper" in inbox_database and "inbox_items" in inbox_database, "InboxDatabase.kt"),
         Check("inbox_entities_present", contains_all(inbox_entities, ("InboxItemEntity", "CaptureDraftEntity", "ActionDraftEntity", "ExecutionResultEntity")), "InboxEntities.kt"),

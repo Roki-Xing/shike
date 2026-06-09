@@ -67,6 +67,7 @@ def main() -> int:
     capture_result_test = read("android-mvp/app/src/test/java/cn/shike/app/CaptureResultActionsTest.kt")
     model_explanation_test = read("android-mvp/app/src/test/java/cn/shike/app/ModelExplanationTest.kt")
     model_api_client_source = read("android-mvp/app/src/main/java/cn/shike/app/data/ModelApiClient.kt")
+    analyze_image_api_client_source = read("android-mvp/app/src/main/java/cn/shike/app/data/BackendImageApiClient.kt")
     model_api_client_test = read("android-mvp/app/src/test/java/cn/shike/app/ModelApiClientTest.kt")
     analyze_image_api_client_test = read("android-mvp/app/src/test/java/cn/shike/app/data/AnalyzeImageApiClientTest.kt")
     today_action_item_test = read("android-mvp/app/src/test/java/cn/shike/app/TodayActionItemMapperTest.kt")
@@ -89,6 +90,7 @@ def main() -> int:
     reminder_permission_fallback_source = read("android-mvp/app/src/main/java/cn/shike/app/ReminderPermissionFallback.kt")
     reminder_permission_fallback_test = read("android-mvp/app/src/test/java/cn/shike/app/ReminderPermissionFallbackTest.kt")
     backend_analysis_runner_source = read("android-mvp/app/src/main/java/cn/shike/app/data/BackendAnalysisRunner.kt")
+    backend_analysis_outcome_source = read("android-mvp/app/src/main/java/cn/shike/app/data/BackendAnalysisOutcomes.kt")
     backend_analysis_runner_test = read("android-mvp/app/src/test/java/cn/shike/app/BackendAnalysisRunnerTest.kt")
     backend_endpoint_test = read("android-mvp/app/src/test/java/cn/shike/app/BackendEndpointActionsTest.kt")
     backend_trigger_test = read("android-mvp/app/src/test/java/cn/shike/app/BackendTriggerActionsTest.kt")
@@ -505,7 +507,7 @@ def main() -> int:
             and "normalizeBackendUrl_stripsPathQueryAndFragment" in model_api_client_test
             and "android-demo-test" in model_api_client_test
             and "Asia/Shanghai" in model_api_client_test
-            and "后端 /v1/analyze：OCR 原文兜底" in model_api_client_test
+            and "云端 AI 解析：OCR 原文兜底" in model_api_client_test
             and "稍后确认" in model_api_client_test,
         ),
         (
@@ -562,21 +564,24 @@ def main() -> int:
         ),
         (
             "analyze_image_api_client_unit_test_exists",
-            "fun buildAnalyzeImageRequestPayload(" in model_api_client_source
-            and "allowCloudImage: Boolean = true" in model_api_client_source
-            and ".put(\"allow_cloud_image\", allowCloudImage)" in model_api_client_source
+            "fun buildAnalyzeImageRequestPayload(" in analyze_image_api_client_source
+            and "allowCloudImage: Boolean = true" in analyze_image_api_client_source
+            and ".put(\"allow_cloud_image\", allowCloudImage)" in analyze_image_api_client_source
             and "class AnalyzeImageApiClientTest" in analyze_image_api_client_test
-            and analyze_image_api_client_test.count("@Test") == 4
+            and analyze_image_api_client_test.count("@Test") == 5
             and "buildAnalyzeImageRequestPayload_includesImageOcrHintAndUserContext" in analyze_image_api_client_test
             and "buildAnalyzeImageRequestPayload_canDisableCloudImageUpload" in analyze_image_api_client_test
             and "backendAnalysisInputForCurrentDraft_keepsImageUriForV2Route" in analyze_image_api_client_test
             and "backendAnalysisPathFor_textOnlyDraftStaysOnV1" in analyze_image_api_client_test
+            and "itemFromAnalyzeImageJson_omitsJsonNullDeadlineAndKeepsStructuredFields" in analyze_image_api_client_test
+            and "assertFalse(item.time.contains(\"null\"))" in analyze_image_api_client_test
+            and "任务：上英语口语" in analyze_image_api_client_test
             and "allowCloudImage = false" in analyze_image_api_client_test
             and "assertFalse(payload.getBoolean(\"allow_cloud_image\"))" in analyze_image_api_client_test
             and test_result_passed(
                 "android-mvp/app/build/test-results/testDebugUnitTest/TEST-cn.shike.app.data.AnalyzeImageApiClientTest.xml",
                 "cn.shike.app.data.AnalyzeImageApiClientTest",
-                4,
+                5,
             ),
         ),
         (
@@ -725,11 +730,11 @@ def main() -> int:
         (
             "backend_analysis_runner_unit_test_exists",
             "fun backendAnalyzeText(" in backend_analysis_runner_source
-            and "fun backendSuccessOutcome(" in backend_analysis_runner_source
-            and "fun backendFailureOutcome(" in backend_analysis_runner_source
-            and "fun backendFailureFallbackCopyFor(" in backend_analysis_runner_source
+            and "fun backendSuccessOutcome(" in backend_analysis_outcome_source
+            and "fun backendFailureOutcome(" in backend_analysis_outcome_source
+            and "fun backendFailureFallbackCopyFor(" in backend_analysis_outcome_source
             and "fun backendAnalysisInputForCurrentDraft(" in backend_analysis_runner_source
-            and "data class BackendFailureFallbackCopy" in backend_analysis_runner_source
+            and "data class BackendFailureFallbackCopy" in backend_analysis_outcome_source
             and "class BackendAnalysisRunnerTest" in backend_analysis_runner_test
             and backend_analysis_runner_test.count("@Test") == 6
             and "backendAnalysisInputForCurrentDraft_usesCaptureSourceSpecificBackendType" in backend_analysis_runner_test
@@ -743,9 +748,9 @@ def main() -> int:
         ),
         (
             "backend_failure_fallback_copy_unit_tested",
-            "BackendFailureFallbackCopy" in backend_analysis_runner_source
-            and "redactSensitiveLogText(textForAnalyze)" in backend_analysis_runner_source
-            and "日志已脱敏" in backend_analysis_runner_source
+            "BackendFailureFallbackCopy" in backend_analysis_outcome_source
+            and "redactSensitiveLogText(textForAnalyze)" in backend_analysis_outcome_source
+            and "日志已脱敏" in backend_analysis_outcome_source
             and "demo@example.com" in backend_analysis_runner_test
             and "assertFalse(copy.rawText.contains(\"demo@example.com\"))" in backend_analysis_runner_test
             and "assertFalse(copy.rawText.contains(\"192.168.0.2\"))" in backend_analysis_runner_test,
@@ -805,7 +810,7 @@ def main() -> int:
             and "applyBackendOutcomeSelection_persistsBackendItemAndSource" in backend_outcome_test
             and "applyBackendOutcomeSelection_preservesFallbackStatusMessage" in backend_outcome_test
             and "sanitizeBackendOutcomeCopy_redactsSensitiveTokensAndFallsBackToDefaults" in backend_outcome_test
-            and "后端 /v1/analyze：活动海报" in backend_outcome_test
+            and "云端 AI 解析：活动海报" in backend_outcome_test
             and "云侧解析失败，本地待确认" in backend_outcome_test
             and "云侧解析结果待确认" in backend_outcome_test,
         ),
@@ -951,7 +956,7 @@ def main() -> int:
             and "cloudEnhancementDisabledFallback_keepsTodayActionReady" in cloud_enhancement_test
             and "cloudEnhancementDisabledFallback_statesBackendIsNotCalled" in cloud_enhancement_test
             and "cloudEnhancementDisabledFallback_keepsLocalDraftAndOfflineEntry" in cloud_enhancement_test
-            and "未调用后端 /v1/analyze" in cloud_enhancement_test,
+            and "未调用云端 AI" in cloud_enhancement_test,
         ),
         (
             "gradle_cloud_enhancement_test_passed",

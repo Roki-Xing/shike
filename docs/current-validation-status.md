@@ -1,10 +1,40 @@
 # Current Validation Status
 
-Date: 2026-06-03
+Date: 2026-06-09
 Guide: `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md`  
 Deep review guide applied this round: `/mnt/c/Users/Xing/Desktop/SHIKE_PRODUCT_MANAGER_DEEP_REVIEW_GUIDE.md`
 Guide source availability: the expected desktop source file was restored from the Windows recycle bin and is currently readable in this closeout audit; see `materials/evidence/desktop-guidance-source-status.md`. The local matrix remains useful for repository evidence traceability, while strict external cloud-device evidence remains blocked.
 Scope: Desktop guidance stages A-E: BlueLM credible evidence, cloud-device and HTTPS backend evidence, frontend productization, long-lived inbox workbench, and materials upgraded to a release evidence package. Historical S2/S3 hardening remains part of the evidence base, but the current public status is anchored to `materials/evidence/requirement-matrix.md` and `REQUIREMENT_MATRIX_METRIC 9/9`.
+
+## 2026-06-09 Closeout Evidence
+
+This closeout pass focused on the real screenshot-to-action product loop: no real gallery/screenshot path may fall back to fixed `MockOcrEngine` / `sampleCourse` values, the home import path now stays on the home screen with staged AI parsing progress, the Android UI displays structured action-card fields without `"null"` copy, screenshot assist uses opt-in MediaStore observation plus a high-priority notification, and ordinary user screens hide backend endpoint, Mock, validation, self-check, and demo tooling copy.
+
+Fresh local evidence from this pass:
+
+| Command | Status | Evidence |
+|---|---|---|
+| `python3 validation/validate_real_world_ready.py` | PASS | `REAL_WORLD_READY_METRIC 22/22` |
+| `python3 validation/validate_landing_release_candidate.py` | PASS | `LANDING_RELEASE_CANDIDATE_METRIC 63/63` |
+| `python3 validation/validate_landable.py` | PASS | `LANDABLE_METRIC 16/16` |
+| `python3 validation/validate_demo_acceptance.py` | PASS | `DEMO_ACCEPTANCE_METRIC 18/18` |
+| `python3 validation/validate_deliverables.py` | PASS | `METRIC 10/10` |
+| `python3 validation/validate_no_sample_contamination.py` | PASS | `NO_SAMPLE_CONTAMINATION_METRIC 14/14` |
+| `python3 validation/validate_real_ocr_routing.py` | PASS | `REAL_OCR_ROUTING_METRIC 3/3` |
+| `python3 validation/validate_no_default_image_upload.py` | PASS | `NO_DEFAULT_IMAGE_UPLOAD_METRIC 12/12` |
+| `python3 validation/validate_analyze_progress_ui.py` | PASS | `ANALYZE_PROGRESS_UI_METRIC 7/7` |
+| `python3 validation/validate_structured_action_card_ui.py` | PASS | `STRUCTURED_ACTION_CARD_UI_METRIC 8/8` |
+| `python3 validation/validate_screenshot_assist.py` | PASS | `SCREENSHOT_ASSIST_METRIC 17/17` |
+| `python3 validation/validate_user_facing_copy.py` | PASS | `USER_FACING_COPY_METRIC 13/13` |
+| `python3 validation/validate_home_one_screen.py` | PASS | `HOME_ONE_SCREEN_METRIC 10/10` |
+| `python3 validation/validate_frontend_polish.py` | PASS | `FRONTEND_POLISH_METRIC 13/13` |
+| `python3 validation/validate_advanced_product_beta.py --strict` | PASS | `PRODUCT_BETA_METRIC 30/30` |
+| `python3 validation/validate_secret_hygiene.py` | PASS | `PASS secret_hygiene` |
+| `python3 validation/validate_apk_secret_hygiene.py` | PASS | `APK_SECRET_HYGIENE_METRIC 8/8` |
+| `gradle --no-daemon :app:testDebugUnitTest` from `shike/android-mvp/` | PASS | `BUILD SUCCESSFUL` |
+| `bash android-mvp/build_apk.sh` | PASS | APK copied to `/mnt/c/Users/Xing/Desktop/Shike-app-debug.apk`; local and Desktop SHA-256 both `76fb6e5e9e59bcc129989870ed63d593c3053c243bfea223b6645ae066c10f1c` |
+
+Strict external cloud-device evidence remains a separate manual recording gate: the local repository and APK gates pass, but final release proof still requires real cloud-device MP4s, filled report fields, and redacted logcat evidence before strict release status can be claimed.
 
 ## Repository Structure Baseline
 

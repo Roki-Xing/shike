@@ -3562,6 +3562,8 @@ Validation:
   - Evidence: `DEMO_ACCEPTANCE_METRIC 16/16`
 - PASS `python3 validation/validate_real_world_ready.py`
   - Evidence: `REAL_WORLD_READY_METRIC 22/22`
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC 63/63`
 - PASS `python3 validation/validate_landable.py`
   - Evidence: `LANDABLE_METRIC 16/16`
 - PASS `python3 backend/verify_backend.py`
@@ -9810,3 +9812,50 @@ Validation:
 
 Next:
 - Install `/mnt/c/Users/Xing/Desktop/Shike-app-debug.apk` on the cloud device and verify the same screenshot now shows a neutral pending state first, then `/v2/analyze-image` output without B203/18:30/22:00/第5章 unless those fields are present in OCR evidence.
+
+## 2026-06-09 / Screenshot-to-Action Real Experience Closeout
+
+Goal: Close the real app loop exposed by cloud-device screenshots: screenshot selection or detection should lead into AI parsing progress, structured confirmation, user-confirmed actions, and optional source-image cleanup without leaking Debug/sample/endpoint copy into ordinary screens.
+
+Files changed:
+- Android state and UI are split around `ShikeAppState`, `ShikeAppActions`, `ShikeScreenHost`, `AnalyzeProgressPanel`, and `StructuredActionCard` so the home screenshot flow can show progress and structured fields without forcing the user through the import tab.
+- `ScreenshotAssistService` and notification routing keep the opt-in screenshot assistant on a notification-based path, not a default overlay or accessibility path.
+- Validators now follow the new `ShikeAppState` owner for `ocrDraft` and `backendUrl`, and delivery materials document the fallback recording coverage and `ShikeApp` coordinator boundary.
+- `materials/evidence/cloud-device/apk-sha256.txt` now records the rebuilt APK hash.
+
+Validation:
+- PASS `python3 validation/validate_real_world_ready.py`
+  - Evidence: `REAL_WORLD_READY_METRIC 22/22`
+- PASS `python3 validation/validate_landable.py`
+  - Evidence: `LANDABLE_METRIC 16/16`
+- PASS `python3 validation/validate_demo_acceptance.py`
+  - Evidence: `DEMO_ACCEPTANCE_METRIC 18/18`
+- PASS `python3 validation/validate_deliverables.py`
+  - Evidence: `METRIC 10/10`
+- PASS `python3 validation/validate_no_sample_contamination.py`
+  - Evidence: `NO_SAMPLE_CONTAMINATION_METRIC 14/14`
+- PASS `python3 validation/validate_no_default_image_upload.py`
+  - Evidence: `NO_DEFAULT_IMAGE_UPLOAD_METRIC 12/12`
+- PASS `python3 validation/validate_analyze_progress_ui.py`
+  - Evidence: `ANALYZE_PROGRESS_UI_METRIC 7/7`
+- PASS `python3 validation/validate_structured_action_card_ui.py`
+  - Evidence: `STRUCTURED_ACTION_CARD_UI_METRIC 8/8`
+- PASS `python3 validation/validate_screenshot_assist.py`
+  - Evidence: `SCREENSHOT_ASSIST_METRIC 17/17`
+- PASS `python3 validation/validate_user_facing_copy.py`
+  - Evidence: `USER_FACING_COPY_METRIC 13/13`
+- PASS `python3 validation/validate_home_one_screen.py`
+  - Evidence: `HOME_ONE_SCREEN_METRIC 10/10`
+- PASS `python3 validation/validate_frontend_polish.py`
+  - Evidence: `FRONTEND_POLISH_METRIC 13/13`
+- PASS `python3 validation/validate_advanced_product_beta.py --strict`
+  - Evidence: `PRODUCT_BETA_METRIC 30/30`
+- PASS `gradle --no-daemon :app:testDebugUnitTest`
+  - Evidence: `BUILD SUCCESSFUL`
+- PASS APK rebuild and Desktop copy parity
+  - Evidence: `APK_SHA256 76fb6e5e9e59bcc129989870ed63d593c3053c243bfea223b6645ae066c10f1c`
+- PASS `python3 validation/validate_apk_secret_hygiene.py`
+  - Evidence: `APK_SECRET_HYGIENE_METRIC 8/8`
+
+Next:
+- Install `/mnt/c/Users/Xing/Desktop/Shike-app-debug.apk` on the cloud device and verify the six manual points: screenshot notification appears, tapping it opens parsing progress, no `null` text appears, action-card fields are structured, ordinary user screens hide engineering copy, and confirmed cards offer system-confirmed screenshot cleanup.

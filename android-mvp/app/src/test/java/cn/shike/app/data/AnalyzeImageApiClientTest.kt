@@ -3,6 +3,9 @@ package cn.shike.app.data
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
+import org.json.JSONArray
+import org.json.JSONObject
+import org.json.JSONObject.NULL
 import org.junit.Test
 
 class AnalyzeImageApiClientTest {
@@ -78,12 +81,45 @@ class AnalyzeImageApiClientTest {
     @Test
     fun backendAnalysisPathFor_textOnlyDraftStaysOnV1() {
         val input = backendAnalysisInputForCurrentDraft(
-            captureSource = "手动输入入口：请编辑 OCR 文本草稿后选择后端解析或离线样例。",
+            captureSource = "手动输入：可编辑识别文字后生成行动卡。",
             fallback = sampleCourse(),
             imageUri = null,
         )
 
         assertEquals("/v1/analyze", backendAnalysisPathFor(input))
         assertFalse(input.hasImageForCloudAnalysis)
+    }
+
+    @Test
+    fun itemFromAnalyzeImageJson_omitsJsonNullDeadlineAndKeepsStructuredFields() {
+        val item = itemFromAnalyzeImageJson(
+            JSONObject()
+                .put("scene_type", "course_notice")
+                .put("title", "英语口语课")
+                .put("time", JSONObject().put("start_text", "明天早上九点").put("deadline_text", NULL))
+                .put("location", JSONObject().put("raw", "E520"))
+                .put("task", JSONObject().put("summary", "上英语口语").put("priority", "medium").put("topic", "course"))
+                .put(
+                    "suggested_actions",
+                    JSONArray()
+                        .put(JSONObject().put("label", "加入日历"))
+                        .put(JSONObject().put("label", "课前提醒"))
+                        .put(JSONObject().put("label", "打开地图")),
+                )
+                .put("missing_fields", JSONArray().put("reminder_offset"))
+                .put("risks", JSONArray().put("日期来自“明天”，请确认"))
+                .put("explanation", "从 OCR 证据提取课程、时间和地点"),
+            fallbackText = "明天早上九点上英语口语教室E520",
+        )
+
+        assertEquals("英语口语课", item.title)
+        assertEquals("课程通知", item.scene)
+        assertEquals("明天早上九点", item.time)
+        assertFalse(item.time.contains("null"))
+        assertEquals("E520", item.location)
+        assertEquals(listOf("加入日历", "课前提醒", "打开地图"), item.actions)
+        assertTrue(item.rawText.contains("任务：上英语口语"))
+        assertTrue(item.rawText.contains("风险：日期来自“明天”，请确认"))
+        assertTrue(item.rawText.contains("待补：reminder_offset"))
     }
 }

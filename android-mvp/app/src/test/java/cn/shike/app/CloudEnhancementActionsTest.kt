@@ -17,8 +17,8 @@ class CloudEnhancementActionsTest {
     fun cloudEnhancementDisabledFallback_statesBackendIsNotCalled() {
         val fallback = cloudEnhancementDisabledFallback()
 
-        assertTrue(fallback.modelStatus.contains("不请求后端"))
-        assertTrue(fallback.captureSource.contains("未调用后端 /v1/analyze"))
+        assertTrue(fallback.modelStatus.contains("不请求云端"))
+        assertTrue(fallback.captureSource.contains("未调用云端 AI"))
     }
 
     @Test
@@ -26,6 +26,5 @@ class CloudEnhancementActionsTest {
         val fallback = cloudEnhancementDisabledFallback()
 
         assertTrue(fallback.modelStatus.contains("保留本地草稿"))
-        assertTrue(fallback.modelStatus.contains("离线样例入口"))
     }
 }

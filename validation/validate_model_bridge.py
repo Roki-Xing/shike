@@ -59,8 +59,8 @@ def main() -> int:
         ("json_request_body_present", "JSONObject()" in android_source and "scene_hint" in android_source and "ocr_text" in android_source),
         ("response_json_mapping_present", "itemFromAnalyzeJson" in android_source and "suggested_actions" in android_source),
         ("actions_mapping_present", "actionsFromJson" in android_source and "optJSONArray" in android_source),
-        ("backend_buttons_present", "解析当前草稿" in android_source and "活动样例解析" in android_source),
-        ("model_status_visible", "modelStatus" in android_source and "模型状态" in android_source),
+        ("backend_buttons_present", "生成行动卡" in android_source and "活动样例解析" not in read("android-mvp/app/src/main/java/cn/shike/app/ui/CaptureEntryPanel.kt")),
+        ("model_status_visible", "modelStatus" in android_source and "解析状态" in android_source),
         (
             "fallback_to_local_confirmation_present",
             "backendFailureOutcome(" in android_source

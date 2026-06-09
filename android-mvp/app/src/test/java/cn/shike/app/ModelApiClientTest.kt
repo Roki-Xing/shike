@@ -108,7 +108,7 @@ class ModelApiClientTest {
         assertEquals("待确认", item.status)
         assertEquals(listOf("加入日历", "课前提醒"), item.actions)
         assertEquals(sampleCourse().startEpochMillis, item.startEpochMillis)
-        assertEquals("后端 /v1/analyze：识别为课程通知，时间和地点完整", item.rawText)
+        assertEquals("云端 AI 解析：识别为课程通知，时间和地点完整", item.rawText)
     }
 
     @Test
@@ -122,13 +122,13 @@ class ModelApiClientTest {
 
         val item = itemFromAnalyzeJson(json, fallbackText = "OCR 原文兜底")
 
-        assertEquals("", item.title)
+        assertEquals("待确认碎片", item.title)
         assertEquals("活动海报", item.scene)
         assertEquals("待确认", item.time)
         assertEquals("待确认", item.location)
         assertEquals(listOf("稍后确认"), item.actions)
         assertEquals(sampleEvent().startEpochMillis, item.startEpochMillis)
-        assertEquals("后端 /v1/analyze：OCR 原文兜底", item.rawText)
+        assertEquals("云端 AI 解析：OCR 原文兜底", item.rawText)
     }
 
     @Test

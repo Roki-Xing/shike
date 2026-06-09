@@ -56,8 +56,8 @@ def main() -> int:
         ("adb_install_documented", "adb install -r" in checklist),
         ("evidence_directory_documented", "shike/materials/evidence/" in checklist),
         ("recording_files_named", all(name in checklist for name in evidence_files)),
-        ("course_flow_documented", all(token in checklist for token in ["选择截图", "OCR 文本草稿", "解析当前草稿", "确认并安排", "打开日历"])),
-        ("event_flow_documented", all(token in checklist for token in ["拍照导入", "活动样例解析", "设置提醒", "查看路线"])),
+        ("course_flow_documented", all(token in checklist for token in ["选择截图", "识别到的文字", "生成行动卡", "确认并安排", "打开日历"])),
+        ("event_flow_documented", all(token in checklist for token in ["拍照导入", "生成行动卡", "设置提醒", "查看路线"])),
         (
             "extended_scene_flow_documented",
             all(token in checklist for token in extended_scene_tokens)
@@ -141,7 +141,7 @@ def main() -> int:
         ),
         (
             "demo_page_flows_match_checklist",
-            all(token in demo for token in ["解析当前草稿", "活动样例解析", "06-delivery-readiness.mp4"])
+            all(token in demo for token in ["生成行动卡", "06-delivery-readiness.mp4"])
             and all(token in demo for token in extended_scene_tokens),
         ),
         ("android_structure_guard_listed", all(token in checklist and token in readme and token in demo for token in ["validate_android_structure.py", "ANDROID_STRUCTURE_METRIC"])),

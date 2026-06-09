@@ -63,6 +63,7 @@ def main() -> int:
     preprocessor = read("android-mvp/app/src/main/java/cn/shike/app/data/ImagePayloadPreprocessor.kt")
     thumbnail_cache = read("android-mvp/app/src/main/java/cn/shike/app/data/ImageThumbnailCache.kt")
     main_activity = read("android-mvp/app/src/main/java/cn/shike/app/MainActivity.kt")
+    activity_payloads = read("android-mvp/app/src/main/java/cn/shike/app/ActivityImagePayloads.kt")
     policy_test = read("android-mvp/app/src/test/java/cn/shike/app/data/ImagePreprocessPolicyTest.kt")
     thumbnail_cache_test = read("android-mvp/app/src/test/java/cn/shike/app/data/ImageThumbnailCacheTest.kt")
     docs = "\n".join(
@@ -258,21 +259,21 @@ def main() -> int:
         (
             "main_activity_delegates_image_payload_building",
             contains_all(
-                main_activity,
+                activity_payloads,
                 (
                     "import cn.shike.app.data.ImagePayloadPreprocessor",
                     "import cn.shike.app.data.ImagePreprocessSource",
-                    "private fun buildImagePayloadFromUri(uriText: String, sourceType: String): BackendImagePayload?",
+                    "fun Context.buildBackendImagePayloadFromUri(uriText: String, sourceType: String): BackendImagePayload?",
                     "ImagePayloadPreprocessor.fromBytesWithThumbnail(",
                     "thumbnailCacheRoot = cacheDir",
                     "private fun imagePreprocessSourceFromBackendSource(sourceType: String): ImagePreprocessSource",
                     '"screenshot_share", "recent_screenshot_assist" -> ImagePreprocessSource.SCREENSHOT',
-                    "private fun buildImagePayloadFromBitmap(bitmap: Bitmap): BackendImagePayload?",
+                    "fun Context.buildBackendImagePayloadFromBitmap(bitmap: Bitmap): BackendImagePayload?",
                     "ImagePayloadPreprocessor.fromBitmapWithThumbnail(",
                 ),
             )
             and not contains_any(
-                main_activity,
+                main_activity + activity_payloads,
                 (
                     "BitmapFactory.decodeByteArray",
                     "Base64.encodeToString",

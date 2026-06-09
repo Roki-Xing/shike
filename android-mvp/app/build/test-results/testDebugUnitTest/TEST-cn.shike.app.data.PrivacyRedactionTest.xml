@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="cn.shike.app.data.PrivacyRedactionTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-06-09T10:02:26" hostname="LAPTOP-B84BKQGP" time="0.001">
+<testsuite name="cn.shike.app.data.PrivacyRedactionTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-06-09T11:37:19" hostname="LAPTOP-B84BKQGP" time="0.0">
   <properties/>
   <testcase name="redactSensitiveLogText_keepsNonSensitiveActionTextReadable" classname="cn.shike.app.data.PrivacyRedactionTest" time="0.0"/>
   <testcase name="redactSensitiveLogText_removesPersonalAndLocalNetworkData" classname="cn.shike.app.data.PrivacyRedactionTest" time="0.0"/>

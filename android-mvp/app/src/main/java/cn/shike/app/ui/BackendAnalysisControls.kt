@@ -19,22 +19,16 @@ fun BackendAnalysisControls(
     onBackendCourse: () -> Unit,
     onBackendEvent: () -> Unit,
 ) {
-    Text("后端模型编排", fontWeight = FontWeight.SemiBold, color = Color(0xFF101828))
+    Text("生成行动卡", fontWeight = FontWeight.SemiBold, color = Color(0xFF101828))
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
         Button(
             onClick = onBackendCourse,
             enabled = cloudEnhancedEnabled,
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2563EB)),
-        ) { Text("解析当前草稿") }
-        Button(
-            onClick = onBackendEvent,
-            enabled = cloudEnhancedEnabled,
-            modifier = Modifier.weight(1f),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF97316)),
-        ) { Text("活动样例解析") }
+        ) { Text("生成行动卡") }
     }
     if (!cloudEnhancedEnabled) {
-        Text("关闭云侧增强时不请求后端；可用离线样例或手动草稿继续。", color = Color(0xFFF97316), fontSize = 12.sp)
+        Text("关闭云侧增强时不请求云端；可手动确认并保留行动卡。", color = Color(0xFFF97316), fontSize = 12.sp)
     }
 }

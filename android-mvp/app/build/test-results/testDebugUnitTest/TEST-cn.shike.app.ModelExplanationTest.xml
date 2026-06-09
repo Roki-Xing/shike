@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="cn.shike.app.ModelExplanationTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-06-09T10:02:26" hostname="LAPTOP-B84BKQGP" time="0.001">
+<testsuite name="cn.shike.app.ModelExplanationTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-06-09T11:37:18" hostname="LAPTOP-B84BKQGP" time="0.001">
   <properties/>
-  <testcase name="modelExplanation_explainsBackendFallbackBeforeLocalConfirmation" classname="cn.shike.app.ModelExplanationTest" time="0.0"/>
+  <testcase name="modelExplanation_explainsBackendFallbackBeforeLocalConfirmation" classname="cn.shike.app.ModelExplanationTest" time="0.001"/>
   <testcase name="modelExplanation_marksConfirmedCourseFieldsAsTrusted" classname="cn.shike.app.ModelExplanationTest" time="0.0"/>
   <testcase name="modelExplanation_usesBackendExplanationWhenPresent" classname="cn.shike.app.ModelExplanationTest" time="0.0"/>
   <system-out><![CDATA[]]></system-out>

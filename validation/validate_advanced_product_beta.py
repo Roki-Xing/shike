@@ -133,6 +133,7 @@ def build_checks() -> list[BetaCheck]:
 
     android_source = read_android_source(ROOT)
     home_agenda = read("android-mvp/app/src/main/java/cn/shike/app/ui/HomeAgendaList.kt")
+    home_action = read("android-mvp/app/src/main/java/cn/shike/app/ui/HomeActionScreen.kt")
     main_flow = read("android-mvp/app/src/main/java/cn/shike/app/ui/MainFlowScreens.kt")
     capture_entry = read("android-mvp/app/src/main/java/cn/shike/app/ui/CaptureEntryPanel.kt")
     inbox_panel = read("android-mvp/app/src/main/java/cn/shike/app/ui/InboxPanel.kt")
@@ -146,6 +147,8 @@ def build_checks() -> list[BetaCheck]:
     capture_mapper = read("android-mvp/app/src/main/java/cn/shike/app/data/CaptureImportMapper.kt")
     local_store = read("android-mvp/app/src/main/java/cn/shike/app/data/LocalInboxStore.kt")
     confirm_panel = read("android-mvp/app/src/main/java/cn/shike/app/ui/ParseConfirmPanel.kt")
+    model_explanation = read("android-mvp/app/src/main/java/cn/shike/app/ui/ModelExplanation.kt")
+    execution_result = read("android-mvp/app/src/main/java/cn/shike/app/ui/ExecutionResult.kt")
     model_schema = read("contracts/model-output.schema.json")
     optimization_log = read("docs/optimization-log.md")
     current_status = read("docs/current-validation-status.md")
@@ -165,12 +168,13 @@ def build_checks() -> list[BetaCheck]:
     home_uses_current_item = (
         "fun HomeAgendaList(" in home_agenda
         and "item: ShikeItem" in home_agenda
-        and ("HomeAgendaList(" in main_screen or "HomeAgendaList(" in main_flow)
+        and ("HomeAgendaList(" in main_screen or "HomeAgendaList(" in main_flow or "HomeAgendaList(" in home_action)
         and (
             "HomeAgendaList(selected)" in main_screen
             or "item = selected" in main_screen
             or "HomeAgendaList(selected)" in main_flow
             or "item = selected" in main_flow
+            or "item = selected" in home_action
         )
     )
     inbox_status_tokens = ["待确认", "已安排", "即将截止", "已完成", "已忽略"]
@@ -222,7 +226,9 @@ def build_checks() -> list[BetaCheck]:
         ),
         check(
             "detail_shows_model_explanation",
-            "explanation" in model_schema and "模型解释" in android_source,
+            "explanation" in model_schema
+            and "fun modelExplanation" in model_explanation
+            and ("模型解释" in android_source or "判断依据" in android_source),
             "schema explanation=" + str("explanation" in model_schema),
             "在确认页或详情页展示模型解释，低置信度时说明需要人工确认的原因。",
         ),
@@ -319,8 +325,8 @@ def build_checks() -> list[BetaCheck]:
         ),
         check(
             "calendar_intent_not_saved_claim",
-            "已打开系统新增页" in android_source and "CalendarContract" in system_actions,
-            "calendar opened wording" if "已打开系统新增页" in android_source else "missing",
+            ("已打开系统新增页" in android_source or "已打开系统日历新增页" in execution_result) and "CalendarContract" in system_actions,
+            "calendar opened wording" if ("已打开系统新增页" in android_source or "已打开系统日历新增页" in execution_result) else "missing",
             "日历 Intent 只能记录已打开系统新增页，不得记录成用户已保存。",
         ),
         check(

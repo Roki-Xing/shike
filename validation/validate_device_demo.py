@@ -83,7 +83,7 @@ def main() -> int:
         ),
         ("camera_preview_present", "ActivityResultContracts.TakePicturePreview" in android_source),
         ("camera_permission_runtime_present", "RequestPermission" in android_source and "Manifest.permission.CAMERA" in android_source),
-        ("capture_source_feedback_present", "captureSource" in android_source and "采集来源" in android_source),
+        ("capture_source_feedback_present", "captureSource" in android_source and "KeyValue(\"来源\", captureSource)" in android_source),
         ("captured_preview_rendered", "asImageBitmap" in android_source and "contentDescription = \"拍照预览\"" in android_source),
         ("offline_sample_fallback_present", "离线兜底样例" in android_source and "课程样例" in android_source and "活动样例" in android_source),
         ("camera_permission_manifest_present", "android.permission.CAMERA" in manifest),

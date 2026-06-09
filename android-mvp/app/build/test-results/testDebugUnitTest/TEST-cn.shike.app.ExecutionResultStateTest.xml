@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="cn.shike.app.ExecutionResultStateTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-06-09T10:02:26" hostname="LAPTOP-B84BKQGP" time="0.001">
+<testsuite name="cn.shike.app.ExecutionResultStateTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-06-09T11:37:18" hostname="LAPTOP-B84BKQGP" time="0.001">
   <properties/>
-  <testcase name="pendingExecutionResults_startsAllActionsInConfirmationState" classname="cn.shike.app.ExecutionResultStateTest" time="0.001"/>
+  <testcase name="pendingExecutionResults_startsAllActionsInConfirmationState" classname="cn.shike.app.ExecutionResultStateTest" time="0.0"/>
   <testcase name="executionResultFactories_keepPermissionAndFallbackWording" classname="cn.shike.app.ExecutionResultStateTest" time="0.0"/>
   <testcase name="imageCleanupResults_distinguishSystemConfirmationStates" classname="cn.shike.app.ExecutionResultStateTest" time="0.0"/>
   <testcase name="recordExecutionResult_replacesOnlyMatchingActionAndAppendsLatestResult" classname="cn.shike.app.ExecutionResultStateTest" time="0.0"/>

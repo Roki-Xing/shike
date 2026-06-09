@@ -16,7 +16,7 @@ class BackendAnalysisRunnerTest {
     @Test
     fun backendAnalysisInputForCurrentDraft_usesCaptureSourceSpecificBackendType() {
         val share = backendAnalysisInputForCurrentDraft("文本分享入口（待确认，未落盘）", sampleCourse())
-        val manual = backendAnalysisInputForCurrentDraft("手动输入入口：请编辑 OCR 文本草稿后选择后端解析或离线样例。", sampleCourse())
+        val manual = backendAnalysisInputForCurrentDraft("手动输入：可编辑识别文字后生成行动卡。", sampleCourse())
 
         assertEquals("share_text", share.sourceType)
         assertEquals("manual", manual.sourceType)
@@ -116,7 +116,7 @@ class BackendAnalysisRunnerTest {
         val outcome = backendSuccessOutcome(item)
 
         assertEquals(item, outcome.item)
-        assertEquals("后端 /v1/analyze：活动海报", outcome.source)
-        assertEquals("模型编排：后端解析成功", outcome.statusMessage)
+        assertEquals("云端 AI 解析：活动海报", outcome.source)
+        assertEquals("云端 AI 解析完成", outcome.statusMessage)
     }
 }

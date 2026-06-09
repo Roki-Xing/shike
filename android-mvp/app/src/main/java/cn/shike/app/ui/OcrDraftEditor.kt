@@ -16,7 +16,7 @@ fun OcrDraftEditor(
     OutlinedTextField(
         value = ocrDraft,
         onValueChange = onOcrDraftChange,
-        label = { Text("OCR 文本草稿") },
+        label = { Text("识别到的文字") },
         modifier = Modifier
             .fillMaxWidth()
             .height(132.dp),

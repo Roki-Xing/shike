@@ -104,6 +104,7 @@ def main() -> int:
     capture_mapper_test = read("android-mvp/app/src/test/java/cn/shike/app/data/CaptureImportMapperTest.kt")
     capture_result_test = read("android-mvp/app/src/test/java/cn/shike/app/CaptureResultActionsTest.kt")
     backend_runner = read("android-mvp/app/src/main/java/cn/shike/app/data/BackendAnalysisRunner.kt")
+    backend_outcomes = read("android-mvp/app/src/main/java/cn/shike/app/data/BackendAnalysisOutcomes.kt")
     backend_runner_test = read("android-mvp/app/src/test/java/cn/shike/app/BackendAnalysisRunnerTest.kt")
     verify_backend = read("backend/verify_backend.py")
     regression_cases = read("validation/regression-cases.json")
@@ -150,10 +151,10 @@ def main() -> int:
         ),
         (
             "android_failure_fallback_forbids_sample_tokens",
-            "fallbackItemForRealDraft" in backend_runner
-            and "今天晚上（需确认具体时间）" in backend_runner
-            and "先存入待确认" in backend_runner
-            and "云侧暂不可用，已切换为本地确认" in backend_runner
+            "fallbackItemForRealDraft" in backend_outcomes
+            and "今天晚上（需确认具体时间）" in backend_outcomes
+            and "先存入待确认" in backend_outcomes
+            and "云侧暂不可用，已切换为本地确认" in backend_outcomes
             and "backendFailureOutcomeForRealMathDraft_doesNotInjectCourseSampleFields" in backend_runner_test,
         ),
         (

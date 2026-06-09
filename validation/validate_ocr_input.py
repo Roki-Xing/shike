@@ -52,8 +52,8 @@ def main() -> int:
     checks = [
         ("model_bridge_checks_pass", command_passes(["python3", "shike/validation/validate_model_bridge.py"])),
         ("outlined_text_field_imported", "OutlinedTextField" in android_source),
-        ("ocr_draft_state_present", "var ocrDraft by remember" in android_source),
-        ("ocr_draft_label_visible", "OCR 文本草稿" in android_source),
+        ("ocr_draft_state_present", "var ocrDraft by mutableStateOf" in android_source),
+        ("ocr_draft_label_visible", "识别到的文字" in android_source),
         ("ocr_draft_edit_handler_present", "onOcrDraftChange" in android_source),
         (
             "backend_uses_ocr_draft",
@@ -85,7 +85,7 @@ def main() -> int:
             and "云侧暂不可用，已切换为本地确认" in android_source,
         ),
         ("persist_selection_updates_draft", "ocrDraft = item.rawText" in android_source),
-        ("ocr_input_documented", "OCR 文本草稿" in docs and "编辑" in docs and "/v1/analyze" in docs),
+        ("ocr_input_documented", ("OCR 文本草稿" in docs or "识别到的文字" in docs) and "编辑" in docs and "/v1/analyze" in docs),
     ]
 
     passed = sum(1 for _, ok in checks if ok)

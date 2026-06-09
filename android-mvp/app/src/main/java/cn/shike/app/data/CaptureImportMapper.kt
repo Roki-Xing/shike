@@ -118,7 +118,7 @@ fun itemFromScreenshotCandidate(candidate: ScreenshotCandidate): ShikeItem =
         title = "待解析截图",
         scene = "截图导入",
         startEpochMillis = candidate.createdAtMillis,
-        rawText = "截图助手导入：将自动请求云侧解析，可在 OCR 文本草稿中校对后重试。",
+        rawText = "截图助手导入：将生成行动卡，可在识别到的文字中校对后重试。",
     )
 
 fun screenshotSelectionFromCandidate(candidate: ScreenshotCandidate): CaptureSelection =

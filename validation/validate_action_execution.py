@@ -32,6 +32,8 @@ def main() -> int:
 
     android_source = read_android_source(ROOT)
     main_activity = read("android-mvp/app/src/main/java/cn/shike/app/MainActivity.kt")
+    main_activity_lifecycle = read("android-mvp/app/src/main/java/cn/shike/app/MainActivityLifecycleActions.kt")
+    main_activity_system_actions = read("android-mvp/app/src/main/java/cn/shike/app/MainActivitySystemActions.kt")
     planner_controls = read("android-mvp/app/src/main/java/cn/shike/app/ui/ActionPlannerExecutionControls.kt")
     banner_actions = read("android-mvp/app/src/main/java/cn/shike/app/ui/ConfirmBannerActions.kt")
     execution_action_gate = read("android-mvp/app/src/main/java/cn/shike/app/ui/ExecutionActionGate.kt")
@@ -84,7 +86,7 @@ def main() -> int:
             and "enabled = gate.canUseMap" in planner_controls
             and "enabled = gate.canUseMap" in banner_actions
             and "ClipboardManager" in system_actions
-            and "copyMapLocationFallback" in main_activity,
+            and "copyMapLocationFallback" in main_activity_system_actions,
         ),
         (
             "reminder_uses_alarm_manager_scheduler",
@@ -136,9 +138,9 @@ def main() -> int:
             and "PendingIntent.FLAG_NO_CREATE" in reminder_scheduler
             and "alarmManager.cancel(pendingIntent)" in reminder_scheduler
             and "pendingIntent.cancel()" in reminder_scheduler
-            and "cancelScheduledReminder(this)" in main_activity
-            and "clearInboxSnapshot(this)" in main_activity
-            and "clearBackendBaseUrl(this)" in main_activity,
+            and "cancelScheduledReminder(this)" in main_activity_lifecycle
+            and "clearInboxSnapshot(this)" in main_activity_lifecycle
+            and "clearBackendBaseUrl(this)" in main_activity_lifecycle,
         ),
         (
             "reminder_receiver_registered_and_posts_payload",
@@ -149,11 +151,11 @@ def main() -> int:
         (
             "notification_permission_denial_preserves_card",
             "permission_blocked" in reminder_permission_fallback
-            and "reminderPermissionFallbackCopyFor" in main_activity
+            and "reminderPermissionFallbackCopyFor" in main_activity_system_actions
             and "去开启通知" in execution_action_gate
             and "已保留" in reminder_permission_fallback
-            and "saveReminderPermissionFallback" in main_activity
-            and "saveSnapshot" in main_activity,
+            and "saveReminderPermissionFallback" in main_activity + main_activity_system_actions
+            and "saveSnapshot" in main_activity_system_actions,
         ),
         (
             "execution_result_mentions_scheduled_reminder",
@@ -163,7 +165,7 @@ def main() -> int:
             "external_intents_have_fallback_catches",
             "ActivityNotFoundException" in system_actions
             and "SecurityException" in system_actions
-            and "startSystemActivitySafely" in main_activity,
+            and "startSystemActivitySafely" in main_activity_system_actions,
         ),
         (
             "product_beta_strict_documents_execution_guard",

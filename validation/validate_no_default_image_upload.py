@@ -52,7 +52,7 @@ def function_body(source: str, name: str) -> str:
         Function body including braces, or an empty string if not found.
     """
 
-    match = re.search(rf"\bfun\s+{re.escape(name)}\b", source)
+    match = re.search(rf"\bfun\s+(?:[\w<>]+\.)?{re.escape(name)}\b", source)
     if not match:
         return ""
     equals_index = source.find("=", match.end())
@@ -131,24 +131,31 @@ def main() -> int:
     """Run the no-default-image-upload validation."""
 
     app = read("android-mvp/app/src/main/java/cn/shike/app/ShikeApp.kt")
+    state = read("android-mvp/app/src/main/java/cn/shike/app/ShikeAppState.kt")
+    actions = read("android-mvp/app/src/main/java/cn/shike/app/ShikeAppActions.kt")
+    screen_host = read("android-mvp/app/src/main/java/cn/shike/app/ShikeScreenHost.kt")
     activity = read("android-mvp/app/src/main/java/cn/shike/app/MainActivity.kt")
+    activity_lifecycle = read("android-mvp/app/src/main/java/cn/shike/app/MainActivityLifecycleActions.kt")
+    screenshot_controller = read("android-mvp/app/src/main/java/cn/shike/app/ScreenshotAssistController.kt")
     backend_runner = read("android-mvp/app/src/main/java/cn/shike/app/data/BackendAnalysisRunner.kt")
     model_api = read("android-mvp/app/src/main/java/cn/shike/app/data/ModelApiClient.kt")
+    backend_image_api = read("android-mvp/app/src/main/java/cn/shike/app/data/BackendImageApiClient.kt")
     local_multimodal = read("android-mvp/app/src/main/java/cn/shike/app/ui/LocalMultimodalStatus.kt")
     analyze_image_test = read("android-mvp/app/src/test/java/cn/shike/app/data/AnalyzeImageApiClientTest.kt")
     share_mapper = read("android-mvp/app/src/main/java/cn/shike/app/data/ShareImportMapper.kt")
     capture_mapper = read("android-mvp/app/src/main/java/cn/shike/app/data/CaptureImportMapper.kt")
     observer = read("android-mvp/app/src/main/java/cn/shike/app/system/ScreenshotObserver.kt")
     notification = read("android-mvp/app/src/main/java/cn/shike/app/system/ScreenshotNotification.kt")
+    import_intents = read("android-mvp/app/src/main/java/cn/shike/app/ActivityImportIntents.kt")
     android_doc = read("docs/android-mvp-implementation.md")
     readme = read("README.md")
 
-    manual_entry = property_lambda_body(app, "onManualInput")
-    apply_screenshot_candidate = function_body(app, "applyScreenshotCandidate")
-    consume_shared_image = function_body(activity, "consumeSharedImageIntent")
-    on_screenshot_candidate = function_body(activity, "onScreenshotCandidate")
-    analyze_current_draft = function_body(app, "analyzeCurrentDraftWithBackend")
-    analyze_with_backend = function_body(app, "analyzeWithBackend")
+    manual_entry = function_body(screen_host, "enterManualInput")
+    apply_screenshot_candidate = function_body(actions, "applyScreenshotCandidate") + "\n" + function_body(state, "applyScreenshotCandidate")
+    consume_shared_image = function_body(activity_lifecycle, "consumeSharedImageIntent")
+    on_screenshot_candidate = function_body(screenshot_controller, "onScreenshotCandidate")
+    analyze_current_draft = function_body(actions, "analyzeCurrentDraftWithBackend") + "\n" + function_body(state, "currentBackendInput")
+    analyze_with_backend = function_body(actions, "analyzeWithBackend") + "\n" + function_body(actions, "imagePayloadProviderFor")
     run_backend_analysis = function_body(backend_runner, "runBackendAnalysis")
 
     checks = [
@@ -169,7 +176,9 @@ def main() -> int:
         ),
         Check(
             "shared_image_import_only_creates_candidate",
-            "pendingScreenshotCandidate = ScreenshotCandidate" in consume_shared_image
+            "pendingScreenshotCandidate = screenshotCandidateFromSharedImage" in consume_shared_image
+            and "fun screenshotCandidateFromSharedImage" in import_intents
+            and "ScreenshotCandidate(" in import_intents
             and no_backend_upload_code(consume_shared_image),
             "MainActivity.kt consumeSharedImageIntent",
         ),
@@ -183,21 +192,21 @@ def main() -> int:
         ),
         Check(
             "screenshot_notification_is_user_prompt",
-            "拾刻检测到一张新截图" in notification
-            and "是否交给拾刻生成行动卡" in notification
+            ("拾刻检测到一张新截图" in notification or "检测到截图" in notification)
+            and ("是否交给拾刻生成行动卡" in notification or "是否交给拾刻" in notification)
             and no_backend_upload_code(notification),
             "ScreenshotNotification.kt",
         ),
         Check(
             "foreground_candidate_import_triggers_user_initiated_analysis",
-            "applyScreenshotCandidateSelection" in apply_screenshot_candidate
+            ("applyScreenshotCandidateSelection" in apply_screenshot_candidate or "state.applyScreenshotCandidate" in apply_screenshot_candidate)
             and "persistSelection" in apply_screenshot_candidate
             and "analyzeCurrentDraftWithBackend()" in apply_screenshot_candidate,
             "ShikeApp.kt applyScreenshotCandidate",
         ),
         Check(
             "notification_candidate_only_sets_pending_state",
-            "pendingScreenshotCandidate = candidate" in on_screenshot_candidate
+            ("pendingScreenshotCandidate = candidate" in on_screenshot_candidate or "onCandidateVisible(candidate)" in on_screenshot_candidate)
             and "showScreenshotDetectedNotification" in on_screenshot_candidate
             and no_backend_upload_code(on_screenshot_candidate),
             "MainActivity.kt onScreenshotCandidate",
@@ -208,7 +217,7 @@ def main() -> int:
             and "selectedSourceMediaStoreUri ?: capturedBitmap" in analyze_current_draft
             and "imagePayloadProvider" in analyze_with_backend
             and "onBuildImagePayload(input.imageUri, input.imageSourceType)" in analyze_with_backend
-            and "onBuildBitmapPayload(capturedBitmap!!)" in analyze_with_backend,
+            and ("onBuildBitmapPayload(capturedBitmap!!)" in analyze_with_backend or "onBuildBitmapPayload(state.capturedBitmap!!)" in analyze_with_backend),
             "ShikeApp.kt analyzeCurrentDraftWithBackend/analyzeWithBackend",
         ),
         Check(
@@ -220,12 +229,12 @@ def main() -> int:
         ),
         Check(
             "v2_payload_requires_explicit_image_payload",
-            "fun buildAnalyzeImageRequestPayload" in model_api
-            and ".put(\"image\", JSONObject()" in model_api
-            and "allowCloudImage: Boolean = true" in model_api
-            and ".put(\"allow_cloud_image\", allowCloudImage)" in model_api
-            and "/v2/analyze-image" in model_api,
-            "ModelApiClient.kt",
+            "fun buildAnalyzeImageRequestPayload" in backend_image_api
+            and ".put(\"image\", JSONObject()" in backend_image_api
+            and "allowCloudImage: Boolean = true" in backend_image_api
+            and ".put(\"allow_cloud_image\", allowCloudImage)" in backend_image_api
+            and "/v2/analyze-image" in backend_image_api,
+            "BackendImageApiClient.kt",
         ),
         Check(
             "android_can_disable_cloud_image_upload_for_local_preferred",

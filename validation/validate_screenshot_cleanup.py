@@ -24,7 +24,10 @@ def main() -> int:
     settings = read("android-mvp/app/src/main/java/cn/shike/app/ui/ReadinessSections.kt")
     local_data_clear = read("android-mvp/app/src/main/java/cn/shike/app/LocalDataClearActions.kt")
     activity = read("android-mvp/app/src/main/java/cn/shike/app/MainActivity.kt")
+    activity_system = read("android-mvp/app/src/main/java/cn/shike/app/MainActivitySystemActions.kt")
     app = read("android-mvp/app/src/main/java/cn/shike/app/ShikeApp.kt")
+    app_state = read("android-mvp/app/src/main/java/cn/shike/app/ShikeAppState.kt")
+    app_actions = read("android-mvp/app/src/main/java/cn/shike/app/ShikeAppActions.kt")
     planner = read("android-mvp/app/src/main/java/cn/shike/app/ui/ActionPlannerPanel.kt")
     main_screen = read("android-mvp/app/src/main/java/cn/shike/app/ui/ShikeMainScreen.kt")
     guide = read("docs/SHIKE_CLOUD_DEVICE_PRODUCT_FIX_GUIDE.md")
@@ -90,22 +93,22 @@ def main() -> int:
             and "onDeleteSourceImage" in planner
             and "onKeepSourceImage" in planner
             and "sourceImageCleanupStatus" in main_screen
-            and "selectedSourceMediaStoreUri" in app,
+            and "selectedSourceMediaStoreUri" in app_state,
         ),
         (
             "delete_request_invoked_by_activity_result",
-            "createScreenshotDeleteRequest" in activity
+            "createScreenshotDeleteRequest" in activity_system
             and "StartIntentSenderForResult" in activity
             and "deleteScreenshotLauncher" in activity,
         ),
         (
             "cleanup_status_updates_after_system_confirmation",
-            "updateImageCleanupStatus(ImageCleanupStatus.DELETE_REQUESTED)" in app
+            "state.sourceImageCleanupStatus = ImageCleanupStatus.DELETE_REQUESTED" in app_actions
             and "imageCleanupStatusFromSystem" in app
-            and "ImageCleanupStatus.DELETED -> executionResults.recordExecutionResult" in app
-            and "ImageCleanupStatus.FAILED -> executionResults.recordExecutionResult" in app
-            and "handleImageCleanupStatusFromSystem(ImageCleanupStatus.FAILED)" in activity
-            and "原截图清理：已移入系统回收站" in activity
+            and "ImageCleanupStatus.DELETED -> state.executionResults.recordExecutionResult" in app_actions
+            and "ImageCleanupStatus.FAILED -> state.executionResults.recordExecutionResult" in app_actions
+            and "handleImageCleanupStatusFromSystem(ImageCleanupStatus.FAILED)" in activity_system
+            and "原截图清理：已移入系统回收站" in activity_system
             and "ImageCleanupStatus.DELETED" in activity
             and "ImageCleanupStatus.FAILED" in activity,
         ),
