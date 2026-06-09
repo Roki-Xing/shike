@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="cn.shike.app.data.CaptureImportMapperTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-06-09T12:29:50" hostname="LAPTOP-B84BKQGP" time="0.003">
+<testsuite name="cn.shike.app.data.CaptureImportMapperTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-06-09T13:06:56" hostname="LAPTOP-B84BKQGP" time="0.002">
   <properties/>
-  <testcase name="captureDraftFromInput_preservesOriginalAndThumbnailUrisSeparately" classname="cn.shike.app.data.CaptureImportMapperTest" time="0.0"/>
+  <testcase name="captureDraftFromInput_preservesOriginalAndThumbnailUrisSeparately" classname="cn.shike.app.data.CaptureImportMapperTest" time="0.001"/>
   <testcase name="backendSourceTypeFromCaptureSource_mapsAllProductEntrypoints" classname="cn.shike.app.data.CaptureImportMapperTest" time="0.0"/>
-  <testcase name="captureDraftFromInput_keepsCameraThumbnailOutOfOriginalMediaUri" classname="cn.shike.app.data.CaptureImportMapperTest" time="0.001"/>
+  <testcase name="captureDraftFromInput_keepsCameraThumbnailOutOfOriginalMediaUri" classname="cn.shike.app.data.CaptureImportMapperTest" time="0.0"/>
   <testcase name="gallerySelectionFromImage_startsPendingImageDraftWithoutCourseSample" classname="cn.shike.app.data.CaptureImportMapperTest" time="0.0"/>
   <testcase name="selectionFromCaptureDraft_routesOnlyImageDraftsToPendingImageCards" classname="cn.shike.app.data.CaptureImportMapperTest" time="0.0"/>
   <testcase name="captureDraftDeleteState_tracksSystemConfirmationStates" classname="cn.shike.app.data.CaptureImportMapperTest" time="0.0"/>

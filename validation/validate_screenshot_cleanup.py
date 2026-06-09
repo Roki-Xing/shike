@@ -30,6 +30,7 @@ def main() -> int:
     app_actions = read("android-mvp/app/src/main/java/cn/shike/app/ShikeAppActions.kt")
     planner = read("android-mvp/app/src/main/java/cn/shike/app/ui/ActionPlannerPanel.kt")
     main_screen = read("android-mvp/app/src/main/java/cn/shike/app/ui/ShikeMainScreen.kt")
+    cleanup_state_test = read("android-mvp/app/src/test/java/cn/shike/app/ShikeAppStateCleanupTest.kt")
     guide = read("docs/SHIKE_CLOUD_DEVICE_PRODUCT_FIX_GUIDE.md")
 
     checks = [
@@ -94,6 +95,15 @@ def main() -> int:
             and "onKeepSourceImage" in planner
             and "sourceImageCleanupStatus" in main_screen
             and "selectedSourceMediaStoreUri" in app_state,
+        ),
+        (
+            "cleanup_state_survives_analysis_and_confirmation",
+            "private fun ShikeAppState.persistedImageCleanupStatus" in app_state
+            and "sourceMediaStoreUri = sourceMediaStoreUri" in app_state
+            and "imageCleanupStatus = imageCleanupStatus" in app_state
+            and "applyBackendOutcome_preservesSourceImageCleanupState" in cleanup_state_test
+            and "updateReviewedItem_preservesSourceImageCleanupStateAfterConfirmation" in cleanup_state_test
+            and "ImageCleanupStatus.NOT_REQUESTED" in cleanup_state_test,
         ),
         (
             "delete_request_invoked_by_activity_result",

@@ -141,7 +141,7 @@ Current evidence tokens:
 
 - `FRONTEND_POLISH_METRIC 12/12`
 - `ANDROID_STRUCTURE_METRIC 31/31`
-- `ANDROID_UNIT_TEST_METRIC 86/86`
+- `ANDROID_UNIT_TEST_METRIC 88/88`
 - `ANDROID_IMAGE_PREPROCESS_METRIC 15/15`
 - `LocalMultimodalStatus` covers the optional端侧 3B boundary without claiming the APK bundles a usable model.
 - `LocalMultimodalRuntime` covers the optional runtime contract: `init(multimodal=true) -> callVit -> generate -> schema_valid -> 待确认`, without bundling credentials or claiming the SDK is installed.
@@ -174,7 +174,7 @@ python3 shike/validation/validate_real_world_ready.py
 Current evidence tokens:
 
 - `INBOX_WORKBENCH_LANDING_METRIC 12/12`
-- `ANDROID_UNIT_TEST_METRIC 86/86`
+- `ANDROID_UNIT_TEST_METRIC 88/88`
 - `REAL_WORLD_READY_METRIC 22/22`
 
 ## Stage E - Materials Upgraded To Release Evidence

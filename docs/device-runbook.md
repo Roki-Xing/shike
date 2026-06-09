@@ -8,7 +8,7 @@
 - Android 8.0 及以上设备开启开发者选项和 USB 调试；不要求 vivo 专属权限。
 - 本机已安装 Android platform-tools，构建脚本会安装到 `~/.local/share/shike-android-tools/android-sdk/platform-tools`。
 - Android 结构守卫已通过：`python3 shike/validation/validate_android_structure.py` 输出 `ANDROID_STRUCTURE_METRIC 31/31`。
-- Android 本地单元测试守卫已通过：`python3 shike/validation/validate_android_unit_tests.py` 输出 `ANDROID_UNIT_TEST_METRIC 86/86`；最近一次 `gradle --no-daemon :app:testDebugUnitTest` 通过。
+- Android 本地单元测试守卫已通过：`python3 shike/validation/validate_android_unit_tests.py` 输出 `ANDROID_UNIT_TEST_METRIC 88/88`；最近一次 `gradle --no-daemon :app:testDebugUnitTest` 通过。
 - Android 图片预处理守卫已通过：`python3 shike/validation/validate_android_image_preprocess.py` 输出 `ANDROID_IMAGE_PREPROCESS_METRIC 15/15`，覆盖输入 MIME 魔数识别、非图片拒绝、EXIF 旋转、截图 UI chrome 裁剪、`ImageThumbnailCache` 私有缩略图缓存、JPEG data URL 和 SHA-256 合同。
 - 后端 smoke test 已通过：`python3 shike/backend/verify_backend.py`
 

@@ -64,6 +64,8 @@ def main() -> int:
     initial_selection_test = read("android-mvp/app/src/test/java/cn/shike/app/data/InitialSelectionMapperTest.kt")
     review_status_test = read("android-mvp/app/src/test/java/cn/shike/app/data/ReviewStatusMapperTest.kt")
     review_actions_test = read("android-mvp/app/src/test/java/cn/shike/app/ReviewActionsTest.kt")
+    shike_app_state_source = read("android-mvp/app/src/main/java/cn/shike/app/ShikeAppState.kt")
+    shike_app_state_cleanup_test = read("android-mvp/app/src/test/java/cn/shike/app/ShikeAppStateCleanupTest.kt")
     capture_result_test = read("android-mvp/app/src/test/java/cn/shike/app/CaptureResultActionsTest.kt")
     model_explanation_test = read("android-mvp/app/src/test/java/cn/shike/app/ModelExplanationTest.kt")
     model_api_client_source = read("android-mvp/app/src/main/java/cn/shike/app/data/ModelApiClient.kt")
@@ -445,6 +447,26 @@ def main() -> int:
             test_result_passed(
                 "android-mvp/app/build/test-results/testDebugUnitTest/TEST-cn.shike.app.ReviewActionsTest.xml",
                 "cn.shike.app.ReviewActionsTest",
+                2,
+            ),
+        ),
+        (
+            "shike_app_state_cleanup_state_unit_test_exists",
+            "private fun ShikeAppState.persistedImageCleanupStatus" in shike_app_state_source
+            and "sourceMediaStoreUri = sourceMediaStoreUri" in shike_app_state_source
+            and "imageCleanupStatus = imageCleanupStatus" in shike_app_state_source
+            and "class ShikeAppStateCleanupTest" in shike_app_state_cleanup_test
+            and shike_app_state_cleanup_test.count("@Test") == 2
+            and "applyBackendOutcome_preservesSourceImageCleanupState" in shike_app_state_cleanup_test
+            and "updateReviewedItem_preservesSourceImageCleanupStateAfterConfirmation" in shike_app_state_cleanup_test
+            and "content://media/external/images/media/520" in shike_app_state_cleanup_test
+            and "ImageCleanupStatus.NOT_REQUESTED" in shike_app_state_cleanup_test,
+        ),
+        (
+            "gradle_shike_app_state_cleanup_test_passed",
+            test_result_passed(
+                "android-mvp/app/build/test-results/testDebugUnitTest/TEST-cn.shike.app.ShikeAppStateCleanupTest.xml",
+                "cn.shike.app.ShikeAppStateCleanupTest",
                 2,
             ),
         ),
@@ -1120,7 +1142,7 @@ def main() -> int:
         (
             "android_unit_test_guard_documented",
             "validate_android_unit_tests.py" in docs
-            and "ANDROID_UNIT_TEST_METRIC 86/86" in docs
+            and "ANDROID_UNIT_TEST_METRIC 88/88" in docs
             and "testDebugUnitTest" in docs,
         ),
     ]

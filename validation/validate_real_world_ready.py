@@ -83,7 +83,7 @@ def main() -> int:
                     "validate_android_structure.py",
                     "validate_android_unit_tests.py",
                     "ANDROID_STRUCTURE_METRIC 31/31",
-                    "ANDROID_UNIT_TEST_METRIC 86/86",
+                    "ANDROID_UNIT_TEST_METRIC 88/88",
                 ]
             ),
         ),

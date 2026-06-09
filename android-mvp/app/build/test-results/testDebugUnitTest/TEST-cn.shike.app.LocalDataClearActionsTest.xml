@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="cn.shike.app.LocalDataClearActionsTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-06-09T12:29:49" hostname="LAPTOP-B84BKQGP" time="0.004">
+<testsuite name="cn.shike.app.LocalDataClearActionsTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-06-09T13:06:56" hostname="LAPTOP-B84BKQGP" time="0.003">
   <properties/>
-  <testcase name="requestLocalDataClearConfirmation_requiresSecondAppConfirmation" classname="cn.shike.app.LocalDataClearActionsTest" time="0.002"/>
-  <testcase name="confirmLocalDataClearConfirmation_onlyClearsAfterPromptIsVisible" classname="cn.shike.app.LocalDataClearActionsTest" time="0.001"/>
+  <testcase name="requestLocalDataClearConfirmation_requiresSecondAppConfirmation" classname="cn.shike.app.LocalDataClearActionsTest" time="0.001"/>
+  <testcase name="confirmLocalDataClearConfirmation_onlyClearsAfterPromptIsVisible" classname="cn.shike.app.LocalDataClearActionsTest" time="0.0"/>
   <testcase name="clearedLocalDataState_restoresCloudEnhancementToDefaultEnabled" classname="cn.shike.app.LocalDataClearActionsTest" time="0.001"/>
-  <testcase name="clearedLocalDataState_resetsToCourseSampleAndEmptyTodayState" classname="cn.shike.app.LocalDataClearActionsTest" time="0.0"/>
+  <testcase name="clearedLocalDataState_resetsToCourseSampleAndEmptyTodayState" classname="cn.shike.app.LocalDataClearActionsTest" time="0.001"/>
   <testcase name="clearedLocalDataState_explainsSafeRestartPath" classname="cn.shike.app.LocalDataClearActionsTest" time="0.0"/>
   <testcase name="cancelLocalDataClearConfirmation_keepsCacheAndDismissesPrompt" classname="cn.shike.app.LocalDataClearActionsTest" time="0.0"/>
   <testcase name="clearedLocalDataState_resetsBackendUrlToDefault" classname="cn.shike.app.LocalDataClearActionsTest" time="0.0"/>

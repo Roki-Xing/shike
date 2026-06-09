@@ -8,7 +8,7 @@
 |---|---|---|
 | 构建 APK | `bash shike/android-mvp/build_apk.sh` | 产出 `shike/android-mvp/app/build/outputs/apk/debug/app-debug.apk` |
 | Android 结构守卫 | `python3 shike/validation/validate_android_structure.py` | 输出 `ANDROID_STRUCTURE_METRIC 31/31` |
-| Android 单元测试守卫 | `python3 shike/validation/validate_android_unit_tests.py` | 输出 `ANDROID_UNIT_TEST_METRIC 86/86`；最近一次 `gradle --no-daemon :app:testDebugUnitTest` 已通过 |
+| Android 单元测试守卫 | `python3 shike/validation/validate_android_unit_tests.py` | 输出 `ANDROID_UNIT_TEST_METRIC 88/88`；最近一次 `gradle --no-daemon :app:testDebugUnitTest` 已通过 |
 | Android 图片预处理守卫 | `python3 shike/validation/validate_android_image_preprocess.py` | 输出 `ANDROID_IMAGE_PREPROCESS_METRIC 15/15`；覆盖 `ImagePayloadPreprocessor` 的输入 MIME 魔数识别、非图片拒绝、EXIF 旋转、1600 长边压缩、截图 UI chrome 裁剪、`ImageThumbnailCache` 私有缩略图缓存、JPEG data URL 和 SHA-256 合同 |
 | 执行层守卫 | `python3 shike/validation/validate_action_execution.py` | 输出 `ACTION_EXECUTION_METRIC 18/18` |
 | 总体验收 | `python3 shike/validation/validate_real_world_ready.py` | 输出 `REAL_WORLD_READY_METRIC 22/22` |

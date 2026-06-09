@@ -63,12 +63,32 @@ class ShikeAppState(
     }
 
     fun applyBackendOutcome(outcome: BackendAnalysisOutcome, persist: (ShikeItem, String) -> Unit) {
+        val sourceMediaStoreUri = selectedSourceMediaStoreUri
+        val imageCleanupStatus = persistedImageCleanupStatus(sourceMediaStoreUri)
         capturedBitmap = null
-        modelStatus = applyBackendOutcomeSelection(outcome) { item, source -> persistSelection(item, source, onPersist = persist) }
+        modelStatus = applyBackendOutcomeSelection(outcome) { item, source ->
+            persistSelection(
+                item = item,
+                source = source,
+                sourceMediaStoreUri = sourceMediaStoreUri,
+                imageCleanupStatus = imageCleanupStatus,
+                onPersist = persist,
+            )
+        }
     }
 
     fun updateReviewedItem(item: ShikeItem, persist: (ShikeItem, String) -> Unit) {
-        modelStatus = applyReviewedItemSelection(item) { next, source -> persistSelection(next, source, onPersist = persist) }
+        val sourceMediaStoreUri = selectedSourceMediaStoreUri
+        val imageCleanupStatus = persistedImageCleanupStatus(sourceMediaStoreUri)
+        modelStatus = applyReviewedItemSelection(item) { next, source ->
+            persistSelection(
+                item = next,
+                source = source,
+                sourceMediaStoreUri = sourceMediaStoreUri,
+                imageCleanupStatus = imageCleanupStatus,
+                onPersist = persist,
+            )
+        }
     }
 
     fun applyCourseSample(persist: (ShikeItem, String) -> Unit) {
@@ -97,6 +117,9 @@ class ShikeAppState(
         todayAgendaState = cleared.todayAgendaState
     }
 }
+
+private fun ShikeAppState.persistedImageCleanupStatus(sourceMediaStoreUri: String?): ImageCleanupStatus =
+    if (sourceMediaStoreUri == null) ImageCleanupStatus.NOT_SUPPORTED else sourceImageCleanupStatus
 
 fun ShikeAppState.currentBackendInput(): BackendAnalysisInput {
     val imageUri = selectedSourceMediaStoreUri ?: capturedBitmap?.let { CAMERA_PREVIEW_IMAGE_URI }

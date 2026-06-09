@@ -65,7 +65,7 @@ REQUIRED_TOKENS = (
     "validate_no_fake_device_chrome.py",
     "HOME_ONE_SCREEN_METRIC 9/9",
     "validate_home_one_screen.py",
-    "SCREENSHOT_CLEANUP_METRIC 14/14",
+    "SCREENSHOT_CLEANUP_METRIC 15/15",
     "validate_screenshot_cleanup.py",
     "ANDROID_IMAGE_PREPROCESS_METRIC 15/15",
     "validate_android_image_preprocess.py",

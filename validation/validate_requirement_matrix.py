@@ -63,7 +63,7 @@ STAGE_TOKENS = {
         "FrontendStateComponents",
         "FRONTEND_POLISH_METRIC 12/12",
         "ANDROID_STRUCTURE_METRIC 31/31",
-        "ANDROID_UNIT_TEST_METRIC 86/86",
+        "ANDROID_UNIT_TEST_METRIC 88/88",
     ),
     "stage_d_inbox": (
         "Stage D - Long-Lived Inbox Workbench",

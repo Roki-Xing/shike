@@ -9892,3 +9892,39 @@ Validation:
 
 Next:
 - Reinstall `/mnt/c/Users/Xing/Desktop/Shike-app-debug.apk` and retry "开启截图助手". If the cloud device still refuses foreground service startup, the app should no longer crash; screenshot assist may fall back to foreground Activity observation until permissions/system policy allow the service.
+
+## 2026-06-09 / Preserve Screenshot Cleanup Prompt After Import
+
+Goal: Fix the case where a user imported a screenshot but could not find the "移入系统回收站" option after analysis and confirmation.
+
+Root cause:
+- Gallery/screenshot import stored `selectedSourceMediaStoreUri`, but later backend outcome persistence and reviewed-item confirmation called `persistSelection` without the previous source URI. The default arguments reset `selectedSourceMediaStoreUri` to `null` and `sourceImageCleanupStatus` to `NOT_SUPPORTED`, so `ActionPlannerPanel` could not show `ScreenshotCleanupPrompt`.
+
+Files changed:
+- `ShikeAppState.kt`: preserves source image cleanup state across `applyBackendOutcome` and `updateReviewedItem`.
+- `ShikeAppStateCleanupTest.kt`: adds regression coverage for backend analysis and user confirmation keeping `ImageCleanupStatus.NOT_REQUESTED`.
+- `validate_android_unit_tests.py` and `validate_screenshot_cleanup.py`: guard the cleanup-state retention path.
+- README, current status, demo/checklist, release evidence, and requirement matrix metrics updated to `ANDROID_UNIT_TEST_METRIC 88/88` and `SCREENSHOT_CLEANUP_METRIC 15/15`.
+
+Validation:
+- PASS RED check before fix
+  - Evidence: `ShikeAppStateCleanupTest` failed on both cleanup-state assertions before changing production code.
+- PASS `gradle --no-daemon :app:testDebugUnitTest`
+  - Evidence: `BUILD SUCCESSFUL`; XML summary reports 149 tests, 0 failures, and 0 errors.
+- PASS `python3 validation/validate_android_unit_tests.py`
+  - Evidence: `ANDROID_UNIT_TEST_METRIC 88/88`
+- PASS `python3 validation/validate_screenshot_cleanup.py`
+  - Evidence: `SCREENSHOT_CLEANUP_METRIC 15/15`
+- PASS `python3 validation/validate_action_execution.py`
+  - Evidence: `ACTION_EXECUTION_METRIC 18/18`
+- PASS `python3 validation/validate_real_world_ready.py`
+  - Evidence: `REAL_WORLD_READY_METRIC 22/22`
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC 63/63`
+- PASS APK rebuild and Desktop copy parity
+  - Evidence: `APK_SHA256 733fd972ac7a1d2a0454acb9a37dd48449b48d2475a49e93156e51288dbcca93`
+- PASS `python3 validation/validate_apk_secret_hygiene.py`
+  - Evidence: `APK_SECRET_HYGIENE_METRIC 8/8`
+
+Next:
+- Reinstall `/mnt/c/Users/Xing/Desktop/Shike-app-debug.apk`, import a screenshot, wait for AI parsing, tap "确认并安排", then check the action planner area for "是否把原图移入系统回收站".
