@@ -53,7 +53,8 @@ def main() -> int:
             "manifest_has_media_and_notification_permissions",
             "android.permission.READ_MEDIA_IMAGES" in manifest
             and "android.permission.POST_NOTIFICATIONS" in manifest
-            and "android.permission.FOREGROUND_SERVICE" in manifest,
+            and "android.permission.FOREGROUND_SERVICE" in manifest
+            and "android.permission.FOREGROUND_SERVICE_DATA_SYNC" in manifest,
         ),
         (
             "observer_uses_mediastore_content_observer",
@@ -89,8 +90,11 @@ def main() -> int:
             and "startForeground" in service
             and "ScreenshotObserver(contentResolver" in service
             and "showScreenshotDetectedNotification(this, candidate)" in service
+            and "startForegroundSafely()" in service
+            and "runCatching { stopForeground" in service
             and "startScreenshotAssistService" in controller + lifecycle
             and "canPostScreenshotAssistNotification(activity)" in controller
+            and 'android:foregroundServiceType="dataSync"' in manifest
             and 'android:name=".system.ScreenshotAssistService"' in manifest,
         ),
         (

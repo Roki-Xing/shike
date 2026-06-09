@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="cn.shike.app.ModelApiClientTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-06-09T11:37:18" hostname="LAPTOP-B84BKQGP" time="0.006">
+<testsuite name="cn.shike.app.ModelApiClientTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-06-09T12:29:49" hostname="LAPTOP-B84BKQGP" time="0.059">
   <properties/>
-  <testcase name="itemFromAnalyzeJson_unknownSceneFallsBackToPendingLabel" classname="cn.shike.app.ModelApiClientTest" time="0.005"/>
-  <testcase name="buildAnalyzeRequestPayload_keepsBackendContractFields" classname="cn.shike.app.ModelApiClientTest" time="0.0"/>
-  <testcase name="itemFromAnalyzeJson_courseNoticeCombinesTimeLocationAndActions" classname="cn.shike.app.ModelApiClientTest" time="0.0"/>
+  <testcase name="itemFromAnalyzeJson_unknownSceneFallsBackToPendingLabel" classname="cn.shike.app.ModelApiClientTest" time="0.056"/>
+  <testcase name="buildAnalyzeRequestPayload_keepsBackendContractFields" classname="cn.shike.app.ModelApiClientTest" time="0.001"/>
+  <testcase name="itemFromAnalyzeJson_courseNoticeCombinesTimeLocationAndActions" classname="cn.shike.app.ModelApiClientTest" time="0.001"/>
   <testcase name="buildAnalyzeRequestPayload_mapsExtendedSceneHints" classname="cn.shike.app.ModelApiClientTest" time="0.0"/>
   <testcase name="itemFromAnalyzeJson_eventPosterUsesFallbacksForBlankFields" classname="cn.shike.app.ModelApiClientTest" time="0.0"/>
   <testcase name="actionsFromJson_ignoresBlankAndMalformedActions" classname="cn.shike.app.ModelApiClientTest" time="0.0"/>
   <testcase name="normalizeBackendUrl_stripsPathQueryAndFragment" classname="cn.shike.app.ModelApiClientTest" time="0.0"/>
-  <testcase name="buildAnalyzeRequestPayload_acceptsShareTextAndManualSourceTypes" classname="cn.shike.app.ModelApiClientTest" time="0.0"/>
+  <testcase name="buildAnalyzeRequestPayload_acceptsShareTextAndManualSourceTypes" classname="cn.shike.app.ModelApiClientTest" time="0.001"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

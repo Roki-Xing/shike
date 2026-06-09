@@ -26,7 +26,10 @@ class ScreenshotAssistService : Service() {
             return START_NOT_STICKY
         }
         createScreenshotAssistNotificationChannel(this)
-        startForeground(SCREENSHOT_ASSIST_SERVICE_ID, foregroundNotification())
+        if (!startForegroundSafely()) {
+            stopAssist()
+            return START_NOT_STICKY
+        }
         registerObserver()
         return START_STICKY
     }
@@ -52,9 +55,14 @@ class ScreenshotAssistService : Service() {
     private fun stopAssist() {
         observer?.unregister()
         observer = null
-        stopForeground(STOP_FOREGROUND_REMOVE)
+        runCatching { stopForeground(STOP_FOREGROUND_REMOVE) }
         stopSelf()
     }
+
+    private fun startForegroundSafely(): Boolean =
+        runCatching {
+            startForeground(SCREENSHOT_ASSIST_SERVICE_ID, foregroundNotification())
+        }.isSuccess
 
     private fun foregroundNotification() =
         NotificationCompat.Builder(this, SCREENSHOT_ASSIST_CHANNEL_ID)
@@ -68,9 +76,11 @@ class ScreenshotAssistService : Service() {
 
 fun startScreenshotAssistService(context: Context) {
     val intent = Intent(context, ScreenshotAssistService::class.java).setAction(ACTION_START_SCREENSHOT_ASSIST)
-    ContextCompat.startForegroundService(context, intent)
+    runCatching { ContextCompat.startForegroundService(context, intent) }
 }
 
 fun stopScreenshotAssistService(context: Context) {
-    context.startService(Intent(context, ScreenshotAssistService::class.java).setAction(ACTION_STOP_SCREENSHOT_ASSIST))
+    runCatching {
+        context.startService(Intent(context, ScreenshotAssistService::class.java).setAction(ACTION_STOP_SCREENSHOT_ASSIST))
+    }
 }

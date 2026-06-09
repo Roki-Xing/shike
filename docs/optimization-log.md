@@ -9859,3 +9859,36 @@ Validation:
 
 Next:
 - Install `/mnt/c/Users/Xing/Desktop/Shike-app-debug.apk` on the cloud device and verify the six manual points: screenshot notification appears, tapping it opens parsing progress, no `null` text appears, action-card fields are structured, ordinary user screens hide engineering copy, and confirmed cards offer system-confirmed screenshot cleanup.
+
+## 2026-06-09 / Screenshot Assist Startup Crash Fix
+
+Goal: Fix the crash reported when tapping "开启截图助手" on Android 16/cloud device.
+
+Root cause:
+- The screenshot assistant started a foreground service after the user enabled the feature, but the service lacked an explicit `foregroundServiceType` and the matching foreground-service type permission required by newer Android targets. On Android 14+ / targetSdk 36 devices, this can throw during foreground service startup and crash the app.
+
+Files changed:
+- `AndroidManifest.xml`: added `android.permission.FOREGROUND_SERVICE_DATA_SYNC` and declared `ScreenshotAssistService` with `android:foregroundServiceType="dataSync"`.
+- `ScreenshotAssistService.kt`: wrapped `startForegroundService`, `startForeground`, `stopForeground`, and stop-service dispatch in safe guards so a device-specific foreground-service denial degrades instead of crashing.
+- `validate_screenshot_assist.py`: extended the guard to require the typed foreground-service declaration and safe foreground startup boundary.
+
+Validation:
+- PASS `gradle --no-daemon :app:testDebugUnitTest`
+  - Evidence: `BUILD SUCCESSFUL`
+- PASS `python3 validation/validate_screenshot_assist.py`
+  - Evidence: `SCREENSHOT_ASSIST_METRIC 17/17`
+- PASS `python3 validation/validate_real_world_ready.py`
+  - Evidence: `REAL_WORLD_READY_METRIC 22/22`
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC 63/63`
+- PASS `python3 validation/validate_android_structure.py`
+  - Evidence: `ANDROID_STRUCTURE_METRIC 31/31`
+- PASS `python3 validation/validate_android_unit_tests.py`
+  - Evidence: `ANDROID_UNIT_TEST_METRIC 86/86`
+- PASS APK rebuild and Desktop copy parity
+  - Evidence: `APK_SHA256 2515e88cf03b851854e262574cf5d476dd8a6e1974139f531f9ac2ed97e790f2`
+- PASS `python3 validation/validate_apk_secret_hygiene.py`
+  - Evidence: `APK_SECRET_HYGIENE_METRIC 8/8`
+
+Next:
+- Reinstall `/mnt/c/Users/Xing/Desktop/Shike-app-debug.apk` and retry "开启截图助手". If the cloud device still refuses foreground service startup, the app should no longer crash; screenshot assist may fall back to foreground Activity observation until permissions/system policy allow the service.
