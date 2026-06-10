@@ -22,18 +22,22 @@ def main() -> int:
     model = read_ui("ActionCardUiModel.kt")
     structured = read_ui("StructuredActionCard.kt")
     confirm = read_ui("ParseConfirmPanel.kt")
+    evidence = read("android-mvp/app/src/main/java/cn/shike/app/domain/ActionCardEvidence.kt")
     api_client = read("android-mvp/app/src/main/java/cn/shike/app/data/ModelApiClient.kt")
     model_test = read("android-mvp/app/src/test/java/cn/shike/app/ActionCardUiModelTest.kt")
     image_test = read("android-mvp/app/src/test/java/cn/shike/app/data/AnalyzeImageApiClientTest.kt")
 
     checks = [
         ("action_card_model_present", "data class ActionCardUiModel" in model and "actionCardUiModelFrom" in model),
-        ("model_extracts_structured_evidence", all(token in model for token in ["任务：", "风险：", "待补："])),
+        ("model_extracts_structured_evidence", all(token in model + evidence for token in ["任务：", "风险：", "待补："])),
         ("model_cleans_null_copy", "equals(\"null\", ignoreCase = true)" in model and "split(\" / \")" in model),
-        ("structured_card_fields_present", all(token in structured for token in ["课程/事项", "时间", "地点", "任务", "风险", "缺失项"])),
+        ("model_has_preparation_and_user_warnings", "preparationItems" in model and "userWarnings" in model and "sourceTextPreview" in model),
+        ("structured_card_fields_present", all(token in structured for token in ["课程/事项", "时间", "地点", "任务", "准备事项", "需要确认"])),
+        ("structured_card_hides_raw_risk_labels", "风险" not in structured and "缺失项" not in structured),
         ("confirm_panel_uses_structured_card", "StructuredActionCard(actionCard)" in confirm and "来源文本" not in confirm),
-        ("api_maps_task_risk_missing", all(token in api_client for token in ["任务：$it", "风险：$it", "待补：$it"])),
+        ("api_maps_task_preparation_risk_missing", all(token in api_client for token in ["任务：$it", "准备：", "风险：$it", "待补：$it"])),
         ("unit_tests_cover_null_and_evidence", "ActionCardUiModelTest" in model_test and "contains(\"null\"" in model_test),
+        ("flexible_tests_cover_preparation", (ROOT / "android-mvp/app/src/test/java/cn/shike/app/FlexibleActionCardTest.kt").read_text(encoding="utf-8").count("@Test") == 2),
         ("image_mapping_test_covers_deadline_null", "JSONObject.NULL" in image_test and "assertFalse(item.time.contains(\"null\"))" in image_test),
     ]
 

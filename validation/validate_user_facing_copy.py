@@ -39,6 +39,10 @@ FORBIDDEN_USER_COPY = [
     "后端地址",
     "交付物自检中心",
     "3分钟演示路线",
+    "schema_valid",
+    "manual_review",
+    "provider_error",
+    "risk code",
 ]
 
 
@@ -91,7 +95,8 @@ def main() -> int:
             "ordinary_flow_has_product_progress_and_structured_card",
             "正在把截图变成行动卡" in user_copy
             and "课程/事项" in user_copy
-            and "缺失项" in user_copy
+            and "准备事项" in user_copy
+            and "需要确认" in user_copy
             and "识别到的文字" in user_copy,
         ),
         (

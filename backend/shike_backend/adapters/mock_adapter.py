@@ -367,6 +367,10 @@ class MockModelAdapter:
         if "高数" in text:
             suffix = " A" if "高数A" in text or "高数 A" in text else ""
             return f"上高数{suffix}".strip()
+        match = re.search(r"(?<!早)(?<!晚)上([\u4e00-\u9fa5A-Za-z0-9]{1,16}?)(?:课|课程|教室|地点|在|，|,|\s|$)", text)
+        if match:
+            subject = match.group(1).strip()
+            return subject if subject.endswith("课") else f"{subject}课"
         match = re.search(r"([\u4e00-\u9fa5A-Za-z0-9]{1,12})(?:课|课程|上课)", text)
         if match:
             return f"{match.group(1)}课"

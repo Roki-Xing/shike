@@ -1,6 +1,7 @@
 package cn.shike.app.system
 
 import cn.shike.app.domain.ShikeItem
+import cn.shike.app.domain.reminderDetailFor
 import kotlin.math.max
 
 private const val REMINDER_LEAD_MILLIS = 15 * 60 * 1000L
@@ -85,8 +86,6 @@ fun reminderDeliveryPayloadFrom(title: String?, detail: String?, notificationId:
         notificationId = notificationId ?: safeTitle.hashCode(),
     )
 }
-
-private fun reminderDetailFor(item: ShikeItem): String = "${item.time} · ${item.location}"
 
 private fun scheduledReminderTriggerAtMillis(startEpochMillis: Long, nowMillis: Long): Long =
     max(nowMillis + MINIMUM_FUTURE_DELAY_MILLIS, startEpochMillis - REMINDER_LEAD_MILLIS)

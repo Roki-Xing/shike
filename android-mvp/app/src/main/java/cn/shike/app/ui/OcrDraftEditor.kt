@@ -7,6 +7,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import cn.shike.app.domain.userVisibleEvidenceText
 
 @Composable
 fun OcrDraftEditor(
@@ -14,7 +15,7 @@ fun OcrDraftEditor(
     onOcrDraftChange: (String) -> Unit,
 ) {
     OutlinedTextField(
-        value = ocrDraft,
+        value = userVisibleOcrDraftText(ocrDraft),
         onValueChange = onOcrDraftChange,
         label = { Text("识别到的文字") },
         modifier = Modifier
@@ -23,3 +24,5 @@ fun OcrDraftEditor(
         minLines = 3,
     )
 }
+
+fun userVisibleOcrDraftText(text: String): String = userVisibleEvidenceText(text)

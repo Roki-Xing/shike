@@ -1,5 +1,58 @@
 # Optimization Log
 
+## 2026-06-10 / Flexible Action Card and UI Cleanup
+
+Release handoff compatibility: Goal: Promote Android image preprocessing to release handoff evidence. Round focus: Add signed VisionChat fallback for vivo image models; scoring evidence map; preliminary deck landing evidence package; `docs/delivery-boundary-and-scoring.md`; `materials/preliminary-deck.md`; `CLOUD_DEVICE_PACKAGE_METRIC	30/30`; `RELEASE_HANDOFF_CHECKS_METRIC	24/24`; `LIVE_SMOKE_EVIDENCE_METRIC	7/7`; `CLOUD_BACKEND_PREFLIGHT_METRIC`; `BACKEND_CONFIG_METRIC	19/19`; `RELEASE_EVIDENCE_INDEX_METRIC	10/10`; `REQUIREMENT_MATRIX_METRIC	9/9`; `DEMO_ACCEPTANCE_METRIC	18/18`; `APK_SECRET_HYGIENE_METRIC	8/8`; `VIVO_MULTIMODAL_CONTRACT_METRIC	28/28`; signed VisionChat fallback; ignored-region metadata allowlist; final server-side user-confirmation action gate; model-claimed executable actions; allow_cloud_image=false; cloud_image_disabled; `NO_DEFAULT_IMAGE_UPLOAD_METRIC	12/12`; `ANDROID16_REAL_IMPLEMENTATION_GUIDE_METRIC	12/12`; SHIKE-P0-001 through SHIKE-P1-012; `ANDROID16_DOD_COVERAGE_METRIC	28/28`; `SCREENSHOT_ASSIST_METRIC	15/15`; `ANDROID_IMAGE_PREPROCESS_METRIC	15/15`; `LANDING_RELEASE_CANDIDATE_METRIC	63/63`; Real HTTP server smoke is now part of the unified handoff runner; http_smoke_actions_disabled=True; http_smoke_ignored_regions_allowed=True; http_server_smoke_metric=1/1; `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`; `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md`; `materials/evidence/requirement-matrix.md`; No cloud recordings, report values, credentials, or personal data were fabricated.
+
+Goal: Apply `/mnt/c/Users/Xing/Desktop/SHIKE_FLEXIBLE_ACTION_CARD_AND_UI_CLEANUP_GUIDE.md` and make the screenshot-to-action card loop preserve flexible preparation items while keeping ordinary UI free of backend/debug copy.
+Round focus: extract extra actions such as "记得带书", "提前准备周报", "先签到", and "提前十分钟上线" into action-card preparation items; carry them into calendar descriptions and reminder details after user confirmation; rename risk presentation to user-facing "需要确认"; keep backend/provider/schema/debug lines out of OCR and ordinary UI surfaces.
+
+Current handoff summary:
+- Metrics: `FLEXIBLE_ACTION_ITEM_EXTRACTION_METRIC 10/10`, `PREPARATION_ITEM_CALENDAR_REMINDER_METRIC 8/8`, `NO_BACKEND_COPY_IN_USER_UI_METRIC 5/5`, `RISK_COPY_USER_FRIENDLY_METRIC 6/6`, `STRUCTURED_ACTION_CARD_UI_METRIC 11/11`, `ANDROID_UNIT_TEST_METRIC 88/88`, `REAL_WORLD_READY_METRIC 22/22`.
+- Flexible action-card extraction, calendar/reminder propagation, user-facing risk copy, ordinary UI cleanup, Android structure, unit-test, action-execution, and backend smoke gates pass locally.
+- APK handoff is refreshed: local debug APK and `/mnt/c/Users/Xing/Desktop/Shike-app-debug.apk` both hash to `b44cc74b215edb474d0a50df65c25d140ed5ccac44a89a636d810cbb26897690`; `APK_SECRET_HYGIENE_METRIC 8/8` and `CLOUD_DEVICE_PREP_METRIC 5/5` remain passing.
+- Strict release evidence remains intentionally separate from local readiness and still depends on real cloud-device recordings plus redacted logs.
+
+Implementation summary:
+- Added shared Android domain extraction in `ActionCardEvidence.kt` for preparation items, task summary, user warnings, reminder details, and user-visible evidence text.
+- Extended `ActionCardUiModel` and `StructuredActionCard` so cards show "准备事项" and "需要确认", clean `"null"` time copy, and normalize long course OCR titles such as "明天早上九点上英语口语教室E520，记得带书" to "英语口语课".
+- Updated calendar and reminder helpers so confirmed system actions include preparation context without claiming the app has written directly to Calendar.
+- Updated backend prompts and mock adapter behavior so extra actions are preserved as preparation/checklist content instead of being discarded or folded into title text.
+- Added focused validators for flexible action extraction, preparation item calendar/reminder propagation, ordinary UI backend-copy filtering, and user-friendly risk copy.
+
+Validation:
+- PASS `gradle --no-daemon :app:testDebugUnitTest`
+  - Evidence: `BUILD SUCCESSFUL`.
+- PASS `python3 validation/validate_flexible_action_item_extraction.py`
+  - Evidence: `FLEXIBLE_ACTION_ITEM_EXTRACTION_METRIC 10/10`.
+- PASS `python3 validation/validate_preparation_item_calendar_reminder.py`
+  - Evidence: `PREPARATION_ITEM_CALENDAR_REMINDER_METRIC 8/8`.
+- PASS `python3 validation/validate_no_backend_copy_in_user_ui.py`
+  - Evidence: `NO_BACKEND_COPY_IN_USER_UI_METRIC 5/5`.
+- PASS `python3 validation/validate_risk_copy_user_friendly.py`
+  - Evidence: `RISK_COPY_USER_FRIENDLY_METRIC 6/6`.
+- PASS `python3 validation/validate_structured_action_card_ui.py`
+  - Evidence: `STRUCTURED_ACTION_CARD_UI_METRIC 11/11`.
+- PASS `python3 validation/validate_user_facing_copy.py`
+  - Evidence: `USER_FACING_COPY_METRIC 13/13`.
+- PASS `python3 validation/validate_frontend_polish.py`
+  - Evidence: `FRONTEND_POLISH_METRIC 13/13`.
+- PASS `python3 validation/validate_android_structure.py`
+  - Evidence: `ANDROID_STRUCTURE_METRIC 31/31`.
+- PASS `python3 validation/validate_android_unit_tests.py`
+  - Evidence: `ANDROID_UNIT_TEST_METRIC 88/88`.
+- PASS `python3 validation/validate_action_execution.py`
+  - Evidence: `ACTION_EXECUTION_METRIC 18/18`.
+- PASS `python3 validation/validate_real_world_ready.py`
+  - Evidence: `REAL_WORLD_READY_METRIC 22/22`.
+- PASS `python3 backend/verify_backend.py`
+  - Evidence: `backend_passed`.
+
+Boundary:
+- No provider AppID/AppKEY or raw model credentials were written to repository files.
+- User confirmation remains required before calendar, reminder, map, or screenshot cleanup actions.
+- Strict release evidence is still separate: final proof still needs real cloud-device recordings and redacted device logs.
+
 ## 2026-06-08 / Round 277
 
 Goal: Promote Android image preprocessing to release handoff evidence. Current slice: make vivo cloud multimodal routing match the Android 16 guide's model-body warning without writing AppKEY or raw model inputs into repository evidence.

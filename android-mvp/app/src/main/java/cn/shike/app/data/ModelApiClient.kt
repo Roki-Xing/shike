@@ -58,6 +58,12 @@ fun itemFromAnalyzeJson(
     val location = json.optJSONObject("location")
     val explanation = json.safeString("explanation").ifBlank { fallbackText }
     val timeText = displayTimeFrom(time)
+    val preparationItems = preparationItemsFromJson(json)
+    val taskSummary = json.optJSONObject("task")?.safeString("summary").orEmpty()
+    val reviewTail = listOfNotNull(
+        taskSummary.takeIf { it.isNotBlank() }?.let { "任务：$it" },
+        preparationItems.takeIf { it.isNotEmpty() }?.let { "准备：${it.joinToString("、")}" },
+    ).joinToString("\n")
     return ShikeItem(
         title = json.safeString("title").ifBlank { "待确认碎片" },
         scene = scene,
@@ -66,7 +72,9 @@ fun itemFromAnalyzeJson(
         status = "待确认",
         actions = actionsFromJson(json.optJSONArray("suggested_actions")),
         startEpochMillis = startEpochMillisFromTime(time, fallbackText, referenceNowMillis, zoneId),
-        rawText = "云端 AI 解析：$explanation",
+        rawText = listOf("云端 AI 解析：$explanation", reviewTail)
+            .filter { it.isNotBlank() }
+            .joinToString("\n"),
     )
 }
 
@@ -91,11 +99,13 @@ fun itemFromAnalyzeImageJson(
     val task = json.optJSONObject("task")
     val explanation = json.safeString("explanation").ifBlank { fallbackText }
     val taskSummary = task?.safeString("summary").orEmpty()
+    val preparationItems = preparationItemsFromJson(json)
     val risks = stringsFromJson(json.optJSONArray("risks")).joinToString("；")
     val missingFields = stringsFromJson(json.optJSONArray("missing_fields")).joinToString("、")
     val timeText = displayTimeFrom(time)
     val reviewTail = listOfNotNull(
         taskSummary.takeIf { it.isNotBlank() }?.let { "任务：$it" },
+        preparationItems.takeIf { it.isNotEmpty() }?.let { "准备：${it.joinToString("、")}" },
         risks.takeIf { it.isNotBlank() }?.let { "风险：$it" },
         missingFields.takeIf { it.isNotBlank() }?.let { "待补：$it" },
     ).joinToString("\n")
@@ -128,6 +138,24 @@ fun stringsFromJson(values: JSONArray?): List<String> {
     }
     return (0 until values.length()).mapNotNull { index ->
         values.safeArrayString(index).takeIf { it.isNotBlank() }
+    }
+}
+
+fun preparationItemsFromJson(json: JSONObject): List<String> {
+    val directItems = stringsFromJson(json.optJSONArray("preparation_items"))
+    val checklistItems = checklistItemTextsFromJson(json.optJSONArray("checklist_items"))
+    return (directItems + checklistItems)
+        .map { it.trim() }
+        .filter { it.isNotBlank() }
+        .distinct()
+}
+
+private fun checklistItemTextsFromJson(values: JSONArray?): List<String> {
+    if (values == null || values.length() == 0) {
+        return emptyList()
+    }
+    return (0 until values.length()).mapNotNull { index ->
+        values.optJSONObject(index)?.safeString("text")?.takeIf { it.isNotBlank() }
     }
 }
 
@@ -170,18 +198,13 @@ fun sceneHint(scene: String): String =
 fun normalizeBackendUrl(url: String): String {
     val trimmed = url.trim()
     if (trimmed.isBlank()) return DEFAULT_BACKEND_BASE_URL
-
     val withScheme =
         if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) trimmed
         else "http://$trimmed"
-
     val uri = runCatching { URI(withScheme) }.getOrNull()
     val host = uri?.host
     val port = uri?.port ?: -1
-    if (uri == null || host.isNullOrBlank()) {
-        return withScheme.trimEnd('/')
-    }
-
+    if (uri == null || host.isNullOrBlank()) return withScheme.trimEnd('/')
     val base = buildString {
         append(uri.scheme)
         append("://")

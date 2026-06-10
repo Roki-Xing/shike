@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="cn.shike.app.data.ShareImportMapperTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-06-09T13:47:44" hostname="LAPTOP-B84BKQGP" time="0.0">
+<testsuite name="cn.shike.app.data.ShareImportMapperTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-06-10T04:15:00" hostname="LAPTOP-B84BKQGP" time="0.001">
   <properties/>
   <testcase name="itemFromSharedText_activityTextMapsToEventReviewCard" classname="cn.shike.app.data.ShareImportMapperTest" time="0.0"/>
   <testcase name="sharedTextCaptureDraft_keepsShareChannelAndRawText" classname="cn.shike.app.data.ShareImportMapperTest" time="0.0"/>

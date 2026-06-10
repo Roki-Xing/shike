@@ -14,6 +14,9 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.toUri
 import cn.shike.app.domain.ShikeItem
+import cn.shike.app.domain.preparationItemsFrom
+import cn.shike.app.domain.reminderDetailFor
+import cn.shike.app.domain.taskSummaryFrom
 
 internal const val REMINDER_CHANNEL_ID = "shike_reminders"
 
@@ -36,7 +39,13 @@ data class CalendarDraft(
  *     Calendar event description that avoids claiming the event was saved.
  */
 fun calendarInsertDescriptionFor(item: ShikeItem): String =
-    "由拾刻从${item.scene}解析，用户确认后打开系统日历新增页，由用户在日历中保存。"
+    buildList {
+        add("来源：拾刻识别")
+        taskSummaryFrom(item).takeIf { it.isNotBlank() }?.let { add("任务：$it") }
+        item.location.takeIf { it.isNotBlank() && it != "待确认" }?.let { add("地点：$it") }
+        preparationItemsFrom(item).takeIf { it.isNotEmpty() }?.let { add("准备事项：${it.joinToString("、")}") }
+        add("说明：已由用户确认后打开系统日历新增页，由用户在日历中保存。")
+    }.joinToString("\n")
 
 fun calendarDraftFrom(item: ShikeItem): CalendarDraft {
     val hasConcreteTime = item.startEpochMillis > 0L && item.time.isNotBlank() && item.time != "待确认"
@@ -155,7 +164,7 @@ fun showReminderNotification(context: Context, item: ShikeItem) {
         context = context,
         notificationId = item.title.hashCode(),
         title = item.title,
-        detail = "${item.time} · ${item.location}",
+        detail = reminderDetailFor(item),
     )
 }
 

@@ -127,7 +127,8 @@ def main() -> int:
             "data class ActionCardUiModel" in read("ActionCardUiModel.kt")
             and "fun StructuredActionCard" in read("StructuredActionCard.kt")
             and "课程/事项" in read("StructuredActionCard.kt")
-            and "缺失项" in read("StructuredActionCard.kt"),
+            and "准备事项" in read("StructuredActionCard.kt")
+            and "需要确认" in read("StructuredActionCard.kt"),
             "structured action card",
         ),
     ]

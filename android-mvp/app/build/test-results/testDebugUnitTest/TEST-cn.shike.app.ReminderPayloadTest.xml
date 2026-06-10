@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="cn.shike.app.ReminderPayloadTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-06-09T13:47:44" hostname="LAPTOP-B84BKQGP" time="0.003">
+<testsuite name="cn.shike.app.ReminderPayloadTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-06-10T04:15:00" hostname="LAPTOP-B84BKQGP" time="0.002">
   <properties/>
   <testcase name="scheduledReminderFrom_keepsStablePayloadFields" classname="cn.shike.app.ReminderPayloadTest" time="0.001"/>
   <testcase name="shouldRestoreScheduledReminder_rejectsExpiredPayload" classname="cn.shike.app.ReminderPayloadTest" time="0.0"/>

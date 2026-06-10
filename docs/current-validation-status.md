@@ -1,9 +1,10 @@
 # Current Validation Status
 
-Date: 2026-06-09
+Date: 2026-06-10
 Guide: `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md`  
 Deep review guide applied this round: `/mnt/c/Users/Xing/Desktop/SHIKE_PRODUCT_MANAGER_DEEP_REVIEW_GUIDE.md`
 Calendar/UI guide applied this round: `/mnt/c/Users/Xing/Desktop/SHIKE_CALENDAR_AND_UI_PRODUCT_FIX_GUIDE.md`
+Flexible action-card guide applied this round: `/mnt/c/Users/Xing/Desktop/SHIKE_FLEXIBLE_ACTION_CARD_AND_UI_CLEANUP_GUIDE.md`
 Guide source availability: the expected desktop source file was restored from the Windows recycle bin and is currently readable in this closeout audit; see `materials/evidence/desktop-guidance-source-status.md`. The local matrix remains useful for repository evidence traceability, while strict external cloud-device evidence remains blocked.
 Scope: Desktop guidance stages A-E: BlueLM credible evidence, cloud-device and HTTPS backend evidence, frontend productization, long-lived inbox workbench, and materials upgraded to a release evidence package. Historical S2/S3 hardening remains part of the evidence base, but the current public status is anchored to `materials/evidence/requirement-matrix.md` and `REQUIREMENT_MATRIX_METRIC 9/9`.
 
@@ -12,6 +13,8 @@ Scope: Desktop guidance stages A-E: BlueLM credible evidence, cloud-device and H
 This closeout pass focused on the real screenshot-to-action product loop: no real gallery/screenshot path may fall back to fixed `MockOcrEngine` / `sampleCourse` values, the home import path now stays on the home screen with staged AI parsing progress, the Android UI displays structured action-card fields without `"null"` copy, screenshot assist uses opt-in MediaStore observation plus a high-priority notification, and ordinary user screens hide backend endpoint, Mock, validation, self-check, and demo tooling copy.
 
 This calendar/UI pass additionally fixed Android calendar prefill ownership: `/v1/analyze` and `/v2/analyze-image` results now derive `startEpochMillis` from `time.normalized_start` or common Chinese relative time such as "明天早上九点" using `Asia/Shanghai`; missing concrete time leaves the calendar/reminder actions disabled instead of falling back to sample epochs. The home route no longer mounts the full confirmation form or action planner; those remain in the import/confirm flow so the first screen stays focused on today action, pending review, import entry, and staged parsing progress.
+
+This flexible action-card pass keeps extra user obligations in the product loop: phrases such as "记得带书", "提前准备周报", "先签到", and "提前十分钟上线" are extracted as preparation items instead of being dropped or stuffed into the title. The Android UI now presents "准备事项" and user-facing "需要确认" prompts, while calendar descriptions and reminder details carry the preparation items after user confirmation.
 
 Fresh local evidence from this pass:
 
@@ -26,7 +29,11 @@ Fresh local evidence from this pass:
 | `python3 validation/validate_real_ocr_routing.py` | PASS | `REAL_OCR_ROUTING_METRIC 3/3` |
 | `python3 validation/validate_no_default_image_upload.py` | PASS | `NO_DEFAULT_IMAGE_UPLOAD_METRIC 12/12` |
 | `python3 validation/validate_analyze_progress_ui.py` | PASS | `ANALYZE_PROGRESS_UI_METRIC 7/7` |
-| `python3 validation/validate_structured_action_card_ui.py` | PASS | `STRUCTURED_ACTION_CARD_UI_METRIC 8/8` |
+| `python3 validation/validate_flexible_action_item_extraction.py` | PASS | `FLEXIBLE_ACTION_ITEM_EXTRACTION_METRIC 10/10` |
+| `python3 validation/validate_preparation_item_calendar_reminder.py` | PASS | `PREPARATION_ITEM_CALENDAR_REMINDER_METRIC 8/8` |
+| `python3 validation/validate_no_backend_copy_in_user_ui.py` | PASS | `NO_BACKEND_COPY_IN_USER_UI_METRIC 5/5` |
+| `python3 validation/validate_risk_copy_user_friendly.py` | PASS | `RISK_COPY_USER_FRIENDLY_METRIC 6/6` |
+| `python3 validation/validate_structured_action_card_ui.py` | PASS | `STRUCTURED_ACTION_CARD_UI_METRIC 11/11` |
 | `python3 validation/validate_screenshot_assist.py` | PASS | `SCREENSHOT_ASSIST_METRIC 17/17` |
 | `python3 validation/validate_user_facing_copy.py` | PASS | `USER_FACING_COPY_METRIC 13/13` |
 | `python3 validation/validate_calendar_prefill_accuracy.py` | PASS | `CALENDAR_PREFILL_ACCURACY_METRIC 9/9` |
@@ -39,8 +46,8 @@ Fresh local evidence from this pass:
 | `python3 validation/validate_advanced_product_beta.py --strict` | PASS | `PRODUCT_BETA_METRIC 30/30` |
 | `python3 validation/validate_secret_hygiene.py` | PASS | `PASS secret_hygiene` |
 | `python3 validation/validate_apk_secret_hygiene.py` | PASS | `APK_SECRET_HYGIENE_METRIC 8/8` |
-| `gradle --no-daemon :app:testDebugUnitTest` from `shike/android-mvp/` | PASS | `BUILD SUCCESSFUL`; local unit suites report 149 tests, 0 failures, 0 errors |
-| `bash android-mvp/build_apk.sh` | PASS | APK copied to `/mnt/c/Users/Xing/Desktop/Shike-app-debug.apk`; local and Desktop SHA-256 both `82c91686512ab0c9347a3837980ca9261eff95b293d7060325f41bd265e868e7` |
+| `gradle --no-daemon :app:testDebugUnitTest` from `shike/android-mvp/` | PASS | `BUILD SUCCESSFUL`; local unit suites report 157 tests, 0 failures, 0 errors |
+| `bash android-mvp/build_apk.sh` | PASS | APK copied to `/mnt/c/Users/Xing/Desktop/Shike-app-debug.apk`; local and Desktop SHA-256 both `b44cc74b215edb474d0a50df65c25d140ed5ccac44a89a636d810cbb26897690` |
 
 Strict external cloud-device evidence remains a separate manual recording gate: the local repository and APK gates pass, but final release proof still requires real cloud-device MP4s, filled report fields, and redacted logcat evidence before strict release status can be claimed.
 
@@ -179,8 +186,8 @@ All commands below were run from `/home/xing-12_26/projects/codex-workspace`.
 | `python3 shike/validation/validate_landing_release_candidate.py` | PASS | `LANDING_RELEASE_CANDIDATE_METRIC 63/63`; default local release-candidate now runs both `validate_backend_audit_log.py` and `validate_live_smoke_evidence.py` directly, so metadata-only backend logging and the redacted private-env live smoke are covered by the main gate as well as the release handoff runner |
 | `python3 shike/validation/validate_landing_release_candidate.py --strict` | BLOCKED | `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE 3/7`; still missing real cloud-device videos, filled report, and redacted logcat |
 | `python3 shike/scripts/verify_core20_package.py "$tmp_core20_package"` | PASS | `CORE20_FILE_COUNT 20/20`; structure/action/unit-test guard references pass |
-| `bash shike/android-mvp/build_apk.sh` | PASS | APK rebuilt with the project-local Gradle/JDK/SDK toolchain; local APK and `/mnt/c/Users/Xing/Desktop/Shike-app-debug.apk` SHA-256 both `733fd972ac7a1d2a0454acb9a37dd48449b48d2475a49e93156e51288dbcca93` |
-| `gradle --no-daemon :app:testDebugUnitTest` from `shike/android-mvp/` | PASS | `BUILD SUCCESSFUL`; local unit suites report 149 tests, 0 failures, 0 errors |
+| `bash shike/android-mvp/build_apk.sh` | PASS | APK rebuilt with the project-local Gradle/JDK/SDK toolchain; local APK and `/mnt/c/Users/Xing/Desktop/Shike-app-debug.apk` SHA-256 both `b44cc74b215edb474d0a50df65c25d140ed5ccac44a89a636d810cbb26897690` |
+| `gradle --no-daemon :app:testDebugUnitTest` from `shike/android-mvp/` | PASS | `BUILD SUCCESSFUL`; local unit suites report 157 tests, 0 failures, 0 errors |
 
 ## Current Strengths
 

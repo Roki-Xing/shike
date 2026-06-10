@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="cn.shike.app.TodayActionItemMapperTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-06-09T13:47:44" hostname="LAPTOP-B84BKQGP" time="0.002">
+<testsuite name="cn.shike.app.TodayActionItemMapperTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-06-10T04:15:00" hostname="LAPTOP-B84BKQGP" time="0.003">
   <properties/>
-  <testcase name="todayActionItemFrom_scheduledItemUsesRouteActionAndConfirmedFooter" classname="cn.shike.app.TodayActionItemMapperTest" time="0.001"/>
+  <testcase name="todayActionItemFrom_scheduledItemUsesRouteActionAndConfirmedFooter" classname="cn.shike.app.TodayActionItemMapperTest" time="0.002"/>
   <testcase name="todayActionItemFrom_dueSoonItemKeepsDeadlineActionAndReviewFooter" classname="cn.shike.app.TodayActionItemMapperTest" time="0.001"/>
   <testcase name="todayActionItemFrom_pendingItemFallsBackToPrimaryActionOrDetail" classname="cn.shike.app.TodayActionItemMapperTest" time="0.0"/>
   <system-out><![CDATA[]]></system-out>

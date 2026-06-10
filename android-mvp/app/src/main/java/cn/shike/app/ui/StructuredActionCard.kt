@@ -16,14 +16,14 @@ fun StructuredActionCard(model: ActionCardUiModel) {
         KeyValue("时间", model.time)
         KeyValue("地点", model.location)
         KeyValue("任务", model.task)
+        if (model.preparationItems.isNotEmpty()) {
+            KeyValue("准备事项", model.preparationItems.joinToString("、"))
+        }
         ActionPillRow(model.actions)
-        if (model.risks.isNotEmpty()) {
-            KeyValue("风险", model.risks.joinToString("；"))
+        if (model.userWarnings.isNotEmpty()) {
+            KeyValue("需要确认", model.userWarnings.joinToString("；"))
         }
-        if (model.missingFields.isNotEmpty()) {
-            KeyValue("缺失项", model.missingFields.joinToString("、"))
-        }
-        if (model.risks.isEmpty() && model.missingFields.isEmpty()) {
+        if (model.userWarnings.isEmpty()) {
             Text("关键字段已可确认；系统动作仍需用户手动确认。", style = ShikeTypography.Caption)
         }
     }
