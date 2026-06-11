@@ -85,6 +85,23 @@
       "type": "array",
       "items": {"type": "string"}
     },
+    "preparation_items": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "checklist_items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["text", "source", "confidence"],
+        "additionalProperties": false,
+        "properties": {
+          "text": {"type": "string", "minLength": 1},
+          "source": {"type": "string", "enum": ["vision", "ocr", "user_edit", "rule"]},
+          "confidence": {"type": "number", "minimum": 0, "maximum": 1}
+        }
+      }
+    },
     "explanation": {
       "type": "string",
       "minLength": 1

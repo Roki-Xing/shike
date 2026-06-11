@@ -17,6 +17,7 @@ from shike_backend.adapters.vivo_cloud_multimodal_adapter import VivoCloudMultim
 from shike_backend.adapters.vivo_ocr_adapter import VivoOcrAdapter, fallback_ocr_response
 from shike_backend.audit_log import build_analyze_image_audit_event
 from shike_backend.image_preprocess import filter_ocr_blocks
+from shike_backend.preparation import enrich_preparation_payload
 from shike_backend.schemas import AnalyzeRequest, AnalyzeResponse, OcrRequest, OcrResponse, load_model_output_schema
 from shike_backend.schemas_v2 import (
     AnalyzeImageRequest,
@@ -195,6 +196,36 @@ def _require_user_confirmation_for_card(card: ParsedActionCard) -> ParsedActionC
     return card.model_copy(
         update={"suggested_actions": _disable_actions_until_user_confirmation(card.suggested_actions)}
     )
+
+
+def _response_with_preparation(response: AnalyzeResponse, evidence_texts: list[str]) -> AnalyzeResponse:
+    """Fill preparation fields from model output and OCR evidence.
+
+    Args:
+        response: Text-analysis response.
+        evidence_texts: OCR or user-entered evidence text.
+
+    Returns:
+        Response with preparation/checklist fields populated when supported by evidence.
+    """
+
+    payload = enrich_preparation_payload(response.model_dump(), evidence_texts)
+    return AnalyzeResponse.model_validate(payload)
+
+
+def _card_with_preparation(card: ParsedActionCard, evidence_texts: list[str]) -> ParsedActionCard:
+    """Fill preparation fields on an image-analysis card.
+
+    Args:
+        card: Image-analysis action card.
+        evidence_texts: OCR hint or user text evidence.
+
+    Returns:
+        Card with preparation/checklist fields populated when supported by evidence.
+    """
+
+    payload = enrich_preparation_payload(card.model_dump(), evidence_texts)
+    return ParsedActionCard.model_validate(payload)
 
 
 def _normalized_text(value: object) -> str:
@@ -384,6 +415,8 @@ def _parsed_card_from_text_response(
             [action.model_dump() for action in response.suggested_actions]
         ),
         missing_fields=response.missing_fields,
+        preparation_items=response.preparation_items,
+        checklist_items=response.checklist_items,
         risks=[f"text_fallback:{reason}"],
         evidence=evidence,
         ignored_regions=ignored_regions,
@@ -425,6 +458,7 @@ def fallback_analyze_image_with_text_model(
     )
     adapter = _get_adapter()
     response = adapter.analyze(text_request)  # type: ignore[attr-defined]
+    response = _response_with_preparation(response, [ocr_text])
     return _parsed_card_from_text_response(response, reason=reason, ignored_regions=ignored_regions)
 
 
@@ -625,17 +659,19 @@ def analyze(request: AnalyzeRequest) -> AnalyzeResponse:
     _ = "missing_fields"
 
     if is_sparse_course_text(text, request.scene_hint):
-        return sparse_course_output(text)
+        return _response_with_preparation(sparse_course_output(text), [text])
 
     adapter = _get_adapter()
     try:
         # Both adapters take AnalyzeRequest and return AnalyzeResponse.
-        return adapter.analyze(request)  # type: ignore[no-any-return]
+        response = adapter.analyze(request)
+        return _response_with_preparation(response, [text])  # type: ignore[arg-type]
     except AdapterError:
         settings = get_settings()
         if settings.allow_mock_fallback:
-            return MockModelAdapter(allow_demo_samples=settings.allows_demo_samples).analyze(request)
-        return manual_review_response("model_unavailable")
+            response = MockModelAdapter(allow_demo_samples=settings.allows_demo_samples).analyze(request)
+            return _response_with_preparation(response, [text])
+        return _response_with_preparation(manual_review_response("model_unavailable"), [text])
 
 
 @app.post("/v2/analyze-image", response_model=ParsedActionCard)
@@ -724,6 +760,7 @@ def analyze_image(request: AnalyzeImageRequest) -> ParsedActionCard:
 
     merged_regions = _sanitized_ignored_regions([*card.ignored_regions, *ignored_regions])
     merged_risks = list(dict.fromkeys([*card.risks, *enrichment_risks, *repair_risks]))
+    card = _card_with_preparation(card, [normalized.ocr_text_hint or ""])
     gated_card = _require_user_confirmation_for_card(card)
     return gated_card.model_copy(update={"ignored_regions": merged_regions, "risks": merged_risks})
 

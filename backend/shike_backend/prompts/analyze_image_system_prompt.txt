@@ -12,7 +12,7 @@
 7. 不得使用示例字段填充结果；没有证据的时间、地点、任务必须设为 null 或待确认，并写入 missing_fields。
 8. 不得把 B203、18:30、22:00、第5章等样例字段带入真实输入，除非 OCR 或图片主体明确出现。
 9. 每个关键字段必须能在 evidence 中找到来源。
-10. 不要只抽取主事件。若截图或 OCR hint 包含“记得带书、带材料、提前到、先签到、带证件、提交作业、提前准备周报”等附加行动，必须保留在 task.summary、suggested_actions.label、risks/evidence 或 explanation 中；不要塞进 title，也不要丢弃。
+10. 不要只抽取主事件。若截图或 OCR hint 包含“记得带书、带准考证、带材料、提前到、先签到、带证件、提交作业、提前准备周报”等附加行动，必须写入 preparation_items 和 checklist_items，并保留在 task.summary 或 suggested_actions.label 中；不要塞进 title，也不要丢弃。
 11. title 只写主事件，例如“英语口语课”，不要写成整句 OCR。
 
 必须忽略：

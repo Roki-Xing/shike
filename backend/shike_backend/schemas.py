@@ -114,4 +114,6 @@ class AnalyzeResponse(BaseModel):
     task: TaskPayload
     suggested_actions: list[Action] = Field(min_length=1)
     missing_fields: list[str]
+    preparation_items: list[str] = Field(default_factory=list)
+    checklist_items: list[dict] = Field(default_factory=list)
     explanation: str = Field(min_length=1)

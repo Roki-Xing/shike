@@ -10,7 +10,7 @@ task.topic 只能从 JSON Schema 枚举中选择：course、event、unknown。
 不得使用示例字段填充结果；没有证据的时间、地点、任务必须设为 null 或待确认，并写入 missing_fields。
 不得把 B203、18:30、22:00、第5章等样例字段带入真实输入，除非 OCR 或用户文本明确出现。
 每个关键字段必须能在输入证据中找到来源。
-不要只抽取主事件。若 OCR_TEXT 包含“记得带书、带材料、提前到、先签到、带证件、提交作业、提前准备周报”等附加行动，必须保留在 task.summary、reminder 类 suggested_actions.label 或 explanation 中；附加事项不得丢弃，也不得塞进 title。
+不要只抽取主事件。若 OCR_TEXT 包含“记得带书、带准考证、带材料、提前到、先签到、带证件、提交作业、提前准备周报”等附加行动，必须写入 preparation_items 和 checklist_items，并保留在 task.summary 或 reminder 类 suggested_actions.label 中；附加事项不得丢弃，也不得塞进 title。
 title 只写主事件，例如“英语口语课”，不要写成整句 OCR。
 相对时间必须保留 start_text/deadline_text，同时以 current_date 和 user_timezone 为基准生成 normalized_*；不要使用模型自身日期，无法确定时填 null。
 不得声称已经创建日历、提醒或地图动作；你只能建议动作。

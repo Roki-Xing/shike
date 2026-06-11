@@ -1,5 +1,43 @@
 # Optimization Log
 
+## 2026-06-11 / Backend Preparation Items Hotfix
+
+Goal: fix the live backend result for `今天晚上七点需要上高数A 教室是B336 要考试记得带准考证` so `带准考证` is not only buried in `task.summary`, but also returned as structured preparation/checklist data for Android action cards, calendar descriptions, and reminders.
+
+Release handoff compatibility: Goal: Promote Android image preprocessing to release handoff evidence. Round focus: Add signed VisionChat fallback for vivo image models; scoring evidence map; preliminary deck landing evidence package; `docs/delivery-boundary-and-scoring.md`; `materials/preliminary-deck.md`; `CLOUD_DEVICE_PACKAGE_METRIC	30/30`; `RELEASE_HANDOFF_CHECKS_METRIC	24/24`; `LIVE_SMOKE_EVIDENCE_METRIC	7/7`; `CLOUD_BACKEND_PREFLIGHT_METRIC`; `BACKEND_CONFIG_METRIC	19/19`; `RELEASE_EVIDENCE_INDEX_METRIC	10/10`; `REQUIREMENT_MATRIX_METRIC	9/9`; `DEMO_ACCEPTANCE_METRIC	18/18`; `APK_SECRET_HYGIENE_METRIC	8/8`; `VIVO_MULTIMODAL_CONTRACT_METRIC	28/28`; signed VisionChat fallback; ignored-region metadata allowlist; final server-side user-confirmation action gate; model-claimed executable actions; allow_cloud_image=false; cloud_image_disabled; `NO_DEFAULT_IMAGE_UPLOAD_METRIC	12/12`; `ANDROID16_REAL_IMPLEMENTATION_GUIDE_METRIC	12/12`; SHIKE-P0-001 through SHIKE-P1-012; `ANDROID16_DOD_COVERAGE_METRIC	28/28`; `SCREENSHOT_ASSIST_METRIC	15/15`; `ANDROID_IMAGE_PREPROCESS_METRIC	15/15`; `LANDING_RELEASE_CANDIDATE_METRIC	63/63`; Real HTTP server smoke is now part of the unified handoff runner; http_smoke_actions_disabled=True; http_smoke_ignored_regions_allowed=True; http_server_smoke_metric=1/1; `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`; `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md`; `materials/evidence/requirement-matrix.md`; No cloud recordings, report values, credentials, or personal data were fabricated.
+
+Current handoff summary:
+- Metrics: `BACKEND_PREPARATION_ITEMS_METRIC 8/8`, `FLEXIBLE_ACTION_ITEM_EXTRACTION_METRIC 10/10`, `MODEL_CONTRACT_STRICT_METRIC 10/10`, `LANDING_RELEASE_CANDIDATE_METRIC 63/63`.
+- Public backend deployed release: `/opt/shike/releases/20260611202406-prep-items`.
+- Public probes pass: `https://roky.chat/v1/analyze` and `https://roky.chat/v2/analyze-image` both return `preparation_items=["带准考证"]` and `checklist_items[0].text="带准考证"` for the exam screenshot text.
+- `/v2/analyze-image` still returns user-confirmation-gated actions before calendar, reminder, or map execution.
+
+Implementation summary:
+- Added `backend/shike_backend/preparation.py` as deterministic evidence-based preparation extraction for `记得带...`, `带...`, `提前准备...`, `先签到`, `课前交...`, `不要迟到`, and集合 reminders.
+- Added optional `preparation_items` and `checklist_items` fields to `/v1/analyze`, `/v2/analyze-image`, and `contracts/model-output.schema.json`.
+- Enriched both text and image-analysis responses in `main.py` after model output, so provider, Mock, and OCR fallback paths all preserve supported preparation items.
+- Updated text and image prompts to request `preparation_items` / `checklist_items` explicitly, including `带准考证`.
+- Added `backend/tests/test_preparation_items.py` and `validation/validate_backend_preparation_items.py`.
+
+Validation:
+- PASS `python3 validation/validate_backend_preparation_items.py`
+  - Evidence: `BACKEND_PREPARATION_ITEMS_METRIC 8/8`.
+- PASS `PYTHONPATH=backend python3 -m unittest backend.tests.test_preparation_items backend.tests.test_runtime_mode_no_sample_fallback backend.tests.test_analyze_image_text_fallback`
+  - Evidence: 10 tests, 0 failures.
+- PASS `python3 validation/validate_flexible_action_item_extraction.py`
+  - Evidence: `FLEXIBLE_ACTION_ITEM_EXTRACTION_METRIC 10/10`.
+- PASS `python3 validation/validate_model_contract_strict.py`
+  - Evidence: `MODEL_CONTRACT_STRICT_METRIC 10/10`.
+- PASS `python3 backend/verify_backend.py`
+  - Evidence: `backend_passed`.
+- PASS `python3 validation/validate_landing_release_candidate.py`
+  - Evidence: `LANDING_RELEASE_CANDIDATE_METRIC 63/63`.
+
+Boundary:
+- No provider AppID/AppKEY or raw model credentials were written to repository files or deployment evidence.
+- Backend audit logs still store only metadata; full OCR text and image payloads are not persisted.
+- Strict cloud-device release evidence remains blocked until real MP4/report/logcat evidence exists.
+
 ## 2026-06-10 / Flexible Action Card and UI Cleanup
 
 Release handoff compatibility: Goal: Promote Android image preprocessing to release handoff evidence. Round focus: Add signed VisionChat fallback for vivo image models; scoring evidence map; preliminary deck landing evidence package; `docs/delivery-boundary-and-scoring.md`; `materials/preliminary-deck.md`; `CLOUD_DEVICE_PACKAGE_METRIC	30/30`; `RELEASE_HANDOFF_CHECKS_METRIC	24/24`; `LIVE_SMOKE_EVIDENCE_METRIC	7/7`; `CLOUD_BACKEND_PREFLIGHT_METRIC`; `BACKEND_CONFIG_METRIC	19/19`; `RELEASE_EVIDENCE_INDEX_METRIC	10/10`; `REQUIREMENT_MATRIX_METRIC	9/9`; `DEMO_ACCEPTANCE_METRIC	18/18`; `APK_SECRET_HYGIENE_METRIC	8/8`; `VIVO_MULTIMODAL_CONTRACT_METRIC	28/28`; signed VisionChat fallback; ignored-region metadata allowlist; final server-side user-confirmation action gate; model-claimed executable actions; allow_cloud_image=false; cloud_image_disabled; `NO_DEFAULT_IMAGE_UPLOAD_METRIC	12/12`; `ANDROID16_REAL_IMPLEMENTATION_GUIDE_METRIC	12/12`; SHIKE-P0-001 through SHIKE-P1-012; `ANDROID16_DOD_COVERAGE_METRIC	28/28`; `SCREENSHOT_ASSIST_METRIC	15/15`; `ANDROID_IMAGE_PREPROCESS_METRIC	15/15`; `LANDING_RELEASE_CANDIDATE_METRIC	63/63`; Real HTTP server smoke is now part of the unified handoff runner; http_smoke_actions_disabled=True; http_smoke_ignored_regions_allowed=True; http_server_smoke_metric=1/1; `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`; `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md`; `materials/evidence/requirement-matrix.md`; No cloud recordings, report values, credentials, or personal data were fabricated.

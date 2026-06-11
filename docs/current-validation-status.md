@@ -1,12 +1,28 @@
 # Current Validation Status
 
-Date: 2026-06-10
+Date: 2026-06-11
 Guide: `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md`  
 Deep review guide applied this round: `/mnt/c/Users/Xing/Desktop/SHIKE_PRODUCT_MANAGER_DEEP_REVIEW_GUIDE.md`
 Calendar/UI guide applied this round: `/mnt/c/Users/Xing/Desktop/SHIKE_CALENDAR_AND_UI_PRODUCT_FIX_GUIDE.md`
 Flexible action-card guide applied this round: `/mnt/c/Users/Xing/Desktop/SHIKE_FLEXIBLE_ACTION_CARD_AND_UI_CLEANUP_GUIDE.md`
 Guide source availability: the expected desktop source file was restored from the Windows recycle bin and is currently readable in this closeout audit; see `materials/evidence/desktop-guidance-source-status.md`. The local matrix remains useful for repository evidence traceability, while strict external cloud-device evidence remains blocked.
 Scope: Desktop guidance stages A-E: BlueLM credible evidence, cloud-device and HTTPS backend evidence, frontend productization, long-lived inbox workbench, and materials upgraded to a release evidence package. Historical S2/S3 hardening remains part of the evidence base, but the current public status is anchored to `materials/evidence/requirement-matrix.md` and `REQUIREMENT_MATRIX_METRIC 9/9`.
+
+## 2026-06-11 Backend Preparation-Item Hotfix
+
+The public backend now treats preparation items as first-class response fields on both `/v1/analyze` and `/v2/analyze-image`. The regression sentence `今天晚上七点需要上高数A 教室是B336 要考试记得带准考证` returns title `高数A考试`, normalized start `2026-06-11T19:00:00+08:00`, location `B336`, task summary `参加高数A考试，记得带准考证`, `preparation_items=["带准考证"]`, and matching `checklist_items` while keeping all `/v2/analyze-image` actions disabled until user confirmation.
+
+Fresh evidence from this hotfix:
+
+| Command | Status | Evidence |
+|---|---|---|
+| `python3 validation/validate_backend_preparation_items.py` | PASS | `BACKEND_PREPARATION_ITEMS_METRIC 8/8` |
+| `PYTHONPATH=backend python3 -m unittest backend.tests.test_preparation_items backend.tests.test_runtime_mode_no_sample_fallback backend.tests.test_analyze_image_text_fallback` | PASS | 10 tests, 0 failures |
+| `python3 validation/validate_flexible_action_item_extraction.py` | PASS | `FLEXIBLE_ACTION_ITEM_EXTRACTION_METRIC 10/10` |
+| `python3 validation/validate_model_contract_strict.py` | PASS | `MODEL_CONTRACT_STRICT_METRIC 10/10` |
+| `python3 backend/verify_backend.py` | PASS | `backend_passed` |
+| `python3 validation/validate_landing_release_candidate.py` | PASS | `LANDING_RELEASE_CANDIDATE_METRIC 63/63` |
+| Public deployment | PASS | `/opt/shike/releases/20260611202406-prep-items`; `https://roky.chat/v1/analyze` and `/v2/analyze-image` return `带准考证` in preparation fields |
 
 ## 2026-06-09 Closeout Evidence
 

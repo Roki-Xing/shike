@@ -88,6 +88,8 @@ class ParsedActionCard(BaseModel):
     task: dict
     suggested_actions: list[dict]
     missing_fields: list[str]
+    preparation_items: list[str] = Field(default_factory=list)
+    checklist_items: list[dict] = Field(default_factory=list)
     risks: list[str]
     evidence: list[EvidenceSpan]
     ignored_regions: list[str]
