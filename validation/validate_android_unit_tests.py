@@ -69,6 +69,8 @@ def main() -> int:
     capture_result_test = read("android-mvp/app/src/test/java/cn/shike/app/CaptureResultActionsTest.kt")
     model_explanation_test = read("android-mvp/app/src/test/java/cn/shike/app/ModelExplanationTest.kt")
     model_api_client_source = read("android-mvp/app/src/main/java/cn/shike/app/data/ModelApiClient.kt")
+    model_json_helpers_source = read("android-mvp/app/src/main/java/cn/shike/app/data/ModelJsonHelpers.kt")
+    model_api_sources = model_api_client_source + "\n" + model_json_helpers_source
     analyze_image_api_client_source = read("android-mvp/app/src/main/java/cn/shike/app/data/BackendImageApiClient.kt")
     model_api_client_test = read("android-mvp/app/src/test/java/cn/shike/app/ModelApiClientTest.kt")
     analyze_image_api_client_test = read("android-mvp/app/src/test/java/cn/shike/app/data/AnalyzeImageApiClientTest.kt")
@@ -270,9 +272,9 @@ def main() -> int:
             and "buildRuntimeSharedTextSelection_mapsNewIntentTextToReadyDraft" in initial_selection_test
             and "buildRuntimeSharedTextSelection_ignoresBlankText" in initial_selection_test
             and "buildInitialSelection_savedSnapshotRestoresReadyState" in initial_selection_test
-            and "buildInitialSelection_noShareNoSavedShowsEmptyState" in initial_selection_test
+            and "initialSelectionMapper_usesUserFacingHomeCopy" in initial_selection_test
             and "文本分享入口（待确认，未落盘）" in initial_selection_test
-            and "今日行动台空状态" in initial_selection_test,
+            and "今天还没有待处理事项" in initial_selection_test,
         ),
         (
             "gradle_initial_selection_test_passed",
@@ -498,7 +500,7 @@ def main() -> int:
             and "modelExplanation_usesBackendExplanationWhenPresent" in model_explanation_test
             and "modelExplanation_explainsBackendFallbackBeforeLocalConfirmation" in model_explanation_test
             and "modelExplanation_marksConfirmedCourseFieldsAsTrusted" in model_explanation_test
-            and "本地规则保留行动卡" in model_explanation_test
+            and "截图已保存为待确认" in model_explanation_test
             and "关键字段已确认" in model_explanation_test,
         ),
         (
@@ -512,14 +514,14 @@ def main() -> int:
         (
             "model_api_client_unit_test_exists",
             'testImplementation("org.json:json:20240303")' in build_gradle
-            and "fun buildAnalyzeRequestPayload(" in model_api_client_source
-            and 'put("source_type", sourceType)' in model_api_client_source
-            and 'put("ocr_text", ocrText)' in model_api_client_source
-            and 'put("scene_hint", sceneHint(scene))' in model_api_client_source
-            and "assignment_deadline" in model_api_client_source
-            and "meeting_notice" in model_api_client_source
-            and "interview_notice" in model_api_client_source
-            and "travel_ticket" in model_api_client_source
+            and "fun buildAnalyzeRequestPayload(" in model_api_sources
+            and 'put("source_type", sourceType)' in model_api_sources
+            and 'put("ocr_text", ocrText)' in model_api_sources
+            and 'put("scene_hint", sceneHint(scene))' in model_api_sources
+            and "assignment_deadline" in model_api_sources
+            and "meeting_notice" in model_api_sources
+            and "interview_notice" in model_api_sources
+            and "travel_ticket" in model_api_sources
             and "class ModelApiClientTest" in model_api_client_test
             and model_api_client_test.count("@Test") == 10
             and "buildAnalyzeRequestPayload_keepsBackendContractFields" in model_api_client_test
@@ -539,9 +541,9 @@ def main() -> int:
         ),
         (
             "backend_url_normalization_strips_path_query_fragment",
-            "fun normalizeBackendUrl(url: String): String" in model_api_client_source
-            and "URI(" in model_api_client_source
-            and "uri?.host" in model_api_client_source
+            "fun normalizeBackendUrl(url: String): String" in model_api_sources
+            and "URI(" in model_api_sources
+            and "uri?.host" in model_api_sources
             and "normalizeBackendUrl_stripsPathQueryAndFragment" in model_api_client_test
             and "192.168.1.10:8000/v1/analyze" in model_api_client_test
             and "http://192.168.1.10:8000/v1/analyze?x=1#frag" in model_api_client_test

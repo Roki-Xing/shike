@@ -102,20 +102,25 @@ def main() -> int:
         ),
         (
             "loading_empty_error_reachable",
-            "ShikeLoadingSkeleton" in main_flow and "ShikeErrorState" in main_flow and "TodayAgendaState.Empty" in read("HomeAgendaList.kt"),
+            "ShikeLoadingSkeleton" in main_flow
+            and "RecoverableErrorState" in main_flow
+            and "TodayAgendaState.Empty" in read("HomeAgendaList.kt"),
             "state usage",
         ),
         (
             "bottom_nav_routes_real_sections",
-            all(name in bottom_nav for name in ["ShikeMainSection.Home", "ShikeMainSection.Import", "ShikeMainSection.Inbox", "ShikeMainSection.Settings"])
+            all(name in bottom_nav for name in ["ShikeMainSection.Home", "ShikeMainSection.Inbox", "ShikeMainSection.Settings"])
+            and "CenterImportButton(" in bottom_nav
+            and "+ 导入" in bottom_nav
+            and 'BottomNavItem("导入"' not in bottom_nav
             and "ShikeMainSection.Debug" not in bottom_nav,
             "bottom nav",
         ),
         (
             "home_has_quick_import",
             "QuickImportPanel" not in home_body
-            and "HomeAgendaList(" in home_body
-            and "AnalyzeProgressPanel(" in home_body
+            and "FocusedHomeCard(" in home_body
+            and "AnalyzeProgressPanel(" not in home_body
             and "ParseConfirmPanel(" not in home_body
             and "ConfirmBanner(" not in home_body
             and "导入截图" in read("HomeAgendaList.kt")
@@ -126,7 +131,8 @@ def main() -> int:
             "structured_action_card_ui_present",
             "data class ActionCardUiModel" in read("ActionCardUiModel.kt")
             and "fun StructuredActionCard" in read("StructuredActionCard.kt")
-            and "课程/事项" in read("StructuredActionCard.kt")
+            and "ActionCardHero(" in read("StructuredActionCard.kt")
+            and "事项" in read("StructuredActionCard.kt")
             and "准备事项" in read("StructuredActionCard.kt")
             and "需要确认" in read("StructuredActionCard.kt"),
             "structured action card",

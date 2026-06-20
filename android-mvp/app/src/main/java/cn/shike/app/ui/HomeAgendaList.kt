@@ -76,8 +76,8 @@ fun HomeAgendaList(
     when (state) {
         TodayAgendaState.Empty -> {
             TodayStateCard(
-                title = "今日行动台空状态",
-                description = "还没有本地收件箱任务。可以从截图、拍照、分享或手动输入开始，不会自动执行日历、提醒或地图动作。",
+                title = "今天还没有待处理事项",
+                description = "把截图交给拾刻，生成第一张行动卡。确认前不会加入日历、提醒或地图。",
                 tone = Color(0xFF0F766E),
                 onGallery = onGallery,
                 onManualInput = onManualInput,
@@ -86,8 +86,8 @@ fun HomeAgendaList(
         }
         TodayAgendaState.Error -> {
             TodayStateCard(
-                title = "今日行动台错误状态",
-                description = "本地数据加载失败或后端不可用时，拾刻会保留当前行动卡，并提示改用截图、拍照、分享或手动输入继续。",
+                title = "AI 暂时没识别成功",
+                description = "截图已保存为待确认，你可以手动补充时间和地点。",
                 tone = Color(0xFFF97316),
                 onGallery = onGallery,
                 onManualInput = onManualInput,

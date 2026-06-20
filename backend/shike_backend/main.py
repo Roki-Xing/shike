@@ -15,8 +15,10 @@ from shike_backend.adapters.mock_adapter import MockModelAdapter, is_sparse_cour
 from shike_backend.adapters.recorded_bluelm_adapter import RecordedBlueLMAdapter
 from shike_backend.adapters.vivo_cloud_multimodal_adapter import VivoCloudMultimodalAdapter
 from shike_backend.adapters.vivo_ocr_adapter import VivoOcrAdapter, fallback_ocr_response
+from shike_backend.action_card_rules import parsed_action_card_from_ocr_text
 from shike_backend.audit_log import build_analyze_image_audit_event
 from shike_backend.image_preprocess import filter_ocr_blocks
+from shike_backend.location import enrich_location_payload
 from shike_backend.preparation import enrich_preparation_payload
 from shike_backend.schemas import AnalyzeRequest, AnalyzeResponse, OcrRequest, OcrResponse, load_model_output_schema
 from shike_backend.schemas_v2 import (
@@ -27,6 +29,7 @@ from shike_backend.schemas_v2 import (
     manual_review_action_card,
 )
 from shike_backend.settings import get_settings
+from shike_backend.time_evidence import enrich_time_payload
 
 app = FastAPI(title="Shike Model Orchestration API", version="0.1.0")
 logger = logging.getLogger("shike_backend.audit")
@@ -209,7 +212,8 @@ def _response_with_preparation(response: AnalyzeResponse, evidence_texts: list[s
         Response with preparation/checklist fields populated when supported by evidence.
     """
 
-    payload = enrich_preparation_payload(response.model_dump(), evidence_texts)
+    payload = enrich_location_payload(response.model_dump(), evidence_texts)
+    payload = enrich_preparation_payload(payload, evidence_texts)
     return AnalyzeResponse.model_validate(payload)
 
 
@@ -224,8 +228,35 @@ def _card_with_preparation(card: ParsedActionCard, evidence_texts: list[str]) ->
         Card with preparation/checklist fields populated when supported by evidence.
     """
 
-    payload = enrich_preparation_payload(card.model_dump(), evidence_texts)
+    payload = enrich_location_payload(card.model_dump(), evidence_texts)
+    payload = enrich_preparation_payload(payload, evidence_texts)
     return ParsedActionCard.model_validate(payload)
+
+
+def _card_with_evidence_fields(
+    card: ParsedActionCard,
+    request: AnalyzeImageRequest,
+) -> tuple[ParsedActionCard, list[str]]:
+    """Fill final card fields from OCR evidence before returning to clients.
+
+    Args:
+        card: Parsed image-analysis card.
+        request: OCR-enriched request with user-local date context.
+
+    Returns:
+        Updated card and non-secret repair reason codes.
+    """
+
+    evidence_texts = [request.ocr_text_hint or ""]
+    payload, time_reasons = enrich_time_payload(
+        card.model_dump(),
+        evidence_texts,
+        current_date=request.current_date,
+        user_timezone=request.user_timezone,
+    )
+    payload = enrich_location_payload(payload, evidence_texts)
+    payload = enrich_preparation_payload(payload, evidence_texts)
+    return ParsedActionCard.model_validate(payload), [f"ocr_evidence_repair:{reason}" for reason in time_reasons]
 
 
 def _normalized_text(value: object) -> str:
@@ -447,6 +478,15 @@ def fallback_analyze_image_with_text_model(
     ocr_text = (request.ocr_text_hint or "").strip()
     if len(ocr_text) < 8:
         raise AdapterError("text_fallback_missing_ocr_hint")
+
+    settings = get_settings()
+    if settings.model_provider == "mock":
+        return parsed_action_card_from_ocr_text(
+            ocr_text,
+            scene_hint=request.scene_hint,
+            reason=reason,
+            ignored_regions=ignored_regions,
+        )
 
     text_request = AnalyzeRequest(
         input_id=request.input_id,
@@ -745,6 +785,13 @@ def analyze_image(request: AnalyzeImageRequest) -> ParsedActionCard:
                 card = manual_review_action_card(f"manual_review:{exc.message}")
         key_present = bool(getattr(adapter, "is_configured", lambda: False)())
 
+    merged_regions = _sanitized_ignored_regions([*card.ignored_regions, *ignored_regions])
+    card, field_repair_risks = _card_with_evidence_fields(card, normalized)
+    repair_risks = list(dict.fromkeys([*repair_risks, *field_repair_risks]))
+    merged_risks = list(dict.fromkeys([*card.risks, *enrichment_risks, *repair_risks]))
+    gated_card = _require_user_confirmation_for_card(card)
+    final_card = gated_card.model_copy(update={"ignored_regions": merged_regions, "risks": merged_risks})
+
     if request.allow_cloud_image:
         audit_provider = "vivo_cloud_multimodal"
 
@@ -755,14 +802,10 @@ def analyze_image(request: AnalyzeImageRequest) -> ParsedActionCard:
         duration_ms=int((time.time() - started_at) * 1000),
         status=status,
         repair_risks=repair_risks,
+        result_card=final_card,
     )
     logger.info("analyze_image_audit %s", audit_event)
-
-    merged_regions = _sanitized_ignored_regions([*card.ignored_regions, *ignored_regions])
-    merged_risks = list(dict.fromkeys([*card.risks, *enrichment_risks, *repair_risks]))
-    card = _card_with_preparation(card, [normalized.ocr_text_hint or ""])
-    gated_card = _require_user_confirmation_for_card(card)
-    return gated_card.model_copy(update={"ignored_regions": merged_regions, "risks": merged_risks})
+    return final_card
 
 
 @app.post("/v1/ocr", response_model=OcrResponse)

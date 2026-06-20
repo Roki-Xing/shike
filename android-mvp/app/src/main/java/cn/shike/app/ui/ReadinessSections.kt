@@ -25,6 +25,7 @@ import cn.shike.app.LocalDataClearConfirmationState
 import cn.shike.app.cancelLocalDataClearConfirmation
 import cn.shike.app.confirmLocalDataClearConfirmation
 import cn.shike.app.requestLocalDataClearConfirmation
+import cn.shike.app.system.ScreenshotAssistDiagnostics
 
 @Composable
 fun DeliveryReadinessPanel() {
@@ -61,6 +62,7 @@ fun PrivacyPanel(
     localMultimodalStatus: LocalMultimodalStatus,
     onLocalMultimodalPreferenceChange: (LocalMultimodalPreference) -> Unit,
     onClearLocalData: () -> Unit,
+    screenshotAssistDiagnostics: ScreenshotAssistDiagnostics? = null,
     screenshotAssistEnabled: Boolean = false,
     onScreenshotAssistChange: (Boolean) -> Unit = {},
     cleanupPreference: String = "每次询问（推荐）",
@@ -111,6 +113,9 @@ fun PrivacyPanel(
             )
         }
         KeyValue("截图提醒", "检测到新截图后发通知，不会自动上传，不使用全局悬浮窗")
+        screenshotAssistDiagnostics?.let { diagnostics ->
+            ScreenshotAssistDiagnosticsPanel(diagnostics)
+        }
         KeyValue("导入后处理原截图", cleanupPreference)
         OutlinedButton(
             onClick = {
@@ -156,5 +161,17 @@ fun PrivacyPanel(
             }
         }
         KeyValue("系统协同", "日历、提醒和地图都需要确认后执行")
+    }
+}
+
+@Composable
+fun ScreenshotAssistDiagnosticsPanel(diagnostics: ScreenshotAssistDiagnostics) {
+    SectionCard("截图助手诊断") {
+        KeyValue("助手状态", if (diagnostics.enabled) "已开启" else "未开启")
+        KeyValue("图片权限", if (diagnostics.mediaPermissionGranted) "已授权" else "未授权")
+        KeyValue("通知权限", if (diagnostics.notificationPermissionGranted) "已授权" else "未授权")
+        KeyValue("后台服务", if (diagnostics.serviceRunning) "运行中" else "已停止")
+        KeyValue("最近检测截图", diagnostics.lastDetectedAtText.removePrefix("最近检测截图："))
+        KeyValue("最近通知", diagnostics.lastNotificationStatus.removePrefix("最近通知："))
     }
 }

@@ -21,11 +21,13 @@ data class AnalyzeProgressState(
 private val AnalyzeSteps = listOf("读取图片", "OCR识别", "结构化解析", "生成行动卡")
 
 fun analyzeProgressStateFor(modelStatus: String, hasPendingImage: Boolean, selectedStatus: String): AnalyzeProgressState {
-    val active = hasPendingImage || "解析中" in modelStatus || "待确认" in selectedStatus
+    val active = "解析中" in modelStatus || "正在解析" in modelStatus
     val index = when {
-        "图片解析中" in modelStatus -> 1
-        "云侧解析中" in modelStatus -> 2
-        "待确认" in selectedStatus -> 3
+        "图片" in modelStatus -> 1
+        "结构" in modelStatus || "文字" in modelStatus -> 2
+        "生成" in modelStatus -> 3
+        hasPendingImage -> 0
+        selectedStatus == "待确认" -> 0
         else -> 0
     }
     return AnalyzeProgressState(

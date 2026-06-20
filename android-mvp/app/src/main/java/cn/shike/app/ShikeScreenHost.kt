@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import cn.shike.app.data.ImageCleanupStatus
 import cn.shike.app.data.ScreenshotCandidate
 import cn.shike.app.domain.ShikeItem
+import cn.shike.app.system.ScreenshotAssistDiagnostics
 import cn.shike.app.system.VisibleScreenCapturePrompt
 import cn.shike.app.ui.LocalMultimodalStatus
 import cn.shike.app.ui.ShikeMainScreen
@@ -15,12 +16,11 @@ fun ShikeScreenHost(
     captureLaunchers: CaptureLaunchers,
     localMultimodalStatus: LocalMultimodalStatus,
     screenshotAssistSwitchEnabled: Boolean,
+    screenshotAssistDiagnostics: ScreenshotAssistDiagnostics?,
     onboardingDismissed: Boolean,
     pendingScreenshotCandidate: ScreenshotCandidate?,
     visibleScreenCapturePrompt: VisibleScreenCapturePrompt?,
     onSaveBackendEndpoint: () -> Unit,
-    onAnalyzeCurrentDraft: () -> Unit,
-    onAnalyzeEvent: () -> Unit,
     onCourseSample: () -> Unit,
     onEventSample: () -> Unit,
     onScreenshotAssistChange: (Boolean) -> Unit,
@@ -54,14 +54,13 @@ fun ShikeScreenHost(
         onGallery = captureLaunchers.launchGallery,
         onCamera = captureLaunchers.launchCamera,
         onManualInput = { state.enterManualInput() },
-        onBackendCourse = onAnalyzeCurrentDraft,
-        onBackendEvent = onAnalyzeEvent,
         onCourse = onCourseSample,
         onEvent = onEventSample,
         cloudEnhancedEnabled = state.cloudEnhancedEnabled,
         onCloudEnhancedChange = { state.cloudEnhancedEnabled = it },
         localMultimodalStatus = localMultimodalStatus,
         onLocalMultimodalPreferenceChange = { state.localMultimodalPreference = it },
+        screenshotAssistDiagnostics = screenshotAssistDiagnostics,
         screenshotAssistEnabled = screenshotAssistSwitchEnabled,
         onScreenshotAssistChange = onScreenshotAssistChange,
         onboardingDismissed = onboardingDismissed,

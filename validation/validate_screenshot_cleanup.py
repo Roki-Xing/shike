@@ -19,6 +19,7 @@ def file_exists(relative: str) -> bool:
 
 def main() -> int:
     media_cleanup = read("android-mvp/app/src/main/java/cn/shike/app/system/MediaCleanupActions.kt")
+    source_cleanup = read("android-mvp/app/src/main/java/cn/shike/app/system/SourceImageCleanupManager.kt")
     capture = read("android-mvp/app/src/main/java/cn/shike/app/data/CaptureImportMapper.kt")
     prompt = read("android-mvp/app/src/main/java/cn/shike/app/ui/ScreenshotCleanupPrompt.kt")
     settings = read("android-mvp/app/src/main/java/cn/shike/app/ui/ReadinessSections.kt")
@@ -43,14 +44,16 @@ def main() -> int:
             and "imageCleanupStatus" in capture,
         ),
         (
-            "uses_delete_request_not_silent_delete",
-            "MediaStore.createDeleteRequest" in media_cleanup
-            and "createTrashRequest" not in media_cleanup
-            and ".delete(" not in media_cleanup,
+            "uses_trash_request_not_silent_delete",
+            "MediaStore.createTrashRequest" in source_cleanup
+            and "createDeleteRequest" not in media_cleanup + source_cleanup
+            and ".delete(" not in media_cleanup + source_cleanup,
         ),
         (
             "system_confirmation_boundary_present",
-            "IntentSender" in media_cleanup and "Build.VERSION_CODES.R" in media_cleanup,
+            "IntentSender" in source_cleanup
+            and "Build.VERSION_CODES.R" in source_cleanup
+            and "SourceImageCleanupRequest.SystemTrashConfirmation" in source_cleanup + activity_system,
         ),
         (
             "cleanup_prompt_requires_user_choice",
@@ -106,8 +109,8 @@ def main() -> int:
             and "ImageCleanupStatus.NOT_REQUESTED" in cleanup_state_test,
         ),
         (
-            "delete_request_invoked_by_activity_result",
-            "createScreenshotDeleteRequest" in activity_system
+            "trash_request_invoked_by_activity_result",
+            "SourceImageCleanupManager(this).requestTrash" in activity_system
             and "StartIntentSenderForResult" in activity
             and "deleteScreenshotLauncher" in activity,
         ),
@@ -116,11 +119,12 @@ def main() -> int:
             "state.sourceImageCleanupStatus = ImageCleanupStatus.DELETE_REQUESTED" in app_actions
             and "imageCleanupStatusFromSystem" in app
             and "ImageCleanupStatus.DELETED -> state.executionResults.recordExecutionResult" in app_actions
+            and "ImageCleanupStatus.USER_KEPT -> state.executionResults.recordExecutionResult" in app_actions
             and "ImageCleanupStatus.FAILED -> state.executionResults.recordExecutionResult" in app_actions
-            and "handleImageCleanupStatusFromSystem(ImageCleanupStatus.FAILED)" in activity_system
+            and "ImageCleanupStatus.USER_KEPT" in activity
             and "原截图清理：已移入系统回收站" in activity_system
             and "ImageCleanupStatus.DELETED" in activity
-            and "ImageCleanupStatus.FAILED" in activity,
+            and "ImageCleanupStatus.USER_KEPT" in activity,
         ),
         (
             "unsupported_source_copy_present",

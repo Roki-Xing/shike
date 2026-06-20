@@ -32,6 +32,7 @@ class ShikeAppActions(
         state.sourceImageCleanupStatus = status
         state.executionResults = when (status) {
             ImageCleanupStatus.DELETED -> state.executionResults.recordExecutionResult(imageCleanupDeletedResult())
+            ImageCleanupStatus.USER_KEPT -> state.executionResults.recordExecutionResult(imageCleanupKeptResult())
             ImageCleanupStatus.FAILED -> state.executionResults.recordExecutionResult(imageCleanupFailedResult())
             else -> state.executionResults
         }
@@ -129,17 +130,17 @@ class ShikeAppActions(
     }
 
     fun onCameraUnavailable() {
-        state.captureSource = "错误状态：相机未返回图片，保留当前行动卡。"
+        state.captureSource = "相机暂时没有返回图片，已保留当前行动卡。"
         state.todayAgendaState = TodayAgendaState.Error
     }
 
     fun onCameraPermissionDenied() {
-        state.captureSource = "错误状态：相机权限被拒绝，可改用相册或文本分享入口。"
+        state.captureSource = "相机权限未开启，可改用相册或文本分享入口。"
         state.todayAgendaState = TodayAgendaState.Error
     }
 
     fun onGalleryUnavailable() {
-        state.captureSource = "错误状态：未选择图片，保留当前行动卡。"
+        state.captureSource = "还没有选择图片，已保留当前行动卡。"
         state.todayAgendaState = TodayAgendaState.Error
     }
 

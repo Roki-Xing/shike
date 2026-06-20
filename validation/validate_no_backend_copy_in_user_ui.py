@@ -63,7 +63,18 @@ def main() -> int:
         ("ordinary_ui_hides_backend_and_provider_copy", all(token not in user_ui for token in FORBIDDEN_COPY)),
         ("debug_screen_can_keep_engineering_tools", "BackendEndpointControls" in debug_ui and "OfflineSampleActions" in debug_ui),
         ("ocr_editor_filters_debug_lines", "userVisibleOcrDraftText" in ocr_editor and "userVisibleEvidenceText(text)" in ocr_editor),
-        ("evidence_filter_removes_backend_lines", all(token in evidence for token in ["startsWith(\"云端 ai 解析\")", "startsWith(\"后端\")", "manual_review", "provider"])),
+        (
+            "evidence_filter_removes_backend_lines",
+            all(
+                token in evidence
+                for token in [
+                    "startsWith(\"云端 ai 解析\")",
+                    "startsWith(\"后端\")",
+                    "INTERNAL_MANUAL_MARKER",
+                    "INTERNAL_PROVIDER_MARKER",
+                ]
+            ),
+        ),
         ("ordinary_ui_uses_product_copy", all(token in user_ui for token in ["识别到的文字", "准备事项", "需要确认", "生成行动卡"])),
     ]
 

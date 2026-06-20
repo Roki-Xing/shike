@@ -119,7 +119,6 @@ class AnalyzeImageApiClientTest {
         assertEquals("E520", item.location)
         assertEquals(listOf("加入日历", "课前提醒", "打开地图"), item.actions)
         assertTrue(item.rawText.contains("任务：上英语口语"))
-        assertTrue(item.rawText.contains("风险：日期来自“明天”，请确认"))
-        assertTrue(item.rawText.contains("待补：reminder_offset"))
+        assertTrue(item.rawText.contains("需要确认：日期来自“明天”，请确认；是否需要提前提醒"))
     }
 }

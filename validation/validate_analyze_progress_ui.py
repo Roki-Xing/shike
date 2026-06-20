@@ -17,6 +17,7 @@ def read(relative: str) -> str:
 def main() -> int:
     progress = read("AnalyzeProgressPanel.kt")
     home = read("HomeActionScreen.kt")
+    routes = read("MainScreenRoutes.kt")
     main_screen = read("ShikeMainScreen.kt")
 
     checks = [
@@ -24,9 +25,14 @@ def main() -> int:
         ("progress_state_model_present", "data class AnalyzeProgressState" in progress and "analyzeProgressStateFor" in progress),
         ("four_steps_present", all(token in progress for token in ["读取图片", "OCR识别", "结构化解析", "生成行动卡"])),
         ("progress_panel_copy_present", "正在把截图变成行动卡" in progress),
-        ("home_uses_progress_panel", "AnalyzeProgressPanel(" in home and "hasPendingImage" in home),
-        ("home_keeps_candidate_prompt", "ScreenshotDetectedSheet" in home and "VisibleScreenCapturePromptCard" in home),
-        ("screenshot_candidate_does_not_force_import_tab", "selectedSection = ShikeMainSection.Import" not in main_screen),
+        ("import_uses_progress_panel", "AnalyzeProgressPanel(" in routes and "hasPendingImage" in routes),
+        ("home_keeps_candidate_prompt", "检测到新截图" in home and "ImportFlowState.Detected" in home),
+        (
+            "screenshot_candidate_enters_import_flow_after_user_accepts",
+            "onImportScreenshotCandidate(candidate)" in main_screen
+            and "onImportVisibleScreenCapture()" in main_screen
+            and "selectedSection = ShikeMainSection.Import" in main_screen,
+        ),
     ]
 
     passed = sum(1 for _, ok in checks if ok)

@@ -72,7 +72,8 @@ def main() -> int:
         ("bottom_nav_hides_debug_tab", "BottomNavItem(\"调试\"" not in bottom_nav),
         (
             "product_copy_replaces_engineering_status",
-            "云侧解析中" in backend_actions
+            "AI 正在解析图片" in backend_actions
+            and "AI 正在解析文字" in backend_actions
             and "云侧连接已保存" in endpoint_actions
             and "云侧暂不可用，已切换为本地确认" in read(APP_ROOT / "data/BackendAnalysisOutcomes.kt"),
         ),
@@ -94,10 +95,10 @@ def main() -> int:
         (
             "ordinary_flow_has_product_progress_and_structured_card",
             "正在把截图变成行动卡" in user_copy
-            and "课程/事项" in user_copy
+            and "事项" in user_copy
             and "准备事项" in user_copy
             and "需要确认" in user_copy
-            and "识别到的文字" in user_copy,
+            and "查看识别原文" in user_copy,
         ),
         (
             "debug_entry_requires_unlock_state",

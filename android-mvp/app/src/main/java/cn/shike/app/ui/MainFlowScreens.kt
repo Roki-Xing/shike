@@ -8,6 +8,7 @@ import cn.shike.app.data.ImageCleanupStatus
 import cn.shike.app.data.InboxItemEntity
 import cn.shike.app.data.ScreenshotCandidate
 import cn.shike.app.domain.ShikeItem
+import cn.shike.app.system.ScreenshotAssistDiagnostics
 import cn.shike.app.system.VisibleScreenCapturePrompt
 
 @Composable
@@ -17,12 +18,9 @@ fun CaptureHubScreen(
     modelStatus: String,
     ocrDraft: String,
     onOcrDraftChange: (String) -> Unit,
-    cloudEnhancedEnabled: Boolean,
     onGallery: () -> Unit,
     onCamera: () -> Unit,
     onManualInput: () -> Unit,
-    onBackendCourse: () -> Unit,
-    onBackendEvent: () -> Unit,
     pendingScreenshotCandidate: ScreenshotCandidate?,
     onImportScreenshotCandidate: (ScreenshotCandidate) -> Unit,
     onIgnoreScreenshotCandidate: () -> Unit,
@@ -47,21 +45,26 @@ fun CaptureHubScreen(
     CaptureEntryPanel(
         captureSource = captureSource,
         capturedBitmap = capturedBitmap,
-        modelStatus = modelStatus,
         ocrDraft = ocrDraft,
         onOcrDraftChange = onOcrDraftChange,
-        cloudEnhancedEnabled = cloudEnhancedEnabled,
         onGallery = onGallery,
         onCamera = onCamera,
         onManualInput = onManualInput,
-        onBackendCourse = onBackendCourse,
-        onBackendEvent = onBackendEvent,
     )
-    if ("请求后端" in modelStatus) {
+    if ("解析" in modelStatus) {
         ShikeLoadingSkeleton("解析中", "正在解析 OCR 文本")
     }
     if ("失败" in modelStatus) {
-        ShikeErrorState("AI 解析暂不可用", "可继续手动确认，连接配置已隐藏在高级设置中。")
+        RecoverableErrorState(
+            title = "AI 解析暂不可用",
+            detail = "截图已保留为待确认，你可以换图、手动输入或稍后重新解析。",
+            repairActions = listOf(
+                RecoverableRepairAction("重新选择截图", onGallery),
+                RecoverableRepairAction("手动输入", onManualInput),
+                RecoverableRepairAction("先存入待确认") {},
+                RecoverableRepairAction("重新解析") {},
+            ),
+        )
     }
 }
 
@@ -85,6 +88,7 @@ fun ActionPlanScreen(
     onAddCalendar: (ShikeItem) -> Unit,
     onReminder: (ShikeItem) -> Unit,
     onOpenMap: (ShikeItem) -> Unit,
+    onCompleteArrangement: () -> Unit,
 ) {
     ActionPlannerPanel(
         item = selected,
@@ -97,6 +101,7 @@ fun ActionPlanScreen(
         onAddCalendar = onAddCalendar,
         onReminder = onReminder,
         onOpenMap = onOpenMap,
+        onCompleteArrangement = onCompleteArrangement,
     )
 }
 
@@ -121,6 +126,7 @@ fun PrivacySettingsScreen(
     onCloudEnhancedChange: (Boolean) -> Unit,
     localMultimodalStatus: LocalMultimodalStatus,
     onLocalMultimodalPreferenceChange: (LocalMultimodalPreference) -> Unit,
+    screenshotAssistDiagnostics: ScreenshotAssistDiagnostics?,
     screenshotAssistEnabled: Boolean,
     onScreenshotAssistChange: (Boolean) -> Unit,
     onClearLocalData: () -> Unit,
@@ -132,6 +138,7 @@ fun PrivacySettingsScreen(
         onCloudEnhancedChange = onCloudEnhancedChange,
         localMultimodalStatus = localMultimodalStatus,
         onLocalMultimodalPreferenceChange = onLocalMultimodalPreferenceChange,
+        screenshotAssistDiagnostics = screenshotAssistDiagnostics,
         screenshotAssistEnabled = screenshotAssistEnabled,
         onScreenshotAssistChange = onScreenshotAssistChange,
         onClearLocalData = onClearLocalData,

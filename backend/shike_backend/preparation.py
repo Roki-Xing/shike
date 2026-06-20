@@ -31,12 +31,59 @@ def preparation_items_from_text(text: str) -> list[str]:
     for match in re.finditer(r"记得带([^，,。；;\n]+)", text):
         for item in _expand_carry_items(match.group(1)):
             add(item)
+    for match in re.finditer(r"(?:别忘|别忘了)([^，,。；;\n]+)", text):
+        raw = match.group(1).strip()
+        if raw and raw != "了":
+            if raw.startswith(("带", "打印", "上传", "完成", "准备", "自备", "穿", "看", "发")):
+                add(raw)
+            else:
+                add(f"带{raw}")
+    if "东西别忘了" in text:
+        add("东西别忘了")
+    if "别迟到" in text:
+        add("别迟到")
+    for match in re.finditer(r"记得打印([^，,。；;\n]+)", text):
+        add(f"打印{match.group(1)}")
     for match in re.finditer(r"带(?!到|来|回)([^，,。；;\n]+)", text):
         for item in _expand_carry_items(match.group(1)):
             add(item)
+    for match in re.finditer(r"带到([^，,。；;\n]+)", text):
+        add(f"带纸质版{_object_before(text, match.start())}".strip())
+    for match in re.finditer(r"带上([^，,。；;\n]+)", text):
+        for item in _expand_carry_items(match.group(1)):
+            add(item)
+    for match in re.finditer(r"先把([^，,。；;\n]+?)带上", text):
+        for item in _expand_carry_items(match.group(1)):
+            add(item)
     for match in re.finditer(r"提前准备([^，,。；;\n]+)", text):
-        add(f"提前准备{match.group(1)}")
+        for item in _expand_prepare_items(match.group(1)):
+            add(item)
+    for match in re.finditer(r"准备([0-9一二三四五六七八九十两]+分钟[^，,。；;\n]+|风险清单|简历|作品集)", text):
+        add(f"准备{match.group(1)}")
+    for match in re.finditer(r"提前把([^，,。；;\n]+)", text):
+        add(f"提前把{match.group(1)}")
+    for match in re.finditer(r"(?:先|提前)(安装好[^，,。；;\n]+|看[^，,。；;\n]+|打印[^，,。；;\n]+|下载[^，,。；;\n]+|调试[^，,。；;\n]+)", text):
+        add(match.group(1))
+    for match in re.finditer(r"上课前(打印[^，,。；;\n]+)", text):
+        add(match.group(1))
+    for match in re.finditer(r"课前(?:交|提交)([^，,。；;\n]+)", text):
+        add(f"带{match.group(1)}")
+    for match in re.finditer(r"文件名写\s*([^，,。；;\n]+)", text):
+        add(f"文件名写{match.group(1)}")
+    for match in re.finditer(r"(上传PDF|完成问卷|截图发群里|扫描报名二维码|先加群报名|完成报名|报名)", text):
+        add(match.group(1))
+    if "录音作业" in text:
+        add("录音作业")
+    if "发QQ群" in text:
+        add("发QQ群")
+    for match in re.finditer(r"(自备[^，,。；;\n]+|穿[^，,。；;\n]+|看PRD第[0-9一二三四五六七八九十]+版|PPT[^，,。；;\n]*备份)", text):
+        add(match.group(1))
+    for match in re.finditer(r"别忘([^，,。；;\n]+)", text):
+        if match.group(1).strip() != "了":
+            add(match.group(1))
     for match in re.finditer(r"提前[一二三四五六七八九十两0-9]+分钟(?:到达|到|上线|入场)?", text):
+        add(match.group(0))
+    for match in re.finditer(r"提前[一二三四五六七八九十两0-9]+(?:小时|分钟)(?:到机场|到站|入会|到达)?", text):
         add(match.group(0))
     for match in re.finditer(r"先去?签到", text):
         add(match.group(0))
@@ -77,15 +124,42 @@ def enrich_preparation_payload(payload: dict[str, Any], evidence_texts: list[str
 
 def _expand_carry_items(raw: str) -> list[str]:
     return [
-        item if item.startswith("带") else f"带{item}"
+        _normalize_carry_item(item)
         for item in (part.strip() for part in _SEPARATORS_RE.split(raw))
         if item
     ]
 
 
+def _expand_prepare_items(raw: str) -> list[str]:
+    return [
+        item if item.startswith("准备") else f"准备{item}"
+        for item in (part.strip() for part in _SEPARATORS_RE.split(raw))
+        if item
+    ]
+
+
+def _normalize_carry_item(item: str) -> str:
+    if item.startswith(("带", "打印", "上传", "完成", "截图", "扫描", "自备", "穿", "看", "发")):
+        return item
+    return f"带{item}"
+
+
+def _object_before(text: str, index: int) -> str:
+    prefix = text[:index]
+    if "纸质版" in prefix and "实验报告" in prefix:
+        return "实验报告"
+    return ""
+
+
 def _clean_item(value: str) -> str | None:
     cleaned = _STOP_CHARS_RE.sub("", value).strip().strip("：:。，,；;")
+    cleaned = cleaned.removesuffix("带上").strip()
+    while re.search(r"\s*(标题|未分类|AI)\s*$", cleaned):
+        cleaned = re.sub(r"\s*(标题|未分类|AI)\s*$", "", cleaned).strip()
+    cleaned = cleaned.replace("PPT存在云盘也备份", "PPT云盘备份")
     if not cleaned or len(cleaned) > 24:
+        return None
+    if cleaned in {"带上", "带了", "了"}:
         return None
     lower = cleaned.lower()
     if any(token in lower for token in _ENGINEERING_TOKENS):

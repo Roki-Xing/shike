@@ -29,6 +29,7 @@ fun MainActivity.clearAllLocalData() {
     clearBackendBaseUrl(this)
     clearScreenshotAssistPreference(this)
     screenshotAssistEnabled = false
+    handleScreenshotAssistServiceRunningChanged(false)
     unregisterScreenshotObserver()
     stopScreenshotAssistService(this)
 }
@@ -81,6 +82,9 @@ fun MainActivity.clearImageCleanupStatusFromSystem() {
 
 fun MainActivity.updateScreenshotAssistEnabled(enabled: Boolean) {
     screenshotAssistController.updateEnabled(enabled)
+    if (!enabled) {
+        handleScreenshotAssistServiceRunningChanged(false)
+    }
 }
 
 fun MainActivity.requestScreenshotNotificationPermissionIfNeeded() {
@@ -104,9 +108,15 @@ fun MainActivity.handleScreenshotMediaPermissionResult(granted: Boolean) {
         requestScreenshotNotificationPermissionIfNeeded()
         registerScreenshotObserverIfAllowed()
         startScreenshotAssistService(this)
+        handleScreenshotAssistServiceRunningChanged(true)
     } else {
         screenshotAssistEnabled = false
         unregisterScreenshotObserver()
         stopScreenshotAssistService(this)
+        handleScreenshotAssistServiceRunningChanged(false)
     }
+}
+
+fun MainActivity.handleScreenshotAssistServiceRunningChanged(running: Boolean) {
+    screenshotAssistServiceRunning = running
 }

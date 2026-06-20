@@ -2,6 +2,7 @@ import unittest
 import hashlib
 
 from shike_backend.schemas_v2 import AnalyzeImageRequest
+from shike_backend.schemas_v2 import ParsedActionCard
 
 try:
     from shike_backend.audit_log import build_analyze_image_audit_event
@@ -39,6 +40,25 @@ class AnalyzeImageAuditLogTest(unittest.TestCase):
             duration_ms=1832,
             status="schema_valid",
             repair_risks=["ocr_evidence_repair:ocr_time_mismatch"],
+            result_card=ParsedActionCard(
+                title="高数课",
+                scene_type="course_notice",
+                confidence=0.91,
+                time={
+                    "start_text": "明天18:30",
+                    "deadline_text": None,
+                    "normalized_start": "2026-06-07T18:30:00+08:00",
+                    "normalized_deadline": None,
+                },
+                location={"raw": "B203", "map_query": "B203", "confidence": 0.9},
+                task={"summary": "明天18:30上高数到B203", "priority": "medium", "topic": "course"},
+                suggested_actions=[],
+                missing_fields=[],
+                risks=[],
+                evidence=[],
+                ignored_regions=[],
+                explanation="测试用结构化卡片。",
+            ),
         )
         serialized = str(event)
 
@@ -60,6 +80,13 @@ class AnalyzeImageAuditLogTest(unittest.TestCase):
         self.assertEqual(event["ocr_has_location_signal"], True)
         self.assertEqual(event["ocr_repair_applied"], True)
         self.assertEqual(event["ocr_repair_reasons"], ["ocr_time_mismatch"])
+        self.assertEqual(event["result_scene_type"], "course_notice")
+        self.assertEqual(event["result_has_start_time"], True)
+        self.assertEqual(event["result_normalized_start_hour"], 18)
+        self.assertEqual(event["result_has_location"], True)
+        self.assertEqual(event["result_location_kind"], "room_code")
+        self.assertEqual(event["result_missing_time"], False)
+        self.assertEqual(event["result_missing_location"], False)
 
         self.assertNotIn("Authorization", serialized)
         self.assertNotIn("AppKEY", serialized)
@@ -69,6 +96,9 @@ class AnalyzeImageAuditLogTest(unittest.TestCase):
         self.assertNotIn("2026123456", serialized)
         self.assertNotIn("张三", serialized)
         self.assertNotIn("明天18:30上高数到B203", serialized)
+        self.assertNotIn("2026-06-07T18:30:00+08:00", serialized)
+        self.assertNotIn("B203", serialized)
+        self.assertNotIn("高数课", serialized)
         self.assertNotIn(request.input_id, serialized)
 
 

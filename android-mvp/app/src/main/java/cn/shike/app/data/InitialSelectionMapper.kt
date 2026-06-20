@@ -35,11 +35,16 @@ fun buildInitialSelection(
     }
     val importedItem = itemFromSharedText(sharedText)
     return InitialSelection(
-        item = savedItem ?: importedItem,
+        item = savedItem ?: importedItem.copy(
+            rawText = listOf(
+                "今天还没有待处理事项",
+                "把截图交给拾刻，生成第一张行动卡",
+            ).joinToString("\n"),
+        ),
         captureSource = if (savedItem == null) {
-            "今日行动台空状态：尚无本地收件箱任务，可从截图、拍照、分享或手动输入开始。"
+            "今天还没有待处理事项：把截图交给拾刻，生成第一张行动卡。"
         } else {
-            savedCaptureSource ?: "尚未采集图片，已加载离线样例。"
+            savedCaptureSource ?: "已恢复上次保存的行动卡。"
         },
         todayState = if (savedItem == null) InitialTodayState.Empty else InitialTodayState.Ready,
     )

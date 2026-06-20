@@ -258,7 +258,8 @@ def main() -> int:
                     "ExplodingMultimodalAdapter",
                     "image-cloud-disabled-001",
                     "cloud_image_disabled",
-                    "text_adapter.captured_request.ocr_text == \"客户端OCR：今晚18:30 项目讨论 B203\"",
+                    "cloud_disabled_payload[\"time\"][\"start_text\"] == \"今晚18:30\"",
+                    "cloud_disabled_payload[\"location\"][\"raw\"] == \"B203\"",
                 ]
             ),
         ),

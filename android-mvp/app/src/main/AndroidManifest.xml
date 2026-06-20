@@ -17,6 +17,9 @@
         <receiver
             android:name=".system.ReminderReceiver"
             android:exported="false" />
+        <receiver
+            android:name=".system.ScreenshotDismissReceiver"
+            android:exported="false" />
         <service
             android:name=".system.ScreenshotAssistService"
             android:exported="false"

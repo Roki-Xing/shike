@@ -27,8 +27,8 @@ class ModelExplanationTest {
 
         val explanation = modelExplanation(item)
 
-        assertTrue(explanation.contains("云端暂不可用"))
-        assertTrue(explanation.contains("本地规则保留行动卡"))
+        assertTrue(explanation.contains("AI 暂时没识别成功"))
+        assertTrue(explanation.contains("截图已保存为待确认"))
         assertTrue(explanation.contains("置信度或字段完整性仍需用户确认"))
     }
 

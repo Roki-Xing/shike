@@ -77,6 +77,7 @@ class ParsedActionCard(BaseModel):
         "course_notice",
         "event_poster",
         "meeting_notice",
+        "interview_notice",
         "assignment_deadline",
         "exam_notice",
         "travel_ticket",

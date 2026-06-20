@@ -72,6 +72,10 @@ def main() -> int:
     inbox_database = read("android-mvp/app/src/main/java/cn/shike/app/data/InboxDatabase.kt")
     backend_config_store = read("android-mvp/app/src/main/java/cn/shike/app/data/BackendConfigStore.kt")
     reminder_scheduler = read("android-mvp/app/src/main/java/cn/shike/app/system/ReminderScheduler.kt")
+    inbox_panel = read("android-mvp/app/src/main/java/cn/shike/app/ui/InboxPanel.kt")
+    inbox_workbench = read("android-mvp/app/src/main/java/cn/shike/app/ui/InboxWorkbench.kt")
+    action_planner = read("android-mvp/app/src/main/java/cn/shike/app/ui/ActionPlannerPanel.kt")
+    capture_entry = read("android-mvp/app/src/main/java/cn/shike/app/ui/CaptureEntryPanel.kt")
     docs = "\n".join(
         read(path)
         for path in [
@@ -128,7 +132,14 @@ def main() -> int:
         ("camera_persists_selection", "相机拍照预览" in android_source and "persistSelection(item, source)" in android_source),
         ("sample_fallback_persists", "persistSelection(sampleCourse()" in android_source and "persistSelection(sampleEvent()" in android_source),
         ("share_import_waits_for_confirmation", "文本分享入口（待确认，未落盘）" in android_source and "saveSnapshot(importedItem" not in android_source),
-        ("restore_feedback_visible", "本地恢复" in android_source and "已保存到收件箱缓存" in android_source),
+        (
+            "restore_feedback_visible",
+            "收件箱状态" in inbox_panel
+            and "收件箱内" in inbox_workbench
+            and "完成安排" in action_planner
+            and "本地恢复" not in capture_entry
+            and "已保存到收件箱缓存" not in capture_entry,
+        ),
         ("persistence_documented", "SharedPreferences" in docs and "重启" in docs and "收件箱缓存" in docs),
     ]
 

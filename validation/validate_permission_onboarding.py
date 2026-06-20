@@ -46,8 +46,13 @@ def main() -> int:
             "不默认上传原图" in onboarding and "用户确认后" in onboarding,
         ),
         (
-            "shike_app_wires_first_run_onboarding",
-            "onboardingDismissed" in shike_app + content and "PermissionOnboarding" in main_flow + home,
+            "home_wires_click_triggered_permission_guide",
+            "onboardingDismissed" in shike_app + content
+            and "ScreenshotAssistGuideDialog" in home
+            and "if (onboardingDismissed)" in home
+            and "onDismissOnboarding()" in home
+            and "onEnableScreenshotAssistFromOnboarding()" in home
+            and "PermissionOnboarding(" not in home,
         ),
         (
             "main_activity_persists_onboarding_state",

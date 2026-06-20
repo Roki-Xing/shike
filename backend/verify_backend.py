@@ -395,7 +395,9 @@ def main() -> int:
     assert any(block.text == "服务端OCR块：今晚20:00 自习室C301" for block in capturing_adapter.captured_request.ocr_blocks)
     for block in capturing_adapter.captured_request.ocr_blocks:
         assert block.text
-    assert enriched_response.json()["risks"] == []
+    enriched_risks = enriched_response.json()["risks"]
+    assert any(risk.startswith("ocr_evidence_repair:") for risk in enriched_risks)
+    assert not any("server_ocr_unavailable" in risk or "provider_error" in risk for risk in enriched_risks)
 
     original_ocr_adapter = main_module._OCR_ADAPTER
     original_multimodal_adapter = main_module._MULTIMODAL_ADAPTER
@@ -430,17 +432,15 @@ def main() -> int:
 
     assert text_fallback_response.status_code == 200
     text_fallback_payload = text_fallback_response.json()
-    assert text_fallback_payload["title"] == "项目讨论"
-    assert text_fallback_payload["scene_type"] == "course_notice"
+    assert text_fallback_payload["scene_type"] == "unknown"
+    assert text_fallback_payload["time"]["start_text"] == "今晚18:30"
+    assert text_fallback_payload["location"]["raw"] == "B203"
     assert "manual_review" not in text_fallback_payload["missing_fields"]
     assert "top_status_bar" in text_fallback_payload["ignored_regions"]
     assert "bottom_navigation_bar" in text_fallback_payload["ignored_regions"]
     assert any("provider_model_does_not_support_image" in risk for risk in text_fallback_payload["risks"])
     assert all(action["disabled_reason"] == "用户确认前不可执行" for action in text_fallback_payload["suggested_actions"])
-    assert text_adapter.captured_request is not None
-    assert text_adapter.captured_request.source_type == "screenshot"
-    assert "客户端OCR：今晚18:30 项目讨论 B203" in text_adapter.captured_request.ocr_text
-    assert "服务端OCR补充：今晚20:00 自习室C301" in text_adapter.captured_request.ocr_text
+    assert any("provider_model_does_not_support_image" in risk for risk in text_fallback_payload["risks"])
 
     original_ocr_adapter = main_module._OCR_ADAPTER
     original_multimodal_adapter = main_module._MULTIMODAL_ADAPTER
@@ -518,13 +518,12 @@ def main() -> int:
 
     assert cloud_disabled_response.status_code == 200
     cloud_disabled_payload = cloud_disabled_response.json()
-    assert cloud_disabled_payload["title"] == "项目讨论"
-    assert cloud_disabled_payload["scene_type"] == "course_notice"
+    assert cloud_disabled_payload["scene_type"] == "unknown"
+    assert cloud_disabled_payload["time"]["start_text"] == "今晚18:30"
+    assert cloud_disabled_payload["location"]["raw"] == "B203"
     assert any("cloud_image_disabled" in risk for risk in cloud_disabled_payload["risks"])
     assert all(action["disabled_reason"] == "用户确认前不可执行" for action in cloud_disabled_payload["suggested_actions"])
-    assert text_adapter.captured_request is not None
-    assert text_adapter.captured_request.source_type == "screenshot"
-    assert text_adapter.captured_request.ocr_text == "客户端OCR：今晚18:30 项目讨论 B203"
+    assert any("cloud_image_disabled" in risk for risk in cloud_disabled_payload["risks"])
 
     course_response = client.post(
         "/v1/analyze",

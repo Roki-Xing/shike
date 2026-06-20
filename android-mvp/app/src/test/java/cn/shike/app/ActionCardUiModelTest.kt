@@ -36,4 +36,23 @@ class ActionCardUiModelTest {
 
         assertEquals("上课", model.task)
     }
+
+    @Test
+    fun actionCardUiModelFrom_surfacesPreparationAsPrimarySectionAndMapsWarnings() {
+        val item = sampleCourse().copy(
+            title = "高数B考试",
+            time = "6月13日 21:00",
+            location = "B地点303",
+            rawText = "任务：高数B考试\n准备：带准考证\n需要确认：地点 B地点303，请确认是否为考场\n风险：ocr_evidence_repair:ocr_time_missing",
+        )
+
+        val model = actionCardUiModelFrom(item)
+
+        assertEquals("高数B考试", model.title)
+        assertEquals("6月13日 21:00", model.time)
+        assertEquals("B地点303", model.location)
+        assertEquals(listOf("带准考证"), model.preparationItems)
+        assertEquals(listOf("地点 B地点303，请确认是否为考场", "请确认时间是否准确"), model.userWarnings)
+        assertFalse(model.userWarnings.any { "ocr_evidence_repair" in it || "风险" in it })
+    }
 }

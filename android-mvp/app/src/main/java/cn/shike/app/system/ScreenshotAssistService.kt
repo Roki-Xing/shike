@@ -49,6 +49,7 @@ class ScreenshotAssistService : Service() {
     private fun onCandidate(candidate: ScreenshotCandidate) {
         if (!shouldNotifyScreenshotCandidate(candidate, lastNotifiedScreenshotUri)) return
         lastNotifiedScreenshotUri = candidate.contentUri
+        recordScreenshotAssistDetected(this, candidate.createdAtMillis)
         showScreenshotDetectedNotification(this, candidate)
     }
 

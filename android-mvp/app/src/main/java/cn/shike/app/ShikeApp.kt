@@ -15,6 +15,7 @@ import cn.shike.app.data.InboxItemEntity
 import cn.shike.app.data.InitialTodayState
 import cn.shike.app.data.ScreenshotCandidate
 import cn.shike.app.domain.ShikeItem
+import cn.shike.app.system.ScreenshotAssistDiagnostics
 import cn.shike.app.system.VisibleScreenCapturePrompt
 import cn.shike.app.ui.LocalMultimodalInstallState
 import cn.shike.app.ui.LocalMultimodalStatus
@@ -49,6 +50,7 @@ fun ShikeApp(
     onImageCleanupStatusChange: (ImageCleanupStatus) -> Unit = {},
     imageCleanupStatusFromSystem: ImageCleanupStatus? = null,
     onImageCleanupStatusConsumed: () -> Unit = {},
+    screenshotAssistDiagnostics: ScreenshotAssistDiagnostics? = null,
 ) {
     val state = rememberShikeAppState(
         initialItem,
@@ -102,12 +104,11 @@ fun ShikeApp(
         captureLaunchers = captureLaunchers,
         localMultimodalStatus = localMultimodalStatus,
         screenshotAssistSwitchEnabled = screenshotAssistSwitchEnabled,
+        screenshotAssistDiagnostics = screenshotAssistDiagnostics,
         onboardingDismissed = onboardingDismissed,
         pendingScreenshotCandidate = pendingScreenshotCandidate,
         visibleScreenCapturePrompt = visibleScreenCapturePrompt,
         onSaveBackendEndpoint = actions::saveBackendEndpoint,
-        onAnalyzeCurrentDraft = actions::analyzeCurrentDraftWithBackend,
-        onAnalyzeEvent = actions::analyzeEventWithBackend,
         onCourseSample = actions::applyCourseSample,
         onEventSample = actions::applyEventSample,
         onScreenshotAssistChange = {

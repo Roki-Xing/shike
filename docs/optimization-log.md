@@ -10066,3 +10066,109 @@ Validation:
 
 Next:
 - Install `/mnt/c/Users/Xing/Desktop/Shike-app-debug.apk` on the cloud device and verify that "明天早上九点上英语口语教室 E520" opens a system calendar insert page at the next-day 09:00 slot and the home page no longer shows the full confirmation/action-planning stack.
+
+## 2026-06-12 / Action Card Training Set Integration
+
+Goal: Apply `/mnt/c/Users/Xing/Desktop/SHIKE_ACTION_CARD_TRAINING_SET_GUIDE.md` and `/mnt/c/Users/Xing/Desktop/shike_action_card_training_cases_v1.jsonl` so OCR text can become structured, evidence-backed action cards instead of title-only OCR copies.
+
+Root cause:
+- Real screenshots such as "地点303" and "教室是B336" could be recognized by OCR but still disappear from the action card when model output or fallback logic missed the location field.
+- The mock-provider v2 image fallback still depended on older text-model behavior, which was too narrow for training-set cases covering exams, interviews, online meetings, travel, preparation items, noise, negative fragments, and rescheduled events.
+
+Files changed:
+- `docs/SHIKE_ACTION_CARD_TRAINING_SET_GUIDE.md`: repo copy of the desktop guidance.
+- `validation/fixtures/shike_action_card_training_cases_v1.jsonl`: 60-case OCR-to-action-card dataset.
+- `backend/shike_backend/action_card_rules.py`: evidence-backed v2 OCR text parser for scene, time, location, task, preparation items, missing fields, warnings, and suggested actions.
+- `backend/shike_backend/location.py`: location enrichment for backend responses that miss OCR-supported classroom/room fields.
+- `backend/shike_backend/preparation.py`: broader extraction for carry/prepare/sign-in/upload/print/reminder items.
+- `backend/shike_backend/main.py`: v1/v2 enrichment path now repairs location before preparation items; mock v2 text fallback uses the action-card rules parser.
+- `android-mvp/app/src/main/java/cn/shike/app/domain/ActionCardEvidence.kt` and `ModelApiClient.kt`: Android-side preparation-field compatibility.
+- `validation/validate_flexible_action_item_extraction.py`, `validation/validate_backend_location_items.py`, backend tests, and contract validators: new regression gates for dataset, location repair, sample contamination, and v2 provider contract.
+
+Validation:
+- PASS RED check before final fix
+  - Evidence: `backend/tests/test_action_card_training_set.py` failed for `meeting_004` and `negative_004` before production rules were corrected.
+- PASS `PYTHONPATH=backend python3 -m pytest backend/tests/test_action_card_training_set.py backend/tests/test_location_items.py`
+  - Evidence: `8 passed`.
+- PASS `python3 validation/validate_flexible_action_item_extraction.py`
+  - Evidence: `FLEXIBLE_ACTION_DATASET_MAIN_FIELDS 60/60`, `FLEXIBLE_ACTION_DATASET_FORBIDDEN 60/60`, `FLEXIBLE_ACTION_ITEM_EXTRACTION_METRIC 11/11`.
+- PASS `python3 validation/validate_backend_location_items.py`
+  - Evidence: `BACKEND_LOCATION_ITEMS_METRIC 5/5`.
+- PASS `python3 validation/validate_no_sample_contamination.py`
+  - Evidence: `NO_SAMPLE_CONTAMINATION_METRIC 14/14`.
+- PASS `python3 backend/verify_backend.py`
+  - Evidence: `backend_passed`.
+- PASS `python3 validation/validate_model_contract_strict.py`
+  - Evidence: `MODEL_CONTRACT_STRICT_METRIC 10/10`.
+- PASS `python3 validation/validate_vivo_multimodal_contract.py`
+  - Evidence: `VIVO_MULTIMODAL_CONTRACT_METRIC 28/28`.
+- PASS `python3 validation/validate_android_unit_tests.py`
+  - Evidence: `ANDROID_UNIT_TEST_METRIC 88/88`.
+- PASS `python3 validation/validate_real_world_ready.py`
+  - Evidence: `REAL_WORLD_READY_METRIC 22/22`.
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS secret_hygiene`.
+- PASS `git diff --check`
+  - Evidence: no whitespace errors.
+
+Next:
+- If an APK refresh is needed, rebuild with `bash android-mvp/build_apk.sh`, copy the debug APK to `/mnt/c/Users/Xing/Desktop/Shike-app-debug.apk`, then run APK secret hygiene before cloud-device reinstall.
+
+## 2026-06-13 / APK Rebuild After Action Card Training Set
+
+Goal: Rebuild the Android debug APK after the action-card training-set integration and place the installable artifact on the Windows Desktop.
+
+Files changed:
+- `android-mvp/build-report.md`: refreshed by `android-mvp/build_apk.sh` with the latest build timestamp and APK path.
+- `/mnt/c/Users/Xing/Desktop/Shike-app-debug.apk`: overwritten with the newly built debug APK.
+
+Validation:
+- PASS `bash android-mvp/build_apk.sh`
+  - Evidence: produced `android-mvp/app/build/outputs/apk/debug/app-debug.apk`.
+- PASS Desktop copy parity
+  - Evidence: local APK and Desktop APK share SHA-256 `4ee47e4af42ed7e098db525ba24874d09ccb4d8afac261236e7cfc96e4ad63ad`.
+- PASS `python3 validation/validate_apk_secret_hygiene.py`
+  - Evidence: `APK_SECRET_HYGIENE_METRIC 8/8`.
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS secret_hygiene`.
+- PASS `python3 validation/validate_flexible_action_item_extraction.py`
+  - Evidence: `FLEXIBLE_ACTION_DATASET_MAIN_FIELDS 60/60`, `FLEXIBLE_ACTION_DATASET_FORBIDDEN 60/60`, `FLEXIBLE_ACTION_ITEM_EXTRACTION_METRIC 11/11`.
+
+Next:
+- Install `/mnt/c/Users/Xing/Desktop/Shike-app-debug.apk` on the cloud device and verify the latest screenshot cases, especially `地点303`, `教室是B336`, and preparation items such as `带准考证`.
+
+## 2026-06-13 / Public Backend Sync For Action Card Training Set
+
+Goal: Deploy the local action-card training-set backend fixes to `https://roky.chat` so the rebuilt APK calls the same behavior that local validation proved.
+
+Root cause:
+- The Android APK was rebuilt from the latest local code, but `https://roky.chat` still pointed at `/opt/shike/releases/20260611202406-prep-items`.
+- The first deployed training-set release exposed one provider-path gap: when a live model returned weak `location.raw=303` while OCR evidence contained `B地点在303`, location enrichment kept the weaker provider value.
+
+Files changed:
+- Server release: `/opt/shike/releases/20260613095632-action-card-training`.
+- Public symlink: `/opt/shike/backend -> /opt/shike/releases/20260613095632-action-card-training`.
+- `backend/shike_backend/location.py`: now prioritizes more specific OCR-backed locations such as `B地点303` over weak model room-only values.
+- `backend/tests/test_location_items.py`: adds regression coverage for the provider-path location overwrite case.
+
+Deployment notes:
+- The new release reuses the known-working venv from `/opt/shike/releases/20260611202406-prep-items/backend/.venv` because fresh dependency install on the server could not resolve `uvicorn>=0.29` from the current pip source.
+- During the first symlink switch, systemd briefly failed with `status=203/EXEC` because `.venv` pointed through `/opt/shike/backend` and became self-referential after the symlink switch. The release venv link was corrected to the absolute previous-release venv path, then `shike-backend` restarted cleanly.
+
+Validation:
+- PASS remote backend smoke before symlink switch
+  - Evidence: `backend_passed` inside `/opt/shike/releases/20260613095632-action-card-training/backend`.
+- PASS remote location regression after fix
+  - Evidence: `python -m unittest tests.test_location_items` ran 4 tests, `OK`.
+- PASS service status
+  - Evidence: `systemctl is-active shike-backend` returned `active`.
+- PASS public preflight
+  - Evidence: `CLOUD_BACKEND_PREFLIGHT_METRIC=1/1`.
+- PASS public HTTPS probes
+  - Evidence: `教室是B336` returns `location.raw=B336` and `preparation_items=["带准考证"]`.
+  - Evidence: `地点303` returns `location.raw=303` and `preparation_items=["带准考证"]`.
+  - Evidence: `B地点在303` returns `location.raw=B地点303`.
+  - Evidence: all returned suggested actions remain `disabled_reason="用户确认前不可执行"`.
+
+Next:
+- Re-test from the cloud device using the freshly rebuilt APK. If image-based provider output still misses a location, compare the latest `analyze_image_audit` entry with the OCR text shown in the app; backend logs intentionally do not store full OCR text.

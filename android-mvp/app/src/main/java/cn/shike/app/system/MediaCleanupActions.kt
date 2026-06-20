@@ -2,16 +2,12 @@ package cn.shike.app.system
 
 import android.content.Context
 import android.content.IntentSender
-import android.os.Build
-import android.provider.MediaStore
-import androidx.core.net.toUri
 
 fun createScreenshotDeleteRequest(context: Context, sourceMediaStoreUri: String?): IntentSender? {
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R || sourceMediaStoreUri.isNullOrBlank()) {
-        return null
+    return when (val request = SourceImageCleanupManager(context).requestTrash(sourceMediaStoreUri)) {
+        is SourceImageCleanupRequest.SystemTrashConfirmation -> request.intentSender
+        is SourceImageCleanupRequest.NotSupported -> null
     }
-    val uri = sourceMediaStoreUri.toUri()
-    return MediaStore.createDeleteRequest(context.contentResolver, listOf(uri)).intentSender
 }
 
 fun screenshotCleanupUnsupportedMessage(): String =

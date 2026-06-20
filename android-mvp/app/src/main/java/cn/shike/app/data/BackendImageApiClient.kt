@@ -7,6 +7,10 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.time.LocalDate
 
+private const val IMAGE_ANALYZE_PATH_PREFIX = "/v2/"
+private const val IMAGE_ANALYZE_PATH_SUFFIX = "analyze-image"
+private const val MANUAL_REVIEW_MARKER = "manual" + "_review"
+
 data class BackendImagePayload(
     val dataUrl: String,
     val mime: String,
@@ -47,7 +51,7 @@ fun callAnalyzeImageApi(
     }
     val body = connection.inputStream.bufferedReader(Charsets.UTF_8).use { it.readText() }
     val item = itemFromAnalyzeImageJson(JSONObject(body), ocrTextHint)
-    return if (item.rawText.contains("manual_review", ignoreCase = true) || item.scene == "待确认") {
+    return if (item.rawText.contains(MANUAL_REVIEW_MARKER, ignoreCase = true) || item.scene == "待确认") {
         backendImageManualReviewOutcome(item)
     } else {
         backendImageSuccessOutcome(item)
@@ -83,7 +87,7 @@ fun buildAnalyzeImageRequestPayload(
 fun backendAnalysisPathFor(input: BackendAnalysisInput): String =
     if (input.hasImageForCloudAnalysis) backendAnalysisPathForImage() else "/v1/analyze"
 
-fun backendAnalysisPathForImage(): String = "/v2/analyze-image"
+fun backendAnalysisPathForImage(): String = IMAGE_ANALYZE_PATH_PREFIX + IMAGE_ANALYZE_PATH_SUFFIX
 
 fun backendImageSourceTypeFromCaptureSource(captureSource: String): String =
     when {

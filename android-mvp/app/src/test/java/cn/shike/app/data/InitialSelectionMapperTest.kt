@@ -1,6 +1,7 @@
 package cn.shike.app.data
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -55,16 +56,19 @@ class InitialSelectionMapperTest {
     }
 
     @Test
-    fun buildInitialSelection_noShareNoSavedShowsEmptyState() {
+    fun initialSelectionMapper_usesUserFacingHomeCopy() {
         val selection = buildInitialSelection(
             sharedText = "   ",
             savedItem = null,
             savedCaptureSource = null,
         )
 
-        assertEquals(sampleCourse(), selection.item)
-        assertTrue(selection.captureSource.contains("今日行动台空状态"))
-        assertTrue(selection.captureSource.contains("截图、拍照、分享或手动输入"))
+        assertEquals(sampleCourse().title, selection.item.title)
+        assertEquals(sampleCourse().scene, selection.item.scene)
+        assertTrue(selection.captureSource.contains("今天还没有待处理事项"))
+        assertTrue(selection.item.rawText.contains("把截图交给拾刻"))
+        assertFalse(selection.captureSource.contains("空状态"))
+        assertFalse(selection.item.rawText.contains("空状态"))
         assertEquals(InitialTodayState.Empty, selection.todayState)
     }
 }

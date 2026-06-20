@@ -8,15 +8,11 @@ import androidx.compose.runtime.Composable
 fun CaptureEntryPanel(
     captureSource: String,
     capturedBitmap: Bitmap?,
-    modelStatus: String,
     ocrDraft: String,
     onOcrDraftChange: (String) -> Unit,
-    cloudEnhancedEnabled: Boolean,
     onGallery: () -> Unit,
     onCamera: () -> Unit,
     onManualInput: () -> Unit,
-    onBackendCourse: () -> Unit,
-    onBackendEvent: () -> Unit,
 ) {
     SectionCard("导入") {
         Text("从相册选择截图、拍海报公告，或直接粘贴文字继续。", style = ShikeTypography.Body)
@@ -25,19 +21,13 @@ fun CaptureEntryPanel(
             onCamera = onCamera,
             onManualInput = onManualInput,
         )
-        KeyValue("本地恢复", "已保存到收件箱缓存")
         KeyValue("来源", captureSource)
-        KeyValue("解析状态", modelStatus)
+        Text("识别原文默认折叠；生成行动卡后再确认细节。", style = ShikeTypography.Caption)
         OcrDraftEditor(
             ocrDraft = ocrDraft,
             onOcrDraftChange = onOcrDraftChange,
         )
         CapturedImagePreview(capturedBitmap = capturedBitmap)
-        BackendAnalysisControls(
-            cloudEnhancedEnabled = cloudEnhancedEnabled,
-            onBackendCourse = onBackendCourse,
-            onBackendEvent = onBackendEvent,
-        )
         Text("AI 解析不可用时也会保留待确认行动卡。", style = ShikeTypography.Caption)
     }
 }

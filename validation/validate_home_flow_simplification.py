@@ -37,25 +37,54 @@ def main() -> int:
     """
 
     home_screen = read("HomeActionScreen.kt")
+    focused_card = read("FocusedHomeCard.kt")
+    screenshot_assist_guide = read("ScreenshotAssistGuideDialog.kt")
     main_routes = read("MainScreenRoutes.kt")
     main_screen = read("ShikeMainScreen.kt")
     main_flow = read("MainFlowScreens.kt")
     progress_panel = read("AnalyzeProgressPanel.kt")
+    structured_card = read("StructuredActionCard.kt")
     action_planner = read("ActionPlannerPanel.kt")
+    capture_entry = read("CaptureEntryPanel.kt")
+    parse_confirm = read("ParseConfirmPanel.kt")
+    execution_controls = read("ActionPlannerExecutionControls.kt")
 
     home_body = body_between(home_screen, "fun HomeActionScreen", "private fun ScreenshotPromptEntry")
     home_route_body = body_between(main_routes, "fun HomeRouteContent", "@Composable\nfun ImportRouteContent")
-    import_route_body = body_between(main_routes, "fun ImportRouteContent", "{\n    CaptureHubScreen")
     import_full_body = body_between(main_routes, "fun ImportRouteContent", "}\n")
 
     checks = [
         (
-            "home_keeps_only_summary_import_and_progress",
-            "DashboardHeader()" in home_body
-            and "DateStrip()" in home_body
-            and "HomeAgendaList(" in home_body
-            and "AnalyzeProgressPanel(" in home_body
-            and "HomePendingReviewPanel(" in home_body,
+            "home_uses_explicit_import_flow_state",
+            all(token in home_screen for token in [
+                "enum class ImportFlowState",
+                "Idle",
+                "Detected",
+                "Analyzing",
+                "Reviewing",
+                "Planning",
+                "Completed",
+                "importFlowStateFor(",
+            ]),
+        ),
+        (
+            "home_renders_only_one_primary_state",
+            "when (flowState)" in home_body
+            and "DashboardHeader()" not in home_body
+            and "DateStrip()" not in home_body
+            and "HomePendingReviewPanel(" not in home_body
+            and "PermissionOnboarding(" not in home_body
+            and "AnalyzeProgressPanel(" not in home_body,
+        ),
+        (
+            "home_states_match_user_journey_copy",
+            all(token in home_screen + focused_card + screenshot_assist_guide for token in [
+                "今天还没有待处理截图",
+                "开启截图助手",
+                "检测到新截图",
+                "交给拾刻",
+                "确认并安排",
+            ]),
         ),
         (
             "home_does_not_mount_confirm_or_action_plan",
@@ -73,13 +102,54 @@ def main() -> int:
             and "ActionPlanScreen(" in import_full_body,
         ),
         (
+            "import_flow_renders_one_stage_at_a_time",
+            "val importStage = importFlowStageFor(" in main_routes
+            and "when (importStage)" in main_routes
+            and "ImportRouteStage.Entry ->" in main_routes
+            and "ImportRouteStage.Analyzing ->" in main_routes
+            and "ImportRouteStage.Reviewing ->" in main_routes
+            and "ImportRouteStage.Planning ->" in main_routes
+            and "ImportRouteStage.Completed ->" in main_routes
+        ),
+        (
+            "import_entry_is_lightweight_not_flow_panel",
+            "识别原文默认折叠" in capture_entry
+            and "KeyValue(\"解析状态\"" not in capture_entry
+            and "BackendAnalysisControls(" not in capture_entry,
+        ),
+        (
             "analyze_progress_has_four_user_steps",
-            all(token in progress_panel for token in ["读取图片", "OCR识别", "结构化解析", "生成行动卡"]),
+            all(token in progress_panel for token in ["读取图片", "OCR识别", "结构化解析", "生成行动卡"])
+            and '"待确认" in selectedStatus' not in progress_panel
+            and "ImportFlowState.Analyzing" in home_screen,
+        ),
+        (
+            "structured_card_is_result_card_not_key_value_table",
+            "ActionCardHero(" in structured_card
+            and "PreparationSection(" in structured_card
+            and "SuggestedPlanSection(" in structured_card
+            and "ConfirmationSection(" in structured_card
+            and "ConfirmActionSection(" in structured_card
+            and "KeyValue(" not in structured_card,
+        ),
+        (
+            "confirm_page_has_single_primary_action",
+            "OutlinedTextField(" not in parse_confirm
+            and "ReviewEditSheet(" in parse_confirm
+            and "确认并安排" in structured_card
+            and "修改" in structured_card,
         ),
         (
             "action_plan_keeps_cleanup_after_confirmation",
             "ScreenshotCleanupPrompt(" in action_planner
             and "isConfirmed && selectedSourceMediaStoreUri != null" in action_planner,
+        ),
+        (
+            "action_plan_has_complete_arrangement_entry",
+            "完成安排" in action_planner
+            and "将执行以下动作" in action_planner
+            and "ExecutionResultPanel" not in action_planner
+            and "完成安排" not in execution_controls,
         ),
         (
             "bottom_padding_protects_nav_overlap",

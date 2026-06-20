@@ -6,7 +6,7 @@ import re
 import hashlib
 from typing import Any
 
-from shike_backend.schemas_v2 import AnalyzeImageRequest
+from shike_backend.schemas_v2 import AnalyzeImageRequest, ParsedActionCard
 
 
 _PHONE_RE = re.compile(r"1[3-9]\d{9}")
@@ -68,6 +68,54 @@ def _ocr_signal_summary(text: str) -> dict[str, bool]:
     }
 
 
+def _result_summary(card: ParsedActionCard | None) -> dict[str, Any]:
+    """Return non-content result fields for operational diagnosis.
+
+    Args:
+        card: Final parsed action card, after evidence repair.
+
+    Returns:
+        Metadata-only result summary without title, OCR text, or raw location.
+    """
+
+    if card is None:
+        return {}
+    time_payload = card.time if isinstance(card.time, dict) else {}
+    location_payload = card.location if isinstance(card.location, dict) else {}
+    normalized_start = str(time_payload.get("normalized_start") or "")
+    raw_location = str(location_payload.get("raw") or location_payload.get("map_query") or "")
+    return {
+        "result_scene_type": card.scene_type,
+        "result_has_start_time": bool(time_payload.get("start_text") or normalized_start),
+        "result_normalized_start_hour": _normalized_start_hour(normalized_start),
+        "result_has_location": bool(raw_location),
+        "result_location_kind": _location_kind(raw_location),
+        "result_missing_time": "time" in card.missing_fields or "exact_start_time" in card.missing_fields,
+        "result_missing_location": "location" in card.missing_fields,
+    }
+
+
+def _normalized_start_hour(value: str) -> int | None:
+    """Extract hour from an ISO datetime string without logging full value."""
+
+    match = re.search(r"T([0-2]\d):[0-5]\d", value)
+    return int(match.group(1)) if match else None
+
+
+def _location_kind(value: str) -> str:
+    """Classify a location without copying the raw location into logs."""
+
+    if not value:
+        return "missing"
+    if re.fullmatch(r"[A-Za-z]?\d{2,4}", value):
+        return "room_code"
+    if re.fullmatch(r"[A-Za-z]地点\d{2,4}", value):
+        return "labeled_room_code"
+    if any(token in value for token in ("线上", "腾讯会议", "QQ群", "邮箱")):
+        return "online"
+    return "named_place"
+
+
 def build_analyze_image_audit_event(
     request: AnalyzeImageRequest,
     *,
@@ -76,6 +124,7 @@ def build_analyze_image_audit_event(
     duration_ms: int,
     status: str,
     repair_risks: list[str] | None = None,
+    result_card: ParsedActionCard | None = None,
 ) -> dict[str, Any]:
     """Build redacted `/v2/analyze-image` request evidence.
 
@@ -86,6 +135,7 @@ def build_analyze_image_audit_event(
         duration_ms: Handler/provider duration in milliseconds.
         status: Non-secret request outcome.
         repair_risks: Non-secret OCR evidence repair reason codes.
+        result_card: Final action card used only for metadata summary.
 
     Returns:
         Metadata-only event suitable for backend access logs.
@@ -111,4 +161,5 @@ def build_analyze_image_audit_event(
         **_ocr_signal_summary(request.ocr_text_hint or ""),
         "ocr_repair_applied": bool(repair_reason_codes),
         "ocr_repair_reasons": repair_reason_codes,
+        **_result_summary(result_card),
     }

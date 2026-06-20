@@ -25,38 +25,29 @@ import cn.shike.app.data.ImageCleanupStatus
 import cn.shike.app.data.InboxItemEntity
 import cn.shike.app.data.ScreenshotCandidate
 import cn.shike.app.domain.ShikeItem
+import cn.shike.app.system.ScreenshotAssistDiagnostics
 import cn.shike.app.system.VisibleScreenCapturePrompt
 
 @Composable
 fun ShikeMainScreen(
-    selected: ShikeItem,
-    todayAgendaState: TodayAgendaState,
-    executionResults: List<ExecutionResult>,
-    isConfirmed: Boolean,
-    captureSource: String,
-    capturedBitmap: Bitmap?,
-    modelStatus: String,
-    ocrDraft: String,
+    selected: ShikeItem, todayAgendaState: TodayAgendaState,
+    executionResults: List<ExecutionResult>, isConfirmed: Boolean,
+    captureSource: String, capturedBitmap: Bitmap?,
+    modelStatus: String, ocrDraft: String,
     onOcrDraftChange: (String) -> Unit,
-    backendUrl: String,
-    inboxHistory: List<InboxItemEntity>,
+    backendUrl: String, inboxHistory: List<InboxItemEntity>,
     onBackendUrlChange: (String) -> Unit,
     onSaveBackendUrl: () -> Unit,
-    onGallery: () -> Unit,
-    onCamera: () -> Unit,
-    onManualInput: () -> Unit,
-    onBackendCourse: () -> Unit,
-    onBackendEvent: () -> Unit,
-    onCourse: () -> Unit,
-    onEvent: () -> Unit,
+    onGallery: () -> Unit, onCamera: () -> Unit, onManualInput: () -> Unit,
+    onCourse: () -> Unit, onEvent: () -> Unit,
     cloudEnhancedEnabled: Boolean,
     onCloudEnhancedChange: (Boolean) -> Unit,
     localMultimodalStatus: LocalMultimodalStatus,
     onLocalMultimodalPreferenceChange: (LocalMultimodalPreference) -> Unit,
+    screenshotAssistDiagnostics: ScreenshotAssistDiagnostics?,
     screenshotAssistEnabled: Boolean,
     onScreenshotAssistChange: (Boolean) -> Unit,
-    onboardingDismissed: Boolean,
-    onDismissOnboarding: () -> Unit,
+    onboardingDismissed: Boolean, onDismissOnboarding: () -> Unit,
     onEnableScreenshotAssistFromOnboarding: () -> Unit,
     pendingScreenshotCandidate: ScreenshotCandidate?,
     onImportScreenshotCandidate: (ScreenshotCandidate) -> Unit,
@@ -64,20 +55,21 @@ fun ShikeMainScreen(
     visibleScreenCapturePrompt: VisibleScreenCapturePrompt?,
     onImportVisibleScreenCapture: () -> Unit,
     onDismissVisibleScreenCapture: () -> Unit,
-    onClearLocalData: () -> Unit,
-    onReviewed: (ShikeItem) -> Unit,
-    sourceImageCleanupStatus: ImageCleanupStatus,
-    selectedSourceMediaStoreUri: String?,
-    onDeleteSourceImage: () -> Unit,
-    onKeepSourceImage: () -> Unit,
-    onAddCalendar: (ShikeItem) -> Unit,
-    onReminder: (ShikeItem) -> Unit,
-    onOpenMap: (ShikeItem) -> Unit,
+    onClearLocalData: () -> Unit, onReviewed: (ShikeItem) -> Unit,
+    sourceImageCleanupStatus: ImageCleanupStatus, selectedSourceMediaStoreUri: String?,
+    onDeleteSourceImage: () -> Unit, onKeepSourceImage: () -> Unit,
+    onAddCalendar: (ShikeItem) -> Unit, onReminder: (ShikeItem) -> Unit, onOpenMap: (ShikeItem) -> Unit,
 ) {
-    var selectedSection by remember {
-        mutableStateOf(ShikeMainSection.Home)
-    }
+    var selectedSection by remember { mutableStateOf(ShikeMainSection.Home) }
+    var showImportSheet by remember { mutableStateOf(false) }
+    var importFlowCompleted by remember { mutableStateOf(false) }
     var developerModeState by remember { mutableStateOf(DeveloperModeState()) }
+    fun openImportEntry(action: () -> Unit) {
+        showImportSheet = false
+        importFlowCompleted = false
+        selectedSection = ShikeMainSection.Import
+        action()
+    }
 
     Scaffold(
         modifier = Modifier
@@ -89,6 +81,7 @@ fun ShikeMainScreen(
             BottomNavBar(
                 selectedSection = selectedSection,
                 onSelected = { selectedSection = it },
+                onImportClick = { showImportSheet = true },
                 modifier = Modifier
                     .fillMaxWidth()
                     .navigationBarsPadding()
@@ -109,19 +102,41 @@ fun ShikeMainScreen(
                 ShikeMainSection.Home -> HomeRouteContent(
                     selected, todayAgendaState, modelStatus,
                     pendingScreenshotCandidate, visibleScreenCapturePrompt, onboardingDismissed,
-                    onGallery, onManualInput,
+                    { openImportEntry(onGallery) },
+                    { openImportEntry(onCamera) },
+                    { openImportEntry(onManualInput) },
+                    {
+                        importFlowCompleted = false
+                        selectedSection = ShikeMainSection.Import
+                    },
                     onDismissOnboarding, onEnableScreenshotAssistFromOnboarding,
-                    onImportScreenshotCandidate, onIgnoreScreenshotCandidate,
-                    onImportVisibleScreenCapture, onDismissVisibleScreenCapture,
+                    { candidate ->
+                        importFlowCompleted = false
+                        selectedSection = ShikeMainSection.Import
+                        onImportScreenshotCandidate(candidate)
+                    },
+                    onIgnoreScreenshotCandidate,
+                    {
+                        importFlowCompleted = false
+                        selectedSection = ShikeMainSection.Import
+                        onImportVisibleScreenCapture()
+                    },
+                    onDismissVisibleScreenCapture,
                 )
                 ShikeMainSection.Import -> ImportRouteContent(
                     selected, executionResults, isConfirmed, captureSource, capturedBitmap,
-                    modelStatus, ocrDraft, cloudEnhancedEnabled, pendingScreenshotCandidate,
+                    modelStatus, ocrDraft, pendingScreenshotCandidate,
                     visibleScreenCapturePrompt, sourceImageCleanupStatus, selectedSourceMediaStoreUri,
-                    onOcrDraftChange, onGallery, onCamera, onManualInput, onBackendCourse,
-                    onBackendEvent, onImportScreenshotCandidate, onIgnoreScreenshotCandidate,
+                    onOcrDraftChange, onGallery, onCamera, onManualInput,
+                    onImportScreenshotCandidate, onIgnoreScreenshotCandidate,
                     onImportVisibleScreenCapture, onDismissVisibleScreenCapture, onReviewed,
                     onDeleteSourceImage, onKeepSourceImage, onAddCalendar, onReminder, onOpenMap,
+                    importFlowCompleted,
+                    onCompleteArrangement = { importFlowCompleted = true },
+                    onReturnHome = {
+                        selectedSection = ShikeMainSection.Home
+                        importFlowCompleted = false
+                    },
                 )
                 ShikeMainSection.Inbox -> InboxScreen(selected, captureSource, executionResults, inboxHistory)
                 ShikeMainSection.Settings -> PrivacySettingsScreen(
@@ -129,6 +144,7 @@ fun ShikeMainScreen(
                     onCloudEnhancedChange = onCloudEnhancedChange,
                     localMultimodalStatus = localMultimodalStatus,
                     onLocalMultimodalPreferenceChange = onLocalMultimodalPreferenceChange,
+                    screenshotAssistDiagnostics = screenshotAssistDiagnostics,
                     screenshotAssistEnabled = screenshotAssistEnabled,
                     onScreenshotAssistChange = onScreenshotAssistChange,
                     onClearLocalData = onClearLocalData,
@@ -150,5 +166,11 @@ fun ShikeMainScreen(
             }
             Spacer(Modifier.height(112.dp))
         }
+        if (showImportSheet) ImportActionSheet(
+            onGallery = { openImportEntry(onGallery) },
+            onCamera = { openImportEntry(onCamera) },
+            onManualInput = { openImportEntry(onManualInput) },
+            onDismiss = { showImportSheet = false },
+        )
     }
 }

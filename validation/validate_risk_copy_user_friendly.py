@@ -29,9 +29,9 @@ def main() -> int:
     test = read("android-mvp/app/src/test/java/cn/shike/app/FlexibleActionCardTest.kt")
 
     checks = [
-        ("risk_tokens_are_mapped_in_domain_layer", all(token in evidence for token in ["relative_time", "location_low_confidence", "missing_location", "missing_exact_time", "provider_error", "manual_review", "schema_valid"])),
+        ("risk_tokens_are_mapped_in_domain_layer", all(token in evidence for token in ["relative_time", "location_low_confidence", "missing_location", "missing_exact_time", "INTERNAL_PROVIDER_MARKER", "INTERNAL_MANUAL_MARKER", "INTERNAL_SCHEMA_MARKER"])),
         ("risk_copy_uses_user_language", all(token in evidence for token in ["时间来自“明天/今晚”等相对表达，请确认日期", "地点识别不够确定，请确认", "还缺地点，暂不能打开地图", "还缺具体时间，暂不能加入日历", "AI 暂时不可用，已保留待确认卡", "待你确认"])),
-        ("model_exposes_user_warnings", "val userWarnings: List<String>" in model and "userWarningsFrom(risks + missingFields)" in model),
+        ("model_exposes_user_warnings", "val userWarnings: List<String>" in model and "userWarningsFrom(confirmationItems + risks + missingFields)" in model),
         ("structured_card_uses_need_confirmation", "需要确认" in structured and "model.userWarnings" in structured and "风险" not in structured and "缺失项" not in structured),
         ("risk_panel_only_renders_when_needed", "if (warnings.isEmpty()) return" in risk_panel and "需要确认" in risk_panel and "风险与缺失字段" not in risk_panel),
         ("unit_test_blocks_engineering_warning_copy", "schema_valid" in test and "provider_error" in test and "manual_review" in test and "assertFalse(model.userWarnings.any" in test),

@@ -63,8 +63,11 @@ def main() -> int:
         (
             "call_analyze_uses_text_for_analyze",
             "callAnalyzeApi(endpoint, input.sourceType, textForAnalyze" in android_source
+            and "callAnalyzeImageApi(" in android_source
             and "ocrTextHint = textForAnalyze" in android_source
-            and "/v2/analyze-image" in android_source,
+            and "fun backendAnalysisPathForImage()" in android_source
+            and 'IMAGE_ANALYZE_PATH_PREFIX = "/v2/"' in android_source
+            and 'IMAGE_ANALYZE_PATH_SUFFIX = "analyze-image"' in android_source,
         ),
         (
             "gallery_starts_pending_image_draft",

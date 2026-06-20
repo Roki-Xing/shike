@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import os
 import unittest
 from typing import Any
+from unittest.mock import patch
 
 from fastapi.testclient import TestClient
 
@@ -254,6 +256,44 @@ class IncompleteCourseMultimodalAdapter:
         )
 
 
+class MissingTimeCourseMultimodalAdapter:
+    """Fake image model that drops the start time despite OCR evidence."""
+
+    def is_configured(self) -> bool:
+        """Return configured state for audit metadata."""
+
+        return True
+
+    def analyze_image(self, request: AnalyzeImageRequest, schema_json: dict[str, object]) -> ParsedActionCard:
+        """Return a course card without time.
+
+        Args:
+            request: Enriched image request.
+            schema_json: Response schema.
+
+        Returns:
+            A schema-valid card missing time fields.
+        """
+
+        return ParsedActionCard(
+            title="高数课",
+            scene_type="course_notice",
+            confidence=0.76,
+            time=None,
+            location={"raw": "B203", "map_query": "B203", "confidence": 0.88},
+            task={"summary": "上高数课，教室是B203", "priority": "medium", "topic": "course"},
+            suggested_actions=[
+                {"type": "reminder", "label": "设置提醒", "requires_permission": True},
+                {"type": "map", "label": "查看地点", "requires_permission": False},
+            ],
+            missing_fields=["time"],
+            risks=[],
+            evidence=[],
+            ignored_regions=[],
+            explanation="图片模型漏掉了开始时间。",
+        )
+
+
 class CorrectingCourseTextAdapter:
     """Fake text fallback adapter that preserves OCR subject and relative time."""
 
@@ -334,6 +374,25 @@ class CapturingTextAdapter:
 
 class AnalyzeImageTextFallbackTest(unittest.TestCase):
     """Verify image analysis can fall back to OCR text parsing."""
+
+    def setUp(self) -> None:
+        """Isolate adapter-injection tests from machine private env files."""
+
+        self._env_patch = patch.dict(
+            os.environ,
+            {
+                "SHIKE_BACKEND_ENV_FILE": "/dev/null",
+                "SHIKE_MODEL_PROVIDER": "bluelm",
+                "SHIKE_ALLOW_MOCK_FALLBACK": "false",
+            },
+            clear=False,
+        )
+        self._env_patch.start()
+
+    def tearDown(self) -> None:
+        """Restore process env after each test."""
+
+        self._env_patch.stop()
 
     def test_analyze_image_uses_text_model_when_provider_does_not_support_image(self) -> None:
         original_ocr_adapter = main_module._OCR_ADAPTER
@@ -510,6 +569,48 @@ class AnalyzeImageTextFallbackTest(unittest.TestCase):
         self.assertIsNotNone(text_adapter.request)
         assert text_adapter.request is not None
         self.assertIn("今晚九点上高数", text_adapter.request.ocr_text)
+
+    def test_analyze_image_fills_missing_time_from_ocr_evidence(self) -> None:
+        original_ocr_adapter = main_module._OCR_ADAPTER
+        original_multimodal_adapter = main_module._MULTIMODAL_ADAPTER
+        original_adapter = main_module._ADAPTER
+        text_adapter = CorrectingCourseTextAdapter()
+        main_module._OCR_ADAPTER = CourseOcrAdapter()  # type: ignore[assignment]
+        main_module._MULTIMODAL_ADAPTER = MissingTimeCourseMultimodalAdapter()  # type: ignore[assignment]
+        main_module._ADAPTER = text_adapter
+        try:
+            response = TestClient(app).post(
+                "/v2/analyze-image",
+                json={
+                    "input_id": "image-course-missing-time-001",
+                    "source_type": "recent_screenshot_assist",
+                    "image": {
+                        "data_url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAB",
+                        "mime": "image/png",
+                        "width": 1080,
+                        "height": 2400,
+                        "sha256": "placeholder-sha256",
+                    },
+                    "ocr_text_hint": "客户端OCR：晚上九点上高数，教室是B203",
+                    "ocr_blocks": [],
+                    "current_date": "2026-06-13",
+                    "user_timezone": "Asia/Shanghai",
+                    "scene_hint": "course_notice",
+                },
+            )
+        finally:
+            main_module._OCR_ADAPTER = original_ocr_adapter
+            main_module._MULTIMODAL_ADAPTER = original_multimodal_adapter
+            main_module._ADAPTER = original_adapter
+
+        self.assertEqual(200, response.status_code)
+        payload = response.json()
+        self.assertIn("九点", payload["time"]["start_text"])
+        self.assertEqual("2026-06-13T21:00:00+08:00", payload["time"]["normalized_start"])
+        self.assertNotIn("time", payload["missing_fields"])
+        self.assertTrue(any(action["type"] == "calendar" for action in payload["suggested_actions"]))
+        self.assertTrue(any("ocr_evidence_repair:ocr_time_missing" in risk for risk in payload["risks"]))
+        self.assertTrue(all(action["disabled_reason"] == "用户确认前不可执行" for action in payload["suggested_actions"]))
 
     def test_analyze_image_uses_ocr_hint_only_when_cloud_image_disabled(self) -> None:
         original_ocr_adapter = main_module._OCR_ADAPTER

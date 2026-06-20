@@ -21,6 +21,7 @@ import cn.shike.app.system.createScreenshotAssistNotificationChannel
 import cn.shike.app.system.ScreenCaptureCallbackHelper
 import cn.shike.app.system.VisibleScreenCapturePrompt
 import cn.shike.app.system.restoreScheduledReminder
+import cn.shike.app.system.screenshotAssistDiagnostics
 
 class MainActivity : ComponentActivity() {
     internal var pendingReminderItem: ShikeItem? = null
@@ -38,6 +39,7 @@ class MainActivity : ComponentActivity() {
     internal var visibleScreenCapturePromptState by mutableStateOf<VisibleScreenCapturePrompt?>(null)
     internal var pendingSharedText by mutableStateOf<String?>(null)
     internal var screenshotAssistEnabled by mutableStateOf(false)
+    internal var screenshotAssistServiceRunning by mutableStateOf(false)
     internal var imageCleanupStatusFromSystem by mutableStateOf<ImageCleanupStatus?>(null)
     internal var permissionOnboardingDismissed by mutableStateOf(false)
 
@@ -63,7 +65,7 @@ class MainActivity : ComponentActivity() {
         val nextStatus = if (result.resultCode == RESULT_OK) {
             ImageCleanupStatus.DELETED
         } else {
-            ImageCleanupStatus.FAILED
+            ImageCleanupStatus.USER_KEPT
         }
         handleImageCleanupStatusFromSystem(nextStatus)
         pendingDeleteSourceUri = null
@@ -94,6 +96,13 @@ class MainActivity : ComponentActivity() {
         registerScreenshotObserverIfAllowed()
         installShikeContent(sharedText)
     }
+
+    internal fun currentScreenshotAssistDiagnostics() =
+        screenshotAssistDiagnostics(
+            context = this,
+            enabled = screenshotAssistEnabled,
+            serviceRunning = screenshotAssistServiceRunning,
+        )
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)

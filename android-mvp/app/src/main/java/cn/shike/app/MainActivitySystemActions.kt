@@ -10,7 +10,8 @@ import cn.shike.app.system.buildCalendarInsertIntent
 import cn.shike.app.system.buildMapIntent
 import cn.shike.app.system.canPostReminderNotification
 import cn.shike.app.system.copyMapLocationFallback
-import cn.shike.app.system.createScreenshotDeleteRequest
+import cn.shike.app.system.SourceImageCleanupManager
+import cn.shike.app.system.SourceImageCleanupRequest
 import cn.shike.app.system.scheduleReminder
 import cn.shike.app.system.startSystemActivitySafely
 
@@ -69,6 +70,8 @@ fun MainActivity.handleImageCleanupStatusFromSystem(status: ImageCleanupStatus) 
     imageCleanupStatusFromSystem = status
     val source = when (status) {
         ImageCleanupStatus.DELETED -> "原截图清理：已移入系统回收站"
+        ImageCleanupStatus.USER_KEPT -> "原截图清理：已保留原图"
+        ImageCleanupStatus.NOT_SUPPORTED -> "原截图清理：当前来源不支持移入回收站"
         ImageCleanupStatus.FAILED -> "原截图清理：系统确认未完成"
         else -> return
     }
@@ -79,12 +82,16 @@ fun MainActivity.loadSavedItemOrFallback(): ShikeItem =
     loadInitialSelection(this, null).item
 
 fun MainActivity.requestDeleteSourceImage(sourceMediaStoreUri: String?) {
-    val sender = createScreenshotDeleteRequest(this, sourceMediaStoreUri)
-    if (sender == null) {
-        handleImageCleanupStatusFromSystem(ImageCleanupStatus.FAILED)
-        return
+    when (val request = SourceImageCleanupManager(this).requestTrash(sourceMediaStoreUri)) {
+        is SourceImageCleanupRequest.SystemTrashConfirmation -> {
+            pendingDeleteSourceUri = sourceMediaStoreUri
+            handleImageCleanupStatusFromApp(ImageCleanupStatus.DELETE_REQUESTED)
+            deleteScreenshotLauncher.launch(
+                androidx.activity.result.IntentSenderRequest.Builder(request.intentSender).build(),
+            )
+        }
+        is SourceImageCleanupRequest.NotSupported -> {
+            handleImageCleanupStatusFromSystem(request.status)
+        }
     }
-    pendingDeleteSourceUri = sourceMediaStoreUri
-    handleImageCleanupStatusFromApp(ImageCleanupStatus.DELETE_REQUESTED)
-    deleteScreenshotLauncher.launch(androidx.activity.result.IntentSenderRequest.Builder(sender).build())
 }

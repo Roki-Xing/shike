@@ -67,6 +67,10 @@ def main() -> int:
         "ocr_has_location_signal",
         "ocr_repair_applied",
         "ocr_repair_reasons",
+        "result_has_start_time",
+        "result_normalized_start_hour",
+        "result_has_location",
+        "result_location_kind",
     ]
 
     checks = [

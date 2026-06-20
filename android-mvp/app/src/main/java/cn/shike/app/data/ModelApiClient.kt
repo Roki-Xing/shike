@@ -5,7 +5,6 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.io.OutputStreamWriter
 import java.net.HttpURLConnection
-import java.net.URI
 import java.net.URL
 import java.time.ZoneId
 
@@ -89,6 +88,7 @@ fun itemFromAnalyzeImageJson(
         "event_poster" -> "活动海报"
         "course_notice" -> "课程通知"
         "meeting_notice" -> "会议通知"
+        "interview_notice" -> "面试通知"
         "assignment_deadline" -> "作业截止"
         "exam_notice" -> "考试通知"
         "travel_ticket" -> "出行票据"
@@ -100,14 +100,12 @@ fun itemFromAnalyzeImageJson(
     val explanation = json.safeString("explanation").ifBlank { fallbackText }
     val taskSummary = task?.safeString("summary").orEmpty()
     val preparationItems = preparationItemsFromJson(json)
-    val risks = stringsFromJson(json.optJSONArray("risks")).joinToString("；")
-    val missingFields = stringsFromJson(json.optJSONArray("missing_fields")).joinToString("、")
+    val confirmationItems = confirmationItemsFromJson(json)
     val timeText = displayTimeFrom(time)
     val reviewTail = listOfNotNull(
         taskSummary.takeIf { it.isNotBlank() }?.let { "任务：$it" },
         preparationItems.takeIf { it.isNotEmpty() }?.let { "准备：${it.joinToString("、")}" },
-        risks.takeIf { it.isNotBlank() }?.let { "风险：$it" },
-        missingFields.takeIf { it.isNotBlank() }?.let { "待补：$it" },
+        confirmationItems.takeIf { it.isNotEmpty() }?.let { "需要确认：${it.joinToString("；")}" },
     ).joinToString("\n")
     return ShikeItem(
         title = json.safeString("title").ifBlank { "待确认碎片" },
@@ -150,6 +148,11 @@ fun preparationItemsFromJson(json: JSONObject): List<String> {
         .distinct()
 }
 
+fun confirmationItemsFromJson(json: JSONObject): List<String> {
+    "需要确认："
+    return confirmationItemsFromModelJson(json, ::stringsFromJson)
+}
+
 private fun checklistItemTextsFromJson(values: JSONArray?): List<String> {
     if (values == null || values.length() == 0) {
         return emptyList()
@@ -165,54 +168,5 @@ fun displayTimeFrom(time: JSONObject?): String =
         time?.safeString("deadline_text")?.takeIf { it.isNotBlank() },
     ).joinToString(" / ").ifBlank { "待确认" }
 
-private fun JSONObject.safeString(key: String): String {
-    if (!has(key) || isNull(key)) {
-        return ""
-    }
-    return optString(key)
-        .trim()
-        .takeUnless { it.equals("null", ignoreCase = true) }
-        .orEmpty()
-}
-
-private fun JSONArray.safeArrayString(index: Int): String {
-    if (isNull(index)) {
-        return ""
-    }
-    return optString(index)
-        .trim()
-        .takeUnless { it.equals("null", ignoreCase = true) }
-        .orEmpty()
-}
-
 fun sceneHint(scene: String): String =
-    when {
-        "活动" in scene -> "event_poster"
-        "作业" in scene || "截止" in scene -> "assignment_deadline"
-        "会议" in scene || "周会" in scene || "例会" in scene -> "meeting_notice"
-        "面试" in scene || "笔试" in scene -> "interview_notice"
-        "出行" in scene || "车票" in scene || "高铁" in scene || "航班" in scene -> "travel_ticket"
-        else -> "course_notice"
-    }
-
-fun normalizeBackendUrl(url: String): String {
-    val trimmed = url.trim()
-    if (trimmed.isBlank()) return DEFAULT_BACKEND_BASE_URL
-    val withScheme =
-        if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) trimmed
-        else "http://$trimmed"
-    val uri = runCatching { URI(withScheme) }.getOrNull()
-    val host = uri?.host
-    val port = uri?.port ?: -1
-    if (uri == null || host.isNullOrBlank()) return withScheme.trimEnd('/')
-    val base = buildString {
-        append(uri.scheme)
-        append("://")
-        append(host)
-        if (port != -1) {
-            append(":")
-            append(port)
-        }
-    }
-    return base.trimEnd('/')
-}
+    sceneHintForModel(scene)

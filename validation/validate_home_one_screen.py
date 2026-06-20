@@ -37,9 +37,10 @@ def main() -> int:
         ("home_excludes_debug_screen", "DebugDemoScreen" not in home_body and "BackendEndpointControls" not in home_body),
         (
             "home_contains_primary_action_and_import",
-            "HomeAgendaList(" in home_body
-            and "AnalyzeProgressPanel(" in home_body
-            and "HomePendingReviewPanel" in home_body,
+            "FocusedHomeCard(" in home_body
+            and "when (flowState)" in home_body
+            and "AnalyzeProgressPanel(" not in home_body
+            and "HomePendingReviewPanel" not in home_body,
         ),
         (
             "home_excludes_full_confirm_and_action_plan",
@@ -60,7 +61,7 @@ def main() -> int:
             "home_keeps_screenshot_flow_on_home",
             "mutableStateOf(ShikeMainSection.Home)" in main_screen
             and "selectedSection = ShikeMainSection.Import" not in main_screen
-            and "ScreenshotDetectedSheet" in home_screen
+            and "检测到新截图" in home_screen
             and "正在把截图变成行动卡" in progress_panel,
         ),
         ("settings_hides_backend_connection", "BackendEndpointControls" not in settings_body and "后端连接" not in settings_body),

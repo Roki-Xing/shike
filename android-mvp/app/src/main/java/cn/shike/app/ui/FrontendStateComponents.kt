@@ -118,6 +118,27 @@ fun ShikeErrorState(title: String, detail: String, actionLabel: String? = null, 
     }
 }
 
+data class RecoverableRepairAction(
+    val label: String,
+    val onClick: () -> Unit,
+)
+
+@Composable
+fun RecoverableErrorState(
+    title: String,
+    detail: String,
+    repairActions: List<RecoverableRepairAction>,
+) {
+    ShikeActionCard(title) {
+        Text(detail, style = ShikeTypography.Body.copy(color = ShikeColors.Warning))
+        repairActions.forEach { action ->
+            OutlinedButton(onClick = action.onClick, modifier = Modifier.fillMaxWidth()) {
+                Text(action.label)
+            }
+        }
+    }
+}
+
 @Composable
 fun ShikeLoadingSkeleton(title: String, detail: String = "正在加载") {
     ShikeActionCard(title) {

@@ -23,6 +23,7 @@ data class ActionCardUiModel(
 fun actionCardUiModelFrom(item: ShikeItem): ActionCardUiModel {
     val risks = item.rawText.linesByPrefix("风险：").flatMap { it.split("；") }.map { it.trim() }.filter { it.isNotBlank() }
     val missingFields = item.rawText.linesByPrefix("待补：").flatMap { it.split("、") }.map { it.trim() }.filter { it.isNotBlank() }
+    val confirmationItems = item.rawText.linesByPrefix("需要确认：").flatMap { it.split("；") }.map { it.trim() }.filter { it.isNotBlank() }
     val task = taskSummaryFrom(item).cleanUiValue(defaultTaskFor(item))
     return ActionCardUiModel(
         sceneLabel = item.scene.ifBlank { "待确认" },
@@ -34,7 +35,7 @@ fun actionCardUiModelFrom(item: ShikeItem): ActionCardUiModel {
         actions = item.actions.map { it.cleanUiValue("") }.filter { it.isNotBlank() }.ifEmpty { listOf("稍后确认") },
         risks = risks,
         missingFields = missingFields,
-        userWarnings = userWarningsFrom(risks + missingFields),
+        userWarnings = userWarningsFrom(confirmationItems + risks + missingFields),
         sourceTextPreview = userVisibleEvidenceText(item.rawText),
     )
 }

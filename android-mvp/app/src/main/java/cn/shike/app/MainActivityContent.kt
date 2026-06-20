@@ -45,6 +45,7 @@ fun MainActivity.installShikeContent(sharedText: String?) {
                     onImageCleanupStatusChange = ::handleImageCleanupStatusFromApp,
                     imageCleanupStatusFromSystem = imageCleanupStatusFromSystem,
                     onImageCleanupStatusConsumed = ::clearImageCleanupStatusFromSystem,
+                    screenshotAssistDiagnostics = currentScreenshotAssistDiagnostics(),
                 )
             }
         }

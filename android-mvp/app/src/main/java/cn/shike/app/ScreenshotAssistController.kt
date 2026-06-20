@@ -8,6 +8,7 @@ import cn.shike.app.data.shouldNotifyScreenshotCandidate
 import cn.shike.app.system.ScreenshotObserver
 import cn.shike.app.system.canPostScreenshotAssistNotification
 import cn.shike.app.system.hasScreenshotMediaPermission
+import cn.shike.app.system.recordScreenshotAssistDetected
 import cn.shike.app.system.showScreenshotDetectedNotification
 import cn.shike.app.system.startScreenshotAssistService
 import cn.shike.app.system.stopScreenshotAssistService
@@ -29,6 +30,7 @@ class ScreenshotAssistController(
             registerIfAllowed()
         } else {
             unregister()
+            activity.handleScreenshotAssistServiceRunningChanged(false)
             stopScreenshotAssistService(activity)
         }
     }
@@ -57,6 +59,7 @@ class ScreenshotAssistController(
             register()
             if (canPostScreenshotAssistNotification(activity)) {
                 startScreenshotAssistService(activity)
+                activity.handleScreenshotAssistServiceRunningChanged(true)
             }
         }
     }
@@ -82,6 +85,7 @@ class ScreenshotAssistController(
     private fun onScreenshotCandidate(candidate: ScreenshotCandidate) {
         if (!shouldNotifyScreenshotCandidate(candidate, lastNotifiedScreenshotUri)) return
         lastNotifiedScreenshotUri = candidate.contentUri
+        recordScreenshotAssistDetected(activity, candidate.createdAtMillis)
         onCandidateVisible(candidate)
         showScreenshotDetectedNotification(activity, candidate)
     }
