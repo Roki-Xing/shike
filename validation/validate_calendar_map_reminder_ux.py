@@ -19,11 +19,12 @@ def main() -> int:
     action_gate = read("android-mvp/app/src/main/java/cn/shike/app/ui/ExecutionActionGate.kt")
     controls = read("android-mvp/app/src/main/java/cn/shike/app/ui/ActionPlannerExecutionControls.kt")
     main_activity = read("android-mvp/app/src/main/java/cn/shike/app/MainActivity.kt")
+    main_activity_system_actions = read("android-mvp/app/src/main/java/cn/shike/app/MainActivitySystemActions.kt")
 
     checks = [
         (
             "calendar_copy_opens_insert_page_only",
-            "已打开系统日历新增页，请在日历中保存" in execution_result
+            "已打开系统日历新增页，尚未确认保存" in execution_result
             and "已写入日历" not in system_actions
             and "已写入日历" not in execution_result,
         ),
@@ -48,7 +49,8 @@ def main() -> int:
         ),
         (
             "map_failure_copies_location_and_keeps_card",
-            "copyMapLocationFallback" in main_activity and "已保留地点" in main_activity,
+            "copyMapLocationFallback" in main_activity_system_actions
+            and "已保留地点" in main_activity_system_actions,
         ),
         (
             "execution_results_are_user_visible",

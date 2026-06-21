@@ -16,8 +16,15 @@ enum class ImportRouteStage {
 }
 
 fun importFlowStageFor(modelStatus: String, selectedStatus: String, isConfirmed: Boolean): ImportRouteStage =
+    importFlowStageFor(analysisUiStateFor(modelStatus), selectedStatus, isConfirmed)
+
+fun importFlowStageFor(
+    analysisUiState: AnalysisUiState,
+    selectedStatus: String,
+    isConfirmed: Boolean,
+): ImportRouteStage =
     when {
-        "解析中" in modelStatus || "正在解析" in modelStatus -> ImportRouteStage.Analyzing
+        analysisUiState is AnalysisUiState.Analyzing -> ImportRouteStage.Analyzing
         isConfirmed || selectedStatus == "已安排" -> ImportRouteStage.Planning
         selectedStatus == "待确认" -> ImportRouteStage.Reviewing
         else -> ImportRouteStage.Entry
@@ -27,7 +34,7 @@ fun importFlowStageFor(modelStatus: String, selectedStatus: String, isConfirmed:
 fun HomeRouteContent(
     selected: ShikeItem,
     todayAgendaState: TodayAgendaState,
-    modelStatus: String,
+    analysisUiState: AnalysisUiState,
     pendingScreenshotCandidate: ScreenshotCandidate?,
     visibleScreenCapturePrompt: VisibleScreenCapturePrompt?,
     onboardingDismissed: Boolean,
@@ -52,7 +59,7 @@ fun HomeRouteContent(
         onboardingDismissed = onboardingDismissed,
         onDismissOnboarding = onDismissOnboarding,
         onEnableScreenshotAssistFromOnboarding = onEnableScreenshotAssistFromOnboarding,
-        modelStatus = modelStatus,
+        analysisUiState = analysisUiState,
         pendingScreenshotCandidate = pendingScreenshotCandidate,
         onImportScreenshotCandidate = onImportScreenshotCandidate,
         onIgnoreScreenshotCandidate = onIgnoreScreenshotCandidate,
@@ -69,7 +76,7 @@ fun ImportRouteContent(
     isConfirmed: Boolean,
     captureSource: String,
     capturedBitmap: Bitmap?,
-    modelStatus: String,
+    analysisUiState: AnalysisUiState,
     ocrDraft: String,
     pendingScreenshotCandidate: ScreenshotCandidate?,
     visibleScreenCapturePrompt: VisibleScreenCapturePrompt?,
@@ -83,6 +90,8 @@ fun ImportRouteContent(
     onIgnoreScreenshotCandidate: () -> Unit,
     onImportVisibleScreenCapture: () -> Unit,
     onDismissVisibleScreenCapture: () -> Unit,
+    onSavePendingReview: () -> Unit,
+    onRetryAnalyze: () -> Unit,
     onReviewed: (ShikeItem) -> Unit,
     onDeleteSourceImage: () -> Unit,
     onKeepSourceImage: () -> Unit,
@@ -96,20 +105,20 @@ fun ImportRouteContent(
     val importStage = if (importFlowCompleted) {
         ImportRouteStage.Completed
     } else {
-        importFlowStageFor(modelStatus, selected.status, isConfirmed)
+        importFlowStageFor(analysisUiState, selected.status, isConfirmed)
     }
     when (importStage) {
         ImportRouteStage.Entry -> CaptureHubScreen(
-            captureSource, capturedBitmap, modelStatus, ocrDraft, onOcrDraftChange,
+            captureSource, capturedBitmap, ocrDraft, onOcrDraftChange,
+            analysisUiState,
             onGallery, onCamera, onManualInput, pendingScreenshotCandidate, onImportScreenshotCandidate,
             onIgnoreScreenshotCandidate, visibleScreenCapturePrompt, onImportVisibleScreenCapture,
-            onDismissVisibleScreenCapture,
+            onDismissVisibleScreenCapture, onSavePendingReview, onRetryAnalyze,
         )
         ImportRouteStage.Analyzing -> AnalyzeProgressPanel(
             analyzeProgressStateFor(
-                modelStatus = modelStatus,
+                analysisUiState = analysisUiState,
                 hasPendingImage = pendingScreenshotCandidate != null || visibleScreenCapturePrompt != null,
-                selectedStatus = selected.status,
             ),
         )
         ImportRouteStage.Reviewing -> ParseConfirmScreen(selected, onReviewed = onReviewed)

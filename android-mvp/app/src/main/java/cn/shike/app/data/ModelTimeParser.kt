@@ -14,7 +14,7 @@ fun startEpochMillisFromTime(
     time: JSONObject?,
     fallbackText: String,
     referenceNowMillis: Long = System.currentTimeMillis(),
-    zoneId: ZoneId = ZoneId.of("Asia/Shanghai"),
+    zoneId: ZoneId = deviceZoneId(),
 ): Long {
     if (time == null) {
         return parseRelativeChineseTime(fallbackText, referenceNowMillis, zoneId) ?: 0L
@@ -24,7 +24,7 @@ fun startEpochMillisFromTime(
         time.normalizedString("start_at"),
         time.normalizedString("start_time"),
     ).firstOrNull { it.isNotBlank() }
-    parseNormalizedEpoch(normalized)?.let { return it }
+    parseNormalizedEpoch(normalized, zoneId)?.let { return it }
 
     val evidenceText = listOf(
         time.normalizedString("start_text"),
@@ -34,7 +34,7 @@ fun startEpochMillisFromTime(
     return parseRelativeChineseTime(evidenceText, referenceNowMillis, zoneId) ?: 0L
 }
 
-private fun parseNormalizedEpoch(value: String?): Long? {
+private fun parseNormalizedEpoch(value: String?, zoneId: ZoneId): Long? {
     val text = value?.trim().orEmpty()
     if (text.isBlank()) {
         return null
@@ -43,7 +43,7 @@ private fun parseNormalizedEpoch(value: String?): Long? {
         ?: runCatching { ZonedDateTime.parse(text).toInstant().toEpochMilli() }.getOrNull()
         ?: runCatching {
             LocalDateTime.parse(text, DateTimeFormatter.ISO_LOCAL_DATE_TIME)
-                .atZone(ZoneId.of("Asia/Shanghai"))
+                .atZone(zoneId)
                 .toInstant()
                 .toEpochMilli()
         }.getOrNull()

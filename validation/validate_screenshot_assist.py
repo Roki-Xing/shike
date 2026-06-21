@@ -26,6 +26,7 @@ def main() -> int:
     intents = read("android-mvp/app/src/main/java/cn/shike/app/ActivityImportIntents.kt")
     content = read("android-mvp/app/src/main/java/cn/shike/app/MainActivityContent.kt")
     store = read("android-mvp/app/src/main/java/cn/shike/app/data/ScreenshotCandidateStore.kt")
+    test = read("android-mvp/app/src/test/java/cn/shike/app/data/ScreenshotCandidateStoreTest.kt")
     settings = read("android-mvp/app/src/main/java/cn/shike/app/ui/ReadinessSections.kt")
     app = read("android-mvp/app/src/main/java/cn/shike/app/ShikeApp.kt")
     activity = read("android-mvp/app/src/main/java/cn/shike/app/MainActivity.kt")
@@ -112,9 +113,11 @@ def main() -> int:
         ),
         (
             "activity_deduplicates_repeated_candidate_notifications",
-            "lastNotifiedScreenshotUri" in controller
-            and "shouldNotifyScreenshotCandidate(candidate, lastNotifiedScreenshotUri)" in controller
-            and "lastNotifiedScreenshotUri = candidate.contentUri" in controller,
+            "lastNotifiedScreenshotUri" not in controller + service
+            and "recordScreenshotAssistNotified(activity, candidate)" in controller
+            and "recordScreenshotAssistNotified(this, candidate)" in service
+            and "KEY_LAST_SCREENSHOT_ASSIST_NOTIFIED_URI" in store
+            and "screenshotAssistSharedDedupe_rejectsSameUriAcrossForegroundAndServiceObservers" in test,
         ),
         (
             "notification_import_intent_is_handled",

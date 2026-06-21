@@ -1,12 +1,30 @@
 # Current Validation Status
 
-Date: 2026-06-11
+Date: 2026-06-21
 Guide: `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md`  
 Deep review guide applied this round: `/mnt/c/Users/Xing/Desktop/SHIKE_PRODUCT_MANAGER_DEEP_REVIEW_GUIDE.md`
 Calendar/UI guide applied this round: `/mnt/c/Users/Xing/Desktop/SHIKE_CALENDAR_AND_UI_PRODUCT_FIX_GUIDE.md`
 Flexible action-card guide applied this round: `/mnt/c/Users/Xing/Desktop/SHIKE_FLEXIBLE_ACTION_CARD_AND_UI_CLEANUP_GUIDE.md`
 Guide source availability: the expected desktop source file was restored from the Windows recycle bin and is currently readable in this closeout audit; see `materials/evidence/desktop-guidance-source-status.md`. The local matrix remains useful for repository evidence traceability, while strict external cloud-device evidence remains blocked.
 Scope: Desktop guidance stages A-E: BlueLM credible evidence, cloud-device and HTTPS backend evidence, frontend productization, long-lived inbox workbench, and materials upgraded to a release evidence package. Historical S2/S3 hardening remains part of the evidence base, but the current public status is anchored to `materials/evidence/requirement-matrix.md` and `REQUIREMENT_MATRIX_METRIC 9/9`.
+
+## 2026-06-21 Deep Research Android State Closure
+
+This pass applied the current deep research follow-up to the Android MVP trust loop: parsing/review/planning screens now use explicit `AnalysisUiState` instead of fragile user-facing status copy, backend text and image-analysis payloads use the device timezone helper, screenshot assist foreground/service observers share the same last-notified URI dedupe state, and calendar/reminder/map receipts describe the actual Android system handoff instead of overclaiming completion.
+
+Fresh evidence from this pass:
+
+| Command | Status | Evidence |
+|---|---|---|
+| `gradle --no-daemon :app:testDebugUnitTest` from `shike/android-mvp/` | PASS | `BUILD SUCCESSFUL`; local unit suites report 45 suites, 167 tests, 0 failures, 0 errors |
+| `python3 validation/validate_android_unit_tests.py` | PASS | `ANDROID_UNIT_TEST_METRIC 90/90`; includes `AnalysisUiStateTest`, device timezone injection, shared screenshot notification dedupe, and accurate calendar/reminder/map receipts |
+| `python3 validation/validate_home_flow_simplification.py` | PASS | `HOME_FLOW_SIMPLIFICATION_METRIC 15/15` |
+| `python3 validation/validate_screenshot_assist.py` | PASS | `SCREENSHOT_ASSIST_METRIC 17/17` |
+| `python3 validation/validate_calendar_map_reminder_ux.py` | PASS | `CALENDAR_MAP_REMINDER_UX_METRIC 7/7` |
+| `python3 validation/validate_calendar_prefill_accuracy.py` | PASS | `CALENDAR_PREFILL_ACCURACY_METRIC 9/9` |
+| `python3 validation/validate_action_execution.py` | PASS | `ACTION_EXECUTION_METRIC 18/18` |
+
+Strict external cloud-device evidence remains a separate manual recording gate: the local repository and Android gates pass, but final release proof still requires real cloud-device MP4s, filled report fields, and redacted logcat evidence before strict release status can be claimed.
 
 ## 2026-06-11 Backend Preparation-Item Hotfix
 
@@ -53,16 +71,16 @@ Fresh local evidence from this pass:
 | `python3 validation/validate_screenshot_assist.py` | PASS | `SCREENSHOT_ASSIST_METRIC 17/17` |
 | `python3 validation/validate_user_facing_copy.py` | PASS | `USER_FACING_COPY_METRIC 13/13` |
 | `python3 validation/validate_calendar_prefill_accuracy.py` | PASS | `CALENDAR_PREFILL_ACCURACY_METRIC 9/9` |
-| `python3 validation/validate_home_flow_simplification.py` | PASS | `HOME_FLOW_SIMPLIFICATION_METRIC 8/8` |
+| `python3 validation/validate_home_flow_simplification.py` | PASS | `HOME_FLOW_SIMPLIFICATION_METRIC 15/15` |
 | `python3 validation/validate_home_one_screen.py` | PASS | `HOME_ONE_SCREEN_METRIC 11/11` |
 | `python3 validation/validate_frontend_polish.py` | PASS | `FRONTEND_POLISH_METRIC 13/13` |
 | `python3 validation/validate_screenshot_cleanup.py` | PASS | `SCREENSHOT_CLEANUP_METRIC 15/15` |
-| `python3 validation/validate_android_unit_tests.py` | PASS | `ANDROID_UNIT_TEST_METRIC 88/88` |
+| `python3 validation/validate_android_unit_tests.py` | PASS | `ANDROID_UNIT_TEST_METRIC 90/90` |
 | `python3 validation/validate_action_execution.py` | PASS | `ACTION_EXECUTION_METRIC 18/18` |
 | `python3 validation/validate_advanced_product_beta.py --strict` | PASS | `PRODUCT_BETA_METRIC 30/30` |
 | `python3 validation/validate_secret_hygiene.py` | PASS | `PASS secret_hygiene` |
 | `python3 validation/validate_apk_secret_hygiene.py` | PASS | `APK_SECRET_HYGIENE_METRIC 8/8` |
-| `gradle --no-daemon :app:testDebugUnitTest` from `shike/android-mvp/` | PASS | `BUILD SUCCESSFUL`; local unit suites report 157 tests, 0 failures, 0 errors |
+| `gradle --no-daemon :app:testDebugUnitTest` from `shike/android-mvp/` | PASS | `BUILD SUCCESSFUL`; local unit suites report 45 suites, 167 tests, 0 failures, 0 errors |
 | `bash android-mvp/build_apk.sh` | PASS | APK copied to `/mnt/c/Users/Xing/Desktop/Shike-app-debug.apk`; local and Desktop SHA-256 both `b44cc74b215edb474d0a50df65c25d140ed5ccac44a89a636d810cbb26897690` |
 
 Strict external cloud-device evidence remains a separate manual recording gate: the local repository and APK gates pass, but final release proof still requires real cloud-device MP4s, filled report fields, and redacted logcat evidence before strict release status can be claimed.
@@ -137,7 +155,7 @@ The current Shike workspace is rooted at `shike/` under `/home/xing-12_26/projec
 | Prototype | `shike/prototype/index.html`, `shike/prototype/demo.html` | Present; PDF exports also present |
 | Validation scripts | `shike/validation/*.py` | Present; baseline commands pass |
 | Android structure validator | `shike/validation/validate_android_structure.py` | Present; checks extracted Android source boundaries, file-size caps, callback names, and helper ownership; listed in README mechanical acceptance, device demo checklist, and Demo console |
-| Android unit-test validator | `shike/validation/validate_android_unit_tests.py` | Present; checks JUnit wiring, `PrivacyRedactionTest`, `CaptureImportMapperTest`, `ShareImportMapperTest`, `OcrEngineTest`, `InitialSelectionMapperTest`, `ExecutionResultActionsTest`, `ExecutionResultStateTest`, `ReminderPermissionFallbackTest`, `ReviewStatusMapperTest`, `ReviewActionsTest`, `CaptureResultActionsTest`, `ModelExplanationTest`, `ModelApiClientTest` including backend request payload contract fields and `share_text`/`manual` source types, `TodayActionItemMapperTest`, `ExecutionActionGateTest`, `InboxWorkbenchTest` including archive/restore action state and all-status priority ordering, `ReminderPayloadTest` including receiver delivery payload defaults, `BackendAnalysisRunnerTest` including backend-failure fallback copy and current-draft source-type mapping, `BackendEndpointActionsTest`, `BackendTriggerActionsTest`, `BackendOutcomeActionsTest`, `SampleActionsTest`, `InboxEntitiesTest`, `LocalInboxStoreTest` including action-list encode/decode, capture-source sanitization, and raw-text sanitization, `LocalPersistenceBoundaryTest`, `LocalDataClearActionsTest` including App-internal cache-clear confirmation, `CloudEnhancementActionsTest`, `DeveloperModeUnlockTest` for settings version-tap Debug unlock, `LocalMultimodalStatusTest` for optional端侧 3B install/route/failure boundaries, `LocalMultimodalRuntimeTest` for optional端侧 3B `init -> callVit -> generate -> schema_valid -> 待确认` runtime contract, `DateStripTest` for home date sorting-hint copy, `SystemActionsTest` for system calendar insert-page wording, `ScreenCapturePromptTest` for visible screenshot callback boundary copy, latest `testDebugUnitTest` XML results, and documentation references |
+| Android unit-test validator | `shike/validation/validate_android_unit_tests.py` | Present; checks JUnit wiring, `PrivacyRedactionTest`, `CaptureImportMapperTest`, `ShareImportMapperTest`, `OcrEngineTest`, `InitialSelectionMapperTest`, `ExecutionResultActionsTest`, `ExecutionResultStateTest`, `ReminderPermissionFallbackTest`, `ReviewStatusMapperTest`, `ReviewActionsTest`, `CaptureResultActionsTest`, `ModelExplanationTest`, `ModelApiClientTest` including backend request payload contract fields, `share_text`/`manual` source types, device timezone injection, and relative-time epoch mapping, `AnalyzeImageApiClientTest` for image payload timezone, `AnalysisUiStateTest` for non-copy-driven parsing/review/planning state, `TodayActionItemMapperTest`, `ExecutionActionGateTest`, `InboxWorkbenchTest` including archive/restore action state and all-status priority ordering, `ReminderPayloadTest` including receiver delivery payload defaults, `BackendAnalysisRunnerTest` including backend-failure fallback copy and current-draft source-type mapping, `BackendEndpointActionsTest`, `BackendTriggerActionsTest`, `BackendOutcomeActionsTest`, `SampleActionsTest`, `InboxEntitiesTest`, `LocalInboxStoreTest` including action-list encode/decode, capture-source sanitization, and raw-text sanitization, `LocalPersistenceBoundaryTest`, `LocalDataClearActionsTest` including App-internal cache-clear confirmation, `CloudEnhancementActionsTest`, `DeveloperModeUnlockTest` for settings version-tap Debug unlock, `LocalMultimodalStatusTest` for optional端侧 3B install/route/failure boundaries, `LocalMultimodalRuntimeTest` for optional端侧 3B `init -> callVit -> generate -> schema_valid -> 待确认` runtime contract, `DateStripTest` for home date sorting-hint copy, `SystemActionsTest` for system calendar insert-page wording, `ScreenCapturePromptTest` for visible screenshot callback boundary copy, `ScreenshotCandidateStoreTest` for shared foreground/service screenshot notification dedupe, latest `testDebugUnitTest` XML results, accurate calendar/reminder/map receipts, and documentation references |
 | Action execution validator | `shike/validation/validate_action_execution.py` | Present; checks confirmation gating, calendar result wording, timed reminder scheduling, exact-alarm fallback, reminder persistence, app-start restore, device reboot restore, delivery cleanup, local-data-clear reminder cancellation, map fallback, permission fallback, and UI/system boundary separation |
 | Today Action ranking validator | `shike/validation/validate_today_ranking.py` | Present; checks 10 synthetic TodayActionItem samples and deterministic S2 ranking rules |
 | Model evaluation case validator | `shike/validation/validate_model_eval_cases.py` | Present; checks 110 synthetic model evaluation cases, unique IDs, required scene coverage, low-quality and negative examples |
@@ -164,7 +182,7 @@ All commands below were run from `/home/xing-12_26/projects/codex-workspace`.
 | `python3 shike/backend/verify_backend.py` | PASS | `backend_passed` |
 | `python3 shike/spike/run_spike.py --all` | PASS | `spike_passed` |
 | `python3 shike/validation/validate_android_structure.py` | PASS | `ANDROID_STRUCTURE_METRIC 31/31` |
-| `python3 shike/validation/validate_android_unit_tests.py` | PASS | `ANDROID_UNIT_TEST_METRIC 88/88` |
+| `python3 shike/validation/validate_android_unit_tests.py` | PASS | `ANDROID_UNIT_TEST_METRIC 90/90` |
 | `python3 shike/validation/validate_android_image_preprocess.py` | PASS | `ANDROID_IMAGE_PREPROCESS_METRIC 15/15` |
 | `python3 shike/validation/validate_landable.py` | PASS | `LANDABLE_METRIC 16/16` |
 | `python3 shike/validation/validate_action_execution.py` | PASS | `ACTION_EXECUTION_METRIC 18/18` |
@@ -213,7 +231,7 @@ All commands below were run from `/home/xing-12_26/projects/codex-workspace`.
 - Demo acceptance and real-world readiness validators both pass.
 - Android source structure now has a dedicated validator covering file boundaries, coordinator size, action helper size, callback names, helper ownership, the extracted AgendaCard boundary, the extracted agenda card footer boundary, the extracted agenda card header boundary, the extracted review risk checklist boundary, the extracted review decision actions boundary, the extracted backend analysis controls boundary, the extracted backend endpoint controls boundary, the extracted import capture actions boundary, the extracted offline sample actions boundary, the extracted OCR draft editor boundary, the extracted captured image preview boundary, the extracted dashboard header boundary, the extracted dashboard notification badge boundary, the extracted system status row boundary, the extracted date strip boundary, the extracted home agenda list boundary, the extracted demo route step boundary, the extracted bottom nav item boundary, the extracted confirm banner actions boundary, the extracted parse confirm header boundary, and the extracted action planner execution controls boundary; it is listed in README, the device demo checklist, and the Demo console.
 - The core 20 package verifier now also checks that packaged acceptance surfaces keep Android structure, action-execution, and unit-test guard references.
-- The real-world readiness validator now keeps the README mechanical acceptance entry tied to `validate_android_structure.py`, `validate_android_unit_tests.py`, `ANDROID_STRUCTURE_METRIC 31/31`, and `ANDROID_UNIT_TEST_METRIC 88/88`.
+- The real-world readiness validator now keeps the README mechanical acceptance entry tied to `validate_android_structure.py`, `validate_android_unit_tests.py`, `ANDROID_STRUCTURE_METRIC 31/31`, and `ANDROID_UNIT_TEST_METRIC 90/90`.
 - The landable validator now checks that `docs/device-runbook.md` names the Android structure guard prerequisite before device testing.
 - The Product Beta validator establishes the S2 readiness baseline from the advanced guide and keeps future work tied to real product capabilities instead of display-only component splits.
 - The action execution validator now keeps confirmation-before-action, timed reminder scheduling, exact-alarm fallback, scheduled reminder persistence, app-start recovery, device reboot recovery, local-data-clear alarm cancellation, map copy fallback, calendar wording, and permission denial persistence covered by a dedicated S3 guard.

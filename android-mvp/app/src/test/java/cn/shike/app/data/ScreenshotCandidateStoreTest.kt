@@ -65,6 +65,25 @@ class ScreenshotCandidateStoreTest {
     }
 
     @Test
+    fun screenshotAssistSharedDedupe_rejectsSameUriAcrossForegroundAndServiceObservers() {
+        val preferences = InMemorySharedPreferences()
+        val candidate = ScreenshotCandidate(
+            contentUri = "content://media/external/images/media/42",
+            createdAtMillis = 1_786_789_000_000,
+            width = 1080,
+            height = 2400,
+            displayNameDigest = "abc123",
+        )
+
+        assertTrue(shouldNotifyScreenshotCandidate(preferences, candidate))
+
+        recordScreenshotAssistNotifiedToPreferences(preferences, candidate)
+
+        assertFalse(shouldNotifyScreenshotCandidate(preferences, candidate))
+        assertEquals(candidate.contentUri, loadLastScreenshotAssistNotifiedUriFromPreferences(preferences))
+    }
+
+    @Test
     fun screenshotAssistLookbackWindow_matchesAndroid16Guide() {
         assertEquals(30L, SCREENSHOT_ASSIST_LOOKBACK_SECONDS)
     }

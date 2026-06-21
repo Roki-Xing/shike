@@ -59,7 +59,11 @@ class ShikeAppState(
         todayAgendaState = TodayAgendaState.Ready
         executionResults = pendingExecutionResults()
         onPersist(item, source)
-        inboxHistory = listOf(inboxItemEntityFrom(item, source, System.currentTimeMillis())) + inboxHistory
+        inboxHistory = inboxHistoryWithUpserted(
+            entity = inboxItemEntityFrom(item, source, System.currentTimeMillis()),
+            sourceKey = sourceMediaStoreUri,
+            current = inboxHistory,
+        )
     }
 
     fun applyBackendOutcome(outcome: BackendAnalysisOutcome, persist: (ShikeItem, String) -> Unit) {
@@ -120,6 +124,18 @@ class ShikeAppState(
 
 private fun ShikeAppState.persistedImageCleanupStatus(sourceMediaStoreUri: String?): ImageCleanupStatus =
     if (sourceMediaStoreUri == null) ImageCleanupStatus.NOT_SUPPORTED else sourceImageCleanupStatus
+
+private fun inboxHistoryWithUpserted(
+    entity: InboxItemEntity,
+    sourceKey: String?,
+    current: List<InboxItemEntity>,
+): List<InboxItemEntity> {
+    val dedupeKey = sourceKey?.takeIf { it.isNotBlank() }
+    val filtered = current.filterNot { existing ->
+        existing.id == entity.id || (dedupeKey != null && existing.source.contains(dedupeKey))
+    }
+    return listOf(entity) + filtered
+}
 
 fun ShikeAppState.currentBackendInput(): BackendAnalysisInput {
     val imageUri = selectedSourceMediaStoreUri ?: capturedBitmap?.let { CAMERA_PREVIEW_IMAGE_URI }

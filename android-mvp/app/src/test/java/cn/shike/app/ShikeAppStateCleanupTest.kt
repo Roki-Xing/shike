@@ -40,6 +40,24 @@ class ShikeAppStateCleanupTest {
         assertEquals("已安排", state.selected.status)
     }
 
+    @Test
+    fun sameCaptureUri_replacesDraftInboxEntryInsteadOfDuplicatingMainList() {
+        val state = cleanupState()
+        val persisted = mutableListOf<Pair<ShikeItem, String>>()
+        val sourceUri = "content://media/external/images/media/336"
+
+        state.applyGalleryImage(sourceUri) { item, source -> persisted += item to source }
+        state.applyBackendOutcome(englishClassOutcome()) { item, source -> persisted += item to source }
+        state.updateReviewedItem(state.selected.copy(status = "待确认", location = "B336")) { item, source ->
+            persisted += item to source
+        }
+
+        assertEquals(1, state.inboxHistory.size)
+        assertEquals("英语口语课", state.inboxHistory.single().title)
+        assertEquals("B336", state.inboxHistory.single().location)
+        assertEquals("已安排", state.inboxHistory.single().status)
+    }
+
     private fun cleanupState(): ShikeAppState =
         ShikeAppState(
             initialItem = sampleCourse(),

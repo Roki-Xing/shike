@@ -33,19 +33,34 @@ fun callAnalyzeApi(backendBaseUrl: String, sourceType: String, ocrText: String, 
 }
 
 fun buildAnalyzeRequestPayload(inputId: String, sourceType: String, ocrText: String, scene: String): JSONObject =
+    buildAnalyzeRequestPayload(
+        inputId = inputId,
+        sourceType = sourceType,
+        ocrText = ocrText,
+        scene = scene,
+        userTimezone = deviceTimeZoneId(),
+    )
+
+fun buildAnalyzeRequestPayload(
+    inputId: String,
+    sourceType: String,
+    ocrText: String,
+    scene: String,
+    userTimezone: String,
+): JSONObject =
     JSONObject()
         .put("input_id", inputId)
         .put("source_type", sourceType)
         .put("ocr_text", ocrText)
         .put("scene_hint", sceneHint(scene))
         .put("locale", "zh-CN")
-        .put("user_timezone", "Asia/Shanghai")
+        .put("user_timezone", userTimezone)
 
 fun itemFromAnalyzeJson(
     json: JSONObject,
     fallbackText: String,
     referenceNowMillis: Long = System.currentTimeMillis(),
-    zoneId: ZoneId = ZoneId.of("Asia/Shanghai"),
+    zoneId: ZoneId = deviceZoneId(),
 ): ShikeItem {
     val sceneType = json.safeString("scene_type")
     val scene = when (sceneType) {
@@ -81,7 +96,7 @@ fun itemFromAnalyzeImageJson(
     json: JSONObject,
     fallbackText: String,
     referenceNowMillis: Long = System.currentTimeMillis(),
-    zoneId: ZoneId = ZoneId.of("Asia/Shanghai"),
+    zoneId: ZoneId = deviceZoneId(),
 ): ShikeItem {
     val sceneType = json.safeString("scene_type")
     val scene = when (sceneType) {

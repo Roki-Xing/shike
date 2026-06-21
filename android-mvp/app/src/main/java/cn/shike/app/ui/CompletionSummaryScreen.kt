@@ -30,7 +30,7 @@ fun completionSummaryState(results: List<ExecutionResult>): CompletionSummarySta
 
     return CompletionSummaryState(
         calendarStatus = when (calendar?.status) {
-            "已请求" -> "日历：已打开系统新增页，请在日历中保存"
+            "已请求", "已打开新增页" -> "日历：已打开系统新增页，尚未确认保存"
             null, "待确认" -> "日历：未打开"
             else -> "日历：${calendar.detail}"
         },

@@ -3,6 +3,7 @@ package cn.shike.app
 import android.Manifest
 import android.os.Handler
 import cn.shike.app.data.ScreenshotCandidate
+import cn.shike.app.data.recordScreenshotAssistNotified
 import cn.shike.app.data.saveScreenshotAssistEnabled
 import cn.shike.app.data.shouldNotifyScreenshotCandidate
 import cn.shike.app.system.ScreenshotObserver
@@ -20,7 +21,6 @@ class ScreenshotAssistController(
 ) {
     private var observer: ScreenshotObserver? = null
     private var observed = false
-    private var lastNotifiedScreenshotUri: String? = null
 
     fun updateEnabled(enabled: Boolean) {
         activity.screenshotAssistEnabled = enabled
@@ -83,8 +83,8 @@ class ScreenshotAssistController(
     }
 
     private fun onScreenshotCandidate(candidate: ScreenshotCandidate) {
-        if (!shouldNotifyScreenshotCandidate(candidate, lastNotifiedScreenshotUri)) return
-        lastNotifiedScreenshotUri = candidate.contentUri
+        if (!shouldNotifyScreenshotCandidate(activity, candidate)) return
+        recordScreenshotAssistNotified(activity, candidate)
         recordScreenshotAssistDetected(activity, candidate.createdAtMillis)
         onCandidateVisible(candidate)
         showScreenshotDetectedNotification(activity, candidate)

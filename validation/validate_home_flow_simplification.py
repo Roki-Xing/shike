@@ -51,7 +51,7 @@ def main() -> int:
 
     home_body = body_between(home_screen, "fun HomeActionScreen", "private fun ScreenshotPromptEntry")
     home_route_body = body_between(main_routes, "fun HomeRouteContent", "@Composable\nfun ImportRouteContent")
-    import_full_body = body_between(main_routes, "fun ImportRouteContent", "}\n")
+    import_full_body = main_routes[main_routes.index("fun ImportRouteContent"):]
 
     checks = [
         (
@@ -65,7 +65,10 @@ def main() -> int:
                 "Planning",
                 "Completed",
                 "importFlowStateFor(",
-            ]),
+            ])
+            and "sealed class AnalysisUiState" in read("AnalysisUiState.kt")
+            and "analysisUiState: AnalysisUiState" in home_screen
+            and "analysisUiStateFor(modelStatus)" in main_screen,
         ),
         (
             "home_renders_only_one_primary_state",
@@ -103,7 +106,8 @@ def main() -> int:
         ),
         (
             "import_flow_renders_one_stage_at_a_time",
-            "val importStage = importFlowStageFor(" in main_routes
+            "val importStage = if (importFlowCompleted)" in main_routes
+            and "importFlowStageFor(analysisUiState, selected.status, isConfirmed)" in main_routes
             and "when (importStage)" in main_routes
             and "ImportRouteStage.Entry ->" in main_routes
             and "ImportRouteStage.Analyzing ->" in main_routes
@@ -121,6 +125,8 @@ def main() -> int:
             "analyze_progress_has_four_user_steps",
             all(token in progress_panel for token in ["读取图片", "OCR识别", "结构化解析", "生成行动卡"])
             and '"待确认" in selectedStatus' not in progress_panel
+            and '"解析中" in modelStatus || "正在解析" in modelStatus' not in progress_panel
+            and "analysisUiState is AnalysisUiState.Analyzing" in progress_panel
             and "ImportFlowState.Analyzing" in home_screen,
         ),
         (

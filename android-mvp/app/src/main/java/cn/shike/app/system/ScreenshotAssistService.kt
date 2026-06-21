@@ -9,6 +9,7 @@ import android.os.Looper
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import cn.shike.app.data.ScreenshotCandidate
+import cn.shike.app.data.recordScreenshotAssistNotified
 import cn.shike.app.data.shouldNotifyScreenshotCandidate
 
 private const val SCREENSHOT_ASSIST_SERVICE_ID = 2701
@@ -18,7 +19,6 @@ private const val ACTION_STOP_SCREENSHOT_ASSIST = "cn.shike.app.action.STOP_SCRE
 class ScreenshotAssistService : Service() {
     private val handler = Handler(Looper.getMainLooper())
     private var observer: ScreenshotObserver? = null
-    private var lastNotifiedScreenshotUri: String? = null
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent?.action == ACTION_STOP_SCREENSHOT_ASSIST || !hasScreenshotMediaPermission(this)) {
@@ -47,8 +47,8 @@ class ScreenshotAssistService : Service() {
     }
 
     private fun onCandidate(candidate: ScreenshotCandidate) {
-        if (!shouldNotifyScreenshotCandidate(candidate, lastNotifiedScreenshotUri)) return
-        lastNotifiedScreenshotUri = candidate.contentUri
+        if (!shouldNotifyScreenshotCandidate(this, candidate)) return
+        recordScreenshotAssistNotified(this, candidate)
         recordScreenshotAssistDetected(this, candidate.createdAtMillis)
         showScreenshotDetectedNotification(this, candidate)
     }

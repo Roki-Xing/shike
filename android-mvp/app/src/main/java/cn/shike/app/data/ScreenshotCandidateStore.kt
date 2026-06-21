@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 
 private const val SCREENSHOT_ASSIST_PREFERENCES_NAME = "shike_screenshot_assist_state"
 internal const val KEY_SCREENSHOT_ASSIST_ENABLED = "screenshot_assist_enabled"
+internal const val KEY_LAST_SCREENSHOT_ASSIST_NOTIFIED_URI = "last_screenshot_assist_notified_uri"
 const val SCREENSHOT_ASSIST_LOOKBACK_SECONDS = 30L
 private const val SCREENSHOT_ASSIST_IMPORT_SOURCE_LABEL = "最近截图助手导入"
 
@@ -24,6 +25,31 @@ fun shouldNotifyScreenshotCandidate(
     candidate: ScreenshotCandidate,
     lastNotifiedContentUri: String?,
 ): Boolean = candidate.contentUri != lastNotifiedContentUri
+
+fun shouldNotifyScreenshotCandidate(
+    preferences: SharedPreferences,
+    candidate: ScreenshotCandidate,
+): Boolean =
+    shouldNotifyScreenshotCandidate(candidate, loadLastScreenshotAssistNotifiedUriFromPreferences(preferences))
+
+fun shouldNotifyScreenshotCandidate(context: Context, candidate: ScreenshotCandidate): Boolean =
+    shouldNotifyScreenshotCandidate(screenshotAssistPreferences(context), candidate)
+
+fun recordScreenshotAssistNotified(context: Context, candidate: ScreenshotCandidate) {
+    recordScreenshotAssistNotifiedToPreferences(screenshotAssistPreferences(context), candidate)
+}
+
+internal fun recordScreenshotAssistNotifiedToPreferences(
+    preferences: SharedPreferences,
+    candidate: ScreenshotCandidate,
+) {
+    preferences.edit()
+        .putString(KEY_LAST_SCREENSHOT_ASSIST_NOTIFIED_URI, candidate.contentUri)
+        .apply()
+}
+
+internal fun loadLastScreenshotAssistNotifiedUriFromPreferences(preferences: SharedPreferences): String? =
+    preferences.getString(KEY_LAST_SCREENSHOT_ASSIST_NOTIFIED_URI, null)
 
 fun screenshotCandidateFromNotificationImport(
     contentUri: String?,
@@ -72,6 +98,7 @@ internal fun saveScreenshotAssistEnabledToPreferences(
 internal fun clearScreenshotAssistPreferenceFromPreferences(preferences: SharedPreferences) {
     preferences.edit()
         .remove(KEY_SCREENSHOT_ASSIST_ENABLED)
+        .remove(KEY_LAST_SCREENSHOT_ASSIST_NOTIFIED_URI)
         .apply()
 }
 

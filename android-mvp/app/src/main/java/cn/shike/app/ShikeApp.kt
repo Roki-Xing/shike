@@ -125,6 +125,8 @@ fun ShikeApp(
         onVisibleScreenCapturePromptConsumed = onVisibleScreenCapturePromptConsumed,
         onClearLocalData = actions::clearLocalDataSelection,
         onReviewed = actions::updateReviewedItem,
+        onSavePendingReview = actions::saveCurrentAsPendingReview,
+        onRetryAnalyze = actions::analyzeCurrentDraftWithBackend,
         onDeleteSourceImage = actions::requestDeleteSourceImage,
         onKeepSourceImage = actions::keepSourceImage,
         onAddCalendar = { runCalendarExecution(it, state.executionResults, { next -> state.executionResults = next }, onAddCalendar) },

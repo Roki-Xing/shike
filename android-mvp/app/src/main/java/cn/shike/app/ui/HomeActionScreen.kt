@@ -25,9 +25,24 @@ fun importFlowStateFor(
     pendingScreenshotCandidate: ScreenshotCandidate?,
     visibleScreenCapturePrompt: VisibleScreenCapturePrompt?,
 ): ImportFlowState =
+    importFlowStateFor(
+        selected = selected,
+        todayAgendaState = todayAgendaState,
+        analysisUiState = analysisUiStateFor(modelStatus),
+        pendingScreenshotCandidate = pendingScreenshotCandidate,
+        visibleScreenCapturePrompt = visibleScreenCapturePrompt,
+    )
+
+fun importFlowStateFor(
+    selected: ShikeItem,
+    todayAgendaState: TodayAgendaState,
+    analysisUiState: AnalysisUiState,
+    pendingScreenshotCandidate: ScreenshotCandidate?,
+    visibleScreenCapturePrompt: VisibleScreenCapturePrompt?,
+): ImportFlowState =
     when {
         pendingScreenshotCandidate != null || visibleScreenCapturePrompt != null -> ImportFlowState.Detected
-        "解析中" in modelStatus || "正在解析" in modelStatus -> ImportFlowState.Analyzing
+        analysisUiState is AnalysisUiState.Analyzing -> ImportFlowState.Analyzing
         selected.status == "待确认" -> ImportFlowState.Reviewing
         selected.status == "已安排" -> ImportFlowState.Completed
         todayAgendaState == TodayAgendaState.Empty -> ImportFlowState.Idle
@@ -45,7 +60,7 @@ fun HomeActionScreen(
     onboardingDismissed: Boolean,
     onDismissOnboarding: () -> Unit,
     onEnableScreenshotAssistFromOnboarding: () -> Unit,
-    modelStatus: String,
+    analysisUiState: AnalysisUiState,
     pendingScreenshotCandidate: ScreenshotCandidate?,
     onImportScreenshotCandidate: (ScreenshotCandidate) -> Unit,
     onIgnoreScreenshotCandidate: () -> Unit,
@@ -64,7 +79,7 @@ fun HomeActionScreen(
     val flowState = importFlowStateFor(
         selected = selected,
         todayAgendaState = todayAgendaState,
-        modelStatus = modelStatus,
+        analysisUiState = analysisUiState,
         pendingScreenshotCandidate = pendingScreenshotCandidate,
         visibleScreenCapturePrompt = visibleScreenCapturePrompt,
     )

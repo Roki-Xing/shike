@@ -9,6 +9,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.dp
+import cn.shike.app.reviewedItemWithPreparationDraft
 import cn.shike.app.domain.ShikeItem
 
 enum class ReviewEditTarget {
@@ -38,11 +39,13 @@ fun ParseConfirmPanel(item: ShikeItem, onReviewed: (ShikeItem) -> Unit) {
             model = actionCard,
             onConfirmAndPlan = {
                 onReviewed(
-                    item.copy(
-                        title = draftTitle.ifBlank { item.title },
-                        time = draftTime.ifBlank { "待确认" },
-                        location = draftLocation.ifBlank { "待确认" },
-                        status = draftStatus.ifBlank { "待确认" },
+                    reviewedItemWithPreparationDraft(
+                        item = item,
+                        title = draftTitle,
+                        time = draftTime,
+                        location = draftLocation,
+                        status = draftStatus,
+                        preparation = draftPreparation,
                     )
                 )
             },
@@ -71,15 +74,18 @@ fun ParseConfirmPanel(item: ShikeItem, onReviewed: (ShikeItem) -> Unit) {
                 onReviewed = onReviewed,
                 onRegenerateFromSource = {
                     onReviewed(
-                        item.copy(
-                            title = draftTitle.ifBlank { item.title },
-                            time = draftTime.ifBlank { "待确认" },
-                            location = draftLocation.ifBlank { "待确认" },
+                        reviewedItemWithPreparationDraft(
+                            item = item.copy(
+                                rawText = listOf(
+                                    draftSourceText.ifBlank { actionCard.sourceTextPreview },
+                                    "需要确认：已根据修改后的识别文字重新生成，请确认时间、地点和准备事项。",
+                                ).joinToString("\n"),
+                            ),
+                            title = draftTitle,
+                            time = draftTime,
+                            location = draftLocation,
                             status = "待确认",
-                            rawText = listOf(
-                                draftSourceText.ifBlank { actionCard.sourceTextPreview },
-                                "需要确认：已根据修改后的识别文字重新生成，请确认时间、地点和准备事项。",
-                            ).joinToString("\n"),
+                            preparation = draftPreparation,
                         )
                     )
                     editTarget = ReviewEditTarget.None

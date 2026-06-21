@@ -57,6 +57,18 @@ class ShikeAppActions(
         state.applyBackendOutcome(outcome, onPersist)
     }
 
+    fun saveCurrentAsPendingReview() {
+        state.persistSelection(
+            item = state.selected.copy(status = "待确认"),
+            source = "待确认：解析失败后已保存",
+            sourceMediaStoreUri = state.selectedSourceMediaStoreUri,
+            imageCleanupStatus = state.sourceImageCleanupStatus,
+            onPersist = onPersist,
+        )
+        state.modelStatus = "已存入待确认"
+        state.todayAgendaState = TodayAgendaState.Ready
+    }
+
     fun applyCourseSample() = state.applyCourseSample(onPersist)
 
     fun applyEventSample() = state.applyEventSample(onPersist)

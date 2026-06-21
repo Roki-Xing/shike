@@ -83,6 +83,8 @@ def main() -> int:
     reminder_payload_test = read("android-mvp/app/src/test/java/cn/shike/app/ReminderPayloadTest.kt")
     execution_test = read("android-mvp/app/src/test/java/cn/shike/app/ExecutionResultActionsTest.kt")
     execution_state_test = read("android-mvp/app/src/test/java/cn/shike/app/ExecutionResultStateTest.kt")
+    analysis_ui_state_source = read("android-mvp/app/src/main/java/cn/shike/app/ui/AnalysisUiState.kt")
+    analysis_ui_state_test = read("android-mvp/app/src/test/java/cn/shike/app/AnalysisUiStateTest.kt")
     date_strip_source = read("android-mvp/app/src/main/java/cn/shike/app/ui/DateStrip.kt")
     date_strip_test = read("android-mvp/app/src/test/java/cn/shike/app/DateStripTest.kt")
     system_actions_source = read("android-mvp/app/src/main/java/cn/shike/app/system/SystemActions.kt")
@@ -309,7 +311,8 @@ def main() -> int:
             and "recordExecutionResult_replacesOnlyMatchingActionAndAppendsLatestResult" in execution_state_test
             and "executionResultFactories_keepPermissionAndFallbackWording" in execution_state_test
             and "imageCleanupResults_distinguishSystemConfirmationStates" in execution_state_test
-            and "permission_blocked" in execution_state_test
+            and "尚未确认保存" in execution_state_test
+            and "精确定时" in execution_state_test
             and "地图不可用" in execution_state_test,
         ),
         (
@@ -318,6 +321,24 @@ def main() -> int:
                 "android-mvp/app/build/test-results/testDebugUnitTest/TEST-cn.shike.app.ExecutionResultStateTest.xml",
                 "cn.shike.app.ExecutionResultStateTest",
                 4,
+            ),
+        ),
+        (
+            "analysis_ui_state_unit_test_exists",
+            "sealed class AnalysisUiState" in analysis_ui_state_source
+            and "class AnalysisUiStateTest" in analysis_ui_state_test
+            and analysis_ui_state_test.count("@Test") == 3
+            and "analysisUiStateFor_keepsFlowLogicAwayFromDisplayCopy" in analysis_ui_state_test
+            and "analysisUiStateFor_mapsLegacyStatusAtTheBoundaryOnly" in analysis_ui_state_test
+            and "homeFlowState_usesAnalysisUiStateInsteadOfParsingModelCopy" in analysis_ui_state_test
+            and "ImportFlowState.Analyzing" in analysis_ui_state_test,
+        ),
+        (
+            "gradle_analysis_ui_state_test_passed",
+            test_result_passed(
+                "android-mvp/app/build/test-results/testDebugUnitTest/TEST-cn.shike.app.AnalysisUiStateTest.xml",
+                "cn.shike.app.AnalysisUiStateTest",
+                3,
             ),
         ),
         (
@@ -441,9 +462,10 @@ def main() -> int:
         (
             "review_actions_unit_test_exists",
             "class ReviewActionsTest" in review_actions_test
-            and review_actions_test.count("@Test") == 2
+            and review_actions_test.count("@Test") == 3
             and "applyReviewedItemSelection_persistsConfirmedItemAndSource" in review_actions_test
             and "applyReviewedItemSelection_persistsIgnoredItemAndSource" in review_actions_test
+            and "reviewedItemWithPreparationDraft_persistsPreparationAsStructuredEvidence" in review_actions_test
             and "用户确认修正：活动海报" in review_actions_test
             and "用户确认修正：课程通知" in review_actions_test,
         ),
@@ -452,7 +474,7 @@ def main() -> int:
             test_result_passed(
                 "android-mvp/app/build/test-results/testDebugUnitTest/TEST-cn.shike.app.ReviewActionsTest.xml",
                 "cn.shike.app.ReviewActionsTest",
-                2,
+                3,
             ),
         ),
         (
@@ -460,10 +482,12 @@ def main() -> int:
             "private fun ShikeAppState.persistedImageCleanupStatus" in shike_app_state_source
             and "sourceMediaStoreUri = sourceMediaStoreUri" in shike_app_state_source
             and "imageCleanupStatus = imageCleanupStatus" in shike_app_state_source
+            and "inboxHistoryWithUpserted" in shike_app_state_source
             and "class ShikeAppStateCleanupTest" in shike_app_state_cleanup_test
-            and shike_app_state_cleanup_test.count("@Test") == 2
+            and shike_app_state_cleanup_test.count("@Test") == 3
             and "applyBackendOutcome_preservesSourceImageCleanupState" in shike_app_state_cleanup_test
             and "updateReviewedItem_preservesSourceImageCleanupStateAfterConfirmation" in shike_app_state_cleanup_test
+            and "sameCaptureUri_replacesDraftInboxEntryInsteadOfDuplicatingMainList" in shike_app_state_cleanup_test
             and "content://media/external/images/media/520" in shike_app_state_cleanup_test
             and "ImageCleanupStatus.NOT_REQUESTED" in shike_app_state_cleanup_test,
         ),
@@ -472,7 +496,7 @@ def main() -> int:
             test_result_passed(
                 "android-mvp/app/build/test-results/testDebugUnitTest/TEST-cn.shike.app.ShikeAppStateCleanupTest.xml",
                 "cn.shike.app.ShikeAppStateCleanupTest",
-                2,
+                3,
             ),
         ),
         (
@@ -535,7 +559,8 @@ def main() -> int:
             and "actionsFromJson_ignoresBlankAndMalformedActions" in model_api_client_test
             and "normalizeBackendUrl_stripsPathQueryAndFragment" in model_api_client_test
             and "android-demo-test" in model_api_client_test
-            and "Asia/Shanghai" in model_api_client_test
+            and "Europe/London" in model_api_client_test
+            and "userTimezone" in model_api_client_test
             and "云端 AI 解析：OCR 原文兜底" in model_api_client_test
             and "稍后确认" in model_api_client_test,
         ),
@@ -570,7 +595,7 @@ def main() -> int:
                     "share_text",
                     "manual",
                     "zh-CN",
-                    "Asia/Shanghai",
+                    "Europe/London",
                 ]
             ),
         ),
@@ -1133,25 +1158,27 @@ def main() -> int:
             and "fun saveScreenshotAssistEnabled(" in screenshot_candidate_store_source
             and "fun clearScreenshotAssistPreference(" in screenshot_candidate_store_source
             and "class ScreenshotCandidateStoreTest" in screenshot_candidate_store_test
-            and screenshot_candidate_store_test.count("@Test") == 7
+            and screenshot_candidate_store_test.count("@Test") == 8
             and "isLikelyScreenshot_acceptsScreenshotNameOrPathSignals" in screenshot_candidate_store_test
             and "isLikelyScreenshot_rejectsScreenSizedImagesWithoutScreenshotSignals" in screenshot_candidate_store_test
             and "screenshotDisplayNameDigest_isStableAndDoesNotExposeTheName" in screenshot_candidate_store_test
             and "shouldNotifyScreenshotCandidate_rejectsDuplicateContentUri" in screenshot_candidate_store_test
+            and "screenshotAssistSharedDedupe_rejectsSameUriAcrossForegroundAndServiceObservers" in screenshot_candidate_store_test
             and "screenshotAssistLookbackWindow_matchesAndroid16Guide" in screenshot_candidate_store_test
             and "screenshotCandidateFromNotificationImport_preservesCandidateMetadata" in screenshot_candidate_store_test
             and "screenshotAssistPreference_persistsAcrossRestartAndCanBeCleared" in screenshot_candidate_store_test
             and "KEY_SCREENSHOT_ASSIST_ENABLED" in screenshot_candidate_store_test
+            and "KEY_LAST_SCREENSHOT_ASSIST_NOTIFIED_URI" in screenshot_candidate_store_source
             and test_result_passed(
                 "android-mvp/app/build/test-results/testDebugUnitTest/TEST-cn.shike.app.data.ScreenshotCandidateStoreTest.xml",
                 "cn.shike.app.data.ScreenshotCandidateStoreTest",
-                7,
+                8,
             ),
         ),
         (
             "android_unit_test_guard_documented",
             "validate_android_unit_tests.py" in docs
-            and "ANDROID_UNIT_TEST_METRIC 88/88" in docs
+            and "ANDROID_UNIT_TEST_METRIC 90/90" in docs
             and "testDebugUnitTest" in docs,
         ),
     ]

@@ -15,9 +15,9 @@ import cn.shike.app.system.VisibleScreenCapturePrompt
 fun CaptureHubScreen(
     captureSource: String,
     capturedBitmap: Bitmap?,
-    modelStatus: String,
     ocrDraft: String,
     onOcrDraftChange: (String) -> Unit,
+    analysisUiState: AnalysisUiState,
     onGallery: () -> Unit,
     onCamera: () -> Unit,
     onManualInput: () -> Unit,
@@ -27,6 +27,8 @@ fun CaptureHubScreen(
     visibleScreenCapturePrompt: VisibleScreenCapturePrompt?,
     onImportVisibleScreenCapture: () -> Unit,
     onDismissVisibleScreenCapture: () -> Unit,
+    onSavePendingReview: () -> Unit,
+    onRetryAnalyze: () -> Unit,
 ) {
     visibleScreenCapturePrompt?.let { prompt ->
         VisibleScreenCapturePromptCard(
@@ -51,18 +53,18 @@ fun CaptureHubScreen(
         onCamera = onCamera,
         onManualInput = onManualInput,
     )
-    if ("解析" in modelStatus) {
+    if (analysisUiState is AnalysisUiState.Analyzing) {
         ShikeLoadingSkeleton("解析中", "正在解析 OCR 文本")
     }
-    if ("失败" in modelStatus) {
+    if (analysisUiState is AnalysisUiState.Failed) {
         RecoverableErrorState(
             title = "AI 解析暂不可用",
             detail = "截图已保留为待确认，你可以换图、手动输入或稍后重新解析。",
             repairActions = listOf(
                 RecoverableRepairAction("重新选择截图", onGallery),
                 RecoverableRepairAction("手动输入", onManualInput),
-                RecoverableRepairAction("先存入待确认") {},
-                RecoverableRepairAction("重新解析") {},
+                RecoverableRepairAction("先存入待确认", onSavePendingReview),
+                RecoverableRepairAction("重新解析", onRetryAnalyze),
             ),
         )
     }

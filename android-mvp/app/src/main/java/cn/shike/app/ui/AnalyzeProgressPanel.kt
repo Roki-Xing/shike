@@ -20,22 +20,33 @@ data class AnalyzeProgressState(
 
 private val AnalyzeSteps = listOf("读取图片", "OCR识别", "结构化解析", "生成行动卡")
 
-fun analyzeProgressStateFor(modelStatus: String, hasPendingImage: Boolean, selectedStatus: String): AnalyzeProgressState {
-    val active = "解析中" in modelStatus || "正在解析" in modelStatus
+fun analyzeProgressStateFor(
+    analysisUiState: AnalysisUiState,
+    hasPendingImage: Boolean,
+): AnalyzeProgressState {
+    val active = analysisUiState is AnalysisUiState.Analyzing
+    val statusLabel = when (analysisUiState) {
+        is AnalysisUiState.Analyzing -> analysisUiState.message
+        is AnalysisUiState.Failed -> analysisUiState.message
+        else -> ""
+    }
     val index = when {
-        "图片" in modelStatus -> 1
-        "结构" in modelStatus || "文字" in modelStatus -> 2
-        "生成" in modelStatus -> 3
+        "图片" in statusLabel -> 1
+        "结构" in statusLabel || "文字" in statusLabel -> 2
+        "生成" in statusLabel -> 3
         hasPendingImage -> 0
-        selectedStatus == "待确认" -> 0
         else -> 0
     }
     return AnalyzeProgressState(
         active = active,
         currentStepIndex = index.coerceIn(0, AnalyzeSteps.lastIndex),
-        statusLabel = modelStatus.removePrefix("模型状态：").ifBlank { "等待截图" },
+        statusLabel = statusLabel.removePrefix("模型状态：").ifBlank { "等待截图" },
     )
 }
+
+@Suppress("UNUSED_PARAMETER")
+fun analyzeProgressStateFor(modelStatus: String, hasPendingImage: Boolean, selectedStatus: String): AnalyzeProgressState =
+    analyzeProgressStateFor(analysisUiStateFor(modelStatus), hasPendingImage)
 
 @Composable
 fun AnalyzeProgressPanel(state: AnalyzeProgressState) {

@@ -24,7 +24,7 @@ fun List<ExecutionResult>.recordExecutionResult(result: ExecutionResult): List<E
     filterNot { it.action == result.action } + result
 
 fun calendarExecutionResult(): ExecutionResult =
-    ExecutionResult("日历", "已请求", "已打开系统日历新增页，请在日历中保存。")
+    ExecutionResult("日历", "已打开新增页", "已打开系统日历新增页，尚未确认保存；请在日历中点保存。")
 
 fun reminderExecutionResult(item: ShikeItem? = null): ExecutionResult =
     ExecutionResult(
@@ -33,11 +33,11 @@ fun reminderExecutionResult(item: ShikeItem? = null): ExecutionResult =
         item?.let {
             "已调度本地定时提醒，模式：精确定时 / 系统普通定时；${reminderPermissionFallbackCopyFor(it).executionDetail}"
         }
-            ?: "已请求本地定时提醒；通知权限拒绝时进入 permission_blocked 并保留行动卡。",
+            ?: "已调度本地定时提醒，模式：精确定时 / 系统普通定时；通知权限拒绝时进入 permission_blocked 并保留行动卡。",
     )
 
 fun mapExecutionResult(): ExecutionResult =
-    ExecutionResult("地图", "已请求", "已打开地图；地图不可用时复制地点并保留行动卡。")
+    ExecutionResult("地图", "已打开路线", "已打开地图路线；地图不可用时复制地点并保留行动卡。")
 
 fun imageCleanupRequestedResult(): ExecutionResult =
     ExecutionResult("原截图", "已请求", "已打开系统确认页；用户确认后移入系统回收站。")

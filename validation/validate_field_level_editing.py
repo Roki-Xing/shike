@@ -33,6 +33,8 @@ def main() -> int:
     parse_confirm = read("ParseConfirmPanel.kt")
     structured_card = read("StructuredActionCard.kt")
     review_edit = read("ReviewEditSheet.kt")
+    review_actions = (ROOT / "android-mvp/app/src/main/java/cn/shike/app/ReviewActions.kt").read_text(encoding="utf-8")
+    review_test = (ROOT / "android-mvp/app/src/test/java/cn/shike/app/ReviewActionsTest.kt").read_text(encoding="utf-8")
 
     checks = [
         (
@@ -77,6 +79,13 @@ def main() -> int:
             "draftSourceText" in parse_confirm
             and "onRegenerateFromSource" in review_edit
             and "重新生成行动卡" in review_edit,
+        ),
+        (
+            "preparation_edit_persists_structured_evidence",
+            "reviewedItemWithPreparationDraft" in parse_confirm
+            and "draftPreparation = draftPreparation" in review_edit
+            and "rawText = item.rawText.withPreparationEvidence(preparation)" in review_actions
+            and "reviewedItemWithPreparationDraft_persistsPreparationAsStructuredEvidence" in review_test,
         ),
     ]
 

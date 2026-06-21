@@ -24,6 +24,7 @@ class ModelApiClientTest {
             sourceType = "screenshot",
             ocrText = "周五 18:30 B203 高数A班调课",
             scene = "课程通知",
+            userTimezone = "Europe/London",
         )
 
         assertEquals("android-demo-test", payload.getString("input_id"))
@@ -31,7 +32,7 @@ class ModelApiClientTest {
         assertEquals("周五 18:30 B203 高数A班调课", payload.getString("ocr_text"))
         assertEquals("course_notice", payload.getString("scene_hint"))
         assertEquals("zh-CN", payload.getString("locale"))
-        assertEquals("Asia/Shanghai", payload.getString("user_timezone"))
+        assertEquals("Europe/London", payload.getString("user_timezone"))
     }
 
     @Test

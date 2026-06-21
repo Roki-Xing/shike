@@ -56,6 +56,8 @@ fun ShikeMainScreen(
     onImportVisibleScreenCapture: () -> Unit,
     onDismissVisibleScreenCapture: () -> Unit,
     onClearLocalData: () -> Unit, onReviewed: (ShikeItem) -> Unit,
+    onSavePendingReview: () -> Unit,
+    onRetryAnalyze: () -> Unit,
     sourceImageCleanupStatus: ImageCleanupStatus, selectedSourceMediaStoreUri: String?,
     onDeleteSourceImage: () -> Unit, onKeepSourceImage: () -> Unit,
     onAddCalendar: (ShikeItem) -> Unit, onReminder: (ShikeItem) -> Unit, onOpenMap: (ShikeItem) -> Unit,
@@ -70,6 +72,7 @@ fun ShikeMainScreen(
         selectedSection = ShikeMainSection.Import
         action()
     }
+    val analysisUiState = analysisUiStateFor(modelStatus)
 
     Scaffold(
         modifier = Modifier
@@ -100,7 +103,7 @@ fun ShikeMainScreen(
         ) {
             when (selectedSection) {
                 ShikeMainSection.Home -> HomeRouteContent(
-                    selected, todayAgendaState, modelStatus,
+                    selected, todayAgendaState, analysisUiState,
                     pendingScreenshotCandidate, visibleScreenCapturePrompt, onboardingDismissed,
                     { openImportEntry(onGallery) },
                     { openImportEntry(onCamera) },
@@ -125,11 +128,12 @@ fun ShikeMainScreen(
                 )
                 ShikeMainSection.Import -> ImportRouteContent(
                     selected, executionResults, isConfirmed, captureSource, capturedBitmap,
-                    modelStatus, ocrDraft, pendingScreenshotCandidate,
+                    analysisUiState, ocrDraft, pendingScreenshotCandidate,
                     visibleScreenCapturePrompt, sourceImageCleanupStatus, selectedSourceMediaStoreUri,
                     onOcrDraftChange, onGallery, onCamera, onManualInput,
                     onImportScreenshotCandidate, onIgnoreScreenshotCandidate,
-                    onImportVisibleScreenCapture, onDismissVisibleScreenCapture, onReviewed,
+                    onImportVisibleScreenCapture, onDismissVisibleScreenCapture,
+                    onSavePendingReview, onRetryAnalyze, onReviewed,
                     onDeleteSourceImage, onKeepSourceImage, onAddCalendar, onReminder, onOpenMap,
                     importFlowCompleted,
                     onCompleteArrangement = { importFlowCompleted = true },

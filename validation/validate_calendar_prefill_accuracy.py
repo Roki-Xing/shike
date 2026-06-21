@@ -30,6 +30,8 @@ def main() -> int:
     """
 
     model_client = read("android-mvp/app/src/main/java/cn/shike/app/data/ModelApiClient.kt")
+    model_json_helpers = read("android-mvp/app/src/main/java/cn/shike/app/data/ModelJsonHelpers.kt")
+    model_time_parser = read("android-mvp/app/src/main/java/cn/shike/app/data/ModelTimeParser.kt")
     model_time_parser = read("android-mvp/app/src/main/java/cn/shike/app/data/ModelTimeParser.kt")
     system_actions = read("android-mvp/app/src/main/java/cn/shike/app/system/SystemActions.kt")
     action_gate = read("android-mvp/app/src/main/java/cn/shike/app/ui/ExecutionActionGate.kt")
@@ -66,7 +68,7 @@ def main() -> int:
             and "由用户在日历中保存" in system_actions
             and "已写入" not in system_actions
             and "已同步" not in system_actions
-            and "已打开系统日历新增页，请在日历中保存" in execution_result,
+            and "已打开系统日历新增页，尚未确认保存" in execution_result,
         ),
         (
             "missing_epoch_blocks_calendar_and_reminder",
@@ -95,7 +97,7 @@ def main() -> int:
         (
             "null_deadline_is_filtered",
             "deadline_text" in model_client
-            and "takeUnless { it.equals(\"null\", ignoreCase = true) }" in model_client
+            and "takeUnless { it.equals(\"null\", ignoreCase = true) }" in model_json_helpers + model_time_parser
             and "assertFalseContainsNull" in model_test,
         ),
     ]

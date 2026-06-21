@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import cn.shike.app.reviewedItemWithPreparationDraft
 import cn.shike.app.domain.ShikeItem
 
 @Composable
@@ -20,17 +21,20 @@ fun ReviewDecisionActions(
     draftTime: String,
     draftLocation: String,
     draftStatus: String,
+    draftPreparation: String,
     onReviewed: (ShikeItem) -> Unit,
 ) {
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
         Button(
             onClick = {
                 onReviewed(
-                    item.copy(
-                        title = draftTitle.ifBlank { item.title },
-                        time = draftTime.ifBlank { "待确认" },
-                        location = draftLocation.ifBlank { "待确认" },
-                        status = draftStatus.ifBlank { "待确认" },
+                    reviewedItemWithPreparationDraft(
+                        item = item,
+                        title = draftTitle,
+                        time = draftTime,
+                        location = draftLocation,
+                        status = draftStatus,
+                        preparation = draftPreparation,
                     )
                 )
             },

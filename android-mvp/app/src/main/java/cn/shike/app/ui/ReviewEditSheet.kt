@@ -55,6 +55,7 @@ fun ReviewEditSheet(
             draftTime = draftTime,
             draftLocation = draftLocation,
             draftStatus = draftStatus,
+            draftPreparation = draftPreparation,
             onReviewed = onReviewed,
         )
     }

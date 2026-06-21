@@ -6,6 +6,7 @@ import java.io.OutputStreamWriter
 import java.net.HttpURLConnection
 import java.net.URL
 import java.time.LocalDate
+import java.time.ZoneId
 
 private const val IMAGE_ANALYZE_PATH_PREFIX = "/v2/"
 private const val IMAGE_ANALYZE_PATH_SUFFIX = "analyze-image"
@@ -39,7 +40,7 @@ fun callAnalyzeImageApi(
         sourceType = sourceType,
         ocrTextHint = ocrTextHint,
         scene = scene,
-        currentDate = LocalDate.now().toString(),
+        currentDate = LocalDate.now(deviceZoneId()).toString(),
         image = image,
         allowCloudImage = allowCloudImage,
     )
@@ -66,6 +67,7 @@ fun buildAnalyzeImageRequestPayload(
     currentDate: String,
     image: BackendImagePayload,
     allowCloudImage: Boolean = true,
+    userTimezone: String = deviceTimeZoneId(),
 ): JSONObject =
     JSONObject()
         .put("input_id", inputId)
@@ -78,7 +80,7 @@ fun buildAnalyzeImageRequestPayload(
             .put("sha256", image.sha256))
         .put("ocr_text_hint", ocrTextHint)
         .put("ocr_blocks", JSONArray())
-        .put("user_timezone", "Asia/Shanghai")
+        .put("user_timezone", userTimezone)
         .put("current_date", currentDate)
         .put("locale", "zh-CN")
         .put("scene_hint", sceneHint(scene))

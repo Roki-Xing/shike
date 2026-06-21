@@ -49,6 +49,13 @@ def main() -> int:
             and all(token in main_flow for token in ["重新选择截图", "手动输入", "先存入待确认", "重新解析"]),
         ),
         (
+            "import_failure_repairs_are_wired_to_real_handlers",
+            "RecoverableRepairAction(\"先存入待确认\", onSavePendingReview)" in main_flow
+            and "RecoverableRepairAction(\"重新解析\", onRetryAnalyze)" in main_flow
+            and "RecoverableRepairAction(\"先存入待确认\") {}" not in main_flow
+            and "RecoverableRepairAction(\"重新解析\") {}" not in main_flow,
+        ),
+        (
             "missing_time_and_location_have_direct_repairs",
             all(token in execution_gate for token in ["补充时间后可用", "补充地点后可用"])
             and all(token in planner for token in ["补时间", "补地点", "存入待确认"]),

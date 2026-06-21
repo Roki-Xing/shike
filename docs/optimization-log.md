@@ -1,5 +1,39 @@
 # Optimization Log
 
+## 2026-06-21 / Deep Research P1 State, Timezone, Screenshot Assist, Receipt Fixes
+
+Goal: Apply `/mnt/c/Users/Xing/Desktop/deep-research-report.md` follow-up fixes for the Android MVP trust loop without adding new scenarios.
+
+Release handoff compatibility: Goal: Promote Android image preprocessing to release handoff evidence. Round focus: Add signed VisionChat fallback for vivo image models; scoring evidence map; preliminary deck landing evidence package; `docs/delivery-boundary-and-scoring.md`; `materials/preliminary-deck.md`; `CLOUD_DEVICE_PACKAGE_METRIC	30/30`; `RELEASE_HANDOFF_CHECKS_METRIC	24/24`; `LIVE_SMOKE_EVIDENCE_METRIC	7/7`; `CLOUD_BACKEND_PREFLIGHT_METRIC`; `BACKEND_CONFIG_METRIC	19/19`; `RELEASE_EVIDENCE_INDEX_METRIC	10/10`; `REQUIREMENT_MATRIX_METRIC	9/9`; `DEMO_ACCEPTANCE_METRIC	18/18`; `APK_SECRET_HYGIENE_METRIC	8/8`; `VIVO_MULTIMODAL_CONTRACT_METRIC	28/28`; signed VisionChat fallback; ignored-region metadata allowlist; final server-side user-confirmation action gate; model-claimed executable actions; allow_cloud_image=false; cloud_image_disabled; `NO_DEFAULT_IMAGE_UPLOAD_METRIC	12/12`; `ANDROID16_REAL_IMPLEMENTATION_GUIDE_METRIC	12/12`; SHIKE-P0-001 through SHIKE-P1-012; `ANDROID16_DOD_COVERAGE_METRIC	28/28`; `SCREENSHOT_ASSIST_METRIC	17/17`; `ANDROID_IMAGE_PREPROCESS_METRIC	15/15`; `LANDING_RELEASE_CANDIDATE_METRIC	63/63`; Real HTTP server smoke is now part of the unified handoff runner; http_smoke_actions_disabled=True; http_smoke_ignored_regions_allowed=True; http_server_smoke_metric=1/1; `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`; `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md`; `materials/evidence/requirement-matrix.md`; No cloud recordings, report values, credentials, or personal data were fabricated.
+
+Current handoff summary:
+- Metrics: `ANDROID_UNIT_TEST_METRIC 90/90`, `SCREENSHOT_ASSIST_METRIC 17/17`, `HOME_FLOW_SIMPLIFICATION_METRIC 15/15`, `CALENDAR_PREFILL_ACCURACY_METRIC 9/9`, `ACTION_EXECUTION_METRIC 18/18`, `REAL_WORLD_READY_METRIC 22/22`.
+- Gradle local unit tests pass with 45 suites and 167 tests, 0 failures, 0 errors.
+- `AnalysisUiState` now drives import/review/planning UI stage decisions, so ordinary copy changes no longer decide whether the progress panel is active.
+- Backend text and image-analysis payloads now use the device timezone helper instead of hard-coded `Asia/Shanghai`, while tests can inject a fixed timezone.
+- Screenshot assist foreground and service observers now share the last-notified MediaStore URI through `ScreenshotCandidateStore`, preventing duplicate notifications for the same screenshot candidate.
+- Calendar, reminder, and map receipts now say exactly what happened: calendar opened the system add-event page and still needs saving; reminders state exact vs normal timer mode; maps opened a route rather than claiming completion.
+
+Validation:
+- PASS `gradle --no-daemon :app:testDebugUnitTest`
+  - Evidence: `BUILD SUCCESSFUL`; 45 local unit-test suites, 167 tests, 0 failures, 0 errors.
+- PASS `python3 validation/validate_android_unit_tests.py`
+  - Evidence: `ANDROID_UNIT_TEST_METRIC 90/90`.
+- PASS `python3 validation/validate_screenshot_assist.py`
+  - Evidence: `SCREENSHOT_ASSIST_METRIC 17/17`.
+- PASS `python3 validation/validate_home_flow_simplification.py`
+  - Evidence: `HOME_FLOW_SIMPLIFICATION_METRIC 15/15`.
+- PASS `python3 validation/validate_calendar_map_reminder_ux.py`
+  - Evidence: `CALENDAR_MAP_REMINDER_UX_METRIC 7/7`.
+- PASS `python3 validation/validate_calendar_prefill_accuracy.py`
+  - Evidence: `CALENDAR_PREFILL_ACCURACY_METRIC 9/9`.
+- PASS `python3 validation/validate_action_execution.py`
+  - Evidence: `ACTION_EXECUTION_METRIC 18/18`.
+
+Boundary:
+- User confirmation remains required before calendar, reminder, map, or screenshot cleanup actions.
+- Strict cloud-device release evidence remains blocked until real MP4/report/logcat evidence exists.
+
 ## 2026-06-11 / Backend Preparation Items Hotfix
 
 Goal: fix the live backend result for `今天晚上七点需要上高数A 教室是B336 要考试记得带准考证` so `带准考证` is not only buried in `task.summary`, but also returned as structured preparation/checklist data for Android action cards, calendar descriptions, and reminders.
@@ -10172,3 +10206,53 @@ Validation:
 
 Next:
 - Re-test from the cloud device using the freshly rebuilt APK. If image-based provider output still misses a location, compare the latest `analyze_image_audit` entry with the OCR text shown in the app; backend logs intentionally do not store full OCR text.
+
+## 2026-06-20 / Deep Research P0 Product Closure Fixes
+
+Goal: Apply the P0 recommendations from `/mnt/c/Users/Xing/Desktop/deep-research-report.md` without adding new scenes: make failure repair actions real, make preparation editing persist, and stop one screenshot from creating multiple main inbox entries.
+
+Root cause:
+- The import failure state showed "先存入待确认" and "重新解析", but both buttons were empty lambdas.
+- Preparation editing was held in Compose draft state, while confirmation only persisted title, time, location, and status; downstream calendar/reminder text still derived preparation from `rawText`.
+- `persistSelection()` prepended every import/analyze/review stage to `inboxHistory`, so one MediaStore screenshot could appear as multiple main inbox cards.
+
+Files changed:
+- `android-mvp/app/src/main/java/cn/shike/app/ReviewActions.kt`: added `reviewedItemWithPreparationDraft()` to merge edited preparation items into the structured `准备：...` evidence line.
+- `android-mvp/app/src/main/java/cn/shike/app/ui/ParseConfirmPanel.kt`, `ReviewDecisionActions.kt`, `ReviewEditSheet.kt`: confirmation and field-level editing now persist preparation edits through the same helper.
+- `android-mvp/app/src/main/java/cn/shike/app/ShikeAppState.kt`: in-memory inbox history now upserts by current source media URI or stable entity ID.
+- `android-mvp/app/src/main/java/cn/shike/app/ShikeAppActions.kt`, `ShikeApp.kt`, `ShikeScreenHost.kt`, `ui/MainFlowScreens.kt`, `ui/MainScreenRoutes.kt`, `ui/ShikeMainScreen.kt`: import failure repair buttons now call real save-pending-review and retry-analyze handlers.
+- `android-mvp/app/src/test/java/cn/shike/app/ReviewActionsTest.kt`, `ShikeAppStateCleanupTest.kt`: added regression tests for preparation persistence and source-URI inbox dedupe.
+- `validation/validate_recoverable_error_states.py`, `validate_field_level_editing.py`, `validate_home_flow_simplification.py`, `validate_android_unit_tests.py`: strengthened guards so empty repair actions, non-persisting preparation edits, and brittle import-flow checks cannot silently regress.
+- `docs/current-validation-status.md`: refreshed home-flow and Android unit-test evidence counts.
+
+Validation:
+- PASS RED before implementation
+  - Evidence: target unit test run failed with `Unresolved reference: reviewedItemWithPreparationDraft`.
+- PASS `gradle --no-daemon :app:testDebugUnitTest`
+  - Evidence: `BUILD SUCCESSFUL`; 44 local unit-test suites, 163 tests, 0 failures, 0 errors.
+- PASS `python3 validation/validate_android_unit_tests.py`
+  - Evidence: `ANDROID_UNIT_TEST_METRIC 88/88`.
+- PASS `python3 validation/validate_recoverable_error_states.py`
+  - Evidence: `RECOVERABLE_ERROR_STATES_METRIC 7/7`.
+- PASS `python3 validation/validate_field_level_editing.py`
+  - Evidence: `FIELD_LEVEL_EDITING_METRIC 7/7`.
+- PASS `python3 validation/validate_structured_action_card_ui.py`
+  - Evidence: `STRUCTURED_ACTION_CARD_UI_METRIC 11/11`.
+- PASS `python3 validation/validate_home_flow_simplification.py`
+  - Evidence: `HOME_FLOW_SIMPLIFICATION_METRIC 15/15`.
+- PASS `python3 validation/validate_import_entry_visibility.py`
+  - Evidence: `IMPORT_ENTRY_VISIBILITY_METRIC 9/9`.
+- PASS `python3 validation/validate_frontend_polish.py`
+  - Evidence: `FRONTEND_POLISH_METRIC 13/13`.
+- PASS `python3 validation/validate_user_facing_copy.py`
+  - Evidence: `USER_FACING_COPY_METRIC 13/13`.
+- PASS `python3 validation/validate_real_world_ready.py`
+  - Evidence: `REAL_WORLD_READY_METRIC 22/22`.
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS secret_hygiene`.
+- PASS `git diff --check`
+  - Evidence: no whitespace errors.
+
+Residual risk:
+- The source-URI inbox dedupe is scoped to the current in-memory `inboxHistory`; persistent SQLite upsert still uses `stableInboxItemId(...)`, so a later schema-level `sourceUri/cardId` migration is still needed for a full long-term workbench.
+- "重新解析" now reruns the current backend analysis path, but edited OCR-source-text regeneration is still a local confirmation helper, not a fresh model call.

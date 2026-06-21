@@ -67,7 +67,7 @@ def main() -> int:
             "canUseCalendar = isConfirmed && !missingTime" in execution_action_gate
             and "enabled = gate.canUseCalendar" in planner_controls
             and "enabled = gate.canUseCalendar" in banner_actions
-            and "已打开系统日历新增页，请在日历中保存" in execution_result
+            and "已打开系统日历新增页，尚未确认保存" in execution_result
             and "确认后写入" not in system_actions
             and "打开系统日历新增页" in system_actions
             and "由用户在日历中保存" in system_actions

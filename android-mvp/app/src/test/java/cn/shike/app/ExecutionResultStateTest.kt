@@ -39,11 +39,11 @@ class ExecutionResultStateTest {
 
     @Test
     fun executionResultFactories_keepPermissionAndFallbackWording() {
-        assertEquals("已请求", calendarExecutionResult().status)
-        assertTrue(calendarExecutionResult().detail.contains("系统日历"))
+        assertEquals("已打开新增页", calendarExecutionResult().status)
+        assertTrue(calendarExecutionResult().detail.contains("尚未确认保存"))
         assertEquals("已调度", reminderExecutionResult().status)
-        assertTrue(reminderExecutionResult().detail.contains("permission_blocked"))
-        assertEquals("已请求", mapExecutionResult().status)
+        assertTrue(reminderExecutionResult().detail.contains("精确定时"))
+        assertEquals("已打开路线", mapExecutionResult().status)
         assertTrue(mapExecutionResult().detail.contains("地图不可用"))
     }
 

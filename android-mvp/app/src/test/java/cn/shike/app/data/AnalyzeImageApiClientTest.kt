@@ -17,6 +17,7 @@ class AnalyzeImageApiClientTest {
             ocrTextHint = "海报：周五 19:30 图书馆报告厅",
             scene = "活动海报",
             currentDate = "2026-06-06",
+            userTimezone = "Europe/London",
             image = BackendImagePayload(
                 dataUrl = "data:image/jpeg;base64,ZmFrZQ==",
                 mime = "image/jpeg",
@@ -30,7 +31,7 @@ class AnalyzeImageApiClientTest {
         assertEquals("photo_picker", payload.getString("source_type"))
         assertEquals("海报：周五 19:30 图书馆报告厅", payload.getString("ocr_text_hint"))
         assertEquals("2026-06-06", payload.getString("current_date"))
-        assertEquals("Asia/Shanghai", payload.getString("user_timezone"))
+        assertEquals("Europe/London", payload.getString("user_timezone"))
         assertEquals("zh-CN", payload.getString("locale"))
         assertEquals("event_poster", payload.getString("scene_hint"))
         assertTrue(payload.getBoolean("allow_cloud_image"))
