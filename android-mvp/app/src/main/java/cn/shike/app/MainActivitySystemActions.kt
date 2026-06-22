@@ -12,8 +12,10 @@ import cn.shike.app.system.canPostReminderNotification
 import cn.shike.app.system.copyMapLocationFallback
 import cn.shike.app.system.SourceImageCleanupManager
 import cn.shike.app.system.SourceImageCleanupRequest
+import cn.shike.app.system.MapActionMode
 import cn.shike.app.system.scheduleReminder
 import cn.shike.app.system.startSystemActivitySafely
+import cn.shike.app.system.mapActionModeFor
 
 fun ComponentActivity.openCalendarInsert(item: ShikeItem) {
     startSystemActivitySafely(
@@ -43,6 +45,17 @@ fun ComponentActivity.saveScheduledReminder(item: ShikeItem) {
 }
 
 fun ComponentActivity.openMap(item: ShikeItem) {
+    when (mapActionModeFor(item.location)) {
+        MapActionMode.Disabled -> {
+            saveMapFallback(item, "地点不完整，已保留行动卡")
+            return
+        }
+        MapActionMode.CopyOnly -> {
+            saveMapFallback(item, "地点像校内教室代码，已复制地点；补充校区后再打开地图")
+            return
+        }
+        MapActionMode.OpenMap -> Unit
+    }
     startSystemActivitySafely(
         context = this,
         intent = buildMapIntent(item),

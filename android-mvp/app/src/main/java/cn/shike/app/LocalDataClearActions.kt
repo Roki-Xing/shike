@@ -78,8 +78,8 @@ fun clearedLocalDataState(): LocalDataClearState {
     val item = sampleCourse()
     return LocalDataClearState(
         item = item,
-        captureSource = "数据清除：已清除拾刻缓存、本地收件箱和设置。",
-        modelStatus = "拾刻缓存已清除，可重新从截图、拍照、分享或手动输入开始。",
+        captureSource = "数据清除：已清除行动卡、识别文字、缓存图片、偏好设置和待触发提醒。",
+        modelStatus = "拾刻本地数据已清除；不会删除系统相册原图，可重新从截图、拍照、分享或手动输入开始。",
         backendUrl = DEFAULT_BACKEND_BASE_URL,
         todayAgendaState = TodayAgendaState.Empty,
         cloudEnhancedEnabled = true,

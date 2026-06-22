@@ -35,7 +35,8 @@ class LocalDataClearActionsTest {
     fun clearedLocalDataState_explainsSafeRestartPath() {
         val state = clearedLocalDataState()
 
-        assertTrue(state.captureSource.contains("已清除拾刻缓存"))
+        assertTrue(state.captureSource.contains("已清除行动卡、识别文字、缓存图片"))
+        assertTrue(state.modelStatus.contains("不会删除系统相册原图"))
         assertTrue(state.modelStatus.contains("重新从截图、拍照、分享或手动输入开始"))
     }
 

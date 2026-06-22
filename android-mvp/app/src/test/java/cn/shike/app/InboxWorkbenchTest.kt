@@ -4,6 +4,7 @@ import cn.shike.app.data.sampleCourse
 import cn.shike.app.ui.ExecutionResult
 import cn.shike.app.ui.inboxAllStatusFilter
 import cn.shike.app.ui.inboxArchiveActionStateFor
+import cn.shike.app.ui.inboxSummaryStatsFor
 import cn.shike.app.ui.inboxWorkbenchEntryFrom
 import cn.shike.app.ui.selectedInboxStatusFor
 import cn.shike.app.ui.visibleInboxEntries
@@ -89,6 +90,20 @@ class InboxWorkbenchTest {
         )
 
         assertEquals(listOf(due, pending, scheduledEarly, scheduledLate), visible)
+    }
+
+    @Test
+    fun inboxSummaryStatsFor_countsRealEntriesInsteadOfDemoConstants() {
+        val pending = inboxWorkbenchEntryFrom(sampleCourse().copy(status = "待确认"), "截图", emptyList())
+        val scheduled = inboxWorkbenchEntryFrom(sampleCourse().copy(title = "早课", status = "已安排"), "相册", emptyList())
+        val due = inboxWorkbenchEntryFrom(sampleCourse().copy(title = "报名截止", status = "即将截止"), "分享", emptyList())
+        val done = inboxWorkbenchEntryFrom(sampleCourse().copy(title = "已完成", status = "已完成"), "分享", emptyList())
+
+        val stats = inboxSummaryStatsFor(listOf(pending, scheduled, due, done))
+
+        assertEquals("1", stats.first { it.label == "待确认" }.count)
+        assertEquals("1", stats.first { it.label == "已安排" }.count)
+        assertEquals("1", stats.first { it.label == "即将截止" }.count)
     }
 
     @Test

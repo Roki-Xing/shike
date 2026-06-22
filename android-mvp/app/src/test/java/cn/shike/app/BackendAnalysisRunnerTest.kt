@@ -25,6 +25,20 @@ class BackendAnalysisRunnerTest {
     }
 
     @Test
+    fun backendAnalysisInputForCurrentDraft_doesNotExposeImageWhenCloudImageDisabled() {
+        val input = backendAnalysisInputForCurrentDraft(
+            captureSource = "相册图片：content://media/external/images/media/7",
+            fallback = sampleCourse(),
+            imageUri = "content://media/external/images/media/7",
+            allowCloudImage = false,
+        )
+
+        assertEquals(false, input.hasImageForCloudAnalysis)
+        assertEquals(null, input.imageUri)
+        assertEquals(false, input.allowCloudImage)
+    }
+
+    @Test
     fun backendAnalyzeText_prefersEditedOcrDraftAndDoesNotFallbackToImageSampleRawText() {
         val fallback = sampleCourse()
         val pendingImage = fallback.copy(

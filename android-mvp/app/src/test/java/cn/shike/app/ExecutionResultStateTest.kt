@@ -20,7 +20,7 @@ class ExecutionResultStateTest {
         val pending = pendingExecutionResults()
 
         assertEquals(listOf("日历", "提醒", "地图"), pending.map { it.action })
-        assertEquals(listOf("待确认", "待确认", "待确认"), pending.map { it.status })
+        assertEquals(listOf("建议", "建议", "建议"), pending.map { it.status })
         assertTrue(pending[0].detail.contains("确认字段后"))
         assertTrue(pending[1].detail.contains("调度本地定时提醒"))
         assertTrue(pending[2].detail.contains("确认地点后"))
@@ -39,11 +39,11 @@ class ExecutionResultStateTest {
 
     @Test
     fun executionResultFactories_keepPermissionAndFallbackWording() {
-        assertEquals("已打开新增页", calendarExecutionResult().status)
-        assertTrue(calendarExecutionResult().detail.contains("尚未确认保存"))
+        assertEquals("待用户保存", calendarExecutionResult().status)
+        assertTrue(calendarExecutionResult().detail.contains("返回拾刻后请标记是否保存"))
         assertEquals("已调度", reminderExecutionResult().status)
         assertTrue(reminderExecutionResult().detail.contains("精确定时"))
-        assertEquals("已打开路线", mapExecutionResult().status)
+        assertEquals("已打开地图", mapExecutionResult().status)
         assertTrue(mapExecutionResult().detail.contains("地图不可用"))
     }
 

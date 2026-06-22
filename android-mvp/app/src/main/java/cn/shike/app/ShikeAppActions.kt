@@ -9,6 +9,7 @@ import cn.shike.app.data.ImageCleanupStatus
 import cn.shike.app.data.ScreenshotCandidate
 import cn.shike.app.data.buildRuntimeSharedTextSelection
 import cn.shike.app.domain.ShikeItem
+import cn.shike.app.ui.LocalMultimodalPreference
 import cn.shike.app.ui.TodayAgendaState
 import cn.shike.app.ui.imageCleanupDeletedResult
 import cn.shike.app.ui.imageCleanupFailedResult
@@ -21,6 +22,7 @@ class ShikeAppActions(
     private val mainHandler: Handler,
     private val onPersist: (ShikeItem, String) -> Unit,
     private val onSaveBackendUrl: (String) -> Unit,
+    private val onSavePrivacyMode: (Boolean, LocalMultimodalPreference) -> Unit,
     private val onClearLocalData: () -> Unit,
     private val onDeleteSourceImage: (String?) -> Unit,
     private val onImageCleanupStatusChange: (ImageCleanupStatus) -> Unit,
@@ -109,6 +111,16 @@ class ShikeAppActions(
     }
 
     fun analyzeCurrentDraftWithBackend() = analyzeWithBackend(state.currentBackendInput())
+
+    fun updateCloudEnhanced(enabled: Boolean) {
+        state.cloudEnhancedEnabled = enabled
+        onSavePrivacyMode(enabled, state.localMultimodalPreference)
+    }
+
+    fun updateLocalMultimodalPreference(preference: LocalMultimodalPreference) {
+        state.localMultimodalPreference = preference
+        onSavePrivacyMode(state.cloudEnhancedEnabled, preference)
+    }
 
     fun applyCameraPreview(bitmap: Bitmap) {
         state.applyCameraPreview(bitmap, onPersist)

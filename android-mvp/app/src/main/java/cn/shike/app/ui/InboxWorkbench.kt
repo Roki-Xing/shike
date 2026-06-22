@@ -38,6 +38,11 @@ data class InboxArchiveActionState(
     val detailText: String,
 )
 
+data class InboxSummaryStat(
+    val label: String,
+    val count: String,
+)
+
 /**
  * Builds the inbox workbench entry from the current action card.
  *
@@ -78,6 +83,14 @@ fun inboxWorkbenchEntryFromEntity(entity: InboxItemEntity): InboxWorkbenchEntry 
         executionSummary = entity.actionLabels.joinToString("；") { "$it:待执行" },
         startEpochMillis = entity.startEpochMillis,
     )
+
+fun inboxSummaryStatsFor(entries: List<InboxWorkbenchEntry>): List<InboxSummaryStat> =
+    listOf("待确认", "已安排", "即将截止").map { status ->
+        InboxSummaryStat(
+            label = status,
+            count = entries.count { it.status == status }.toString(),
+        )
+    }
 
 /**
  * Normalizes the selected inbox status to a supported filter.

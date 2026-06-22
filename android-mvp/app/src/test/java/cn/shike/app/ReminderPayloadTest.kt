@@ -1,10 +1,14 @@
 package cn.shike.app
 
 import cn.shike.app.data.sampleCourse
+import cn.shike.app.data.InMemorySharedPreferences
 import cn.shike.app.system.REMINDER_FALLBACK_DETAIL
 import cn.shike.app.system.ScheduledReminder
+import cn.shike.app.system.addScheduledReminderToPreferences
+import cn.shike.app.system.loadScheduledRemindersFromPreferences
 import cn.shike.app.system.reminderDeliveryPayloadFrom
 import cn.shike.app.system.reminderScheduleResultDetail
+import cn.shike.app.system.removeScheduledReminderFromPreferences
 import cn.shike.app.system.scheduledReminderFrom
 import cn.shike.app.system.shouldRestoreScheduledReminder
 import org.junit.Assert.assertEquals
@@ -27,8 +31,19 @@ class ReminderPayloadTest {
 
         assertEquals("课程提醒", reminder.title)
         assertEquals("今天 18:30 · B203", reminder.detail)
-        assertEquals("课程提醒".hashCode(), reminder.notificationId)
+        assertTrue(reminder.notificationId != 0)
         assertEquals(100_000L, reminder.triggerAtMillis)
+    }
+
+    @Test
+    fun scheduledReminderFrom_sameTitleCardsDoNotShareRequestCode() {
+        val first = sampleCourse().copy(title = "同名课程", startEpochMillis = 1_000_000L, rawText = "第一条")
+        val second = sampleCourse().copy(title = "同名课程", startEpochMillis = 2_000_000L, rawText = "第二条")
+
+        val firstReminder = scheduledReminderFrom(first, nowMillis = 0L)
+        val secondReminder = scheduledReminderFrom(second, nowMillis = 0L)
+
+        assertTrue(firstReminder.notificationId != secondReminder.notificationId)
     }
 
     @Test
@@ -84,5 +99,18 @@ class ReminderPayloadTest {
     fun reminderDeliveryPayloadFrom_rejectsMissingOrBlankTitle() {
         assertNull(reminderDeliveryPayloadFrom(title = null, detail = "地点", notificationId = 1))
         assertNull(reminderDeliveryPayloadFrom(title = "", detail = "地点", notificationId = 1))
+    }
+
+    @Test
+    fun scheduledReminderPreferences_storeMultipleRecordsAndRemoveOne() {
+        val preferences = InMemorySharedPreferences()
+        val first = ScheduledReminder("第一条", "明天 08:00", 101, 10_000L)
+        val second = ScheduledReminder("第二条", "明天 09:00", 202, 20_000L)
+
+        addScheduledReminderToPreferences(preferences, first)
+        addScheduledReminderToPreferences(preferences, second)
+        removeScheduledReminderFromPreferences(preferences, first.notificationId)
+
+        assertEquals(listOf(second), loadScheduledRemindersFromPreferences(preferences))
     }
 }

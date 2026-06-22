@@ -2,8 +2,10 @@ package cn.shike.app
 
 import android.content.Intent
 import cn.shike.app.data.ImageCleanupStatus
+import cn.shike.app.data.ImageThumbnailCache
 import cn.shike.app.data.clearBackendBaseUrl
 import cn.shike.app.data.clearInboxSnapshot
+import cn.shike.app.data.clearPrivacyMode
 import cn.shike.app.data.clearScreenshotAssistPreference
 import cn.shike.app.data.savePermissionOnboardingDismissed
 import cn.shike.app.domain.ShikeItem
@@ -27,6 +29,8 @@ fun MainActivity.clearAllLocalData() {
     cancelScheduledReminder(this)
     clearInboxSnapshot(this)
     clearBackendBaseUrl(this)
+    clearPrivacyMode(this)
+    ImageThumbnailCache.clearThumbnailCache(cacheDir)
     clearScreenshotAssistPreference(this)
     screenshotAssistEnabled = false
     handleScreenshotAssistServiceRunningChanged(false)

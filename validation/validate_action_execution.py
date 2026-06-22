@@ -67,7 +67,8 @@ def main() -> int:
             "canUseCalendar = isConfirmed && !missingTime" in execution_action_gate
             and "enabled = gate.canUseCalendar" in planner_controls
             and "enabled = gate.canUseCalendar" in banner_actions
-            and "已打开系统日历新增页，尚未确认保存" in execution_result
+            and "待用户保存" in execution_result
+            and "返回拾刻后请标记是否保存" in execution_result
             and "确认后写入" not in system_actions
             and "打开系统日历新增页" in system_actions
             and "由用户在日历中保存" in system_actions
@@ -108,7 +109,10 @@ def main() -> int:
             "PREFERENCES_NAME" in reminder_scheduler
             and "persistScheduledReminder" in reminder_scheduler
             and "scheduled_reminder_trigger_at_millis" in reminder_scheduler
-            and "putLong(KEY_SCHEDULED_TRIGGER" in reminder_scheduler,
+            and "KEY_REMINDER_IDS" in reminder_scheduler
+            and "addScheduledReminderToPreferences" in reminder_scheduler
+            and "putStringSet(KEY_REMINDER_IDS" in reminder_scheduler
+            and "putLong(KEY_REMINDER_TRIGGER_PREFIX + reminder.notificationId" in reminder_scheduler,
         ),
         (
             "reminder_restores_pending_alarm_on_app_start",
@@ -128,8 +132,8 @@ def main() -> int:
         ),
         (
             "reminder_clears_persisted_payload_after_delivery",
-            "clearScheduledReminder" in reminder_scheduler
-            and "clearScheduledReminder(context)" in reminder_receiver
+            "removeScheduledReminder" in reminder_scheduler
+            and "removeScheduledReminder(context, payload.notificationId)" in reminder_receiver
             and "showReminderNotificationPayload" in reminder_receiver,
         ),
         (

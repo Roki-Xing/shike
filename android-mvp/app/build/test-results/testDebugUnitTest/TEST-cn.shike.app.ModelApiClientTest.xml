@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="cn.shike.app.ModelApiClientTest" tests="10" skipped="0" failures="0" errors="0" timestamp="2026-06-20T15:32:29" hostname="LAPTOP-B84BKQGP" time="0.015">
+<testsuite name="cn.shike.app.ModelApiClientTest" tests="10" skipped="0" failures="0" errors="0" timestamp="2026-06-22T13:38:31" hostname="LAPTOP-B84BKQGP" time="0.018">
   <properties/>
-  <testcase name="itemFromAnalyzeJson_unknownSceneFallsBackToPendingLabel" classname="cn.shike.app.ModelApiClientTest" time="0.01"/>
+  <testcase name="itemFromAnalyzeJson_unknownSceneFallsBackToPendingLabel" classname="cn.shike.app.ModelApiClientTest" time="0.012"/>
   <testcase name="buildAnalyzeRequestPayload_keepsBackendContractFields" classname="cn.shike.app.ModelApiClientTest" time="0.0"/>
-  <testcase name="itemFromAnalyzeJson_courseNoticeCombinesTimeLocationAndActions" classname="cn.shike.app.ModelApiClientTest" time="0.001"/>
+  <testcase name="itemFromAnalyzeJson_courseNoticeCombinesTimeLocationAndActions" classname="cn.shike.app.ModelApiClientTest" time="0.0"/>
   <testcase name="buildAnalyzeRequestPayload_mapsExtendedSceneHints" classname="cn.shike.app.ModelApiClientTest" time="0.0"/>
   <testcase name="itemFromAnalyzeImageJson_normalizesChineseRelativeStartTextWhenNormalizedStartMissing" classname="cn.shike.app.ModelApiClientTest" time="0.002"/>
-  <testcase name="actionsFromJson_ignoresBlankAndMalformedActions" classname="cn.shike.app.ModelApiClientTest" time="0.001"/>
+  <testcase name="actionsFromJson_ignoresBlankAndMalformedActions" classname="cn.shike.app.ModelApiClientTest" time="0.0"/>
   <testcase name="normalizeBackendUrl_stripsPathQueryAndFragment" classname="cn.shike.app.ModelApiClientTest" time="0.0"/>
   <testcase name="itemFromAnalyzeJson_usesNormalizedStartInsteadOfSampleEpoch" classname="cn.shike.app.ModelApiClientTest" time="0.0"/>
   <testcase name="itemFromAnalyzeJson_eventPosterUsesPendingEpochForBlankFields" classname="cn.shike.app.ModelApiClientTest" time="0.0"/>

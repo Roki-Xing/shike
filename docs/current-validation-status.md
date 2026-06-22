@@ -1,12 +1,34 @@
 # Current Validation Status
 
-Date: 2026-06-21
+Date: 2026-06-22
 Guide: `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md`  
 Deep review guide applied this round: `/mnt/c/Users/Xing/Desktop/SHIKE_PRODUCT_MANAGER_DEEP_REVIEW_GUIDE.md`
 Calendar/UI guide applied this round: `/mnt/c/Users/Xing/Desktop/SHIKE_CALENDAR_AND_UI_PRODUCT_FIX_GUIDE.md`
 Flexible action-card guide applied this round: `/mnt/c/Users/Xing/Desktop/SHIKE_FLEXIBLE_ACTION_CARD_AND_UI_CLEANUP_GUIDE.md`
+Multi-role review guide applied this round: `/mnt/c/Users/Xing/Desktop/7. 多角色评审.md`
 Guide source availability: the expected desktop source file was restored from the Windows recycle bin and is currently readable in this closeout audit; see `materials/evidence/desktop-guidance-source-status.md`. The local matrix remains useful for repository evidence traceability, while strict external cloud-device evidence remains blocked.
 Scope: Desktop guidance stages A-E: BlueLM credible evidence, cloud-device and HTTPS backend evidence, frontend productization, long-lived inbox workbench, and materials upgraded to a release evidence package. Historical S2/S3 hardening remains part of the evidence base, but the current public status is anchored to `materials/evidence/requirement-matrix.md` and `REQUIREMENT_MATRIX_METRIC 9/9`.
+
+## 2026-06-22 Multi-role Review Product Closure
+
+This pass applied `/mnt/c/Users/Xing/Desktop/7. 多角色评审.md` to the Android MVP closeout path. The current app now covers the review's P0 risks around local data clearing, multi-reminder persistence/cancel recovery, restart-persistent privacy mode, no default image upload when cloud image understanding is disabled, and build provenance. The P1 quick fixes covered in this pass keep calendar handoff honest as "待用户保存", route campus classroom codes such as `E520` / `B地点303` to copy-only recovery instead of blind map search, and derive inbox summary counts from real entries instead of demo constants.
+
+Fresh evidence from this pass:
+
+| Command | Status | Evidence |
+|---|---|---|
+| `gradle --no-daemon :app:testDebugUnitTest` from `shike/android-mvp/` | PASS | `BUILD SUCCESSFUL`; latest local unit suites report 45 suites, 167 tests, 0 failures, 0 errors |
+| `python3 validation/validate_build_provenance.py` | PASS | `BUILD_PROVENANCE_METRIC 10/10` |
+| `python3 validation/validate_no_default_image_upload.py` | PASS | `NO_DEFAULT_IMAGE_UPLOAD_METRIC 12/12` |
+| `python3 validation/validate_action_execution.py` | PASS | `ACTION_EXECUTION_METRIC 18/18` |
+| `python3 validation/validate_android_unit_tests.py` | PASS | `ANDROID_UNIT_TEST_METRIC 90/90` |
+| `python3 validation/validate_user_facing_copy.py` | PASS | `USER_FACING_COPY_METRIC 13/13` |
+| `python3 validation/validate_screenshot_cleanup.py` | PASS | `SCREENSHOT_CLEANUP_METRIC 15/15` |
+| `python3 validation/validate_real_world_ready.py` | PASS | `REAL_WORLD_READY_METRIC 22/22` |
+| `python3 validation/validate_secret_hygiene.py` | PASS | `PASS secret_hygiene` |
+| `bash android-mvp/build_apk.sh` | PASS | APK rebuilt with the project-local Gradle/JDK/SDK toolchain; local APK and `/mnt/c/Users/Xing/Desktop/Shike-app-debug.apk` SHA-256 both `e6fb09b59acf972a9c3791487891e0baf8aef74903f69af0d56c14a0876e8d9f` |
+
+Strict external cloud-device evidence remains a separate manual recording gate: this local repository state and rebuilt APK are ready for reinstall, but final strict release proof still requires real cloud-device MP4s, filled report fields, and redacted logcat evidence.
 
 ## 2026-06-21 Deep Research Android State Closure
 
@@ -81,7 +103,7 @@ Fresh local evidence from this pass:
 | `python3 validation/validate_secret_hygiene.py` | PASS | `PASS secret_hygiene` |
 | `python3 validation/validate_apk_secret_hygiene.py` | PASS | `APK_SECRET_HYGIENE_METRIC 8/8` |
 | `gradle --no-daemon :app:testDebugUnitTest` from `shike/android-mvp/` | PASS | `BUILD SUCCESSFUL`; local unit suites report 45 suites, 167 tests, 0 failures, 0 errors |
-| `bash android-mvp/build_apk.sh` | PASS | APK copied to `/mnt/c/Users/Xing/Desktop/Shike-app-debug.apk`; local and Desktop SHA-256 both `b44cc74b215edb474d0a50df65c25d140ed5ccac44a89a636d810cbb26897690` |
+| `bash android-mvp/build_apk.sh` | PASS | APK copied to `/mnt/c/Users/Xing/Desktop/Shike-app-debug.apk`; local and Desktop SHA-256 both `e6fb09b59acf972a9c3791487891e0baf8aef74903f69af0d56c14a0876e8d9f` |
 
 Strict external cloud-device evidence remains a separate manual recording gate: the local repository and APK gates pass, but final release proof still requires real cloud-device MP4s, filled report fields, and redacted logcat evidence before strict release status can be claimed.
 
@@ -220,7 +242,7 @@ All commands below were run from `/home/xing-12_26/projects/codex-workspace`.
 | `python3 shike/validation/validate_landing_release_candidate.py` | PASS | `LANDING_RELEASE_CANDIDATE_METRIC 63/63`; default local release-candidate now runs both `validate_backend_audit_log.py` and `validate_live_smoke_evidence.py` directly, so metadata-only backend logging and the redacted private-env live smoke are covered by the main gate as well as the release handoff runner |
 | `python3 shike/validation/validate_landing_release_candidate.py --strict` | BLOCKED | `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE 3/7`; still missing real cloud-device videos, filled report, and redacted logcat |
 | `python3 shike/scripts/verify_core20_package.py "$tmp_core20_package"` | PASS | `CORE20_FILE_COUNT 20/20`; structure/action/unit-test guard references pass |
-| `bash shike/android-mvp/build_apk.sh` | PASS | APK rebuilt with the project-local Gradle/JDK/SDK toolchain; local APK and `/mnt/c/Users/Xing/Desktop/Shike-app-debug.apk` SHA-256 both `b44cc74b215edb474d0a50df65c25d140ed5ccac44a89a636d810cbb26897690` |
+| `bash shike/android-mvp/build_apk.sh` | PASS | APK rebuilt with the project-local Gradle/JDK/SDK toolchain; local APK and `/mnt/c/Users/Xing/Desktop/Shike-app-debug.apk` SHA-256 both `e6fb09b59acf972a9c3791487891e0baf8aef74903f69af0d56c14a0876e8d9f` |
 | `gradle --no-daemon :app:testDebugUnitTest` from `shike/android-mvp/` | PASS | `BUILD SUCCESSFUL`; local unit suites report 157 tests, 0 failures, 0 errors |
 
 ## Current Strengths

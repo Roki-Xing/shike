@@ -21,7 +21,7 @@ class ExecutionResultActionsTest {
     )
 
     @Test
-    fun runCalendarExecution_recordsResultBeforeSystemAction() {
+    fun runCalendarExecution_recordsPendingSystemSaveBeforeSystemAction() {
         val events = mutableListOf<String>()
         var updated = emptyList<cn.shike.app.ui.ExecutionResult>()
 
@@ -37,10 +37,10 @@ class ExecutionResultActionsTest {
             },
         )
 
-        assertEquals(listOf("update:日历:已打开新增页", "action:AI应用分享会"), events)
+        assertEquals(listOf("update:日历:待用户保存", "action:AI应用分享会"), events)
         assertEquals(listOf("提醒", "地图", "日历"), updated.map { it.action })
-        assertEquals("待确认", updated[0].status)
-        assertEquals("已打开新增页", updated.last().status)
+        assertEquals("建议", updated[0].status)
+        assertEquals("待用户保存", updated.last().status)
     }
 
     @Test
@@ -74,7 +74,7 @@ class ExecutionResultActionsTest {
         )
 
         assertEquals(listOf("提醒", "日历", "地图"), updated.map { it.action })
-        assertEquals("已打开新增页", updated.first { it.action == "日历" }.status)
-        assertEquals("已打开路线", updated.first { it.action == "地图" }.status)
+        assertEquals("待用户保存", updated.first { it.action == "日历" }.status)
+        assertEquals("已打开地图", updated.first { it.action == "地图" }.status)
     }
 }

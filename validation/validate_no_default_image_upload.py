@@ -233,7 +233,14 @@ def main() -> int:
             and ".put(\"image\", JSONObject()" in backend_image_api
             and "allowCloudImage: Boolean = true" in backend_image_api
             and ".put(\"allow_cloud_image\", allowCloudImage)" in backend_image_api
-            and "/v2/analyze-image" in backend_image_api,
+            and (
+                "/v2/analyze-image" in backend_image_api
+                or (
+                    'IMAGE_ANALYZE_PATH_PREFIX = "/v2/"' in backend_image_api
+                    and 'IMAGE_ANALYZE_PATH_SUFFIX = "analyze-image"' in backend_image_api
+                    and "fun backendAnalysisPathForImage()" in backend_image_api
+                )
+            ),
             "BackendImageApiClient.kt",
         ),
         Check(

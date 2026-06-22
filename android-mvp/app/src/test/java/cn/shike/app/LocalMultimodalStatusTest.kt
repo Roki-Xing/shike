@@ -5,6 +5,7 @@ import cn.shike.app.ui.LocalMultimodalPreference
 import cn.shike.app.ui.LocalMultimodalStatus
 import cn.shike.app.ui.allowCloudImageForPreference
 import cn.shike.app.ui.localMultimodalUiState
+import cn.shike.app.ui.userLabel
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -21,9 +22,9 @@ class LocalMultimodalStatusTest {
         val uiState = localMultimodalUiState(status)
 
         assertEquals("端侧模型：未安装", uiState.statusLabel)
-        assertEquals("云端优先", uiState.routeLabel)
-        assertTrue(uiState.detail.contains("不打包模型"))
-        assertTrue(uiState.detail.contains("不会假装可用"))
+        assertEquals("云端图片理解", uiState.routeLabel)
+        assertTrue(uiState.detail.contains("不打包端侧模型"))
+        assertTrue(uiState.detail.contains("所选图片会发送至拾刻服务"))
     }
 
     @Test
@@ -80,5 +81,11 @@ class LocalMultimodalStatusTest {
     fun allowCloudImageForPreference_disablesImageUploadWhenLocalPreferred() {
         assertEquals(true, allowCloudImageForPreference(LocalMultimodalPreference.CloudFirst))
         assertEquals(false, allowCloudImageForPreference(LocalMultimodalPreference.LocalPreferred))
+    }
+
+    @Test
+    fun localMultimodalPreferenceLabels_areHonestUserModes() {
+        assertEquals("云端图片理解", LocalMultimodalPreference.CloudFirst.userLabel)
+        assertEquals("仅保存待确认草稿", LocalMultimodalPreference.LocalPreferred.userLabel)
     }
 }

@@ -6,6 +6,7 @@ import cn.shike.app.data.ScreenshotCandidate
 import cn.shike.app.domain.ShikeItem
 import cn.shike.app.system.ScreenshotAssistDiagnostics
 import cn.shike.app.system.VisibleScreenCapturePrompt
+import cn.shike.app.ui.LocalMultimodalPreference
 import cn.shike.app.ui.LocalMultimodalStatus
 import cn.shike.app.ui.ShikeMainScreen
 import cn.shike.app.ui.TodayAgendaState
@@ -21,6 +22,8 @@ fun ShikeScreenHost(
     pendingScreenshotCandidate: ScreenshotCandidate?,
     visibleScreenCapturePrompt: VisibleScreenCapturePrompt?,
     onSaveBackendEndpoint: () -> Unit,
+    onCloudEnhancedChange: (Boolean) -> Unit,
+    onLocalMultimodalPreferenceChange: (LocalMultimodalPreference) -> Unit,
     onCourseSample: () -> Unit,
     onEventSample: () -> Unit,
     onScreenshotAssistChange: (Boolean) -> Unit,
@@ -59,9 +62,9 @@ fun ShikeScreenHost(
         onCourse = onCourseSample,
         onEvent = onEventSample,
         cloudEnhancedEnabled = state.cloudEnhancedEnabled,
-        onCloudEnhancedChange = { state.cloudEnhancedEnabled = it },
+        onCloudEnhancedChange = onCloudEnhancedChange,
         localMultimodalStatus = localMultimodalStatus,
-        onLocalMultimodalPreferenceChange = { state.localMultimodalPreference = it },
+        onLocalMultimodalPreferenceChange = onLocalMultimodalPreferenceChange,
         screenshotAssistDiagnostics = screenshotAssistDiagnostics,
         screenshotAssistEnabled = screenshotAssistSwitchEnabled,
         onScreenshotAssistChange = onScreenshotAssistChange,

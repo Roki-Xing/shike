@@ -11,6 +11,7 @@ import cn.shike.app.data.BackendAnalysisOutcome
 import cn.shike.app.data.ImageCleanupStatus
 import cn.shike.app.data.InboxItemEntity
 import cn.shike.app.data.InitialTodayState
+import cn.shike.app.data.PrivacyModeState
 import cn.shike.app.data.ScreenshotCandidate
 import cn.shike.app.data.backendAnalysisInputForCurrentDraft
 import cn.shike.app.data.inboxItemEntityFrom
@@ -26,6 +27,7 @@ class ShikeAppState(
     initialTodayState: InitialTodayState,
     initialBackendUrl: String,
     initialInboxHistory: List<InboxItemEntity>,
+    initialPrivacyMode: PrivacyModeState,
 ) {
     var selected by mutableStateOf(initialItem)
     var isConfirmed by mutableStateOf(initialItem.status == "已安排")
@@ -38,8 +40,8 @@ class ShikeAppState(
     var backendUrl by mutableStateOf(initialBackendUrl)
     var executionResults by mutableStateOf(pendingExecutionResults())
     var todayAgendaState by mutableStateOf(initialTodayState.toTodayAgendaState())
-    var cloudEnhancedEnabled by mutableStateOf(true)
-    var localMultimodalPreference by mutableStateOf(LocalMultimodalPreference.CloudFirst)
+    var cloudEnhancedEnabled by mutableStateOf(initialPrivacyMode.cloudEnhancedEnabled)
+    var localMultimodalPreference by mutableStateOf(initialPrivacyMode.localMultimodalPreference)
     var inboxHistory by mutableStateOf(initialInboxHistory)
 
     fun persistSelection(
@@ -138,12 +140,17 @@ private fun inboxHistoryWithUpserted(
 }
 
 fun ShikeAppState.currentBackendInput(): BackendAnalysisInput {
-    val imageUri = selectedSourceMediaStoreUri ?: capturedBitmap?.let { CAMERA_PREVIEW_IMAGE_URI }
+    val allowCloudImage = allowCloudImageForPreference(localMultimodalPreference)
+    val imageUri = if (allowCloudImage) {
+        selectedSourceMediaStoreUri ?: capturedBitmap?.let { CAMERA_PREVIEW_IMAGE_URI }
+    } else {
+        null
+    }
     return backendAnalysisInputForCurrentDraft(
         captureSource = captureSource,
         fallback = selected,
         imageUri = imageUri,
-        allowCloudImage = allowCloudImageForPreference(localMultimodalPreference),
+        allowCloudImage = allowCloudImage,
     )
 }
 
@@ -187,9 +194,17 @@ fun rememberShikeAppState(
     initialTodayState: InitialTodayState,
     initialBackendUrl: String,
     initialInboxHistory: List<InboxItemEntity>,
+    initialPrivacyMode: PrivacyModeState,
 ): ShikeAppState =
     remember {
-        ShikeAppState(initialItem, initialCaptureSource, initialTodayState, initialBackendUrl, initialInboxHistory)
+        ShikeAppState(
+            initialItem,
+            initialCaptureSource,
+            initialTodayState,
+            initialBackendUrl,
+            initialInboxHistory,
+            initialPrivacyMode,
+        )
     }
 
 fun InitialTodayState.toTodayAgendaState(): TodayAgendaState =

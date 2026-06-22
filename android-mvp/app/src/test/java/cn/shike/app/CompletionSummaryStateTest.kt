@@ -22,9 +22,9 @@ class CompletionSummaryStateTest {
             ),
         )
 
-        assertEquals("日历：已打开系统新增页，尚未确认保存", state.calendarStatus)
+        assertEquals("日历：已打开系统新增页，等待你在日历中保存", state.calendarStatus)
         assertEquals("提醒：已调度", state.reminderStatus)
-        assertEquals("地图：已打开路线", state.mapStatus)
+        assertEquals("地图：已打开地图", state.mapStatus)
         assertEquals("原截图：已移入回收站", state.sourceImageStatus)
     }
 

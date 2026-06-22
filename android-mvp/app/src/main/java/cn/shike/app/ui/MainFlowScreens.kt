@@ -8,6 +8,7 @@ import cn.shike.app.data.ImageCleanupStatus
 import cn.shike.app.data.InboxItemEntity
 import cn.shike.app.data.ScreenshotCandidate
 import cn.shike.app.domain.ShikeItem
+import cn.shike.app.currentBuildProvenance
 import cn.shike.app.system.ScreenshotAssistDiagnostics
 import cn.shike.app.system.VisibleScreenCapturePrompt
 
@@ -146,11 +147,13 @@ fun PrivacySettingsScreen(
         onClearLocalData = onClearLocalData,
     )
     SectionCard("关于拾刻") {
+        val provenance = currentBuildProvenance()
         VersionUnlockRow(
-            version = "0.1.0",
+            version = provenance.displayVersion,
             developerModeState = developerModeState,
             onVersionTap = onVersionTap,
         )
+        KeyValue("构建时间", provenance.buildTimeUtc)
         val remainingTaps = (DEVELOPER_MODE_UNLOCK_TAPS - developerModeState.tapCount).coerceAtLeast(0)
         KeyValue("高级设置", if (developerModeState.enabled) "已开启" else "连续点击版本号 5 次后显示")
         ShikeStatusPill(

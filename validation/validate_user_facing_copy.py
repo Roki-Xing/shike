@@ -108,11 +108,10 @@ def main() -> int:
         ),
         (
             "settings_names_local_multimodal_boundary",
-            "解析方式" in readiness_sections
-            and "本地优先处理" in readiness_sections
-            and "端侧模型：未安装" in local_multimodal
-            and "不会假装可用" in local_multimodal
-            and "同一 JSON Schema" in local_multimodal,
+            "云端图片理解" in readiness_sections
+            and "仅保存待确认草稿" in local_multimodal
+            and "图片不会上传" in local_multimodal
+            and "不打包端侧模型" in local_multimodal,
         ),
     ]
 

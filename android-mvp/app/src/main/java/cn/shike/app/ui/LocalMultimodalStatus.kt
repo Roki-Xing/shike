@@ -11,6 +11,12 @@ enum class LocalMultimodalPreference {
     LocalPreferred,
 }
 
+val LocalMultimodalPreference.userLabel: String
+    get() = when (this) {
+        LocalMultimodalPreference.CloudFirst -> "云端图片理解"
+        LocalMultimodalPreference.LocalPreferred -> "仅保存待确认草稿"
+    }
+
 fun allowCloudImageForPreference(preference: LocalMultimodalPreference): Boolean =
     preference == LocalMultimodalPreference.CloudFirst
 
@@ -40,8 +46,12 @@ fun localMultimodalUiState(status: LocalMultimodalStatus): LocalMultimodalUiStat
     return when (status.installState) {
         LocalMultimodalInstallState.NotInstalled -> LocalMultimodalUiState(
             statusLabel = "端侧模型：未安装",
-            routeLabel = "云端优先",
-            detail = "当前 APK 不打包模型，不会假装可用；截图解析优先走云端增强或本地草稿确认。",
+            routeLabel = status.preference.userLabel,
+            detail = if (status.preference == LocalMultimodalPreference.CloudFirst) {
+                "开启后，所选图片会发送至拾刻服务进行识别；当前 APK 不打包端侧模型。"
+            } else {
+                "关闭云端图片理解后，图片不会上传，只在本机保存待确认草稿。"
+            },
         )
         LocalMultimodalInstallState.Available -> availableLocalMultimodalUiState(status)
         LocalMultimodalInstallState.InitFailed -> LocalMultimodalUiState(

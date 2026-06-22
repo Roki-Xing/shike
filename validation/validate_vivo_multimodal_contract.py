@@ -294,6 +294,7 @@ def main() -> int:
                     "adapter.analyze_image",
                 ]
             )
+            and "adapter = candidate" in main_py
             and all(
                 token in text_fallback_test
                 for token in [
@@ -309,7 +310,7 @@ def main() -> int:
                 for token in [
                     "def _require_user_confirmation_for_card",
                     "gated_card = _require_user_confirmation_for_card(card)",
-                    "return gated_card.model_copy",
+                    "gated_card.model_copy",
                 ]
             )
             and "test_from_env_uses_default_multimodal_candidate_chain_when_list_is_absent" in settings_test

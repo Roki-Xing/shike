@@ -3,6 +3,8 @@ package cn.shike.app
 import cn.shike.app.data.sampleCourse
 import cn.shike.app.system.calendarDraftFrom
 import cn.shike.app.system.calendarInsertDescriptionFor
+import cn.shike.app.system.mapActionModeFor
+import cn.shike.app.system.MapActionMode
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertFalse
@@ -44,5 +46,13 @@ class SystemActionsTest {
         assertNull(missingTimeDraft.startAtMillis)
         assertNull(missingTimeDraft.endAtMillis)
         assertEquals("补充具体时间后可加入日历", missingTimeDraft.disabledReason)
+    }
+
+    @Test
+    fun mapActionModeFor_classroomCodeRequiresCampusInsteadOfMapSearch() {
+        assertEquals(MapActionMode.CopyOnly, mapActionModeFor("E520"))
+        assertEquals(MapActionMode.CopyOnly, mapActionModeFor("B地点303"))
+        assertEquals(MapActionMode.OpenMap, mapActionModeFor("广州南站"))
+        assertEquals(MapActionMode.Disabled, mapActionModeFor("待确认"))
     }
 }

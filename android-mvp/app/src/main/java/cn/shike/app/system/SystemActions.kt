@@ -29,6 +29,12 @@ data class CalendarDraft(
     val disabledReason: String?,
 )
 
+enum class MapActionMode {
+    OpenMap,
+    CopyOnly,
+    Disabled,
+}
+
 /**
  * Builds the user-visible description for Android's calendar insert page.
  *
@@ -106,8 +112,24 @@ fun buildCalendarInsertIntent(item: ShikeItem): Intent {
  *     Intent that opens a map app for the card location.
  */
 fun buildMapIntent(item: ShikeItem): Intent {
+    require(mapActionModeFor(item.location) == MapActionMode.OpenMap) {
+        "地点缺少可导航上下文"
+    }
     val uri = "geo:0,0?q=${Uri.encode(item.location)}".toUri()
     return Intent(Intent.ACTION_VIEW, uri)
+}
+
+fun mapActionModeFor(location: String): MapActionMode {
+    val value = location.trim()
+    if (value.isBlank() || value == "待确认") return MapActionMode.Disabled
+    if (looksLikeCampusRoomCode(value)) return MapActionMode.CopyOnly
+    return MapActionMode.OpenMap
+}
+
+private fun looksLikeCampusRoomCode(value: String): Boolean {
+    val normalized = value.replace("教室", "").replace("地点", "").replace(" ", "")
+    return normalized.matches(Regex("^[A-Za-z]?\\d{3,4}[A-Za-z]?$")) ||
+        normalized.matches(Regex("^[A-Za-z][A-Za-z]?\\d{2,4}$"))
 }
 
 /**

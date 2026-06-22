@@ -1,5 +1,47 @@
 # Optimization Log
 
+## 2026-06-22 / Multi-role Review P0 Closure and APK Refresh
+
+Goal: Apply `/mnt/c/Users/Xing/Desktop/7. 多角色评审.md` and close the remaining local Android evidence gaps before pushing the repository and rebuilding the APK.
+
+Release handoff compatibility: Goal: Promote Android image preprocessing to release handoff evidence. Round focus: Add signed VisionChat fallback for vivo image models; scoring evidence map; preliminary deck landing evidence package; `docs/delivery-boundary-and-scoring.md`; `materials/preliminary-deck.md`; `CLOUD_DEVICE_PACKAGE_METRIC	30/30`; `RELEASE_HANDOFF_CHECKS_METRIC	24/24`; `LIVE_SMOKE_EVIDENCE_METRIC	7/7`; `CLOUD_BACKEND_PREFLIGHT_METRIC`; `BACKEND_CONFIG_METRIC	19/19`; `RELEASE_EVIDENCE_INDEX_METRIC	10/10`; `REQUIREMENT_MATRIX_METRIC	9/9`; `DEMO_ACCEPTANCE_METRIC	18/18`; `APK_SECRET_HYGIENE_METRIC	8/8`; `VIVO_MULTIMODAL_CONTRACT_METRIC	28/28`; signed VisionChat fallback; ignored-region metadata allowlist; final server-side user-confirmation action gate; model-claimed executable actions; allow_cloud_image=false; cloud_image_disabled; `NO_DEFAULT_IMAGE_UPLOAD_METRIC	12/12`; `ANDROID16_REAL_IMPLEMENTATION_GUIDE_METRIC	12/12`; SHIKE-P0-001 through SHIKE-P1-012; `ANDROID16_DOD_COVERAGE_METRIC	28/28`; `SCREENSHOT_ASSIST_METRIC	17/17`; `ANDROID_IMAGE_PREPROCESS_METRIC	15/15`; `ANDROID_UNIT_TEST_METRIC 90/90`; `LANDING_RELEASE_CANDIDATE_METRIC	63/63`; Real HTTP server smoke is now part of the unified handoff runner; http_smoke_actions_disabled=True; http_smoke_ignored_regions_allowed=True; http_server_smoke_metric=1/1; `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`; `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md`; `materials/evidence/requirement-matrix.md`; No cloud recordings, report values, credentials, or personal data were fabricated.
+
+Current handoff summary:
+- P0 privacy/storage fixes are in place: local data clearing now covers private thumbnail cache, inbox/backend/privacy/screenshot-assist preferences, and pending reminder records without deleting system gallery originals.
+- Reminder persistence now supports multiple scheduled records, stable per-card request codes, app-start/device-reboot restore, per-delivery removal, and clear-all cancellation.
+- Privacy mode is persisted and user-facing as "云端图片理解" / "仅保存待确认草稿"; disabling cloud image understanding prevents image URI exposure to the `/v2/analyze-image` path.
+- Build provenance is injected into `BuildConfig` and surfaced through support/about copy without exposing secrets.
+- P1 trust fixes are covered locally: calendar handoff is "待用户保存", campus classroom codes use copy-only map recovery, and inbox stats derive from actual entries.
+- APK handoff is refreshed: local debug APK and `/mnt/c/Users/Xing/Desktop/Shike-app-debug.apk` both hash to `e6fb09b59acf972a9c3791487891e0baf8aef74903f69af0d56c14a0876e8d9f`.
+
+Validation:
+- PASS `gradle --no-daemon :app:testDebugUnitTest`
+  - Evidence: `BUILD SUCCESSFUL`; 45 local unit-test suites, 167 tests, 0 failures, 0 errors.
+- PASS `python3 validation/validate_build_provenance.py`
+  - Evidence: `BUILD_PROVENANCE_METRIC 10/10`.
+- PASS `python3 validation/validate_no_default_image_upload.py`
+  - Evidence: `NO_DEFAULT_IMAGE_UPLOAD_METRIC 12/12`.
+- PASS `python3 validation/validate_action_execution.py`
+  - Evidence: `ACTION_EXECUTION_METRIC 18/18`.
+- PASS `python3 validation/validate_android_unit_tests.py`
+  - Evidence: `ANDROID_UNIT_TEST_METRIC 90/90`.
+- PASS `python3 validation/validate_user_facing_copy.py`
+  - Evidence: `USER_FACING_COPY_METRIC 13/13`.
+- PASS `python3 validation/validate_screenshot_cleanup.py`
+  - Evidence: `SCREENSHOT_CLEANUP_METRIC 15/15`.
+- PASS `python3 validation/validate_real_world_ready.py`
+  - Evidence: `REAL_WORLD_READY_METRIC 22/22`.
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS secret_hygiene`.
+- PASS `bash android-mvp/build_apk.sh`
+  - Evidence: rebuilt `android-mvp/app/build/outputs/apk/debug/app-debug.apk`.
+- PASS Desktop APK parity
+  - Evidence: local and `/mnt/c/Users/Xing/Desktop/Shike-app-debug.apk` SHA-256 both `e6fb09b59acf972a9c3791487891e0baf8aef74903f69af0d56c14a0876e8d9f`.
+
+Boundary:
+- User confirmation remains required before calendar, reminder, map, or screenshot cleanup actions.
+- Strict cloud-device release evidence remains blocked until real MP4/report/logcat evidence exists.
+
 ## 2026-06-21 / Deep Research P1 State, Timezone, Screenshot Assist, Receipt Fixes
 
 Goal: Apply `/mnt/c/Users/Xing/Desktop/deep-research-report.md` follow-up fixes for the Android MVP trust loop without adding new scenarios.

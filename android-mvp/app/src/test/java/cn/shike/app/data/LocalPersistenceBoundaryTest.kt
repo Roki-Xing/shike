@@ -2,6 +2,9 @@ package cn.shike.app.data
 
 import android.content.SharedPreferences
 import cn.shike.app.system.clearScheduledReminderFromPreferences
+import cn.shike.app.ui.LocalMultimodalPreference
+import cn.shike.app.data.savePrivacyModeToPreferences
+import cn.shike.app.data.loadPrivacyModeFromPreferences
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -38,6 +41,22 @@ class LocalPersistenceBoundaryTest {
         clearScheduledReminderFromPreferences(reminderPreferences)
 
         assertNull(reminderPreferences.getString("scheduled_reminder_title", null))
+    }
+
+    @Test
+    fun privacyModePreference_persistsCloudImageChoice() {
+        val preferences = InMemorySharedPreferences()
+
+        savePrivacyModeToPreferences(
+            preferences = preferences,
+            cloudEnhancedEnabled = false,
+            localMultimodalPreference = LocalMultimodalPreference.LocalPreferred,
+        )
+
+        val restored = loadPrivacyModeFromPreferences(preferences)
+
+        assertEquals(false, restored.cloudEnhancedEnabled)
+        assertEquals(LocalMultimodalPreference.LocalPreferred, restored.localMultimodalPreference)
     }
 
     private class InMemorySharedPreferences : SharedPreferences {

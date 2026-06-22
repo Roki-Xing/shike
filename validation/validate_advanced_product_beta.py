@@ -177,6 +177,11 @@ def build_checks() -> list[BetaCheck]:
             or "item = selected" in home_action
         )
     )
+    home_uses_current_item = home_uses_current_item or (
+        "FocusedActionReviewCard(" in home_action
+        and "item = selected" in home_action
+        and "todayActionItemFrom(" in home_agenda
+    )
     inbox_status_tokens = ["待确认", "已安排", "即将截止", "已完成", "已忽略"]
     cloud_toggle_mentions = android_source.count("云侧增强")
     log_redaction_tokens = ["脱敏", "手机号", "邮箱", "学号"]
@@ -190,14 +195,17 @@ def build_checks() -> list[BetaCheck]:
         ),
         check(
             "today_empty_state",
-            "空状态" in android_source and any(token in android_source for token in ["截图", "拍照", "分享"]),
-            "空状态入口文案" if "空状态" in android_source else "missing",
+            ("今天还没有待处理事项" in android_source or "今天还没有待处理截图" in android_source)
+            and any(token in android_source for token in ["截图", "拍照", "分享"]),
+            "用户友好空首页入口文案"
+            if ("今天还没有待处理事项" in android_source or "今天还没有待处理截图" in android_source)
+            else "missing",
             "为今日行动台增加空收件箱状态，并提供截图、拍照、分享或手动输入入口。",
         ),
         check(
             "today_error_state",
-            "错误状态" in android_source or "加载失败" in android_source,
-            "错误状态/加载失败" if ("错误状态" in android_source or "加载失败" in android_source) else "missing",
+            "AI 暂时没识别成功" in android_source or "加载失败" in android_source,
+            "用户友好错误恢复文案" if ("AI 暂时没识别成功" in android_source or "加载失败" in android_source) else "missing",
             "为今日行动台增加本地数据加载失败和后端不可用的可解释错误状态。",
         ),
         check(
@@ -278,7 +286,7 @@ def build_checks() -> list[BetaCheck]:
             "ocr_failure_manual_continue",
             ("OCR 失败" in android_source or "未识别到稳定文字" in android_source)
             and ("手动" in android_source or "继续" in android_source),
-            "OCR failure fallback" if "OCR 失败" in android_source else "missing",
+            "OCR failure fallback" if ("OCR 失败" in android_source or "未识别到稳定文字" in android_source) else "missing",
             "将 OCR 失败分类为 no_text、low_quality、permission_denied、timeout，并提供手动继续。",
         ),
         check(

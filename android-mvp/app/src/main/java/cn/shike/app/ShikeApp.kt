@@ -13,11 +13,13 @@ import cn.shike.app.data.BackendImagePayload
 import cn.shike.app.data.ImageCleanupStatus
 import cn.shike.app.data.InboxItemEntity
 import cn.shike.app.data.InitialTodayState
+import cn.shike.app.data.PrivacyModeState
 import cn.shike.app.data.ScreenshotCandidate
 import cn.shike.app.domain.ShikeItem
 import cn.shike.app.system.ScreenshotAssistDiagnostics
 import cn.shike.app.system.VisibleScreenCapturePrompt
 import cn.shike.app.ui.LocalMultimodalInstallState
+import cn.shike.app.ui.LocalMultimodalPreference
 import cn.shike.app.ui.LocalMultimodalStatus
 
 @Composable
@@ -27,8 +29,10 @@ fun ShikeApp(
     initialTodayState: InitialTodayState,
     initialBackendUrl: String,
     initialInboxHistory: List<InboxItemEntity>,
+    initialPrivacyMode: PrivacyModeState,
     onPersist: (ShikeItem, String) -> Unit,
     onSaveBackendUrl: (String) -> Unit,
+    onSavePrivacyMode: (Boolean, LocalMultimodalPreference) -> Unit,
     onClearLocalData: () -> Unit,
     onAddCalendar: (ShikeItem) -> Unit,
     onReminder: (ShikeItem) -> Unit,
@@ -58,6 +62,7 @@ fun ShikeApp(
         initialTodayState,
         initialBackendUrl,
         initialInboxHistory,
+        initialPrivacyMode,
     )
     var screenshotAssistSwitchEnabled by remember(screenshotAssistEnabled) { mutableStateOf(screenshotAssistEnabled) }
     val mainHandler = remember { Handler(Looper.getMainLooper()) }
@@ -67,6 +72,7 @@ fun ShikeApp(
             mainHandler = mainHandler,
             onPersist = onPersist,
             onSaveBackendUrl = onSaveBackendUrl,
+            onSavePrivacyMode = onSavePrivacyMode,
             onClearLocalData = onClearLocalData,
             onDeleteSourceImage = onDeleteSourceImage,
             onImageCleanupStatusChange = onImageCleanupStatusChange,
@@ -109,6 +115,8 @@ fun ShikeApp(
         pendingScreenshotCandidate = pendingScreenshotCandidate,
         visibleScreenCapturePrompt = visibleScreenCapturePrompt,
         onSaveBackendEndpoint = actions::saveBackendEndpoint,
+        onCloudEnhancedChange = actions::updateCloudEnhanced,
+        onLocalMultimodalPreferenceChange = actions::updateLocalMultimodalPreference,
         onCourseSample = actions::applyCourseSample,
         onEventSample = actions::applyEventSample,
         onScreenshotAssistChange = {

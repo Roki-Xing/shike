@@ -7,8 +7,10 @@ import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import cn.shike.app.data.loadBackendBaseUrl
 import cn.shike.app.data.loadInitialSelection
+import cn.shike.app.data.loadPrivacyMode
 import cn.shike.app.data.loadSavedInboxHistory
 import cn.shike.app.data.saveBackendBaseUrl
+import cn.shike.app.data.savePrivacyMode
 import cn.shike.app.data.saveSnapshot
 
 fun MainActivity.installShikeContent(sharedText: String?) {
@@ -22,8 +24,12 @@ fun MainActivity.installShikeContent(sharedText: String?) {
                     initialTodayState = initialSelection.todayState,
                     initialBackendUrl = loadBackendBaseUrl(this),
                     initialInboxHistory = loadSavedInboxHistory(this),
+                    initialPrivacyMode = loadPrivacyMode(this),
                     onPersist = { item, source -> saveSnapshot(this, item, source) },
                     onSaveBackendUrl = { url -> saveBackendBaseUrl(this, url) },
+                    onSavePrivacyMode = { cloudEnabled, preference ->
+                        savePrivacyMode(this, cloudEnabled, preference)
+                    },
                     onClearLocalData = ::clearAllLocalData,
                     onAddCalendar = { item -> openCalendarInsert(item) },
                     onReminder = { item -> requestReminder(item) },

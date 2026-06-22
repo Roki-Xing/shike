@@ -35,7 +35,7 @@ fun scheduledReminderFrom(item: ShikeItem, nowMillis: Long): ScheduledReminder =
     ScheduledReminder(
         title = item.title,
         detail = reminderDetailFor(item),
-        notificationId = item.title.hashCode(),
+        notificationId = stableReminderRequestCode(item),
         triggerAtMillis = scheduledReminderTriggerAtMillis(item.startEpochMillis, nowMillis),
     )
 
@@ -89,3 +89,10 @@ fun reminderDeliveryPayloadFrom(title: String?, detail: String?, notificationId:
 
 private fun scheduledReminderTriggerAtMillis(startEpochMillis: Long, nowMillis: Long): Long =
     max(nowMillis + MINIMUM_FUTURE_DELAY_MILLIS, startEpochMillis - REMINDER_LEAD_MILLIS)
+
+private fun stableReminderRequestCode(item: ShikeItem): Int {
+    val raw = listOf(item.title, item.startEpochMillis.toString(), item.location, item.rawText)
+        .joinToString("|")
+        .hashCode()
+    return if (raw == 0) 1 else raw
+}

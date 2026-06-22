@@ -311,10 +311,11 @@ def main() -> int:
                     "class ImageThumbnailCacheTest",
                     "cacheThumbnailBytes_persistsPrivateDigestNamedJpeg",
                     "cacheThumbnailBytes_reusesExistingFileForSameDigest",
+                    "clearThumbnailCache_removesCachedThumbnailDirectoryOnly",
                     "TemporaryFolder",
                 ),
             )
-            and thumbnail_cache_test.count("@Test") == 2,
+            and thumbnail_cache_test.count("@Test") == 3,
             "ImageThumbnailCacheTest.kt",
         ),
         (

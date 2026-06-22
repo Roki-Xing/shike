@@ -13,6 +13,10 @@ private const val KEY_SCHEDULED_TITLE = "scheduled_reminder_title"
 private const val KEY_SCHEDULED_DETAIL = "scheduled_reminder_detail"
 private const val KEY_SCHEDULED_ID = "scheduled_reminder_id"
 private const val KEY_SCHEDULED_TRIGGER = "scheduled_reminder_trigger_at_millis"
+private const val KEY_REMINDER_IDS = "scheduled_reminder_ids"
+private const val KEY_REMINDER_TITLE_PREFIX = "scheduled_reminder_title_"
+private const val KEY_REMINDER_DETAIL_PREFIX = "scheduled_reminder_detail_"
+private const val KEY_REMINDER_TRIGGER_PREFIX = "scheduled_reminder_trigger_"
 internal const val EXTRA_REMINDER_TITLE = "cn.shike.app.extra.REMINDER_TITLE"
 internal const val EXTRA_REMINDER_DETAIL = "cn.shike.app.extra.REMINDER_DETAIL"
 internal const val EXTRA_REMINDER_ID = "cn.shike.app.extra.REMINDER_ID"
@@ -44,13 +48,18 @@ fun scheduleReminder(context: Context, item: ShikeItem): String {
  *     True when a non-expired reminder was restored into AlarmManager.
  */
 fun restoreScheduledReminder(context: Context): Boolean {
-    val reminder = loadScheduledReminder(context) ?: return false
-    if (!shouldRestoreScheduledReminder(reminder, System.currentTimeMillis())) {
-        clearScheduledReminder(context)
-        return false
+    val preferences = context.getSharedPreferences(REMINDER_PREFERENCES_NAME, Context.MODE_PRIVATE)
+    migrateLegacyReminderIfNeeded(preferences)
+    var restored = false
+    loadScheduledRemindersFromPreferences(preferences).forEach { reminder ->
+        if (shouldRestoreScheduledReminder(reminder, System.currentTimeMillis())) {
+            scheduleReminderPayload(context, reminder)
+            restored = true
+        } else {
+            removeScheduledReminderFromPreferences(preferences, reminder.notificationId)
+        }
     }
-    scheduleReminderPayload(context, reminder)
-    return true
+    return restored
 }
 
 /**
@@ -60,8 +69,9 @@ fun restoreScheduledReminder(context: Context): Boolean {
  *     context: Android context used to access app-scoped preferences and AlarmManager.
  */
 fun cancelScheduledReminder(context: Context) {
-    val reminder = loadScheduledReminder(context)
-    if (reminder != null) {
+    val preferences = context.getSharedPreferences(REMINDER_PREFERENCES_NAME, Context.MODE_PRIVATE)
+    migrateLegacyReminderIfNeeded(preferences)
+    loadScheduledRemindersFromPreferences(preferences).forEach { reminder ->
         val pendingIntent = PendingIntent.getBroadcast(
             context,
             reminder.notificationId,
@@ -74,7 +84,14 @@ fun cancelScheduledReminder(context: Context) {
             pendingIntent.cancel()
         }
     }
-    clearScheduledReminder(context)
+    clearScheduledReminderFromPreferences(preferences)
+}
+
+fun removeScheduledReminder(context: Context, notificationId: Int) {
+    removeScheduledReminderFromPreferences(
+        context.getSharedPreferences(REMINDER_PREFERENCES_NAME, Context.MODE_PRIVATE),
+        notificationId,
+    )
 }
 
 /**
@@ -84,21 +101,27 @@ fun cancelScheduledReminder(context: Context) {
  *     context: Android context used to access app-scoped preferences.
  */
 fun clearScheduledReminder(context: Context) {
-    context.getSharedPreferences(REMINDER_PREFERENCES_NAME, Context.MODE_PRIVATE).edit()
-        .remove(KEY_SCHEDULED_TITLE)
-        .remove(KEY_SCHEDULED_DETAIL)
-        .remove(KEY_SCHEDULED_ID)
-        .remove(KEY_SCHEDULED_TRIGGER)
-        .apply()
+    clearScheduledReminderFromPreferences(
+        context.getSharedPreferences(REMINDER_PREFERENCES_NAME, Context.MODE_PRIVATE),
+    )
 }
 
 internal fun clearScheduledReminderFromPreferences(preferences: SharedPreferences) {
-    preferences.edit()
+    migrateLegacyReminderIfNeeded(preferences)
+    val ids = reminderIdsFromPreferences(preferences)
+    val editor = preferences.edit()
+        .remove(KEY_REMINDER_IDS)
         .remove(KEY_SCHEDULED_TITLE)
         .remove(KEY_SCHEDULED_DETAIL)
         .remove(KEY_SCHEDULED_ID)
         .remove(KEY_SCHEDULED_TRIGGER)
-        .apply()
+    ids.forEach { id ->
+        editor
+            .remove(KEY_REMINDER_TITLE_PREFIX + id)
+            .remove(KEY_REMINDER_DETAIL_PREFIX + id)
+            .remove(KEY_REMINDER_TRIGGER_PREFIX + id)
+    }
+    editor.apply()
 }
 
 private fun scheduleReminderPayload(context: Context, reminder: ScheduledReminder): Boolean {
@@ -125,16 +148,13 @@ private fun canScheduleExactReminder(alarmManager: AlarmManager): Boolean =
     Build.VERSION.SDK_INT < Build.VERSION_CODES.S || alarmManager.canScheduleExactAlarms()
 
 private fun persistScheduledReminder(context: Context, reminder: ScheduledReminder) {
-    context.getSharedPreferences(REMINDER_PREFERENCES_NAME, Context.MODE_PRIVATE).edit()
-        .putString(KEY_SCHEDULED_TITLE, reminder.title)
-        .putString(KEY_SCHEDULED_DETAIL, reminder.detail)
-        .putInt(KEY_SCHEDULED_ID, reminder.notificationId)
-        .putLong(KEY_SCHEDULED_TRIGGER, reminder.triggerAtMillis)
-        .apply()
+    addScheduledReminderToPreferences(
+        context.getSharedPreferences(REMINDER_PREFERENCES_NAME, Context.MODE_PRIVATE),
+        reminder,
+    )
 }
 
-private fun loadScheduledReminder(context: Context): ScheduledReminder? {
-    val preferences = context.getSharedPreferences(REMINDER_PREFERENCES_NAME, Context.MODE_PRIVATE)
+private fun loadLegacyScheduledReminder(preferences: SharedPreferences): ScheduledReminder? {
     val title = preferences.getString(KEY_SCHEDULED_TITLE, null) ?: return null
     val detail = preferences.getString(KEY_SCHEDULED_DETAIL, null) ?: REMINDER_FALLBACK_DETAIL
     val notificationId = preferences.getInt(KEY_SCHEDULED_ID, title.hashCode())
@@ -142,6 +162,59 @@ private fun loadScheduledReminder(context: Context): ScheduledReminder? {
     if (triggerAtMillis <= 0L) return null
     return ScheduledReminder(title, detail, notificationId, triggerAtMillis)
 }
+
+internal fun addScheduledReminderToPreferences(preferences: SharedPreferences, reminder: ScheduledReminder) {
+    migrateLegacyReminderIfNeeded(preferences)
+    val ids = reminderIdsFromPreferences(preferences).toMutableSet()
+    ids.add(reminder.notificationId)
+    preferences.edit()
+        .putStringSet(KEY_REMINDER_IDS, ids.map { it.toString() }.toMutableSet())
+        .putString(KEY_REMINDER_TITLE_PREFIX + reminder.notificationId, reminder.title)
+        .putString(KEY_REMINDER_DETAIL_PREFIX + reminder.notificationId, reminder.detail)
+        .putLong(KEY_REMINDER_TRIGGER_PREFIX + reminder.notificationId, reminder.triggerAtMillis)
+        .apply()
+}
+
+internal fun removeScheduledReminderFromPreferences(preferences: SharedPreferences, notificationId: Int) {
+    migrateLegacyReminderIfNeeded(preferences)
+    val ids = reminderIdsFromPreferences(preferences).toMutableSet()
+    ids.remove(notificationId)
+    preferences.edit()
+        .putStringSet(KEY_REMINDER_IDS, ids.map { it.toString() }.toMutableSet())
+        .remove(KEY_REMINDER_TITLE_PREFIX + notificationId)
+        .remove(KEY_REMINDER_DETAIL_PREFIX + notificationId)
+        .remove(KEY_REMINDER_TRIGGER_PREFIX + notificationId)
+        .apply()
+}
+
+internal fun loadScheduledRemindersFromPreferences(preferences: SharedPreferences): List<ScheduledReminder> {
+    migrateLegacyReminderIfNeeded(preferences)
+    return reminderIdsFromPreferences(preferences).mapNotNull { id ->
+        val title = preferences.getString(KEY_REMINDER_TITLE_PREFIX + id, null) ?: return@mapNotNull null
+        val detail = preferences.getString(KEY_REMINDER_DETAIL_PREFIX + id, null) ?: REMINDER_FALLBACK_DETAIL
+        val triggerAt = preferences.getLong(KEY_REMINDER_TRIGGER_PREFIX + id, 0L)
+        if (triggerAt <= 0L) return@mapNotNull null
+        ScheduledReminder(title, detail, id, triggerAt)
+    }.sortedBy { it.triggerAtMillis }
+}
+
+private fun migrateLegacyReminderIfNeeded(preferences: SharedPreferences) {
+    if (preferences.getStringSet(KEY_REMINDER_IDS, null) != null) return
+    val legacy = loadLegacyScheduledReminder(preferences) ?: return
+    val ids = mutableSetOf(legacy.notificationId.toString())
+    preferences.edit()
+        .putStringSet(KEY_REMINDER_IDS, ids)
+        .putString(KEY_REMINDER_TITLE_PREFIX + legacy.notificationId, legacy.title)
+        .putString(KEY_REMINDER_DETAIL_PREFIX + legacy.notificationId, legacy.detail)
+        .putLong(KEY_REMINDER_TRIGGER_PREFIX + legacy.notificationId, legacy.triggerAtMillis)
+        .apply()
+}
+
+private fun reminderIdsFromPreferences(preferences: SharedPreferences): Set<Int> =
+    preferences.getStringSet(KEY_REMINDER_IDS, mutableSetOf())
+        .orEmpty()
+        .mapNotNull { it.toIntOrNull() }
+        .toSet()
 
 private fun reminderIntent(context: Context, reminder: ScheduledReminder): Intent =
     Intent(context, ReminderReceiver::class.java).apply {

@@ -4,8 +4,10 @@ import cn.shike.app.data.BackendAnalysisOutcome
 import cn.shike.app.data.DEFAULT_BACKEND_BASE_URL
 import cn.shike.app.data.ImageCleanupStatus
 import cn.shike.app.data.InitialTodayState
+import cn.shike.app.data.PrivacyModeState
 import cn.shike.app.data.sampleCourse
 import cn.shike.app.domain.ShikeItem
+import cn.shike.app.ui.LocalMultimodalPreference
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -65,6 +67,10 @@ class ShikeAppStateCleanupTest {
             initialTodayState = InitialTodayState.Empty,
             initialBackendUrl = DEFAULT_BACKEND_BASE_URL,
             initialInboxHistory = emptyList(),
+            initialPrivacyMode = PrivacyModeState(
+                cloudEnhancedEnabled = true,
+                localMultimodalPreference = LocalMultimodalPreference.CloudFirst,
+            ),
         )
 
     private fun englishClassOutcome(): BackendAnalysisOutcome =

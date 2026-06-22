@@ -74,24 +74,32 @@ fun PrivacyPanel(
             horizontalArrangement = androidx.compose.foundation.layout.Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text("本地优先处理", color = Color(0xFF667085), fontSize = 12.sp)
+            Text("云端图片理解", color = Color(0xFF667085), fontSize = 14.sp)
             Switch(
-                checked = localMultimodalStatus.preference == LocalMultimodalPreference.LocalPreferred,
+                checked = localMultimodalStatus.preference == LocalMultimodalPreference.CloudFirst,
                 onCheckedChange = { enabled ->
                     onLocalMultimodalPreferenceChange(
-                        if (enabled) LocalMultimodalPreference.LocalPreferred else LocalMultimodalPreference.CloudFirst,
+                        if (enabled) LocalMultimodalPreference.CloudFirst else LocalMultimodalPreference.LocalPreferred,
                     )
                 },
             )
         }
-        KeyValue("解析方式", if (localMultimodalStatus.preference == LocalMultimodalPreference.LocalPreferred) "优先本地待确认" else "AI 解析优先")
-        Text("主动导入后才解析；不默认上传原图。", color = Color(0xFF667085), fontSize = 12.sp)
+        KeyValue("图片处理", localMultimodalStatus.preference.userLabel)
+        Text(
+            if (localMultimodalStatus.preference == LocalMultimodalPreference.CloudFirst) {
+                "开启后，所选图片会发送至拾刻服务进行识别。"
+            } else {
+                "关闭后，图片不会上传，只在本机保存待确认草稿。"
+            },
+            color = Color(0xFF667085),
+            fontSize = 14.sp,
+        )
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = androidx.compose.foundation.layout.Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text("AI 解析", color = Color(0xFF667085), fontSize = 12.sp)
+            Text("文本 AI 解析", color = Color(0xFF667085), fontSize = 14.sp)
             Switch(
                 checked = cloudEnhancedEnabled,
                 onCheckedChange = onCloudEnhancedChange,

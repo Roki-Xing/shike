@@ -40,4 +40,23 @@ class ImageThumbnailCacheTest {
         assertEquals(firstUri, secondUri)
         assertEquals(first.toList(), File(URI(secondUri)).readBytes().toList())
     }
+
+    @Test
+    fun clearThumbnailCache_removesCachedThumbnailDirectoryOnly() {
+        val root = temporaryFolder.newFolder("cache-root")
+        val thumbnailDir = File(root, ImagePreprocessPolicy.THUMBNAIL_CACHE_DIR)
+        val otherDir = File(root, "unrelated-cache")
+        thumbnailDir.mkdirs()
+        otherDir.mkdirs()
+        File(thumbnailDir, "one.jpg").writeBytes(byteArrayOf(1))
+        File(thumbnailDir, "two.jpg").writeBytes(byteArrayOf(2))
+        File(otherDir, "keep.txt").writeText("keep")
+
+        val result = ImageThumbnailCache.clearThumbnailCache(root)
+
+        assertEquals(2, result.deletedFiles)
+        assertTrue(result.success)
+        assertTrue(!thumbnailDir.exists())
+        assertTrue(File(otherDir, "keep.txt").exists())
+    }
 }

@@ -15,16 +15,16 @@ data class ExecutionResult(
 )
 
 fun pendingExecutionResults(): List<ExecutionResult> = listOf(
-    ExecutionResult("日历", "待确认", "确认字段后才会打开系统新增日程页。"),
-    ExecutionResult("提醒", "待确认", "确认字段后才会调度本地定时提醒。"),
-    ExecutionResult("地图", "待确认", "确认地点后才会打开地图路线。"),
+    ExecutionResult("日历", "建议", "确认字段后才会打开系统新增日程页。"),
+    ExecutionResult("提醒", "建议", "确认字段后才会调度本地定时提醒。"),
+    ExecutionResult("地图", "建议", "确认地点后才会打开地图路线。"),
 )
 
 fun List<ExecutionResult>.recordExecutionResult(result: ExecutionResult): List<ExecutionResult> =
     filterNot { it.action == result.action } + result
 
 fun calendarExecutionResult(): ExecutionResult =
-    ExecutionResult("日历", "已打开新增页", "已打开系统日历新增页，尚未确认保存；请在日历中点保存。")
+    ExecutionResult("日历", "待用户保存", "已打开系统日历新增页；返回拾刻后请标记是否保存。")
 
 fun reminderExecutionResult(item: ShikeItem? = null): ExecutionResult =
     ExecutionResult(
@@ -37,7 +37,7 @@ fun reminderExecutionResult(item: ShikeItem? = null): ExecutionResult =
     )
 
 fun mapExecutionResult(): ExecutionResult =
-    ExecutionResult("地图", "已打开路线", "已打开地图路线；地图不可用时复制地点并保留行动卡。")
+    ExecutionResult("地图", "已打开地图", "已打开地图；地图不可用时复制地点并保留行动卡。")
 
 fun imageCleanupRequestedResult(): ExecutionResult =
     ExecutionResult("原截图", "已请求", "已打开系统确认页；用户确认后移入系统回收站。")

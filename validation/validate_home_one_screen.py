@@ -60,7 +60,10 @@ def main() -> int:
         (
             "home_keeps_screenshot_flow_on_home",
             "mutableStateOf(ShikeMainSection.Home)" in main_screen
-            and "selectedSection = ShikeMainSection.Import" not in main_screen
+            and "fun startHomeImport" in main_screen
+            and "{ startHomeImport(onGallery) }" in main_screen
+            and "{ startHomeImport(onCamera) }" in main_screen
+            and "{ startHomeImport(onManualInput) }" in main_screen
             and "检测到新截图" in home_screen
             and "正在把截图变成行动卡" in progress_panel,
         ),

@@ -26,6 +26,6 @@ class ReminderReceiver : BroadcastReceiver() {
             title = payload.title,
             detail = payload.detail,
         )
-        clearScheduledReminder(context)
+        removeScheduledReminder(context, payload.notificationId)
     }
 }

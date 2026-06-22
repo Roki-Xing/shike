@@ -72,6 +72,12 @@ fun ShikeMainScreen(
         selectedSection = ShikeMainSection.Import
         action()
     }
+    fun startHomeImport(action: () -> Unit) {
+        showImportSheet = false
+        importFlowCompleted = false
+        selectedSection = ShikeMainSection.Home
+        action()
+    }
     val analysisUiState = analysisUiStateFor(modelStatus)
 
     Scaffold(
@@ -105,9 +111,9 @@ fun ShikeMainScreen(
                 ShikeMainSection.Home -> HomeRouteContent(
                     selected, todayAgendaState, analysisUiState,
                     pendingScreenshotCandidate, visibleScreenCapturePrompt, onboardingDismissed,
-                    { openImportEntry(onGallery) },
-                    { openImportEntry(onCamera) },
-                    { openImportEntry(onManualInput) },
+                    { startHomeImport(onGallery) },
+                    { startHomeImport(onCamera) },
+                    { startHomeImport(onManualInput) },
                     {
                         importFlowCompleted = false
                         selectedSection = ShikeMainSection.Import
@@ -115,13 +121,13 @@ fun ShikeMainScreen(
                     onDismissOnboarding, onEnableScreenshotAssistFromOnboarding,
                     { candidate ->
                         importFlowCompleted = false
-                        selectedSection = ShikeMainSection.Import
+                        selectedSection = ShikeMainSection.Home
                         onImportScreenshotCandidate(candidate)
                     },
                     onIgnoreScreenshotCandidate,
                     {
                         importFlowCompleted = false
-                        selectedSection = ShikeMainSection.Import
+                        selectedSection = ShikeMainSection.Home
                         onImportVisibleScreenCapture()
                     },
                     onDismissVisibleScreenCapture,

@@ -10,7 +10,7 @@ data class BackendAnalysisInput(
     val allowCloudImage: Boolean = true,
 ) {
     val hasImageForCloudAnalysis: Boolean
-        get() = !imageUri.isNullOrBlank()
+        get() = allowCloudImage && !imageUri.isNullOrBlank()
 }
 
 /**
@@ -40,7 +40,7 @@ fun backendAnalysisInputForCurrentDraft(
     BackendAnalysisInput(
         sourceType = backendSourceTypeFromCaptureSource(captureSource),
         fallback = fallback,
-        imageUri = imageUri,
+        imageUri = imageUri.takeIf { allowCloudImage },
         imageSourceType = backendImageSourceTypeFromCaptureSource(captureSource),
         allowCloudImage = allowCloudImage,
     )

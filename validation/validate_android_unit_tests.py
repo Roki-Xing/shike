@@ -290,7 +290,7 @@ def main() -> int:
             "execution_result_unit_test_exists",
             "class ExecutionResultActionsTest" in execution_test
             and execution_test.count("@Test") == 3
-            and "runCalendarExecution_recordsResultBeforeSystemAction" in execution_test
+            and "runCalendarExecution_recordsPendingSystemSaveBeforeSystemAction" in execution_test
             and "runReminderExecution_recordsPermissionAwareReminderResult" in execution_test
             and "runMapExecution_preservesExistingCalendarResult" in execution_test
             and "permission_blocked" in execution_test,
@@ -311,7 +311,8 @@ def main() -> int:
             and "recordExecutionResult_replacesOnlyMatchingActionAndAppendsLatestResult" in execution_state_test
             and "executionResultFactories_keepPermissionAndFallbackWording" in execution_state_test
             and "imageCleanupResults_distinguishSystemConfirmationStates" in execution_state_test
-            and "尚未确认保存" in execution_state_test
+            and "待用户保存" in execution_state_test
+            and "返回拾刻后请标记是否保存" in execution_state_test
             and "精确定时" in execution_state_test
             and "地图不可用" in execution_state_test,
         ),
@@ -368,14 +369,15 @@ def main() -> int:
             and "打开系统日历新增页" in system_actions_source
             and "由用户在日历中保存" in system_actions_source
             and "class SystemActionsTest" in system_actions_test
-            and system_actions_test.count("@Test") == 2
+            and system_actions_test.count("@Test") == 3
             and "calendarInsertDescriptionFor_onlyDescribesSystemInsertPage" in system_actions_test
             and "calendarDraftFrom_usesParsedEpochAndDisablesWhenTimeIsMissing" in system_actions_test
+            and "mapActionModeFor_classroomCodeRequiresCampusInsteadOfMapSearch" in system_actions_test
             and 'assertFalse(description.contains("确认后写入"))' in system_actions_test
             and test_result_passed(
                 "android-mvp/app/build/test-results/testDebugUnitTest/TEST-cn.shike.app.SystemActionsTest.xml",
                 "cn.shike.app.SystemActionsTest",
-                2,
+                3,
             ),
         ),
         (
@@ -711,12 +713,15 @@ def main() -> int:
             and "const val inboxAllStatusFilter = \"全部\"" in inbox_workbench_source
             and "fun inboxArchiveActionStateFor(" in inbox_workbench_source
             and "data class InboxArchiveActionState" in inbox_workbench_source
+            and "data class InboxSummaryStat" in inbox_workbench_source
+            and "fun inboxSummaryStatsFor(" in inbox_workbench_source
             and "class InboxWorkbenchTest" in inbox_workbench_test
-            and inbox_workbench_test.count("@Test") == 5
+            and inbox_workbench_test.count("@Test") == 6
             and "selectedInboxStatusFor_unsupportedStatusFallsBackToPendingReview" in inbox_workbench_test
             and "inboxWorkbenchEntryFrom_searchesRawTextExplanationAndExecutionSummary" in inbox_workbench_test
             and "visibleInboxEntries_respectsArchiveStatusAndSearchQuery" in inbox_workbench_test
             and "visibleInboxEntries_allStatusPrioritizesUrgentReviewAndScheduleOrder" in inbox_workbench_test
+            and "inboxSummaryStatsFor_countsRealEntriesInsteadOfDemoConstants" in inbox_workbench_test
             and "inboxArchiveActionStateFor_separatesArchiveAndRestoreDecisions" in inbox_workbench_test
             and "archivedKeys = setOf(current.archiveKey)" in inbox_workbench_test,
         ),
@@ -746,7 +751,7 @@ def main() -> int:
             test_result_passed(
                 "android-mvp/app/build/test-results/testDebugUnitTest/TEST-cn.shike.app.InboxWorkbenchTest.xml",
                 "cn.shike.app.InboxWorkbenchTest",
-                5,
+                6,
             ),
         ),
         (
@@ -755,15 +760,19 @@ def main() -> int:
             and "fun reminderScheduleResultDetail(" in reminder_payload_source
             and "fun shouldRestoreScheduledReminder(" in reminder_payload_source
             and "fun reminderDeliveryPayloadFrom(" in reminder_payload_source
+            and "fun addScheduledReminderToPreferences(" in reminder_payload_source + read("android-mvp/app/src/main/java/cn/shike/app/system/ReminderScheduler.kt")
+            and "fun loadScheduledRemindersFromPreferences(" in reminder_payload_source + read("android-mvp/app/src/main/java/cn/shike/app/system/ReminderScheduler.kt")
             and "data class ReminderDeliveryPayload" in reminder_payload_source
             and "class ReminderPayloadTest" in reminder_payload_test
-            and reminder_payload_test.count("@Test") == 6
+            and reminder_payload_test.count("@Test") == 8
             and "scheduledReminderFrom_keepsStablePayloadFields" in reminder_payload_test
             and "scheduledReminderFrom_nearStartUsesOneMinuteFallbackAndResultMode" in reminder_payload_test
             and "shouldRestoreScheduledReminder_rejectsExpiredPayload" in reminder_payload_test
             and "reminderDeliveryPayloadFrom_keepsIntentPayloadFields" in reminder_payload_test
             and "reminderDeliveryPayloadFrom_defaultsMissingDetailAndId" in reminder_payload_test
             and "reminderDeliveryPayloadFrom_rejectsMissingOrBlankTitle" in reminder_payload_test
+            and "scheduledReminderFrom_sameTitleCardsDoNotShareRequestCode" in reminder_payload_test
+            and "scheduledReminderPreferences_storeMultipleRecordsAndRemoveOne" in reminder_payload_test
             and "调度模式：系统普通定时" in reminder_payload_test,
         ),
         (
@@ -780,7 +789,7 @@ def main() -> int:
             test_result_passed(
                 "android-mvp/app/build/test-results/testDebugUnitTest/TEST-cn.shike.app.ReminderPayloadTest.xml",
                 "cn.shike.app.ReminderPayloadTest",
-                6,
+                8,
             ),
         ),
         (
@@ -792,8 +801,9 @@ def main() -> int:
             and "fun backendAnalysisInputForCurrentDraft(" in backend_analysis_runner_source
             and "data class BackendFailureFallbackCopy" in backend_analysis_outcome_source
             and "class BackendAnalysisRunnerTest" in backend_analysis_runner_test
-            and backend_analysis_runner_test.count("@Test") == 6
+            and backend_analysis_runner_test.count("@Test") == 7
             and "backendAnalysisInputForCurrentDraft_usesCaptureSourceSpecificBackendType" in backend_analysis_runner_test
+            and "backendAnalysisInputForCurrentDraft_doesNotExposeImageWhenCloudImageDisabled" in backend_analysis_runner_test
             and "backendAnalyzeText_prefersEditedOcrDraftAndDoesNotFallbackToImageSampleRawText" in backend_analysis_runner_test
             and "backendFailureOutcome_redactsSensitiveTextAndKeepsFallbackReviewState" in backend_analysis_runner_test
             and "backendFailureOutcomeForRealMathDraft_doesNotInjectCourseSampleFields" in backend_analysis_runner_test
@@ -816,7 +826,7 @@ def main() -> int:
             test_result_passed(
                 "android-mvp/app/build/test-results/testDebugUnitTest/TEST-cn.shike.app.BackendAnalysisRunnerTest.xml",
                 "cn.shike.app.BackendAnalysisRunnerTest",
-                6,
+                7,
             ),
         ),
         (
@@ -1052,11 +1062,11 @@ def main() -> int:
             and "enum class LocalMultimodalPreference" in local_multimodal_source
             and "fun allowCloudImageForPreference" in local_multimodal_source
             and "fun localMultimodalUiState(" in local_multimodal_source
-            and "不打包模型" in local_multimodal_source
-            and "不会假装可用" in local_multimodal_source
-            and "同一 JSON Schema" in local_multimodal_source
+            and "云端图片理解" in local_multimodal_source
+            and "仅保存待确认草稿" in local_multimodal_source
+            and "图片不会上传" in local_multimodal_source
             and "class LocalMultimodalStatusTest" in local_multimodal_test
-            and local_multimodal_test.count("@Test") == 4
+            and local_multimodal_test.count("@Test") == 5
             and "localMultimodalUiState_reportsNotInstalledWithoutClaimingAvailability" in local_multimodal_test
             and "localMultimodalUiState_usesAvailableLocalOnlyWhenRequestedOrCloudDisabled" in local_multimodal_test
             and "localMultimodalUiState_reportsInitializationFailureAsManualReviewBoundary" in local_multimodal_test
@@ -1067,7 +1077,7 @@ def main() -> int:
             test_result_passed(
                 "android-mvp/app/build/test-results/testDebugUnitTest/TEST-cn.shike.app.LocalMultimodalStatusTest.xml",
                 "cn.shike.app.LocalMultimodalStatusTest",
-                4,
+                5,
             ),
         ),
         (
@@ -1134,18 +1144,20 @@ def main() -> int:
             "image_thumbnail_cache_unit_test_exists",
             "object ImageThumbnailCache" in image_thumbnail_cache_source
             and "fun cacheThumbnailBytes(" in image_thumbnail_cache_source
+            and "fun clearThumbnailCache(" in image_thumbnail_cache_source
             and "ImagePreprocessPolicy.THUMBNAIL_CACHE_DIR" in image_thumbnail_cache_source
             and "class ImageThumbnailCacheTest" in image_thumbnail_cache_test
-            and image_thumbnail_cache_test.count("@Test") == 2
+            and image_thumbnail_cache_test.count("@Test") == 3
             and "cacheThumbnailBytes_persistsPrivateDigestNamedJpeg" in image_thumbnail_cache_test
-            and "cacheThumbnailBytes_reusesExistingFileForSameDigest" in image_thumbnail_cache_test,
+            and "cacheThumbnailBytes_reusesExistingFileForSameDigest" in image_thumbnail_cache_test
+            and "clearThumbnailCache_removesCachedThumbnailDirectoryOnly" in image_thumbnail_cache_test,
         ),
         (
             "gradle_image_thumbnail_cache_test_passed",
             test_result_passed(
                 "android-mvp/app/build/test-results/testDebugUnitTest/TEST-cn.shike.app.data.ImageThumbnailCacheTest.xml",
                 "cn.shike.app.data.ImageThumbnailCacheTest",
-                2,
+                3,
             ),
         ),
         (

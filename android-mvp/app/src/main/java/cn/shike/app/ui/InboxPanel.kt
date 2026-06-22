@@ -30,6 +30,7 @@ fun InboxPanel(
     var isArchived by remember(item.title, item.rawText) { mutableStateOf(false) }
     val currentEntry = inboxWorkbenchEntryFrom(item, captureSource, executionResults)
     val allEntries = (historyEntries + currentEntry).distinctBy { it.archiveKey }
+    val summaryStats = inboxSummaryStatsFor(allEntries)
     val archivedKeys = if (isArchived) setOf(currentEntry.archiveKey) else emptySet()
     val visibleEntries = visibleInboxEntries(
         entries = allEntries,
@@ -43,9 +44,9 @@ fun InboxPanel(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            SummaryStat("3", "待确认", Color(0xFF0F766E))
-            SummaryStat("1", "已安排", Color(0xFFF97316))
-            SummaryStat("2", "即将截止", Color(0xFF2563EB))
+            SummaryStat(summaryStats.first { it.label == "待确认" }.count, "待确认", Color(0xFF0F766E))
+            SummaryStat(summaryStats.first { it.label == "已安排" }.count, "已安排", Color(0xFFF97316))
+            SummaryStat(summaryStats.first { it.label == "即将截止" }.count, "即将截止", Color(0xFF2563EB))
         }
         Row(
             modifier = Modifier
