@@ -50,6 +50,14 @@ def main() -> int:
             and ".delete(" not in media_cleanup + source_cleanup,
         ),
         (
+            "cleanup_only_for_standard_mediastore_items",
+            "SourceUriCapability.STANDARD_MEDIASTORE_ITEM" in source_cleanup
+            and "SourceUriCapability.PHOTO_PICKER_PROXY" in source_cleanup
+            and "\"/picker/\" in lower" in source_cleanup
+            and "Regex(\"^[^/]+/images/media/[0-9]+$\")" in source_cleanup
+            and "isMediaStoreUri(uri)" in app_state + source_cleanup,
+        ),
+        (
             "system_confirmation_boundary_present",
             "IntentSender" in source_cleanup
             and "Build.VERSION_CODES.R" in source_cleanup

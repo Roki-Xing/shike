@@ -23,13 +23,7 @@ private val engineeringWarningTokens = listOf(
  *     Distinct user-visible preparation items such as `带书`.
  */
 fun preparationItemsFrom(item: ShikeItem): List<String> =
-    preparationItemsFromText(
-        listOf(
-            taskSummaryFrom(item),
-            item.rawText,
-            item.title,
-        ).joinToString("\n")
-    )
+    preparationItemsFromText(item.rawText)
 
 /**
  * Extracts preparation items from OCR or model task text.
@@ -41,7 +35,6 @@ fun preparationItemsFrom(item: ShikeItem): List<String> =
  *     Distinct preparation items, capped to concise display strings.
  */
 fun preparationItemsFromText(text: String): List<String> {
-    "准备事项"
     return parsePreparationItemsFromText(text, ::isInternalEvidenceText)
 }
 

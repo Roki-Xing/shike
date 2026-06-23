@@ -9,6 +9,30 @@ Multi-role review guide applied this round: `/mnt/c/Users/Xing/Desktop/7. 多角
 Guide source availability: the expected desktop source file was restored from the Windows recycle bin and is currently readable in this closeout audit; see `materials/evidence/desktop-guidance-source-status.md`. The local matrix remains useful for repository evidence traceability, while strict external cloud-device evidence remains blocked.
 Scope: Desktop guidance stages A-E: BlueLM credible evidence, cloud-device and HTTPS backend evidence, frontend productization, long-lived inbox workbench, and materials upgraded to a release evidence package. Historical S2/S3 hardening remains part of the evidence base, but the current public status is anchored to `materials/evidence/requirement-matrix.md` and `REQUIREMENT_MATRIX_METRIC 9/9`.
 
+## 2026-06-23 Multi-role Review Regression Closure
+
+This pass continued `/mnt/c/Users/Xing/Desktop/7. 多角色评审.md` and focused on the newest P0 regressions from the cloud-device recording review: fixed decimal trust copy, preparation-item noise from screenshot chrome, Photo Picker proxy URIs being treated like trashable MediaStore items, and APK provenance gates that could miss stale builds.
+
+Fresh evidence from this pass:
+
+| Command | Status | Evidence |
+|---|---|---|
+| `gradle --no-daemon :app:testDebugUnitTest` from `shike/android-mvp/` | PASS | `BUILD SUCCESSFUL`; local unit suites report 45 suites, 167 tests, 0 failures, 0 errors |
+| `python3 validation/validate_structured_action_card_ui.py` | PASS | `STRUCTURED_ACTION_CARD_UI_METRIC 13/13`; covers field-status copy, no `0.91` / `0.94` UI decimals, and screenshot-chrome preparation noise regression |
+| `python3 validation/validate_capture_source_uri.py` | PASS | `CAPTURE_SOURCE_URI_METRIC 11/11`; gallery/screenshot/share sources preserve the URI while Photo Picker proxy and collection URIs are not treated as trashable originals |
+| `python3 validation/validate_source_image_trash_request.py` | PASS | `SOURCE_IMAGE_TRASH_REQUEST_METRIC 11/11`; `MediaStore.createTrashRequest` is restricted to concrete `content://media/.../images/media/{id}` items |
+| `python3 validation/validate_screenshot_cleanup.py` | PASS | `SCREENSHOT_CLEANUP_METRIC 16/16`; unsupported sources keep the user-facing fallback instead of showing a doomed trash button |
+| `python3 validation/validate_android_unit_tests.py` | PASS | `ANDROID_UNIT_TEST_METRIC 90/90` |
+| `python3 validation/validate_user_facing_copy.py` | PASS | `USER_FACING_COPY_METRIC 13/13` |
+| `python3 validation/validate_action_execution.py` | PASS | `ACTION_EXECUTION_METRIC 18/18` |
+| `python3 validation/validate_build_provenance.py` | PASS | `BUILD_PROVENANCE_METRIC 14/14`; compares declared/local/Desktop APK SHA-256 and rejects stale APKs older than Android source inputs |
+| `python3 validation/validate_real_world_ready.py` | PASS | `REAL_WORLD_READY_METRIC 22/22` |
+| `python3 validation/validate_secret_hygiene.py` | PASS | `PASS secret_hygiene` |
+| `git diff --check` | PASS | no whitespace errors |
+| `bash android-mvp/build_apk.sh` | PASS | local APK rebuilt and copied to `/mnt/c/Users/Xing/Desktop/Shike-app-debug.apk`; both SHA-256 values are `bf2e5b2b8be49238f96eb7d896bf47d2cfcae7199754c43eaa0aca2eca7b0234` |
+
+Boundary: Photo Picker, DocumentsProvider, shared-provider, and app-temp URIs are intentionally treated as not directly trashable; the user sees the fallback copy and may delete those originals in the source app/gallery. Strict external cloud-device evidence still requires a real system trash confirmation recording for standard MediaStore screenshots, filled report fields, real redacted logcat, and installed-device APK hash proof.
+
 ## 2026-06-22 Multi-role Review Product Closure
 
 This pass applied `/mnt/c/Users/Xing/Desktop/7. 多角色评审.md` to the Android MVP closeout path. The current app now covers the review's P0 risks around local data clearing, multi-reminder persistence/cancel recovery, restart-persistent privacy mode, no default image upload when cloud image understanding is disabled, and build provenance. The P1 quick fixes covered in this pass keep calendar handoff honest as "待用户保存", route campus classroom codes such as `E520` / `B地点303` to copy-only recovery instead of blind map search, and derive inbox summary counts from real entries instead of demo constants.

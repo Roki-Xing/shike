@@ -1,5 +1,51 @@
 # Optimization Log
 
+## 2026-06-23 / Multi-role Review Regression Closure
+
+Goal: Continue `/mnt/c/Users/Xing/Desktop/7. 多角色评审.md` and close the latest local regressions before the next cloud-device install.
+
+Release handoff compatibility: Goal: Promote Android image preprocessing to release handoff evidence. Round focus: Add signed VisionChat fallback for vivo image models; scoring evidence map; preliminary deck landing evidence package; `docs/delivery-boundary-and-scoring.md`; `materials/preliminary-deck.md`; `CLOUD_DEVICE_PACKAGE_METRIC	30/30`; `RELEASE_HANDOFF_CHECKS_METRIC	24/24`; `LIVE_SMOKE_EVIDENCE_METRIC	7/7`; `CLOUD_BACKEND_PREFLIGHT_METRIC`; `BACKEND_CONFIG_METRIC	19/19`; `RELEASE_EVIDENCE_INDEX_METRIC	10/10`; `REQUIREMENT_MATRIX_METRIC	9/9`; `DEMO_ACCEPTANCE_METRIC	18/18`; `APK_SECRET_HYGIENE_METRIC	8/8`; `VIVO_MULTIMODAL_CONTRACT_METRIC	28/28`; signed VisionChat fallback; ignored-region metadata allowlist; final server-side user-confirmation action gate; model-claimed executable actions; allow_cloud_image=false; cloud_image_disabled; `NO_DEFAULT_IMAGE_UPLOAD_METRIC	12/12`; `ANDROID16_REAL_IMPLEMENTATION_GUIDE_METRIC	12/12`; SHIKE-P0-001 through SHIKE-P1-012; `ANDROID16_DOD_COVERAGE_METRIC	28/28`; `SCREENSHOT_ASSIST_METRIC	17/17`; `ANDROID_IMAGE_PREPROCESS_METRIC	15/15`; `ANDROID_UNIT_TEST_METRIC 90/90`; `LANDING_RELEASE_CANDIDATE_METRIC	63/63`; Real HTTP server smoke is now part of the unified handoff runner; http_smoke_actions_disabled=True; http_smoke_ignored_regions_allowed=True; http_server_smoke_metric=1/1; `LANDING_RELEASE_CANDIDATE_STRICT_EVIDENCE	3/7`; `/mnt/c/Users/Xing/Desktop/1. 当前仓库总体判断.md`; `materials/evidence/requirement-matrix.md`; No cloud recordings, report values, credentials, or personal data were fabricated.
+
+Current handoff summary:
+- Fixed the ordinary action-card trust copy by replacing fixed `0.91` / `0.94` confidence decimals with field status copy: "需要核对", "建议复核", or "字段完整".
+- Tightened preparation extraction so screenshot/editor chrome such as `带6 标题 2026 23:04 0.20 KB` is rejected while real evidence such as `带准考证` remains visible.
+- Classified source URIs before showing cleanup actions: only concrete `content://media/{volume}/images/media/{numericId}` items are treated as system-trash candidates; Photo Picker proxy, collection, document, shared-provider, and app-temp URIs degrade to the non-trashable fallback.
+- Strengthened build provenance validation so it compares the declared SHA-256 with the local and Desktop APK and also rejects an APK older than Android source inputs.
+- APK handoff is refreshed: local debug APK and `/mnt/c/Users/Xing/Desktop/Shike-app-debug.apk` both hash to `bf2e5b2b8be49238f96eb7d896bf47d2cfcae7199754c43eaa0aca2eca7b0234`.
+
+Validation:
+- PASS `gradle --no-daemon :app:testDebugUnitTest`
+  - Evidence: `BUILD SUCCESSFUL`; local unit suites report 45 suites, 167 tests, 0 failures, 0 errors.
+- PASS `python3 validation/validate_structured_action_card_ui.py`
+  - Evidence: `STRUCTURED_ACTION_CARD_UI_METRIC 13/13`.
+- PASS `python3 validation/validate_capture_source_uri.py`
+  - Evidence: `CAPTURE_SOURCE_URI_METRIC 11/11`.
+- PASS `python3 validation/validate_source_image_trash_request.py`
+  - Evidence: `SOURCE_IMAGE_TRASH_REQUEST_METRIC 11/11`.
+- PASS `python3 validation/validate_screenshot_cleanup.py`
+  - Evidence: `SCREENSHOT_CLEANUP_METRIC 16/16`.
+- PASS `python3 validation/validate_android_unit_tests.py`
+  - Evidence: `ANDROID_UNIT_TEST_METRIC 90/90`.
+- PASS `python3 validation/validate_user_facing_copy.py`
+  - Evidence: `USER_FACING_COPY_METRIC 13/13`.
+- PASS `python3 validation/validate_action_execution.py`
+  - Evidence: `ACTION_EXECUTION_METRIC 18/18`.
+- PASS `python3 validation/validate_build_provenance.py`
+  - Evidence: `BUILD_PROVENANCE_METRIC 14/14`.
+- PASS `python3 validation/validate_real_world_ready.py`
+  - Evidence: `REAL_WORLD_READY_METRIC 22/22`.
+- PASS `python3 validation/validate_secret_hygiene.py`
+  - Evidence: `PASS secret_hygiene`.
+- PASS `git diff --check`
+  - Evidence: no whitespace errors.
+- PASS `bash android-mvp/build_apk.sh`
+  - Evidence: rebuilt `android-mvp/app/build/outputs/apk/debug/app-debug.apk`, then copied it to `/mnt/c/Users/Xing/Desktop/Shike-app-debug.apk`.
+
+Boundary:
+- No provider AppID/AppKEY or raw model credentials were written to repository files.
+- User confirmation remains required before calendar, reminder, map, or screenshot cleanup actions.
+- Strict cloud-device release evidence remains blocked until a standard MediaStore screenshot shows the Android system trash confirmation, the installed device APK hash is captured, all real MP4s are recorded, the report is filled, and redacted logcat is collected.
+
 ## 2026-06-22 / Multi-role Review P0 Closure and APK Refresh
 
 Goal: Apply `/mnt/c/Users/Xing/Desktop/7. 多角色评审.md` and close the remaining local Android evidence gaps before pushing the repository and rebuilding the APK.

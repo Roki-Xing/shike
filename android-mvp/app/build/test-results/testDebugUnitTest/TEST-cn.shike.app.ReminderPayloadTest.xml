@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="cn.shike.app.ReminderPayloadTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-06-22T13:38:31" hostname="LAPTOP-B84BKQGP" time="0.006">
+<testsuite name="cn.shike.app.ReminderPayloadTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-06-23T01:49:06" hostname="LAPTOP-B84BKQGP" time="0.008">
   <properties/>
   <testcase name="scheduledReminderFrom_sameTitleCardsDoNotShareRequestCode" classname="cn.shike.app.ReminderPayloadTest" time="0.001"/>
   <testcase name="scheduledReminderFrom_keepsStablePayloadFields" classname="cn.shike.app.ReminderPayloadTest" time="0.001"/>
   <testcase name="shouldRestoreScheduledReminder_rejectsExpiredPayload" classname="cn.shike.app.ReminderPayloadTest" time="0.0"/>
   <testcase name="scheduledReminderFrom_nearStartUsesOneMinuteFallbackAndResultMode" classname="cn.shike.app.ReminderPayloadTest" time="0.001"/>
-  <testcase name="reminderDeliveryPayloadFrom_keepsIntentPayloadFields" classname="cn.shike.app.ReminderPayloadTest" time="0.0"/>
-  <testcase name="scheduledReminderPreferences_storeMultipleRecordsAndRemoveOne" classname="cn.shike.app.ReminderPayloadTest" time="0.003"/>
+  <testcase name="reminderDeliveryPayloadFrom_keepsIntentPayloadFields" classname="cn.shike.app.ReminderPayloadTest" time="0.001"/>
+  <testcase name="scheduledReminderPreferences_storeMultipleRecordsAndRemoveOne" classname="cn.shike.app.ReminderPayloadTest" time="0.004"/>
   <testcase name="reminderDeliveryPayloadFrom_rejectsMissingOrBlankTitle" classname="cn.shike.app.ReminderPayloadTest" time="0.0"/>
   <testcase name="reminderDeliveryPayloadFrom_defaultsMissingDetailAndId" classname="cn.shike.app.ReminderPayloadTest" time="0.0"/>
   <system-out><![CDATA[]]></system-out>

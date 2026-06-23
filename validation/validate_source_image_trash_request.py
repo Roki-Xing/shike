@@ -56,6 +56,15 @@ def main() -> int:
             and "NOT_SUPPORTED" in combined_cleanup,
         ),
         (
+            "source_uri_capability_blocks_picker_proxy",
+            "enum class SourceUriCapability" in manager
+            and "STANDARD_MEDIASTORE_ITEM" in manager
+            and "PHOTO_PICKER_PROXY" in manager
+            and "\"/picker/\" in lower" in manager
+            and "isConcreteMediaImageItem" in manager
+            and "Regex(\"^[^/]+/images/media/[0-9]+$\")" in manager,
+        ),
+        (
             "manager_returns_clear_status",
             "sealed class SourceImageCleanupRequest" in manager
             and "SystemTrashConfirmation" in manager

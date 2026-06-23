@@ -62,4 +62,25 @@ class FlexibleActionCardTest {
             assertEquals(expected, actionCardUiModelFrom(item).preparationItems)
         }
     }
+
+    @Test
+    fun actionCardUiModel_rejectsPreparationNoiseFromScreenshotChrome() {
+        val item = ShikeItem(
+            title = "高数B考试",
+            scene = "考试通知",
+            time = "今天 21:00",
+            location = "303",
+            status = "待确认",
+            actions = listOf("加入日历", "考试提醒"),
+            startEpochMillis = 0L,
+            rawText = """
+                OCR原文：今天晚上七点需要上高数A 教室是303 要考试记得带准考证
+                任务：高数A考试
+                准备：带6 标题 2026 23:04 0.20 KB
+                准备：带准考证
+            """.trimIndent(),
+        )
+
+        assertEquals(listOf("带准考证"), actionCardUiModelFrom(item).preparationItems)
+    }
 }

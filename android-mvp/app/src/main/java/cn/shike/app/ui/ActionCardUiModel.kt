@@ -9,6 +9,7 @@ import cn.shike.app.domain.userWarningsFrom
 data class ActionCardUiModel(
     val sceneLabel: String,
     val title: String,
+    val confidenceStatus: String,
     val time: String,
     val location: String,
     val task: String,
@@ -28,6 +29,7 @@ fun actionCardUiModelFrom(item: ShikeItem): ActionCardUiModel {
     return ActionCardUiModel(
         sceneLabel = item.scene.ifBlank { "待确认" },
         title = actionCardTitleFor(item),
+        confidenceStatus = confidenceStatusFor(item, risks, missingFields, confirmationItems),
         time = item.time.cleanUiValue("待确认"),
         location = item.location.cleanUiValue("待确认"),
         task = task,
@@ -101,3 +103,18 @@ private fun courseTitleFromEvidence(text: String): String? {
         ?.let { return if (it.endsWith("课")) it else "${it}课" }
     return null
 }
+
+private fun confidenceStatusFor(
+    item: ShikeItem,
+    risks: List<String>,
+    missingFields: List<String>,
+    confirmationItems: List<String>,
+): String =
+    when {
+        item.status.contains("待确认") || missingFields.isNotEmpty() || confirmationItems.isNotEmpty() ->
+            "需要核对"
+        risks.isNotEmpty() ->
+            "建议复核"
+        else ->
+            "字段完整"
+    }

@@ -80,8 +80,26 @@ private fun cleanPreparationItem(value: String, isInternalText: (String) -> Bool
     }
     if (cleaned.isBlank() || cleaned.length > 24) return null
     if (cleaned in listOf("带上", "带了", "了")) return null
+    if (isScreenshotChromeNoise(cleaned)) return null
     return cleaned.takeUnless { isInternalText(it.lowercase()) }
 }
+
+private fun isScreenshotChromeNoise(value: String): Boolean {
+    val normalized = value.lowercase()
+    val hasFileMetadata = Regex("\\b\\d+(?:\\.\\d+)?\\s*(kb|mb|gb)\\b").containsMatchIn(normalized)
+    val hasClockLikeText = Regex("\\b\\d{1,2}:\\d{2}\\b").containsMatchIn(normalized)
+    val hasUiChromeWord = listOf("标题", "未分类", "状态栏", "编辑器", "文件大小").any { it in value }
+    val hasLongNumericRun = Regex("\\d{4,}").containsMatchIn(value)
+    val looksLikeBadCarry =
+        value.startsWith("带") &&
+            (hasFileMetadata || hasClockLikeText || hasUiChromeWord || hasLongNumericRun) &&
+            noneOfPreparationEvidenceTokens(value)
+    return looksLikeBadCarry || hasFileMetadata && hasUiChromeWord
+}
+
+private fun noneOfPreparationEvidenceTokens(value: String): Boolean =
+    listOf("准考证", "学生证", "身份证", "书", "教材", "实验报告", "纸质版", "材料", "电脑", "简历", "作品集")
+        .none { it in value }
 
 private fun String.startsWithAny(vararg prefixes: String): Boolean = prefixes.any { startsWith(it) }
 

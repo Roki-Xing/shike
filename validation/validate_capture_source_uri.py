@@ -22,6 +22,7 @@ def main() -> int:
     actions = read("android-mvp/app/src/main/java/cn/shike/app/ShikeAppActions.kt")
     intents = read("android-mvp/app/src/main/java/cn/shike/app/ActivityImportIntents.kt")
     activity = read("android-mvp/app/src/main/java/cn/shike/app/MainActivityLifecycleActions.kt")
+    manager = read("android-mvp/app/src/main/java/cn/shike/app/system/SourceImageCleanupManager.kt")
     tests = read("android-mvp/app/src/test/java/cn/shike/app/data/CaptureImportMapperTest.kt")
     cleanup_tests = read("android-mvp/app/src/test/java/cn/shike/app/ShikeAppStateCleanupTest.kt")
     manager_tests = read("android-mvp/app/src/test/java/cn/shike/app/system/SourceImageCleanupManagerTest.kt")
@@ -39,7 +40,8 @@ def main() -> int:
             "gallery_uses_selected_content_uri_as_source",
             "fun gallerySelectionFromImage" in mapper
             and "sourceMediaStoreUri = label" in state
-            and "imageCleanupStatus = ImageCleanupStatus.NOT_REQUESTED" in state,
+            and "initialCleanupStatusForSourceUri(label)" in state
+            and "isMediaStoreUri(uri)" in state + manager,
         ),
         (
             "screenshot_candidate_uses_notification_media_uri",
@@ -89,6 +91,14 @@ def main() -> int:
             "isMediaStoreUri_acceptsOnlySystemMediaContentUris" in manager_tests
             and "content://com.example.provider/image/42" in manager_tests
             and "file:/private-cache" in manager_tests,
+        ),
+        (
+            "cleanup_manager_rejects_picker_proxy_and_collection_uri",
+            "content://media/picker/0/com.android.providers.media.photopicker/media/42" in manager_tests
+            and "content://media/external/images/media" in manager_tests
+            and "PHOTO_PICKER_PROXY" in manager
+            and "STANDARD_MEDIASTORE_ITEM" in manager
+            and "Regex(\"^[^/]+/images/media/[0-9]+$\")" in manager,
         ),
     ]
 

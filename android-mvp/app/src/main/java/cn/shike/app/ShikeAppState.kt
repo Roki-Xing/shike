@@ -16,6 +16,7 @@ import cn.shike.app.data.ScreenshotCandidate
 import cn.shike.app.data.backendAnalysisInputForCurrentDraft
 import cn.shike.app.data.inboxItemEntityFrom
 import cn.shike.app.domain.ShikeItem
+import cn.shike.app.system.isMediaStoreUri
 import cn.shike.app.ui.LocalMultimodalPreference
 import cn.shike.app.ui.TodayAgendaState
 import cn.shike.app.ui.allowCloudImageForPreference
@@ -161,12 +162,13 @@ fun ShikeAppState.applyCameraPreview(bitmap: Bitmap, persist: (ShikeItem, String
 
 fun ShikeAppState.applyGalleryImage(label: String, persist: (ShikeItem, String) -> Unit) {
     capturedBitmap = null
+    val cleanupStatus = initialCleanupStatusForSourceUri(label)
     applyGalleryImageSelection(label) { item, source ->
         persistSelection(
             item = item,
             source = source,
             sourceMediaStoreUri = label,
-            imageCleanupStatus = ImageCleanupStatus.NOT_REQUESTED,
+            imageCleanupStatus = cleanupStatus,
             onPersist = persist,
         )
     }
@@ -174,16 +176,20 @@ fun ShikeAppState.applyGalleryImage(label: String, persist: (ShikeItem, String) 
 
 fun ShikeAppState.applyScreenshotCandidate(candidate: ScreenshotCandidate, persist: (ShikeItem, String) -> Unit) {
     capturedBitmap = null
+    val cleanupStatus = initialCleanupStatusForSourceUri(candidate.contentUri)
     applyScreenshotCandidateSelection(candidate) { item, source ->
         persistSelection(
             item = item,
             source = source,
             sourceMediaStoreUri = candidate.contentUri,
-            imageCleanupStatus = ImageCleanupStatus.NOT_REQUESTED,
+            imageCleanupStatus = cleanupStatus,
             onPersist = persist,
         )
     }
 }
+
+private fun initialCleanupStatusForSourceUri(uri: String?): ImageCleanupStatus =
+    if (isMediaStoreUri(uri)) ImageCleanupStatus.NOT_REQUESTED else ImageCleanupStatus.NOT_SUPPORTED
 
 const val CAMERA_PREVIEW_IMAGE_URI = "camera_preview"
 

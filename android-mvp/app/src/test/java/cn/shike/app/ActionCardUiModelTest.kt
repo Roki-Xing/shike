@@ -55,4 +55,18 @@ class ActionCardUiModelTest {
         assertEquals(listOf("地点 B地点303，请确认是否为考场", "请确认时间是否准确"), model.userWarnings)
         assertFalse(model.userWarnings.any { "ocr_evidence_repair" in it || "风险" in it })
     }
+
+    @Test
+    fun actionCardUiModelFrom_usesConfidenceStatusInsteadOfFixedDecimal() {
+        val model = actionCardUiModelFrom(
+            sampleCourse().copy(
+                scene = "考试通知",
+                rawText = "任务：高数B考试\n风险：relative_time\n待补：校区",
+            )
+        )
+
+        assertEquals("需要核对", model.confidenceStatus)
+        assertFalse(model.confidenceStatus.contains("0.91"))
+        assertFalse(model.confidenceStatus.contains("0.94"))
+    }
 }

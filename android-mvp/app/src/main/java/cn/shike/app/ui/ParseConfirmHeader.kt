@@ -16,6 +16,7 @@ import cn.shike.app.domain.ShikeItem
 
 @Composable
 fun ParseConfirmHeader(item: ShikeItem) {
+    val model = actionCardUiModelFrom(item)
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -23,7 +24,7 @@ fun ParseConfirmHeader(item: ShikeItem) {
     ) {
         Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Text(item.title, fontSize = 17.sp, fontWeight = FontWeight.Bold, color = Color(0xFF101828))
-            Text("场景：${item.scene} · 置信度 ${if (item.scene == "课程通知") "0.94" else "0.91"}", color = Color(0xFF667085), fontSize = 12.sp)
+            Text("场景：${model.sceneLabel} · 字段状态：${model.confidenceStatus}", color = Color(0xFF667085), fontSize = 12.sp)
         }
         Pill("可编辑", Color(0xFFEAF1FF), Color(0xFF2563EB))
     }
