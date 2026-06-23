@@ -29,7 +29,7 @@ Fresh evidence from this pass:
 | `python3 validation/validate_real_world_ready.py` | PASS | `REAL_WORLD_READY_METRIC 22/22` |
 | `python3 validation/validate_secret_hygiene.py` | PASS | `PASS secret_hygiene` |
 | `git diff --check` | PASS | no whitespace errors |
-| `bash android-mvp/build_apk.sh` | PASS | local APK rebuilt and copied to `/mnt/c/Users/Xing/Desktop/Shike-app-debug.apk`; both SHA-256 values are `bf2e5b2b8be49238f96eb7d896bf47d2cfcae7199754c43eaa0aca2eca7b0234` |
+| `bash android-mvp/build_apk.sh` | PASS | local APK rebuilt and copied to `/mnt/c/Users/Xing/Desktop/Shike-app-debug.apk`; both SHA-256 values are `baf7a6cb78211450104d0d28917d00c00ef74363a1194946c50637e72394eb8e` |
 
 Boundary: Photo Picker, DocumentsProvider, shared-provider, and app-temp URIs are intentionally treated as not directly trashable; the user sees the fallback copy and may delete those originals in the source app/gallery. Strict external cloud-device evidence still requires a real system trash confirmation recording for standard MediaStore screenshots, filled report fields, real redacted logcat, and installed-device APK hash proof.
 

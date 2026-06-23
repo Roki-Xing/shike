@@ -11,7 +11,7 @@ Current handoff summary:
 - Tightened preparation extraction so screenshot/editor chrome such as `带6 标题 2026 23:04 0.20 KB` is rejected while real evidence such as `带准考证` remains visible.
 - Classified source URIs before showing cleanup actions: only concrete `content://media/{volume}/images/media/{numericId}` items are treated as system-trash candidates; Photo Picker proxy, collection, document, shared-provider, and app-temp URIs degrade to the non-trashable fallback.
 - Strengthened build provenance validation so it compares the declared SHA-256 with the local and Desktop APK and also rejects an APK older than Android source inputs.
-- APK handoff is refreshed: local debug APK and `/mnt/c/Users/Xing/Desktop/Shike-app-debug.apk` both hash to `bf2e5b2b8be49238f96eb7d896bf47d2cfcae7199754c43eaa0aca2eca7b0234`.
+- APK handoff is refreshed: local debug APK and `/mnt/c/Users/Xing/Desktop/Shike-app-debug.apk` both hash to `baf7a6cb78211450104d0d28917d00c00ef74363a1194946c50637e72394eb8e`.
 
 Validation:
 - PASS `gradle --no-daemon :app:testDebugUnitTest`
