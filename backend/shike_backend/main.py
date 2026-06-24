@@ -738,7 +738,19 @@ def analyze_image(request: AnalyzeImageRequest) -> ParsedActionCard:
     audit_provider = "vivo_cloud_multimodal"
     key_present = False
     repair_risks: list[str] = []
-    if not request.allow_cloud_image:
+    if image is None and len((request.ocr_text_hint or "").strip()) >= 8:
+        audit_provider = "ocr_hint_text_fallback"
+        try:
+            card = fallback_analyze_image_with_text_model(
+                normalized,
+                reason="ocr_hint_without_image",
+                ignored_regions=ignored_regions,
+            )
+            status = "text_fallback_schema_valid"
+        except AdapterError as exc:
+            status = "manual_review"
+            card = manual_review_action_card(f"manual_review:ocr_hint_without_image;text_fallback:{exc.message}")
+    elif not request.allow_cloud_image:
         audit_provider = "ocr_hint_text_fallback"
         try:
             card = fallback_analyze_image_with_text_model(
@@ -792,7 +804,7 @@ def analyze_image(request: AnalyzeImageRequest) -> ParsedActionCard:
     gated_card = _require_user_confirmation_for_card(card)
     final_card = gated_card.model_copy(update={"ignored_regions": merged_regions, "risks": merged_risks})
 
-    if request.allow_cloud_image:
+    if request.allow_cloud_image and image is not None:
         audit_provider = "vivo_cloud_multimodal"
 
     audit_event = build_analyze_image_audit_event(

@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections.abc import Iterable
 import re
 
+from shike_backend.location import extract_location_from_text
 from shike_backend.schemas import AnalyzeRequest, AnalyzeResponse
 
 
@@ -350,6 +351,9 @@ class MockModelAdapter:
 
     @staticmethod
     def _extract_location_text(text: str) -> str | None:
+        evidence_location = extract_location_from_text(text)
+        if evidence_location:
+            return evidence_location
         for pattern in [
             r"([A-Za-z]地点在\d{2,4})",
             r"(?:教室是|教室|地点|改到|调整到|在)\s*([A-Za-z一-龥]*[A-Z]?\d{2,4}[A-Za-z一-龥]*)",

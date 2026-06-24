@@ -74,7 +74,7 @@ def main() -> int:
             "foreground_service_observes_mediastore",
             "class ScreenshotAssistService : Service()" in service
             and "startForeground(" in service
-            and "START_STICKY" in service
+            and "START_NOT_STICKY" in service
             and "ScreenshotObserver(contentResolver" in service
             and "showScreenshotDetectedNotification(this, candidate)" in service,
         ),

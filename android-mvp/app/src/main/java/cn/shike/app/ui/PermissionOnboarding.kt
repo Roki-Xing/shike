@@ -25,6 +25,7 @@ fun PermissionOnboarding(
         Column(verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
             PermissionOnboardingRow("通知权限", "用于截图后提醒你是否交给拾刻，也用于到点提醒。")
             PermissionOnboardingRow("图片权限", "仅在你开启截图助手后观察最近截图，不默认上传原图。")
+            PermissionOnboardingRow("不需要", "拾刻不需要悬浮窗或无障碍权限；截图整理只通过系统通知询问。")
             PermissionOnboardingRow("相机权限", "用于拍海报、公告或课堂通知，点击拍照时才申请。")
             PermissionOnboardingRow("日历", "用户确认后打开系统日历新增页，由你在日历中保存。")
             PermissionOnboardingRow("地图", "用户确认地点后打开地图；地图不可用时复制地点。")

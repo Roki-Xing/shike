@@ -89,8 +89,8 @@ class MainActivity : ComponentActivity() {
         createScreenshotAssistNotificationChannel(this)
         restoreScheduledReminder(this)
         consumeScreenshotImportIntent(intent)
-        consumeSharedImageIntent(intent)
-        val sharedText = sharedTextFromIntent(intent)
+        consumeSharedImageStream(intent)
+        val sharedText = sharedTextFrom(intent)
         screenshotAssistEnabled = loadScreenshotAssistEnabled(this)
         permissionOnboardingDismissed = loadPermissionOnboardingDismissed(this)
         registerScreenshotObserverIfAllowed()
@@ -107,8 +107,8 @@ class MainActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         consumeScreenshotImportIntent(intent)
-        consumeSharedImageIntent(intent)
-        pendingSharedText = sharedTextFromIntent(intent)
+        consumeSharedImageStream(intent)
+        pendingSharedText = sharedTextFrom(intent)
     }
 
     override fun onStart() {
@@ -125,4 +125,15 @@ class MainActivity : ComponentActivity() {
         unregisterScreenshotObserver()
         super.onDestroy()
     }
+
+    private fun consumeSharedImageStream(intent: Intent?) {
+        val carriesSharedImage = intent?.hasExtra(Intent.EXTRA_STREAM) == true ||
+            (intent?.action == Intent.ACTION_SEND && intent.type.orEmpty().startsWith("image/"))
+        if (carriesSharedImage) {
+            consumeSharedImageIntent(intent)
+        }
+    }
+
+    private fun sharedTextFrom(intent: Intent?): String? =
+        sharedTextFromIntent(intent)
 }

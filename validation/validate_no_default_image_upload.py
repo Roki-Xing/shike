@@ -153,7 +153,7 @@ def main() -> int:
     manual_entry = function_body(screen_host, "enterManualInput")
     apply_screenshot_candidate = function_body(actions, "applyScreenshotCandidate") + "\n" + function_body(state, "applyScreenshotCandidate")
     consume_shared_image = function_body(activity_lifecycle, "consumeSharedImageIntent")
-    on_screenshot_candidate = function_body(screenshot_controller, "onScreenshotCandidate")
+    notification_candidate_handoff = function_body(activity_lifecycle, "consumeScreenshotImportIntent") + "\n" + screenshot_controller
     analyze_current_draft = function_body(actions, "analyzeCurrentDraftWithBackend") + "\n" + function_body(state, "currentBackendInput")
     analyze_with_backend = function_body(actions, "analyzeWithBackend") + "\n" + function_body(actions, "imagePayloadProviderFor")
     run_backend_analysis = function_body(backend_runner, "runBackendAnalysis")
@@ -206,9 +206,9 @@ def main() -> int:
         ),
         Check(
             "notification_candidate_only_sets_pending_state",
-            ("pendingScreenshotCandidate = candidate" in on_screenshot_candidate or "onCandidateVisible(candidate)" in on_screenshot_candidate)
-            and "showScreenshotDetectedNotification" in on_screenshot_candidate
-            and no_backend_upload_code(on_screenshot_candidate),
+            "pendingScreenshotCandidate = screenshotCandidateFromImportIntent" in notification_candidate_handoff
+            and "startScreenshotAssistService(activity)" in notification_candidate_handoff
+            and no_backend_upload_code(notification_candidate_handoff),
             "MainActivity.kt onScreenshotCandidate",
         ),
         Check(

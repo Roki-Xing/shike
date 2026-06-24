@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="cn.shike.app.BackendAnalysisRunnerTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-06-23T01:49:06" hostname="LAPTOP-B84BKQGP" time="0.007">
+<testsuite name="cn.shike.app.BackendAnalysisRunnerTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-06-24T01:57:26" hostname="LAPTOP-B84BKQGP" time="0.005">
   <properties/>
-  <testcase name="backendAnalysisInputForCurrentDraft_usesCaptureSourceSpecificBackendType" classname="cn.shike.app.BackendAnalysisRunnerTest" time="0.003"/>
+  <testcase name="backendAnalysisInputForCurrentDraft_usesCaptureSourceSpecificBackendType" classname="cn.shike.app.BackendAnalysisRunnerTest" time="0.002"/>
   <testcase name="backendFailureOutcomeForRealMathDraft_doesNotInjectCourseSampleFields" classname="cn.shike.app.BackendAnalysisRunnerTest" time="0.001"/>
   <testcase name="backendFailureOutcome_redactsSensitiveTextAndKeepsFallbackReviewState" classname="cn.shike.app.BackendAnalysisRunnerTest" time="0.001"/>
-  <testcase name="backendFailureFallbackCopyFor_redactsEvidenceBeforeUiPersistence" classname="cn.shike.app.BackendAnalysisRunnerTest" time="0.0"/>
+  <testcase name="backendFailureFallbackCopyFor_redactsEvidenceBeforeUiPersistence" classname="cn.shike.app.BackendAnalysisRunnerTest" time="0.001"/>
   <testcase name="backendAnalyzeText_prefersEditedOcrDraftAndDoesNotFallbackToImageSampleRawText" classname="cn.shike.app.BackendAnalysisRunnerTest" time="0.0"/>
   <testcase name="backendAnalysisInputForCurrentDraft_doesNotExposeImageWhenCloudImageDisabled" classname="cn.shike.app.BackendAnalysisRunnerTest" time="0.0"/>
   <testcase name="backendSuccessOutcome_preservesReturnedItemAndBackendSource" classname="cn.shike.app.BackendAnalysisRunnerTest" time="0.0"/>

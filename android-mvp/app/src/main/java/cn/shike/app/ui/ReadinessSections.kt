@@ -120,7 +120,7 @@ fun PrivacyPanel(
                 onCheckedChange = onScreenshotAssistChange,
             )
         }
-        KeyValue("截图提醒", "检测到新截图后发通知，不会自动上传，不使用全局悬浮窗")
+        KeyValue("截图提醒", "检测到新截图后发通知，不会自动上传，不需要悬浮窗或无障碍权限")
         screenshotAssistDiagnostics?.let { diagnostics ->
             ScreenshotAssistDiagnosticsPanel(diagnostics)
         }

@@ -3,25 +3,19 @@ package cn.shike.app
 import android.Manifest
 import android.os.Handler
 import cn.shike.app.data.ScreenshotCandidate
-import cn.shike.app.data.recordScreenshotAssistNotified
 import cn.shike.app.data.saveScreenshotAssistEnabled
-import cn.shike.app.data.shouldNotifyScreenshotCandidate
-import cn.shike.app.system.ScreenshotObserver
 import cn.shike.app.system.canPostScreenshotAssistNotification
 import cn.shike.app.system.hasScreenshotMediaPermission
-import cn.shike.app.system.recordScreenshotAssistDetected
-import cn.shike.app.system.showScreenshotDetectedNotification
 import cn.shike.app.system.startScreenshotAssistService
 import cn.shike.app.system.stopScreenshotAssistService
 
 class ScreenshotAssistController(
     private val activity: MainActivity,
+    @Suppress("UNUSED_PARAMETER")
     private val handler: Handler,
+    @Suppress("UNUSED_PARAMETER")
     private val onCandidateVisible: (ScreenshotCandidate) -> Unit,
 ) {
-    private var observer: ScreenshotObserver? = null
-    private var observed = false
-
     fun updateEnabled(enabled: Boolean) {
         activity.screenshotAssistEnabled = enabled
         saveScreenshotAssistEnabled(activity, enabled)
@@ -56,37 +50,20 @@ class ScreenshotAssistController(
 
     fun registerIfAllowed() {
         if (activity.screenshotAssistEnabled && hasScreenshotMediaPermission(activity)) {
-            register()
             if (canPostScreenshotAssistNotification(activity)) {
                 startScreenshotAssistService(activity)
                 activity.handleScreenshotAssistServiceRunningChanged(true)
+            } else {
+                activity.handleScreenshotAssistServiceRunningChanged(false)
             }
         }
     }
 
     fun register() {
-        if (observed) return
-        observer = ScreenshotObserver(
-            resolver = activity.contentResolver,
-            handler = handler,
-            onCandidate = ::onScreenshotCandidate,
-        ).also { screenshotObserver ->
-            screenshotObserver.register()
-            observed = true
-        }
+        registerIfAllowed()
     }
 
     fun unregister() {
-        observer?.unregister()
-        observer = null
-        observed = false
-    }
-
-    private fun onScreenshotCandidate(candidate: ScreenshotCandidate) {
-        if (!shouldNotifyScreenshotCandidate(activity, candidate)) return
-        recordScreenshotAssistNotified(activity, candidate)
-        recordScreenshotAssistDetected(activity, candidate.createdAtMillis)
-        onCandidateVisible(candidate)
-        showScreenshotDetectedNotification(activity, candidate)
+        // Activity no longer owns a MediaStore observer; the service keeps running until explicitly disabled.
     }
 }

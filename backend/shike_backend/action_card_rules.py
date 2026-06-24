@@ -167,12 +167,12 @@ def _extract_start_text(text: str) -> str | None:
         rf"(?:改为|改到|调整到)\s*((?:这周|本周|下周|周)[一二三四五六日天]\s*(?:上午|下午|晚上|早上|晚|中午)?\s*{_CLOCK})",
         text,
     ):
-        return re.sub(r"\s+", "", match.group(1)).strip()
+        return _clean_start_text(match.group(1))
     if match := re.search(
         rf"((?:这周|本周|下周|周)[一二三四五六日天]).{{0,28}}?((?:上午|下午|晚上|早上|晚|中午)?\s*{_CLOCK})(?:\s*(?:开始|上课|集合|发车|入场))?",
         text,
     ):
-        return f"{match.group(1)}{re.sub(r'\s+', '', match.group(2))}"
+        return _clean_start_text(f"{match.group(1)}{match.group(2)}")
     patterns = [
         rf"\d{{1,2}}/\d{{1,2}}\s*(?:上午|下午|晚上|晚|中午)?\s*{_CLOCK}",
         rf"\d{{1,2}}/\d{{1,2}}\s+{_CLOCK}",
@@ -186,10 +186,17 @@ def _extract_start_text(text: str) -> str | None:
     for pattern in patterns:
         match = re.search(pattern, text)
         if match and not _looks_like_noise_time(text, match.start(), match.group(0)):
-            return re.sub(r"\s+", "", match.group(0)).strip()
+            return _clean_start_text(match.group(0))
     if match := re.search(rf"(这周[一二三四五六日天]).*?((?:上午|下午|晚上|早上|晚|中午)?\s*{_CLOCK})", text):
-        return f"{match.group(1)}{re.sub(r'\\s+', '', match.group(2))}"
+        return _clean_start_text(f"{match.group(1)}{match.group(2)}")
     return None
+
+
+def _clean_start_text(value: str) -> str:
+    """Normalize a matched start-time phrase for display and downstream rules."""
+
+    cleaned = re.sub(r"\s+", "", value).strip()
+    return re.sub(r"(?:开始|集合|发车|入场|上课|上)$", "", cleaned)
 
 
 def _extract_deadline_text(text: str) -> str | None:
