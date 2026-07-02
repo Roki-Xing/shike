@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -79,6 +80,7 @@ fun ShikeMainScreen(
         action()
     }
     val analysisUiState = analysisUiStateFor(modelStatus)
+    val bottomBarHeightWithSafeSpace = 148.dp
 
     Scaffold(
         modifier = Modifier
@@ -104,6 +106,7 @@ fun ShikeMainScreen(
                 .background(ShikeColors.Surface)
                 .verticalScroll(rememberScrollState())
                 .padding(padding)
+                .statusBarsPadding()
                 .padding(horizontal = 14.dp, vertical = 12.dp),
             verticalArrangement = ShikeSpacing.Screen,
         ) {
@@ -174,7 +177,7 @@ fun ShikeMainScreen(
                     localMultimodalStatus = localMultimodalStatus,
                 )
             }
-            Spacer(Modifier.height(112.dp))
+            Spacer(Modifier.height(bottomBarHeightWithSafeSpace))
         }
         if (showImportSheet) ImportActionSheet(
             onGallery = { openImportEntry(onGallery) },

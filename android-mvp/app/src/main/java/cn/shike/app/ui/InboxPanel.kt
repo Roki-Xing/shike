@@ -8,10 +8,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -39,14 +42,14 @@ fun InboxPanel(
         archivedKeys = archivedKeys,
     )
 
-    SectionCard("收件箱状态") {
+    SectionCard("行动台") {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            SummaryStat(summaryStats.first { it.label == "待确认" }.count, "待确认", Color(0xFF0F766E))
-            SummaryStat(summaryStats.first { it.label == "已安排" }.count, "已安排", Color(0xFFF97316))
-            SummaryStat(summaryStats.first { it.label == "即将截止" }.count, "即将截止", Color(0xFF2563EB))
+            summaryStats.forEach { stat ->
+                SummaryStat(stat.count, stat.label, Color(0xFF0F766E))
+            }
         }
         Row(
             modifier = Modifier
@@ -56,19 +59,19 @@ fun InboxPanel(
         ) {
             inboxStatusFilters.forEach { status ->
                 OutlinedButton(onClick = { selectedStatus = status }) {
-                    androidx.compose.material3.Text(if (status == selectedStatus) "✓ $status" else status)
+                    Text(if (status == selectedStatus) "✓ $status" else status)
                 }
             }
         }
         OutlinedTextField(
             value = searchQuery,
             onValueChange = { searchQuery = it },
-            label = { androidx.compose.material3.Text("搜索标题、地点、来源文本、场景或 OCR 原文") },
+            label = { Text("搜课程、地点、活动") },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
         )
         if (visibleEntries.isEmpty()) {
-            KeyValue("筛选结果", "没有匹配的收件箱卡片")
+            KeyValue("筛选结果", "没有匹配的行动卡")
             KeyValue("当前筛选", selectedStatus)
         } else {
             visibleEntries.forEach { entry ->
@@ -94,17 +97,22 @@ private fun InboxWorkbenchRow(
     onRestore: () -> Unit,
 ) {
     val archiveActionState = inboxArchiveActionStateFor(isArchived)
+    var showEvidence by rememberSaveable(entry.archiveKey) { mutableStateOf(false) }
     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        KeyValue("当前卡片", entry.title)
-        KeyValue("当前状态", entry.status)
-        KeyValue("场景", entry.scene)
-        KeyValue("地点", entry.location)
-        KeyValue("来源", entry.source)
-            KeyValue("识别文字", entry.rawText.take(36))
+        KeyValue("标题", entry.title)
+        KeyValue("时间", if (entry.startEpochMillis > 0L) "今天" else "待确认")
+        KeyValue("地点", entry.location.ifBlank { "待确认" })
+        KeyValue("状态", entry.status)
+        KeyValue("下一步", inboxNextStepFor(entry))
+        TextButton(onClick = { showEvidence = !showEvidence }) {
+            Text(if (showEvidence) "收起识别依据" else "查看识别依据")
+        }
+        if (showEvidence) {
+            KeyValue("识别原文", entry.rawText.take(36))
             KeyValue("判断依据", entry.explanation.take(42))
-        KeyValue("执行结果", entry.executionSummary)
+            KeyValue("回执", entry.executionSummary)
+        }
         KeyValue("归档状态", archiveActionState.statusLabel)
-        KeyValue("归档说明", archiveActionState.detailText)
         InboxArchiveActions(
             actionState = archiveActionState,
             onArchive = onArchive,
@@ -131,10 +139,10 @@ private fun InboxArchiveActions(
 ) {
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
         OutlinedButton(onClick = onArchive, enabled = actionState.archiveEnabled, modifier = Modifier.weight(1f)) {
-            androidx.compose.material3.Text("归档")
+            Text("归档")
         }
         OutlinedButton(onClick = onRestore, enabled = actionState.restoreEnabled, modifier = Modifier.weight(1f)) {
-            androidx.compose.material3.Text("恢复")
+            Text("恢复")
         }
     }
 }

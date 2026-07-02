@@ -53,7 +53,8 @@ def main() -> int:
         ),
         (
             "detected_notification_has_user_actions",
-            "检测到截图，是否交给拾刻？" in notification
+            "发现新截图" in notification
+            and "要生成一张行动卡吗？" in notification
             and "交给拾刻" in notification
             and "忽略" in notification
             and "ACTION_IMPORT_SCREENSHOT" in notification
@@ -77,6 +78,13 @@ def main() -> int:
             and "START_NOT_STICKY" in service
             and "ScreenshotObserver(contentResolver" in service
             and "showScreenshotDetectedNotification(this, candidate)" in service,
+        ),
+        (
+            "foreground_service_copy_is_user_facing",
+            "拾刻截图提醒运行中" in service
+            and "只在本机检测新截图，不会自动上传图片" in service
+            and "Service is running" not in service + notification
+            and "observer" not in notification.lower(),
         ),
         (
             "onboarding_requests_media_then_notification_permissions",

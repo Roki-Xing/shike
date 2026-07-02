@@ -122,8 +122,8 @@ def main() -> int:
             and "BackendAnalysisControls(" not in capture_entry,
         ),
         (
-            "analyze_progress_has_four_user_steps",
-            all(token in progress_panel for token in ["读取图片", "OCR识别", "结构化解析", "生成行动卡"])
+            "analyze_progress_has_product_steps",
+            all(word in progress_panel for word in ["读截图", "找时间地点", "生成行动卡", "等你确认"])
             and '"待确认" in selectedStatus' not in progress_panel
             and '"解析中" in modelStatus || "正在解析" in modelStatus' not in progress_panel
             and "analysisUiState is AnalysisUiState.Analyzing" in progress_panel
@@ -151,15 +151,18 @@ def main() -> int:
             and "isConfirmed && selectedSourceMediaStoreUri != null" in action_planner,
         ),
         (
-            "action_plan_has_complete_arrangement_entry",
-            "完成安排" in action_planner
-            and "将执行以下动作" in action_planner
+            "action_plan_has_product_next_steps",
+            "下一步，先完成这 2 件" in action_planner
+            and "保存日历草稿" in action_planner
+            and "先存入待确认" in action_planner
+            and "执行上方动作后查看回执" not in action_planner
             and "ExecutionResultPanel" not in action_planner
             and "完成安排" not in execution_controls,
         ),
         (
             "bottom_padding_protects_nav_overlap",
-            "Spacer(Modifier.height(112.dp))" in main_screen
+            "bottomBarHeightWithSafeSpace = 148.dp" in main_screen
+            and ".statusBarsPadding()" in main_screen
             and ".navigationBarsPadding()" in main_screen,
         ),
         (

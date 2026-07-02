@@ -8,11 +8,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.Switch
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -68,13 +70,18 @@ fun PrivacyPanel(
     cleanupPreference: String = "每次询问（推荐）",
 ) {
     var clearConfirmationState by remember { mutableStateOf(LocalDataClearConfirmationState()) }
-    SectionCard("隐私与协同") {
+    var diagnosticsExpanded by rememberSaveable { mutableStateOf(false) }
+    SectionCard("设置") {
+        SettingPlainRow(
+            title = "图片识别",
+            detail = "只有你主动导入的图片才会用于生成行动卡。",
+        )
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = androidx.compose.foundation.layout.Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text("云端图片理解", color = Color(0xFF667085), fontSize = 14.sp)
+            Text("使用图片识别", color = Color(0xFF667085), fontSize = 14.sp)
             Switch(
                 checked = localMultimodalStatus.preference == LocalMultimodalPreference.CloudFirst,
                 onCheckedChange = { enabled ->
@@ -84,47 +91,36 @@ fun PrivacyPanel(
                 },
             )
         }
-        KeyValue("图片处理", localMultimodalStatus.preference.userLabel)
-        Text(
-            if (localMultimodalStatus.preference == LocalMultimodalPreference.CloudFirst) {
-                "开启后，所选图片会发送至拾刻服务进行识别。"
-            } else {
-                "关闭后，图片不会上传，只在本机保存待确认草稿。"
-            },
-            color = Color(0xFF667085),
-            fontSize = 14.sp,
+        SettingPlainRow(
+            title = "文字解析",
+            detail = "整理时间、地点和准备事项。",
         )
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = androidx.compose.foundation.layout.Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text("文本 AI 解析", color = Color(0xFF667085), fontSize = 14.sp)
+            Text("生成行动卡", color = Color(0xFF667085), fontSize = 14.sp)
             Switch(
                 checked = cloudEnhancedEnabled,
                 onCheckedChange = onCloudEnhancedChange,
             )
         }
-        KeyValue(
-            "解析状态",
-            if (cloudEnhancedEnabled) "开启，主动导入或手动重试才解析" else "关闭，不请求 AI 解析",
+        SettingPlainRow(
+            title = "截图提醒",
+            detail = "检测到新截图后提醒你处理，不会自动上传图片。",
         )
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = androidx.compose.foundation.layout.Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text("截图助手", color = Color(0xFF667085), fontSize = 12.sp)
+            Text("提醒我处理新截图", color = Color(0xFF667085), fontSize = 14.sp)
             Switch(
                 checked = screenshotAssistEnabled,
                 onCheckedChange = onScreenshotAssistChange,
             )
         }
-        KeyValue("截图提醒", "检测到新截图后发通知，不会自动上传，不需要悬浮窗或无障碍权限")
-        screenshotAssistDiagnostics?.let { diagnostics ->
-            ScreenshotAssistDiagnosticsPanel(diagnostics)
-        }
-        KeyValue("导入后处理原截图", cleanupPreference)
         OutlinedButton(
             onClick = {
                 clearConfirmationState =
@@ -132,11 +128,11 @@ fun PrivacyPanel(
             },
             modifier = Modifier.fillMaxWidth(),
         ) {
-            Text("清除拾刻缓存")
+            Text("清除本地数据")
         }
         if (clearConfirmationState.isAwaitingConfirmation) {
             Text(
-                "将删除 App 私有缓存图、OCR 原文、收件箱记录、后端地址和待触发提醒；不会删除系统相册原截图。",
+                "将删除 App 私有缓存图、识别文字、行动台记录和待触发提醒；不会删除系统相册原截图。",
                 color = Color(0xFF667085),
                 fontSize = 12.sp,
             )
@@ -168,7 +164,42 @@ fun PrivacyPanel(
                 }
             }
         }
-        KeyValue("系统协同", "日历、提醒和地图都需要确认后执行")
+        TextButton(onClick = { diagnosticsExpanded = !diagnosticsExpanded }) {
+            Text(if (diagnosticsExpanded) "收起高级诊断" else "高级诊断")
+        }
+        if (diagnosticsExpanded) {
+            KeyValue("图片处理", localMultimodalStatus.preference.userLabel)
+            KeyValue("文字解析", if (cloudEnhancedEnabled) "已开启" else "已关闭")
+            KeyValue("导入后处理原截图", cleanupPreference)
+            screenshotAssistDiagnostics?.let { diagnostics ->
+                ScreenshotAssistDiagnosticsPanel(diagnostics)
+            }
+            KeyValue("系统协同", "日历、提醒和地图都需要确认后执行")
+        }
+    }
+}
+
+@Composable
+private fun SettingPlainRow(title: String, detail: String) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(10.dp),
+        verticalAlignment = Alignment.Top,
+    ) {
+        Text(
+            title,
+            modifier = Modifier.weight(0.9f),
+            color = ShikeColors.Ink,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.SemiBold,
+        )
+        Text(
+            detail,
+            modifier = Modifier.weight(1.8f),
+            color = Color(0xFF667085),
+            fontSize = 12.sp,
+            textAlign = TextAlign.End,
+        )
     }
 }
 

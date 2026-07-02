@@ -33,11 +33,11 @@ fun actionCardUiModelFrom(item: ShikeItem): ActionCardUiModel {
         time = item.time.cleanUiValue("待确认"),
         location = item.location.cleanUiValue("待确认"),
         task = task,
-        preparationItems = preparationItemsFrom(item),
+        preparationItems = preparationItemsForUi(item),
         actions = item.actions.map { it.cleanUiValue("") }.filter { it.isNotBlank() }.ifEmpty { listOf("稍后确认") },
         risks = risks,
         missingFields = missingFields,
-        userWarnings = userWarningsFrom(confirmationItems + risks + missingFields),
+        userWarnings = userWarningsFrom(confirmationItems + risks + missingFields).mapNotNull(::userFacingRiskCopy),
         sourceTextPreview = userVisibleEvidenceText(item.rawText),
     )
 }

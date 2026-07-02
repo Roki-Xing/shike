@@ -54,7 +54,7 @@ fun calendarInsertDescriptionFor(item: ShikeItem): String =
     }.joinToString("\n")
 
 fun calendarDraftFrom(item: ShikeItem): CalendarDraft {
-    val hasConcreteTime = item.startEpochMillis > 0L && item.time.isNotBlank() && item.time != "待确认"
+    val hasConcreteTime = item.startEpochMillis > 0L && item.time.isNotBlank() && item.time != "待确认" && !isAmbiguousCalendarTime(item.time)
     val startAtMillis = item.startEpochMillis.takeIf { hasConcreteTime }
     return CalendarDraft(
         title = item.title,
@@ -62,7 +62,7 @@ fun calendarDraftFrom(item: ShikeItem): CalendarDraft {
         endAtMillis = startAtMillis?.plus(60 * 60 * 1000L),
         location = item.location.takeIf { it.isNotBlank() && it != "待确认" },
         description = calendarInsertDescriptionFor(item),
-        disabledReason = if (startAtMillis == null) "补充具体时间后可加入日历" else null,
+        disabledReason = if (startAtMillis == null) "这是建议时间，请保存前确认；补充具体时间后可加入日历" else null,
     )
 }
 
@@ -128,8 +128,18 @@ fun mapActionModeFor(location: String): MapActionMode {
 
 private fun looksLikeCampusRoomCode(value: String): Boolean {
     val normalized = value.replace("教室", "").replace("地点", "").replace(" ", "")
-    return normalized.matches(Regex("^[A-Za-z]?\\d{3,4}[A-Za-z]?$")) ||
-        normalized.matches(Regex("^[A-Za-z][A-Za-z]?\\d{2,4}$"))
+    return normalized.matches(Regex("^[A-Za-z]?\\d{2,4}[A-Za-z]?$")) ||
+        normalized.matches(Regex("^[A-Za-z][A-Za-z]?\\d{2,4}$")) ||
+        normalized.matches(Regex("^[一二三四五六七八九十两0-9]{1,2}教\\d{2,4}$"))
+}
+
+private fun isAmbiguousCalendarTime(value: String): Boolean {
+    val normalized = value.replace(" ", "").trim()
+    if (Regex("(?:[0-2]?\\d[:：][0-5]\\d|[一二三四五六七八九十两0-9]{1,3}点)").containsMatchIn(normalized)) {
+        return false
+    }
+    return listOf("今天上午", "今天下午", "今天晚上", "上午", "下午", "晚上", "今晚", "明天上午", "明天下午", "明天晚上", "明早", "明晚")
+        .any { token -> normalized.contains(token) }
 }
 
 /**

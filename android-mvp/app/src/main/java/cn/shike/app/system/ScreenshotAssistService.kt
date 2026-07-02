@@ -91,8 +91,8 @@ class ScreenshotAssistService : Service() {
     private fun foregroundNotification() =
         NotificationCompat.Builder(this, SCREENSHOT_ASSIST_CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_menu_upload)
-            .setContentTitle("截图助手已开启")
-            .setContentText("检测到新截图后会通知你是否交给拾刻。")
+            .setContentTitle("拾刻截图提醒运行中")
+            .setContentText("只在本机检测新截图，不会自动上传图片")
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .setOngoing(true)
             .build()

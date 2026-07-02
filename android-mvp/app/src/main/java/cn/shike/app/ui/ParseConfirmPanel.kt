@@ -1,8 +1,12 @@
 package cn.shike.app.ui
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -11,6 +15,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.dp
 import cn.shike.app.reviewedItemWithPreparationDraft
 import cn.shike.app.domain.ShikeItem
+import kotlinx.coroutines.delay
 
 enum class ReviewEditTarget {
     None,
@@ -30,31 +35,44 @@ fun ParseConfirmPanel(item: ShikeItem, onReviewed: (ShikeItem) -> Unit) {
     var draftPreparation by remember(item.rawText) { mutableStateOf(actionCardUiModelFrom(item).preparationItems.joinToString("、")) }
     var draftSourceText by remember(item.rawText) { mutableStateOf(actionCardUiModelFrom(item).sourceTextPreview) }
     val actionCard = actionCardUiModelFrom(item)
+    val smartCard = smartActionCardUiModelFrom(item)
+    val readiness = actionReadinessUiModelFrom(item)
     var editTarget by rememberSaveable(item.rawText) { mutableStateOf(ReviewEditTarget.None) }
     var showReason by rememberSaveable(item.rawText) { mutableStateOf(false) }
     var showSourceText by rememberSaveable(item.rawText) { mutableStateOf(false) }
-    SectionCard("AI 生成的行动卡") {
+    var showGeneratedHint by rememberSaveable(item.rawText) { mutableStateOf(true) }
+    LaunchedEffect(item.rawText) {
+        showGeneratedHint = true
+        delay(1000)
+        showGeneratedHint = false
+    }
+    SectionCard("生成的行动卡") {
         ParseConfirmHeader(item)
-        StructuredActionCard(
-            model = actionCard,
-            onConfirmAndPlan = {
-                onReviewed(
-                    reviewedItemWithPreparationDraft(
-                        item = item,
-                        title = draftTitle,
-                        time = draftTime,
-                        location = draftLocation,
-                        status = draftStatus,
-                        preparation = draftPreparation,
+        AnimatedVisibility(visible = showGeneratedHint, enter = fadeIn()) {
+            Text("行动卡已生成", color = ShikeColors.Brand, style = ShikeTypography.Caption)
+        }
+        ActionReadinessBar(readiness)
+        AnimatedVisibility(visible = true, enter = fadeIn() + slideInVertically { it / 6 }) {
+            SmartActionCard(
+                model = smartCard,
+                onConfirmAndPlan = {
+                    onReviewed(
+                        reviewedItemWithPreparationDraft(
+                            item = item,
+                            title = draftTitle,
+                            time = draftTime,
+                            location = draftLocation,
+                            status = draftStatus,
+                            preparation = draftPreparation,
+                        )
                     )
-                )
-            },
-            onEdit = { editTarget = ReviewEditTarget.All },
-            onEditTime = { editTarget = ReviewEditTarget.Time },
-            onEditLocation = { editTarget = ReviewEditTarget.Location },
-            onEditPreparation = { editTarget = ReviewEditTarget.Preparation },
-            onEditSourceText = { editTarget = ReviewEditTarget.SourceText },
-        )
+                },
+                onEditTime = { editTarget = ReviewEditTarget.Time },
+                onEditLocation = { editTarget = ReviewEditTarget.Location },
+                onEditPreparation = { editTarget = ReviewEditTarget.Preparation },
+                onEditSourceText = { editTarget = ReviewEditTarget.SourceText },
+            )
+        }
         if (editTarget != ReviewEditTarget.None) {
             ReviewEditSheet(
                 target = editTarget,

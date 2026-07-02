@@ -133,10 +133,10 @@ def main() -> int:
         ("sample_fallback_persists", "persistSelection(sampleCourse()" in android_source and "persistSelection(sampleEvent()" in android_source),
         ("share_import_waits_for_confirmation", "文本分享入口（待确认，未落盘）" in android_source and "saveSnapshot(importedItem" not in android_source),
         (
-            "restore_feedback_visible",
-            "收件箱状态" in inbox_panel
+            "restore_feedback_visible_after_action_workbench_rename",
+            "行动台" in inbox_panel
             and "收件箱内" in inbox_workbench
-            and "完成安排" in action_planner
+            and "先存入待确认" in action_planner
             and "本地恢复" not in capture_entry
             and "已保存到收件箱缓存" not in capture_entry,
         ),

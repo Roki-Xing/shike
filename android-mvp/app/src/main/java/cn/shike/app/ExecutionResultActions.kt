@@ -31,7 +31,7 @@ fun runMapExecution(
     updateResults: (List<ExecutionResult>) -> Unit,
     action: (ShikeItem) -> Unit,
 ) {
-    runExecution(mapExecutionResult(), item, currentResults, updateResults, action)
+    runExecution(mapExecutionResult(item), item, currentResults, updateResults, action)
 }
 
 private fun runExecution(

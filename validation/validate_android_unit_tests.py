@@ -727,13 +727,13 @@ def main() -> int:
         ),
         (
             "inbox_all_status_sorting_unit_tested",
-            "selectedStatus == inboxAllStatusFilter || entry.status == selectedStatus" in inbox_workbench_source
+            "selectedStatus == inboxAllStatusFilter || inboxBucketFor(entry) == selectedStatus || entry.status == selectedStatus" in inbox_workbench_source
             and "compareBy<InboxWorkbenchEntry> { inboxStatusPriority(it.status) }" in inbox_workbench_source
-            and "\"即将截止\" -> 0" in inbox_workbench_source
-            and "\"待确认\" -> 1" in inbox_workbench_source
+            and "\"待确认\" -> 0" in inbox_workbench_source
+            and "\"即将截止\" -> 1" in inbox_workbench_source
             and "\"已安排\" -> 2" in inbox_workbench_source
             and "thenBy { it.startEpochMillis }" in inbox_workbench_source
-            and "assertEquals(listOf(due, pending, scheduledEarly, scheduledLate), visible)" in inbox_workbench_test
+            and "assertEquals(listOf(pending, due, scheduledEarly, scheduledLate), visible)" in inbox_workbench_test
             and "selectedStatus = inboxAllStatusFilter" in inbox_workbench_test,
         ),
         (
@@ -1008,7 +1008,7 @@ def main() -> int:
             "local_data_clear_requires_app_internal_confirmation",
             "data class LocalDataClearConfirmationState" in local_data_clear_source
             and "shouldClearLocalData = state.isAwaitingConfirmation" in local_data_clear_source
-            and "清除拾刻缓存" in readiness_sections
+            and ("清除拾刻缓存" in readiness_sections or "清除本地数据" in readiness_sections)
             and "确认清除" in readiness_sections
             and "不会删除系统相册原截图" in readiness_sections
             and "requestLocalDataClearConfirmation(clearConfirmationState)" in readiness_sections

@@ -59,13 +59,12 @@ fun CaptureHubScreen(
     }
     if (analysisUiState is AnalysisUiState.Failed) {
         RecoverableErrorState(
-            title = "AI 解析暂不可用",
-            detail = "截图已保留为待确认，你可以换图、手动输入或稍后重新解析。",
+            title = "这张图没完全看懂",
+            detail = "可以手动补一下，行动卡还会保留。",
             repairActions = listOf(
-                RecoverableRepairAction("重新选择截图", onGallery),
-                RecoverableRepairAction("手动输入", onManualInput),
+                RecoverableRepairAction("手动补充", onManualInput),
+                RecoverableRepairAction("重新导入", onGallery),
                 RecoverableRepairAction("先存入待确认", onSavePendingReview),
-                RecoverableRepairAction("重新解析", onRetryAnalyze),
             ),
         )
     }
