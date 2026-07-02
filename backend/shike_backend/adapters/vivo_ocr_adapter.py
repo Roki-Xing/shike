@@ -9,7 +9,7 @@ from typing import Any
 import requests
 
 from shike_backend.adapters.base import AdapterError
-from shike_backend.privacy import redact_ocr_text
+from shike_backend.privacy import normalize_ocr_for_model, redact_for_log
 from shike_backend.schemas import OcrRequest, OcrResponse
 from shike_backend.schemas_v2 import OcrBlock
 
@@ -133,7 +133,7 @@ def _collect_blocks(result: Any) -> list[OcrBlock]:
         confidence = _number(item.get("confidence", item.get("score", item.get("probability"))))
         blocks.append(
             OcrBlock(
-                text=redact_ocr_text(text),
+                text=normalize_ocr_for_model(text),
                 x1=box[0],
                 y1=box[1],
                 x2=box[2],
@@ -143,6 +143,15 @@ def _collect_blocks(result: Any) -> list[OcrBlock]:
         )
 
     return blocks
+
+
+def _aggregate_block_confidence(blocks: list[OcrBlock]) -> float:
+    """Return provider confidence aggregated from valid OCR blocks."""
+
+    values = [block.confidence for block in blocks if block.confidence is not None]
+    if not values:
+        return 0.0
+    return round(sum(values) / len(values), 4)
 
 
 class VivoOcrAdapter:
@@ -181,7 +190,7 @@ class VivoOcrAdapter:
             request: Base64 image payload and capture source metadata.
 
         Returns:
-            Redacted OCR text response plus coordinate blocks for v2 prompts.
+            Full OCR text response plus coordinate blocks for v2 prompts.
         """
 
         if not self.is_configured():
@@ -235,23 +244,24 @@ class VivoOcrAdapter:
                 continue
 
             words = _collect_words(payload.get("result"))
-            text = "\n".join(words).strip()
+            text = normalize_ocr_for_model("\n".join(words))
             if not text:
                 last_error = "ocr_empty_result"
                 continue
 
-            redacted = redact_ocr_text(text)
+            log_summary = redact_for_log(text)
+            blocks = _collect_blocks(payload.get("result"))
             return OcrDetail(
                 response=OcrResponse(
-                    text=redacted,
-                    confidence=0.86,
+                    text=text,
+                    confidence=_aggregate_block_confidence(blocks),
                     engine="vivo_general_ocr",
-                    is_redacted=redacted != text,
+                    is_redacted=log_summary != " ".join(text.split()),
                     image_cleared=True,
                     failure_hint=None,
                     request_id=request_id,
                 ),
-                blocks=_collect_blocks(payload.get("result")),
+                blocks=blocks,
             )
 
         raise AdapterError(last_error or "vivo_ocr_failed")

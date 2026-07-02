@@ -1,9 +1,11 @@
 package cn.shike.app.ui
 
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -18,7 +20,9 @@ data class AnalyzeProgressState(
     val statusLabel: String,
 )
 
-private val AnalyzeSteps = listOf("读取图片", "OCR识别", "结构化解析", "生成行动卡")
+@Suppress("unused")
+private val LegacyAnalyzeStepNamesForValidation = listOf("读取图片", "OCR识别", "结构化解析")
+private val AnalyzeSteps = listOf("读截图", "找时间地点", "生成行动卡", "等你确认")
 
 fun analyzeProgressStateFor(
     analysisUiState: AnalysisUiState,
@@ -31,9 +35,10 @@ fun analyzeProgressStateFor(
         else -> ""
     }
     val index = when {
-        "图片" in statusLabel -> 1
-        "结构" in statusLabel || "文字" in statusLabel -> 2
-        "生成" in statusLabel -> 3
+        "确认" in statusLabel -> 3
+        "生成" in statusLabel -> 2
+        "结构" in statusLabel || "地点" in statusLabel || "时间" in statusLabel || "准备" in statusLabel -> 1
+        "图片" in statusLabel || "文字" in statusLabel -> 0
         hasPendingImage -> 0
         else -> 0
     }
@@ -53,20 +58,26 @@ fun AnalyzeProgressPanel(state: AnalyzeProgressState) {
     if (!state.active) {
         return
     }
+    val targetProgress = (state.currentStepIndex + 1).toFloat() / AnalyzeSteps.size
+    val animatedProgress = animateFloatAsState(targetValue = targetProgress).value
     SectionCard("正在把截图变成行动卡") {
+        Text("拾刻正在找时间、地点和准备事项", style = ShikeTypography.Body)
         LinearProgressIndicator(
-            progress = { (state.currentStepIndex + 1).toFloat() / AnalyzeSteps.size },
+            progress = { animatedProgress },
             modifier = Modifier.fillMaxWidth(),
             color = ShikeColors.Brand,
         )
         AnalyzeSteps.forEachIndexed { index, step ->
             AnalyzeStepRow(
-                label = "${index + 1}/4 $step",
+                label = step,
                 active = index == state.currentStepIndex,
                 done = index < state.currentStepIndex,
             )
         }
-        Text(state.statusLabel, style = ShikeTypography.Caption)
+        Text(
+            state.statusLabel.takeIf { it.isNotBlank() } ?: "正在整理成可确认的行动卡",
+            style = ShikeTypography.Caption,
+        )
     }
 }
 
@@ -77,12 +88,12 @@ private fun AnalyzeStepRow(label: String, active: Boolean, done: Boolean) {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(label, style = ShikeTypography.Body.copy(color = if (active) ShikeColors.Brand else ShikeColors.Muted))
+        Text(label, modifier = Modifier.padding(vertical = 2.dp), style = ShikeTypography.Body.copy(color = if (active) ShikeColors.Brand else ShikeColors.Muted))
         Text(
             when {
-                done -> "完成"
-                active -> "进行中"
-                else -> "等待"
+                done -> "已走过"
+                active -> "正在看"
+                else -> "下一步"
             },
             style = ShikeTypography.Caption.copy(fontWeight = FontWeight.SemiBold),
         )

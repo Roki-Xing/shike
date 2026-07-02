@@ -41,6 +41,8 @@ def main() -> int:
     build_gradle = read("android-mvp/app/build.gradle.kts")
     manifest = read("android-mvp/app/src/main/AndroidManifest.xml")
     activity = read("android-mvp/app/src/main/java/cn/shike/app/MainActivity.kt")
+    lifecycle = read("android-mvp/app/src/main/java/cn/shike/app/MainActivityLifecycleActions.kt")
+    controller = read("android-mvp/app/src/main/java/cn/shike/app/ScreenshotAssistController.kt")
     main_screen = read("android-mvp/app/src/main/java/cn/shike/app/ui/ShikeMainScreen.kt")
     flow_screens = read("android-mvp/app/src/main/java/cn/shike/app/ui/MainFlowScreens.kt")
     launchers = read("android-mvp/app/src/main/java/cn/shike/app/CaptureLaunchers.kt")
@@ -50,6 +52,8 @@ def main() -> int:
     visible_prompt_card = read("android-mvp/app/src/main/java/cn/shike/app/ui/VisibleScreenCapturePromptCard.kt")
     settings = read("android-mvp/app/src/main/java/cn/shike/app/ui/ReadinessSections.kt")
     app = read("android-mvp/app/src/main/java/cn/shike/app/ShikeApp.kt")
+    host = read("android-mvp/app/src/main/java/cn/shike/app/ShikeScreenHost.kt")
+    source_cleanup = read("android-mvp/app/src/main/java/cn/shike/app/system/SourceImageCleanupManager.kt")
 
     checks = [
         ("compile_sdk_36", "compileSdk = 36" in build_gradle),
@@ -87,7 +91,7 @@ def main() -> int:
         (
             "visible_callback_page_prompt",
             "visibleScreenCapturePromptState" in activity
-            and "visibleScreenCapturePrompt()" in activity
+            and "visibleScreenCapturePrompt()" in activity + lifecycle
             and "visibleScreenCapturePrompt: VisibleScreenCapturePrompt?" in app
             and "visibleScreenCapturePrompt: VisibleScreenCapturePrompt?" in main_screen
             and "visibleScreenCapturePrompt: VisibleScreenCapturePrompt?" in flow_screens
@@ -95,7 +99,7 @@ def main() -> int:
         ),
         (
             "visible_callback_photo_picker_action",
-            "captureLaunchers.launchGallery()" in app
+            "captureLaunchers.launchGallery()" in host
             and "不会直接获得图片" in visible_prompt
             and "导入页选择这张截图" in visible_prompt
             and "移入回收站" in visible_prompt
@@ -103,7 +107,9 @@ def main() -> int:
         ),
         (
             "mediastore_delete_confirmation",
-            "MediaStore.createDeleteRequest" in cleanup and "createTrashRequest" not in cleanup,
+            "MediaStore.createTrashRequest" in source_cleanup
+            and "createDeleteRequest" not in cleanup + source_cleanup
+            and "系统确认" in cleanup,
         ),
         (
             "screenshot_assist_privacy_copy",
@@ -111,8 +117,8 @@ def main() -> int:
             and "不会自动上传" in settings
             and "screenshotAssistEnabled" in app
             and "loadScreenshotAssistEnabled" in activity
-            and "saveScreenshotAssistEnabled" in activity
-            and "clearScreenshotAssistPreference" in activity,
+            and "saveScreenshotAssistEnabled" in activity + lifecycle + controller
+            and "clearScreenshotAssistPreference" in activity + lifecycle,
         ),
         (
             "android_does_not_hold_provider_secret_names",

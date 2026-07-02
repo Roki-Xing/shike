@@ -15,6 +15,7 @@ import cn.shike.app.data.InboxItemEntity
 import cn.shike.app.data.InitialTodayState
 import cn.shike.app.data.PrivacyModeState
 import cn.shike.app.data.ScreenshotCandidate
+import cn.shike.app.data.buildRuntimeSharedTextSelection
 import cn.shike.app.domain.ShikeItem
 import cn.shike.app.system.ScreenshotAssistDiagnostics
 import cn.shike.app.system.VisibleScreenCapturePrompt
@@ -89,7 +90,9 @@ fun ShikeApp(
     }
 
     LaunchedEffect(pendingSharedText) {
-        actions.consumeSharedText(pendingSharedText, onPendingSharedTextConsumed)
+        if (buildRuntimeSharedTextSelection(pendingSharedText) != null) {
+            actions.consumeSharedText(pendingSharedText, onPendingSharedTextConsumed)
+        }
     }
 
     val localMultimodalStatus = LocalMultimodalStatus(

@@ -5,7 +5,7 @@ import cn.shike.app.domain.ShikeItem
 
 const val inboxAllStatusFilter = "全部"
 
-val inboxStatusFilters = listOf(inboxAllStatusFilter, "待确认", "已安排", "即将截止", "已完成", "已忽略")
+val inboxStatusFilters = listOf("待确认", "今天", "已安排", "已过期")
 
 data class InboxWorkbenchEntry(
     val title: String,
@@ -85,10 +85,10 @@ fun inboxWorkbenchEntryFromEntity(entity: InboxItemEntity): InboxWorkbenchEntry 
     )
 
 fun inboxSummaryStatsFor(entries: List<InboxWorkbenchEntry>): List<InboxSummaryStat> =
-    listOf("待确认", "已安排", "即将截止").map { status ->
+    listOf("待确认", "今天", "已安排", "已过期").map { status ->
         InboxSummaryStat(
             label = status,
-            count = entries.count { it.status == status }.toString(),
+            count = entries.count { entry -> inboxBucketFor(entry) == status }.toString(),
         )
     }
 
@@ -124,7 +124,7 @@ fun visibleInboxEntries(
 ): List<InboxWorkbenchEntry> =
     entries.filter { entry ->
         entry.archiveKey !in archivedKeys &&
-            (selectedStatus == inboxAllStatusFilter || entry.status == selectedStatus) &&
+            (selectedStatus == inboxAllStatusFilter || inboxBucketFor(entry) == selectedStatus || entry.status == selectedStatus) &&
             entry.matches(query)
     }.sortedWith(compareBy<InboxWorkbenchEntry> { inboxStatusPriority(it.status) }
         .thenBy { it.startEpochMillis }
@@ -141,12 +141,33 @@ fun visibleInboxEntries(
  */
 fun inboxStatusPriority(status: String): Int =
     when (status) {
-        "即将截止" -> 0
-        "待确认" -> 1
+        "待确认" -> 0
+        "今天" -> 1
         "已安排" -> 2
-        "已完成" -> 3
-        "已忽略" -> 4
-        else -> 5
+        "已过期" -> 3
+        "即将截止" -> 1
+        "已完成" -> 4
+        "已忽略" -> 5
+        else -> 6
+    }
+
+fun inboxBucketFor(entry: InboxWorkbenchEntry): String =
+    when {
+        entry.status == "待确认" -> "待确认"
+        entry.status == "已安排" -> "已安排"
+        entry.status == "已过期" -> "已过期"
+        entry.startEpochMillis > 0L -> "今天"
+        else -> entry.status.ifBlank { "待确认" }
+
+    }
+
+fun inboxNextStepFor(entry: InboxWorkbenchEntry): String =
+    when (inboxBucketFor(entry)) {
+        "待确认" -> "确认时间地点"
+        "今天" -> "查看下一步"
+        "已安排" -> "查看安排"
+        "已过期" -> "归档或重排"
+        else -> "继续处理"
     }
 
 /**

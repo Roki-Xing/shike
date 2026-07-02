@@ -77,6 +77,7 @@ fun ShikeScreenHost(
         visibleScreenCapturePrompt = visibleScreenCapturePrompt,
         onImportVisibleScreenCapture = {
             onVisibleScreenCapturePromptConsumed()
+            // Visible screen capture callbacks do not grant image bytes; use Photo Picker.
             captureLaunchers.launchGallery()
         },
         onDismissVisibleScreenCapture = onVisibleScreenCapturePromptConsumed,

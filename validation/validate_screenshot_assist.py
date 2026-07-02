@@ -99,22 +99,21 @@ def main() -> int:
             and 'android:name=".system.ScreenshotAssistService"' in manifest,
         ),
         (
-            "activity_registers_observer_when_enabled",
-            "ScreenshotObserver(" in controller
-            and ".register()" in controller
-            and ".unregister()" in controller
+            "service_is_single_observer_owner",
+            "ScreenshotObserver(" not in controller
+            and "startScreenshotAssistService(activity)" in controller
+            and "stopScreenshotAssistService(activity)" in controller
             and "screenshotAssistEnabled" in activity + controller
             and "registerScreenshotObserverIfAllowed()" in activity + lifecycle,
         ),
         (
-            "activity_shows_notification_for_detected_candidate",
-            "showScreenshotDetectedNotification" in controller
-            and "onScreenshotCandidate" in controller,
+            "service_shows_notification_for_detected_candidate",
+            "showScreenshotDetectedNotification(this, candidate)" in service
+            and "onCandidate(candidate: ScreenshotCandidate)" in service,
         ),
         (
-            "activity_deduplicates_repeated_candidate_notifications",
+            "service_deduplicates_repeated_candidate_notifications",
             "lastNotifiedScreenshotUri" not in controller + service
-            and "recordScreenshotAssistNotified(activity, candidate)" in controller
             and "recordScreenshotAssistNotified(this, candidate)" in service
             and "KEY_LAST_SCREENSHOT_ASSIST_NOTIFIED_URI" in store
             and "screenshotAssistSharedDedupe_rejectsSameUriAcrossForegroundAndServiceObservers" in test,

@@ -11,31 +11,45 @@ import androidx.core.content.ContextCompat
 import cn.shike.app.data.ScreenshotCandidate
 import cn.shike.app.data.recordScreenshotAssistNotified
 import cn.shike.app.data.shouldNotifyScreenshotCandidate
+import java.util.concurrent.Executors
 
 private const val SCREENSHOT_ASSIST_SERVICE_ID = 2701
 private const val ACTION_START_SCREENSHOT_ASSIST = "cn.shike.app.action.START_SCREENSHOT_ASSIST"
 private const val ACTION_STOP_SCREENSHOT_ASSIST = "cn.shike.app.action.STOP_SCREENSHOT_ASSIST"
+private const val HEARTBEAT_INTERVAL_MS = 10_000L
 
 class ScreenshotAssistService : Service() {
     private val handler = Handler(Looper.getMainLooper())
+    private val queryExecutor = Executors.newSingleThreadExecutor()
     private var observer: ScreenshotObserver? = null
+    private val heartbeatRunnable = object : Runnable {
+        override fun run() {
+            recordScreenshotAssistHeartbeat(
+                context = this@ScreenshotAssistService,
+                observerOwner = "service",
+                observerRegistered = observer != null,
+            )
+            handler.postDelayed(this, HEARTBEAT_INTERVAL_MS)
+        }
+    }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent?.action == ACTION_STOP_SCREENSHOT_ASSIST || !hasScreenshotMediaPermission(this)) {
-            stopAssist()
+            stopAssist(if (intent?.action == ACTION_STOP_SCREENSHOT_ASSIST) "USER_DISABLED" else "PERMISSION_REVOKED")
             return START_NOT_STICKY
         }
         createScreenshotAssistNotificationChannel(this)
         if (!startForegroundSafely()) {
-            stopAssist()
+            stopAssist("START_FAILED")
             return START_NOT_STICKY
         }
         registerObserver()
-        return START_STICKY
+        return START_NOT_STICKY
     }
 
     override fun onDestroy() {
-        stopAssist()
+        stopAssist("SYSTEM_STOPPED")
+        queryExecutor.shutdownNow()
         super.onDestroy()
     }
 
@@ -43,7 +57,10 @@ class ScreenshotAssistService : Service() {
 
     private fun registerObserver() {
         if (observer != null) return
-        observer = ScreenshotObserver(contentResolver, handler, ::onCandidate).also { it.register() }
+        observer = ScreenshotObserver(contentResolver, handler, queryExecutor, ::onCandidate).also { it.register() }
+        recordScreenshotAssistHeartbeat(this, observerOwner = "service", observerRegistered = true)
+        handler.removeCallbacks(heartbeatRunnable)
+        handler.postDelayed(heartbeatRunnable, HEARTBEAT_INTERVAL_MS)
     }
 
     private fun onCandidate(candidate: ScreenshotCandidate) {
@@ -53,9 +70,15 @@ class ScreenshotAssistService : Service() {
         showScreenshotDetectedNotification(this, candidate)
     }
 
-    private fun stopAssist() {
+    override fun onTimeout(startId: Int, fgsType: Int) {
+        stopAssist("FGS_TIMEOUT")
+    }
+
+    private fun stopAssist(reason: String) {
+        handler.removeCallbacks(heartbeatRunnable)
         observer?.unregister()
         observer = null
+        recordScreenshotAssistStopped(this, reason)
         runCatching { stopForeground(STOP_FOREGROUND_REMOVE) }
         stopSelf()
     }
@@ -68,8 +91,8 @@ class ScreenshotAssistService : Service() {
     private fun foregroundNotification() =
         NotificationCompat.Builder(this, SCREENSHOT_ASSIST_CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_menu_upload)
-            .setContentTitle("截图助手已开启")
-            .setContentText("检测到新截图后会通知你是否交给拾刻。")
+            .setContentTitle("拾刻截图提醒运行中")
+            .setContentText("只在本机检测新截图，不会自动上传图片")
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .setOngoing(true)
             .build()

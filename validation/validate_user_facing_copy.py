@@ -107,11 +107,13 @@ def main() -> int:
             and "ShikeMainSection.Debug" not in bottom_nav,
         ),
         (
-            "settings_names_local_multimodal_boundary",
-            "云端图片理解" in readiness_sections
+            "settings_names_product_privacy_boundary",
+            "图片识别" in readiness_sections
+            and "文字解析" in readiness_sections
+            and "截图提醒" in readiness_sections
+            and "高级诊断" in readiness_sections
             and "仅保存待确认草稿" in local_multimodal
             and "图片不会上传" in local_multimodal
-            and "不打包端侧模型" in local_multimodal,
         ),
     ]
 

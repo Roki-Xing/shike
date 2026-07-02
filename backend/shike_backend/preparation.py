@@ -9,6 +9,9 @@ from typing import Any
 _SEPARATORS_RE = re.compile(r"[、/和及与]")
 _STOP_CHARS_RE = re.compile(r"[，,。；;\n]")
 _ENGINEERING_TOKENS = ("schema_valid", "manual_review", "provider", "/v1/analyze", "/v2/analyze-image")
+_SCREENSHOT_CHROME_RE = re.compile(
+    r"\s+(?:Aa|标题|未分类|截图编辑|撤销|完成|[<>中]|AI|\d{1,2}:\d{2}|\d{4}(?:[/-]\d{1,2}){0,2}|\d+(?:\.\d+)?\s*KB(?:/s)?)\b.*$"
+)
 
 
 def preparation_items_from_text(text: str) -> list[str]:
@@ -108,9 +111,9 @@ def enrich_preparation_payload(payload: dict[str, Any], evidence_texts: list[str
         Copy of `payload` with `preparation_items` and `checklist_items`.
     """
 
-    existing_items = _strings(payload.get("preparation_items"))
-    checklist_items = _checklist_texts(payload.get("checklist_items"))
-    source_text = "\n".join([*_payload_texts(payload), *evidence_texts])
+    existing_items = _clean_items(_strings(payload.get("preparation_items")))
+    checklist_items = _clean_items(_checklist_texts(payload.get("checklist_items")))
+    source_text = "\n".join(evidence_texts)
     extracted_items = preparation_items_from_text(source_text)
     items = _distinct([*existing_items, *checklist_items, *extracted_items])
     if not items:
@@ -153,6 +156,7 @@ def _object_before(text: str, index: int) -> str:
 
 def _clean_item(value: str) -> str | None:
     cleaned = _STOP_CHARS_RE.sub("", value).strip().strip("：:。，,；;")
+    cleaned = _SCREENSHOT_CHROME_RE.sub("", cleaned).strip()
     cleaned = cleaned.removesuffix("带上").strip()
     while re.search(r"\s*(标题|未分类|AI)\s*$", cleaned):
         cleaned = re.sub(r"\s*(标题|未分类|AI)\s*$", "", cleaned).strip()
@@ -165,6 +169,15 @@ def _clean_item(value: str) -> str | None:
     if any(token in lower for token in _ENGINEERING_TOKENS):
         return None
     return cleaned
+
+
+def _clean_items(items: list[str]) -> list[str]:
+    result: list[str] = []
+    for item in items:
+        cleaned = _clean_item(item)
+        if cleaned and cleaned not in result:
+            result.append(cleaned)
+    return result
 
 
 def _occurrence_index(text: str, item: str) -> int:

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="cn.shike.app.data.InitialSelectionMapperTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-06-23T01:49:06" hostname="LAPTOP-B84BKQGP" time="0.002">
+<testsuite name="cn.shike.app.data.InitialSelectionMapperTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-06-24T01:57:26" hostname="LAPTOP-B84BKQGP" time="0.001">
   <properties/>
   <testcase name="buildRuntimeSharedTextSelection_mapsNewIntentTextToReadyDraft" classname="cn.shike.app.data.InitialSelectionMapperTest" time="0.001"/>
   <testcase name="buildInitialSelection_sharedTextWinsOverSavedSnapshot" classname="cn.shike.app.data.InitialSelectionMapperTest" time="0.0"/>
   <testcase name="buildRuntimeSharedTextSelection_ignoresBlankText" classname="cn.shike.app.data.InitialSelectionMapperTest" time="0.0"/>
   <testcase name="buildInitialSelection_savedSnapshotRestoresReadyState" classname="cn.shike.app.data.InitialSelectionMapperTest" time="0.0"/>
-  <testcase name="initialSelectionMapper_usesUserFacingHomeCopy" classname="cn.shike.app.data.InitialSelectionMapperTest" time="0.001"/>
+  <testcase name="initialSelectionMapper_usesUserFacingHomeCopy" classname="cn.shike.app.data.InitialSelectionMapperTest" time="0.0"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

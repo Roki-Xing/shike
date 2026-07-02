@@ -60,9 +60,9 @@ class ExecutionActionGateTest {
     fun executionActionButtonLabelsFor_usesGuideActionCopyAfterConfirmation() {
         val labels = executionActionButtonLabelsFor(sampleCourse(), isConfirmed = true)
 
-        assertEquals("打开日历", labels.calendar)
+        assertEquals("打开日历草稿", labels.calendar)
         assertEquals("设置提醒", labels.reminder)
-        assertEquals("查看路线", labels.map)
+        assertEquals("复制地点", labels.map)
     }
 
     @Test
@@ -95,8 +95,8 @@ class ExecutionActionGateTest {
             ),
         )
 
-        assertEquals("打开日历", labels.calendar)
+        assertEquals("打开日历草稿", labels.calendar)
         assertEquals("去开启通知", labels.reminder)
-        assertEquals("查看路线", labels.map)
+        assertEquals("复制地点", labels.map)
     }
 }

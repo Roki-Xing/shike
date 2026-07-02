@@ -83,11 +83,16 @@ fun HomeActionScreen(
         pendingScreenshotCandidate = pendingScreenshotCandidate,
         visibleScreenCapturePrompt = visibleScreenCapturePrompt,
     )
-    QuickImportBar(
-        onGallery = onGallery,
-        onCamera = onCamera,
-        onManualInput = onManualInput,
-    )
+    val productHomeState = productHomeStateFor(selected, todayAgendaState)
+    if (productHomeState == ProductHomeState.Empty && flowState == ImportFlowState.Idle) {
+        ProductHomeHero(
+            onGallery = onGallery,
+            onCamera = onCamera,
+            onManualInput = onManualInput,
+        )
+    } else {
+        ProductHomeMiniHeader(selected, todayAgendaState)
+    }
     when (flowState) {
         ImportFlowState.Idle -> FocusedHomeCard(
             title = "今天还没有待处理截图",
@@ -106,8 +111,8 @@ fun HomeActionScreen(
             onDismissVisibleScreenCapture = onDismissVisibleScreenCapture,
         )
         ImportFlowState.Analyzing -> FocusedHomeCard(
-            title = "正在解析截图",
-            body = "完成后会生成可确认的行动卡。",
+            title = "正在把截图变成行动卡",
+            body = "读取截图文字、找时间地点，再生成待确认的行动卡。",
             primaryLabel = "查看导入",
             secondaryLabel = "手动输入",
             onPrimary = onGallery,
@@ -115,13 +120,22 @@ fun HomeActionScreen(
         )
         ImportFlowState.Reviewing, ImportFlowState.Planning -> FocusedActionReviewCard(
             item = selected,
+            titlePrefix = "今天要处理",
             onPrimary = onOpenCurrentAction,
         )
-        ImportFlowState.Completed -> FocusedActionReviewCard(
-            item = selected,
-            primaryLabel = "查看安排",
-            onPrimary = onOpenCurrentAction,
-        )
+        ImportFlowState.Completed -> {
+            TodayFocusCard(
+                selected = selected,
+                todayAgendaState = todayAgendaState,
+                onOpenCurrentAction = onOpenCurrentAction,
+            )
+            FocusedActionReviewCard(
+                item = selected,
+                titlePrefix = "今晚要做",
+                primaryLabel = "查看下一步",
+                onPrimary = onOpenCurrentAction,
+            )
+        }
     }
     if (showScreenshotAssistGuide) {
         ScreenshotAssistGuideDialog(

@@ -20,7 +20,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cn.shike.app.domain.ShikeItem
-import cn.shike.app.domain.preparationItemsFrom
 
 @Composable
 fun QuickImportBar(
@@ -36,14 +35,14 @@ fun QuickImportBar(
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
     ) {
         Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text("导入新截图", color = ShikeColors.Ink, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            Text("把截图变成行动卡", color = ShikeColors.Ink, fontSize = 18.sp, fontWeight = FontWeight.Bold)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
                 Button(
                     onClick = onGallery,
                     modifier = Modifier.weight(1.2f),
                     colors = ButtonDefaults.buttonColors(containerColor = ShikeColors.Brand),
                 ) { Text("导入截图") }
-                OutlinedButton(onClick = onCamera, modifier = Modifier.weight(1f)) { Text("拍照识别") }
+                OutlinedButton(onClick = onCamera, modifier = Modifier.weight(1f)) { Text("拍照") }
                 OutlinedButton(onClick = onManualInput, modifier = Modifier.weight(1f)) { Text("手动输入") }
             }
         }
@@ -84,10 +83,12 @@ fun FocusedHomeCard(
 @Composable
 fun FocusedActionReviewCard(
     item: ShikeItem,
+    titlePrefix: String = "今天要处理",
     primaryLabel: String = "确认并安排",
     onPrimary: () -> Unit,
 ) {
-    val preparation = preparationItemsFrom(item)
+    val preparation = preparationItemsForUi(item)
+    val readiness = actionReadinessUiModelFrom(item)
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -96,17 +97,24 @@ fun FocusedActionReviewCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
     ) {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                Pill(titlePrefix, ShikeColors.BrandSoft, ShikeColors.Brand, modifier = Modifier.weight(1f))
+                Pill("准备度 ${readiness.completed}/${readiness.total}", ShikeColors.WarningSoft, ShikeColors.Warning, modifier = Modifier.weight(1f))
+            }
             Text(item.title, color = ShikeColors.Ink, fontSize = 21.sp, fontWeight = FontWeight.Bold)
+            ActionReadinessBar(readiness, compact = true)
             Text(
-                listOf(item.time, item.location)
-                    .filter { it.isNotBlank() && it != "待确认" }
-                    .joinToString(" · ")
-                    .ifBlank { "时间地点待确认" },
+                smartActionCardUiModelFrom(item).let { model ->
+                    listOf(model.time.value, model.location.value)
+                        .filter { it.isNotBlank() && it != "待确认" }
+                        .joinToString(" · ")
+                        .ifBlank { "时间地点待确认" }
+                },
                 style = ShikeTypography.Body,
             )
             if (preparation.isNotEmpty()) {
                 Text(
-                    "准备：${preparation.joinToString("、")}",
+                    "课前包：${preparation.joinToString("、")}",
                     color = ShikeColors.Warning,
                     fontSize = 13.sp,
                     fontWeight = FontWeight.SemiBold,

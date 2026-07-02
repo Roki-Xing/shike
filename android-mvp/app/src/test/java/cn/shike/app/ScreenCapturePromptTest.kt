@@ -14,6 +14,8 @@ class ScreenCapturePromptTest {
         assertEquals("检测到当前页面截图", prompt.title)
         assertTrue(prompt.body.contains("不会直接获得图片"))
         assertTrue(prompt.body.contains("导入页选择这张截图"))
+        assertTrue(prompt.body.contains("尚未上传"))
+        assertTrue(prompt.body.contains("Photo Picker"))
         assertTrue(prompt.secondaryActionLabel.contains("移入回收站"))
         assertFalse(prompt.body.contains("后台监听"))
         assertFalse(prompt.body.contains("全局监听"))

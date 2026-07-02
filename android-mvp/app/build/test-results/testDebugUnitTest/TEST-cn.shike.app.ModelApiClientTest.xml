@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="cn.shike.app.ModelApiClientTest" tests="10" skipped="0" failures="0" errors="0" timestamp="2026-06-23T01:49:06" hostname="LAPTOP-B84BKQGP" time="0.019">
+<testsuite name="cn.shike.app.ModelApiClientTest" tests="10" skipped="0" failures="0" errors="0" timestamp="2026-06-24T01:57:26" hostname="LAPTOP-B84BKQGP" time="0.017">
   <properties/>
-  <testcase name="itemFromAnalyzeJson_unknownSceneFallsBackToPendingLabel" classname="cn.shike.app.ModelApiClientTest" time="0.013"/>
-  <testcase name="buildAnalyzeRequestPayload_keepsBackendContractFields" classname="cn.shike.app.ModelApiClientTest" time="0.001"/>
+  <testcase name="itemFromAnalyzeJson_unknownSceneFallsBackToPendingLabel" classname="cn.shike.app.ModelApiClientTest" time="0.012"/>
+  <testcase name="buildAnalyzeRequestPayload_keepsBackendContractFields" classname="cn.shike.app.ModelApiClientTest" time="0.0"/>
   <testcase name="itemFromAnalyzeJson_courseNoticeCombinesTimeLocationAndActions" classname="cn.shike.app.ModelApiClientTest" time="0.0"/>
-  <testcase name="buildAnalyzeRequestPayload_mapsExtendedSceneHints" classname="cn.shike.app.ModelApiClientTest" time="0.0"/>
-  <testcase name="itemFromAnalyzeImageJson_normalizesChineseRelativeStartTextWhenNormalizedStartMissing" classname="cn.shike.app.ModelApiClientTest" time="0.004"/>
+  <testcase name="buildAnalyzeRequestPayload_mapsExtendedSceneHints" classname="cn.shike.app.ModelApiClientTest" time="0.001"/>
+  <testcase name="itemFromAnalyzeImageJson_normalizesChineseRelativeStartTextWhenNormalizedStartMissing" classname="cn.shike.app.ModelApiClientTest" time="0.002"/>
   <testcase name="actionsFromJson_ignoresBlankAndMalformedActions" classname="cn.shike.app.ModelApiClientTest" time="0.0"/>
   <testcase name="normalizeBackendUrl_stripsPathQueryAndFragment" classname="cn.shike.app.ModelApiClientTest" time="0.001"/>
   <testcase name="itemFromAnalyzeJson_usesNormalizedStartInsteadOfSampleEpoch" classname="cn.shike.app.ModelApiClientTest" time="0.0"/>
   <testcase name="itemFromAnalyzeJson_eventPosterUsesPendingEpochForBlankFields" classname="cn.shike.app.ModelApiClientTest" time="0.0"/>
-  <testcase name="buildAnalyzeRequestPayload_acceptsShareTextAndManualSourceTypes" classname="cn.shike.app.ModelApiClientTest" time="0.0"/>
+  <testcase name="buildAnalyzeRequestPayload_acceptsShareTextAndManualSourceTypes" classname="cn.shike.app.ModelApiClientTest" time="0.001"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

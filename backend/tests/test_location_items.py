@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import ast
 import unittest
 from unittest.mock import patch
 
@@ -73,6 +74,7 @@ class LocationItemsTest(unittest.TestCase):
         self.assertEqual("303", extract_location_from_text("今天晚上七点上高数A 地点是303"))
         self.assertEqual("303", extract_location_from_text("今天晚上七点上高数A 教室是303"))
         self.assertEqual("B地点303", extract_location_from_text("晚上九点上 高数 B地点在303"))
+        self.assertEqual("E306", extract_location_from_text("明天晚上七点半上英语课，地点是E306，记得带书"))
 
     def test_location_enrichment_prefers_more_specific_ocr_evidence(self) -> None:
         payload = {
@@ -120,6 +122,32 @@ class LocationItemsTest(unittest.TestCase):
         self.assertTrue(any(action["type"] == "map" for action in payload["suggested_actions"]))
         self.assertNotIn("location", payload["missing_fields"])
 
+    def test_v1_analyze_normalizes_location_marker_before_room_code(self) -> None:
+        env = {
+            "SHIKE_BACKEND_ENV_FILE": "/dev/null",
+            "SHIKE_RUNTIME_MODE": "release_user",
+            "SHIKE_MODEL_PROVIDER": "mock",
+            "SHIKE_ALLOW_MOCK_FALLBACK": "true",
+        }
+        with patch.dict(os.environ, env, clear=True):
+            reset_backend_singletons()
+            response = TestClient(app).post(
+                "/v1/analyze",
+                json={
+                    "input_id": "location-e306-v1",
+                    "source_type": "manual",
+                    "ocr_text": "明天晚上七点半上英语课，地点是E306，记得带书",
+                    "scene_hint": "course_notice",
+                    "user_timezone": "Asia/Shanghai",
+                },
+            )
+
+        self.assertEqual(200, response.status_code)
+        payload = response.json()
+        self.assertEqual("E306", payload["location"]["raw"])
+        self.assertEqual("E306", payload["location"]["map_query"])
+        self.assertEqual(["带书"], payload["preparation_items"])
+
     def test_v2_image_result_repairs_location_from_ocr_hint(self) -> None:
         env = {
             "SHIKE_BACKEND_ENV_FILE": "/dev/null",
@@ -153,6 +181,73 @@ class LocationItemsTest(unittest.TestCase):
         self.assertTrue(any(action["type"] == "map" for action in payload["suggested_actions"]))
         self.assertNotIn("location", payload["missing_fields"])
         self.assertTrue(all(action["disabled_reason"] == "用户确认前不可执行" for action in payload["suggested_actions"]))
+
+    def test_v2_without_image_uses_ocr_hint_text_fallback(self) -> None:
+        env = {
+            "SHIKE_BACKEND_ENV_FILE": "/dev/null",
+            "SHIKE_RUNTIME_MODE": "release_user",
+            "SHIKE_MODEL_PROVIDER": "mock",
+            "SHIKE_ALLOW_MOCK_FALLBACK": "true",
+        }
+        with patch.dict(os.environ, env, clear=True):
+            reset_backend_singletons()
+            response = TestClient(app).post(
+                "/v2/analyze-image",
+                json={
+                    "input_id": "location-303-v2-no-image",
+                    "source_type": "recent_screenshot_assist",
+                    "image": None,
+                    "ocr_text_hint": "晚上九点上 高数 B地点在303",
+                    "ocr_blocks": [],
+                    "current_date": "2026-06-13",
+                    "user_timezone": "Asia/Shanghai",
+                    "locale": "zh-CN",
+                    "scene_hint": "course_notice",
+                    "allow_cloud_image": True,
+                },
+            )
+
+        self.assertEqual(200, response.status_code)
+        payload = response.json()
+        self.assertEqual("course_notice", payload["scene_type"])
+        self.assertIn("高数", payload["title"])
+        self.assertEqual("晚上九点", payload["time"]["start_text"])
+        self.assertEqual("2026-06-13T21:00:00+08:00", payload["time"]["normalized_start"])
+        self.assertEqual("B地点303", payload["location"]["raw"])
+        self.assertNotIn("manual_review", payload["missing_fields"])
+        self.assertTrue(all(action["disabled_reason"] == "用户确认前不可执行" for action in payload["suggested_actions"]))
+
+    def test_v2_without_image_audit_provider_is_text_fallback(self) -> None:
+        env = {
+            "SHIKE_BACKEND_ENV_FILE": "/dev/null",
+            "SHIKE_RUNTIME_MODE": "release_user",
+            "SHIKE_MODEL_PROVIDER": "mock",
+            "SHIKE_ALLOW_MOCK_FALLBACK": "true",
+        }
+        with patch.dict(os.environ, env, clear=True), self.assertLogs("shike_backend.audit", level="INFO") as logs:
+            reset_backend_singletons()
+            response = TestClient(app).post(
+                "/v2/analyze-image",
+                json={
+                    "input_id": "location-303-v2-no-image-audit",
+                    "source_type": "recent_screenshot_assist",
+                    "image": None,
+                    "ocr_text_hint": "晚上九点上 高数 B地点在303",
+                    "ocr_blocks": [],
+                    "current_date": "2026-06-13",
+                    "user_timezone": "Asia/Shanghai",
+                    "locale": "zh-CN",
+                    "scene_hint": "course_notice",
+                    "allow_cloud_image": True,
+                },
+            )
+
+        self.assertEqual(200, response.status_code)
+        audit_line = next(line for line in logs.output if "analyze_image_audit" in line)
+        event = ast.literal_eval(audit_line.split("analyze_image_audit ", 1)[1])
+        self.assertEqual("ocr_hint_text_fallback", event["provider"])
+        self.assertEqual("text_fallback_schema_valid", event["status"])
+        self.assertFalse(event["key_present"])
 
 
 if __name__ == "__main__":

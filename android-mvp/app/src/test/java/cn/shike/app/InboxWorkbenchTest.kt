@@ -17,7 +17,7 @@ class InboxWorkbenchTest {
     @Test
     fun selectedInboxStatusFor_unsupportedStatusFallsBackToPendingReview() {
         assertEquals("待确认", selectedInboxStatusFor("草稿"))
-        assertEquals("即将截止", selectedInboxStatusFor("即将截止"))
+        assertEquals("今天", selectedInboxStatusFor("今天"))
         assertEquals(inboxAllStatusFilter, selectedInboxStatusFor(inboxAllStatusFilter))
     }
 
@@ -89,7 +89,7 @@ class InboxWorkbenchTest {
             archivedKeys = emptySet(),
         )
 
-        assertEquals(listOf(due, pending, scheduledEarly, scheduledLate), visible)
+        assertEquals(listOf(pending, due, scheduledEarly, scheduledLate), visible)
     }
 
     @Test
@@ -97,13 +97,14 @@ class InboxWorkbenchTest {
         val pending = inboxWorkbenchEntryFrom(sampleCourse().copy(status = "待确认"), "截图", emptyList())
         val scheduled = inboxWorkbenchEntryFrom(sampleCourse().copy(title = "早课", status = "已安排"), "相册", emptyList())
         val due = inboxWorkbenchEntryFrom(sampleCourse().copy(title = "报名截止", status = "即将截止"), "分享", emptyList())
-        val done = inboxWorkbenchEntryFrom(sampleCourse().copy(title = "已完成", status = "已完成"), "分享", emptyList())
+        val expired = inboxWorkbenchEntryFrom(sampleCourse().copy(title = "已过期事项", status = "已过期"), "分享", emptyList())
 
-        val stats = inboxSummaryStatsFor(listOf(pending, scheduled, due, done))
+        val stats = inboxSummaryStatsFor(listOf(pending, scheduled, due, expired))
 
         assertEquals("1", stats.first { it.label == "待确认" }.count)
         assertEquals("1", stats.first { it.label == "已安排" }.count)
-        assertEquals("1", stats.first { it.label == "即将截止" }.count)
+        assertEquals("1", stats.first { it.label == "今天" }.count)
+        assertEquals("1", stats.first { it.label == "已过期" }.count)
     }
 
     @Test

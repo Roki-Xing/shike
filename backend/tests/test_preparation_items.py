@@ -12,7 +12,7 @@ import shike_backend.main as main_module
 import shike_backend.settings as settings_module
 from shike_backend.adapters.base import AdapterError
 from shike_backend.main import app
-from shike_backend.preparation import preparation_items_from_text
+from shike_backend.preparation import enrich_preparation_payload, preparation_items_from_text
 
 
 def reset_backend_singletons() -> None:
@@ -48,6 +48,27 @@ class PreparationItemsTest(unittest.TestCase):
         text = "今天晚上七点需要上高数A 教室是B336 要考试记得带准考证"
 
         self.assertEqual(["带准考证"], preparation_items_from_text(text))
+
+    def test_preparation_parser_ignores_screenshot_chrome_after_item(self) -> None:
+        text = "明天晚上七点半上英语课，地点是E306，记得带书 Aa 17:01 中 < 标题 2026"
+
+        self.assertEqual(["带书"], preparation_items_from_text(text))
+
+    def test_preparation_enrichment_only_extracts_new_items_from_evidence(self) -> None:
+        payload = {
+            "title": "英语口语课，记得带标题 2026",
+            "explanation": "模型说明：提醒用户带书，但 OCR 证据没有准备事项。",
+            "task": {"summary": "明天晚上七点半上英语课", "priority": "medium", "topic": "course"},
+            "suggested_actions": [
+                {"type": "reminder", "label": "课前提醒：带书", "requires_permission": True},
+            ],
+            "preparation_items": [],
+            "checklist_items": [],
+        }
+
+        enriched = enrich_preparation_payload(payload, ["明天晚上七点半上英语课，地点是E306"])
+
+        self.assertIs(enriched, payload)
 
     def test_v1_analyze_returns_preparation_items_for_exam_text(self) -> None:
         env = {

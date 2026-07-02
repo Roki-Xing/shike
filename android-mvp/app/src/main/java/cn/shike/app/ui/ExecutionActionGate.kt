@@ -28,7 +28,7 @@ data class ExecutionActionButtonLabels(
  *     Gate flags shared by the confirmation banner and action planner.
  */
 fun executionActionGateFor(item: ShikeItem, isConfirmed: Boolean): ExecutionActionGate {
-    val missingTime = item.time.isBlank() || item.time == "待确认" || item.startEpochMillis <= 0L
+    val missingTime = item.time.isBlank() || item.time == "待确认" || item.startEpochMillis <= 0L || isAmbiguousTimeText(item.time)
     val missingLocation = item.location.isBlank() || item.location == "待确认"
     return ExecutionActionGate(
         missingTime = missingTime,
@@ -63,13 +63,22 @@ fun executionActionButtonLabelsFor(
         )
     }
     return ExecutionActionButtonLabels(
-        calendar = if (gate.missingTime) "补充时间后可用" else "打开日历",
+        calendar = when {
+            gate.missingTime && isAmbiguousTimeText(item.time) -> "确认时间"
+            gate.missingTime -> "补充时间后可用"
+            else -> "打开日历草稿"
+        },
         reminder = when {
+            gate.missingTime && isAmbiguousTimeText(item.time) -> "确认时间"
             gate.missingTime -> "补充时间后可用"
             executionResults.hasReminderPermissionBlocked() -> "去开启通知"
             else -> "设置提醒"
         },
-        map = if (gate.missingLocation) "补充地点后可用" else "查看路线",
+        map = when {
+            gate.missingLocation -> "补充地点后可用"
+            isCampusRoomCode(item.location) -> "复制地点"
+            else -> "查看路线"
+        },
     )
 }
 

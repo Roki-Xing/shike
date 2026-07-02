@@ -45,7 +45,7 @@ fun BottomNavBar(
         ) {
             BottomNavItem("首页", "⌂", selectedSection == ShikeMainSection.Home, Modifier.clickable { onSelected(ShikeMainSection.Home) })
             CenterImportButton(onImportClick)
-            BottomNavItem("收件箱", "箱", selectedSection == ShikeMainSection.Inbox, Modifier.clickable { onSelected(ShikeMainSection.Inbox) })
+            BottomNavItem("行动台", "卡", selectedSection == ShikeMainSection.Inbox, Modifier.clickable { onSelected(ShikeMainSection.Inbox) })
             BottomNavItem("设置", "设", selectedSection == ShikeMainSection.Settings, Modifier.clickable { onSelected(ShikeMainSection.Settings) })
         }
     }
@@ -85,7 +85,7 @@ fun ImportActionSheet(
                 colors = ButtonDefaults.buttonColors(containerColor = ShikeColors.Brand),
             ) { Text("从截图导入") }
             OutlinedButton(onClick = onCamera, modifier = Modifier.fillMaxWidth()) {
-                Text("拍照识别")
+                Text("拍照")
             }
             OutlinedButton(onClick = onManualInput, modifier = Modifier.fillMaxWidth()) {
                 Text("手动输入")
